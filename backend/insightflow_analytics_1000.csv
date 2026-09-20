@@ -1,0 +1,1001 @@
+﻿customer_id,customer_name,channel,device,session_duration_sec,pages_viewed,orders_count,total_revenue,converted
+CUST-0001,Prasert Suksom,Email Mkt,Desktop,126,3,0,0.0,No
+CUST-0002,Anan Jaroensuk,Social Ads,Desktop,173,4,0,0.0,No
+CUST-0003,Prapai Kiatnarong,Email Mkt,Desktop,478,8,0,0.0,No
+CUST-0004,Somchai Saetang,Email Mkt,Desktop,125,3,0,0.0,No
+CUST-0005,Robert Petchcharat,Social Ads,Desktop,144,5,0,0.0,No
+CUST-0006,Robert Chaiwong,Social Ads,iOS App,471,10,0,0.0,No
+CUST-0007,Kittipong Rattanakul,Email Mkt,iOS App,79,2,0,0.0,No
+CUST-0008,Jirayu Kiatnarong,Affiliate,Desktop,245,6,0,0.0,No
+CUST-0009,Kittipong Nantakong,Social Ads,Mobile Web,154,4,0,0.0,No
+CUST-0010,Malee Brown,Affiliate,iOS App,113,4,0,0.0,No
+CUST-0011,Kittipong Wongsuwan,Affiliate,Mobile Web,498,12,0,0.0,No
+CUST-0012,Pongsak Kiatnarong,Social Ads,Desktop,259,4,0,0.0,No
+CUST-0013,Patchara Jaroensuk,Social Ads,Desktop,192,3,0,0.0,No
+CUST-0014,Nattapong Petchcharat,Google Search,Desktop,560,11,1,4485.84,Yes
+CUST-0015,John Ruangrit,Affiliate,Desktop,372,12,0,0.0,No
+CUST-0016,Alex Kiatnarong,Social Ads,Desktop,152,3,0,0.0,No
+CUST-0017,John Vongpradit,Email Mkt,Mobile Web,144,2,0,0.0,No
+CUST-0018,Prapai Boonma,Social Ads,Desktop,694,13,0,0.0,No
+CUST-0019,Worawat Suksom,Google Search,Desktop,566,14,2,8612.73,Yes
+CUST-0020,Anan Thanasuk,Affiliate,Android App,265,9,0,0.0,No
+CUST-0021,Kanya Johnson,Social Ads,Mobile Web,265,4,0,0.0,No
+CUST-0022,Michael Davis,Direct,Mobile Web,457,8,1,2084.01,Yes
+CUST-0023,Malee Jaroensuk,Google Search,Desktop,272,11,1,2056.06,Yes
+CUST-0024,Sunee Johnson,Email Mkt,Desktop,209,3,0,0.0,No
+CUST-0025,Nutthida Wilson,Google Search,Desktop,326,7,0,0.0,No
+CUST-0026,Nattapong Kiatnarong,Direct,Desktop,298,7,0,0.0,No
+CUST-0027,Prapai Ruangrit,Social Ads,Desktop,265,5,0,0.0,No
+CUST-0028,Kittipong Taylor,Affiliate,iOS App,92,2,0,0.0,No
+CUST-0029,Somchai Chaiwong,Direct,iOS App,174,3,0,0.0,No
+CUST-0030,Pongsak Rattanakul,Google Search,Desktop,286,7,0,0.0,No
+CUST-0031,Worawat Boonma,Google Search,Desktop,96,1,1,1033.02,Yes
+CUST-0032,Nutthida Vongpradit,Affiliate,Mobile Web,62,1,0,0.0,No
+CUST-0033,Kittipong Nantakong,Google Search,iOS App,230,7,0,0.0,No
+CUST-0034,Wichai Nantakong,Google Search,Mobile Web,555,10,0,0.0,No
+CUST-0035,Rattana Brown,Google Search,Desktop,463,11,0,0.0,No
+CUST-0036,Kittipong Suksom,Social Ads,Android App,87,2,0,0.0,No
+CUST-0037,John Boonma,Direct,iOS App,553,15,0,0.0,No
+CUST-0038,Apinya Ruangrit,Email Mkt,Mobile Web,694,13,0,0.0,No
+CUST-0039,Michael Petchcharat,Direct,Desktop,92,2,0,0.0,No
+CUST-0040,David Nantakong,Google Search,Desktop,681,11,0,0.0,No
+CUST-0041,John Rattanakul,Google Search,Desktop,115,5,0,0.0,No
+CUST-0042,Siriporn Kiatnarong,Direct,Desktop,490,8,0,0.0,No
+CUST-0043,Somchai Petchcharat,Google Search,iOS App,474,15,1,2866.72,Yes
+CUST-0044,Patchara Boonma,Google Search,Desktop,357,15,0,0.0,No
+CUST-0045,Sunee Petchcharat,Social Ads,Mobile Web,688,14,0,0.0,No
+CUST-0046,Sunee Saetang,Direct,iOS App,696,15,0,0.0,No
+CUST-0047,Emily Wilson,Affiliate,iOS App,477,13,2,4492.55,Yes
+CUST-0048,Wichai Thanasuk,Google Search,iOS App,360,8,0,0.0,No
+CUST-0049,Malee Smith,Google Search,Desktop,231,6,0,0.0,No
+CUST-0050,Alex Miller,Social Ads,Desktop,782,14,0,0.0,No
+CUST-0051,Prasert Johnson,Google Search,Android App,121,5,0,0.0,No
+CUST-0052,Jessica Brown,Social Ads,Android App,129,2,0,0.0,No
+CUST-0053,Wichai Wilson,Google Search,Android App,316,9,0,0.0,No
+CUST-0054,Emily Nantakong,Social Ads,iOS App,505,12,0,0.0,No
+CUST-0055,Thanawat Brown,Social Ads,Desktop,127,3,0,0.0,No
+CUST-0056,Robert Saetang,Social Ads,Desktop,204,9,0,0.0,No
+CUST-0057,Patchara Jaroensuk,Social Ads,Desktop,432,8,0,0.0,No
+CUST-0058,Nutthida Saetang,Email Mkt,Desktop,704,11,0,0.0,No
+CUST-0059,Sunee Williams,Google Search,Desktop,42,1,0,0.0,No
+CUST-0060,Kittipong Taylor,Social Ads,Mobile Web,212,4,0,0.0,No
+CUST-0061,Supaporn Kiatnarong,Email Mkt,iOS App,396,14,0,0.0,No
+CUST-0062,Jirayu Rattanakul,Social Ads,Android App,111,2,0,0.0,No
+CUST-0063,Sarah Taylor,Social Ads,Mobile Web,463,9,0,0.0,No
+CUST-0064,Kanya Thanasuk,Social Ads,iOS App,862,14,0,0.0,No
+CUST-0065,Worawat Kiatnarong,Google Search,Desktop,476,12,0,0.0,No
+CUST-0066,Sarah Ruangrit,Google Search,Desktop,253,7,0,0.0,No
+CUST-0067,Thanawat Wilson,Social Ads,Mobile Web,64,1,0,0.0,No
+CUST-0068,Somsak Jaroensuk,Social Ads,Desktop,263,6,0,0.0,No
+CUST-0069,Thanawat Ruangrit,Email Mkt,Mobile Web,376,10,0,0.0,No
+CUST-0070,Patchara Thanasuk,Google Search,Desktop,510,11,0,0.0,No
+CUST-0071,Siriporn Nantakong,Social Ads,Android App,607,10,1,1345.3,Yes
+CUST-0072,Jirayu Saetang,Google Search,Desktop,221,4,0,0.0,No
+CUST-0073,Robert Johnson,Email Mkt,iOS App,160,5,1,4499.66,Yes
+CUST-0074,Jessica Smith,Email Mkt,iOS App,248,11,0,0.0,No
+CUST-0075,Prapai Suksom,Social Ads,Desktop,257,8,0,0.0,No
+CUST-0076,Jirayu Johnson,Email Mkt,Desktop,285,10,0,0.0,No
+CUST-0077,Chaiwat Jaroensuk,Google Search,Desktop,514,11,0,0.0,No
+CUST-0078,Prapai Chaiwong,Social Ads,iOS App,153,4,0,0.0,No
+CUST-0079,Prasert Jaroensuk,Email Mkt,Desktop,310,7,0,0.0,No
+CUST-0080,Emily Suksom,Affiliate,iOS App,122,2,0,0.0,No
+CUST-0081,Jirayu Boonma,Social Ads,Mobile Web,451,11,0,0.0,No
+CUST-0082,Nutthida Taylor,Social Ads,Mobile Web,220,5,0,0.0,No
+CUST-0083,Anan Johnson,Affiliate,Desktop,492,8,0,0.0,No
+CUST-0084,Emily Suksom,Social Ads,Desktop,291,8,0,0.0,No
+CUST-0085,Emily Johnson,Affiliate,Mobile Web,280,5,0,0.0,No
+CUST-0086,Prapai Chaiwong,Google Search,Desktop,364,9,0,0.0,No
+CUST-0087,Worawat Taylor,Email Mkt,Desktop,229,4,0,0.0,No
+CUST-0088,James Thanasuk,Social Ads,Desktop,686,12,0,0.0,No
+CUST-0089,Jirayu Johnson,Social Ads,Desktop,409,12,1,3631.99,Yes
+CUST-0090,Waraporn Wongsuwan,Google Search,Mobile Web,722,12,0,0.0,No
+CUST-0091,Chaiwat Wongsuwan,Google Search,Desktop,150,5,0,0.0,No
+CUST-0092,Alex Rattanakul,Direct,Mobile Web,381,12,0,0.0,No
+CUST-0093,Worawat Petchcharat,Affiliate,Mobile Web,433,8,0,0.0,No
+CUST-0094,Nattapong Johnson,Direct,Mobile Web,366,14,0,0.0,No
+CUST-0095,Nattapong Boonma,Google Search,Mobile Web,145,5,0,0.0,No
+CUST-0096,Thanawat Nantakong,Social Ads,Mobile Web,718,13,0,0.0,No
+CUST-0097,Apinya Williams,Affiliate,Android App,324,5,3,3636.61,Yes
+CUST-0098,Rattana Kiatnarong,Google Search,Mobile Web,121,3,0,0.0,No
+CUST-0099,Kanya Suksom,Social Ads,Mobile Web,311,8,0,0.0,No
+CUST-0100,David Taylor,Google Search,Desktop,342,5,0,0.0,No
+CUST-0101,Prapai Wilson,Google Search,Desktop,125,3,1,1972.78,Yes
+CUST-0102,David Taylor,Google Search,Mobile Web,562,12,0,0.0,No
+CUST-0103,Worawat Taylor,Google Search,Desktop,323,7,0,0.0,No
+CUST-0104,Anan Smith,Direct,iOS App,576,10,0,0.0,No
+CUST-0105,Alex Jaroensuk,Google Search,iOS App,470,8,0,0.0,No
+CUST-0106,Alex Saetang,Direct,Desktop,724,14,0,0.0,No
+CUST-0107,Thanawat Brown,Social Ads,Desktop,154,3,0,0.0,No
+CUST-0108,David Davis,Affiliate,Mobile Web,225,8,0,0.0,No
+CUST-0109,Prasert Davis,Affiliate,iOS App,88,1,0,0.0,No
+CUST-0110,Prapai Vongpradit,Social Ads,iOS App,536,11,0,0.0,No
+CUST-0111,Siriporn Williams,Social Ads,Mobile Web,87,2,0,0.0,No
+CUST-0112,Sunee Saetang,Social Ads,Desktop,194,7,0,0.0,No
+CUST-0113,Prasert Taylor,Direct,Mobile Web,203,3,0,0.0,No
+CUST-0114,Alex Wilson,Affiliate,Android App,236,4,0,0.0,No
+CUST-0115,Prapai Nantakong,Social Ads,iOS App,358,14,0,0.0,No
+CUST-0116,Thanawat Brown,Direct,Mobile Web,303,14,0,0.0,No
+CUST-0117,Worawat Boonma,Social Ads,Mobile Web,369,6,0,0.0,No
+CUST-0118,Sarah Wongsuwan,Direct,Desktop,269,7,2,6848.16,Yes
+CUST-0119,Robert Davis,Direct,iOS App,355,11,0,0.0,No
+CUST-0120,Siriporn Vongpradit,Direct,Desktop,107,2,0,0.0,No
+CUST-0121,Jirayu Suksom,Email Mkt,Desktop,328,11,0,0.0,No
+CUST-0122,John Brown,Social Ads,Desktop,130,2,0,0.0,No
+CUST-0123,Robert Brown,Social Ads,iOS App,439,8,0,0.0,No
+CUST-0124,Sunee Kiatnarong,Email Mkt,Desktop,132,4,0,0.0,No
+CUST-0125,Chaiwat Taylor,Google Search,Desktop,47,1,0,0.0,No
+CUST-0126,David Miller,Social Ads,Desktop,455,9,0,0.0,No
+CUST-0127,Waraporn Saetang,Google Search,Mobile Web,461,7,0,0.0,No
+CUST-0128,Supaporn Smith,Social Ads,Desktop,134,5,0,0.0,No
+CUST-0129,Kanya Chaiwong,Social Ads,Desktop,435,10,0,0.0,No
+CUST-0130,John Taylor,Affiliate,Desktop,361,7,0,0.0,No
+CUST-0131,Jessica Jaroensuk,Google Search,Mobile Web,67,1,2,7381.67,Yes
+CUST-0132,Nattapong Nantakong,Email Mkt,iOS App,589,15,0,0.0,No
+CUST-0133,Jessica Smith,Social Ads,Mobile Web,353,11,1,993.89,Yes
+CUST-0134,Apinya Rattanakul,Social Ads,Mobile Web,101,2,0,0.0,No
+CUST-0135,Waraporn Wongsuwan,Google Search,Mobile Web,355,6,0,0.0,No
+CUST-0136,Kanya Johnson,Affiliate,Android App,520,13,0,0.0,No
+CUST-0137,Jirayu Chaiwong,Google Search,Android App,670,14,0,0.0,No
+CUST-0138,Pongsak Suksom,Google Search,Desktop,258,6,0,0.0,No
+CUST-0139,James Petchcharat,Email Mkt,Mobile Web,575,10,0,0.0,No
+CUST-0140,Malee Kiatnarong,Google Search,iOS App,631,15,0,0.0,No
+CUST-0141,Siriporn Rattanakul,Direct,Desktop,227,8,0,0.0,No
+CUST-0142,Siriporn Davis,Social Ads,Mobile Web,679,12,0,0.0,No
+CUST-0143,Supaporn Wilson,Email Mkt,iOS App,482,10,1,2468.35,Yes
+CUST-0144,Sunee Miller,Google Search,Mobile Web,386,9,0,0.0,No
+CUST-0145,Prapai Petchcharat,Direct,iOS App,112,2,0,0.0,No
+CUST-0146,Somsak Rattanakul,Email Mkt,Desktop,186,3,0,0.0,No
+CUST-0147,Rattana Jaroensuk,Google Search,iOS App,217,6,2,2756.22,Yes
+CUST-0148,Siriporn Ruangrit,Google Search,Desktop,244,11,2,3436.9,Yes
+CUST-0149,Sarah Suksom,Google Search,Desktop,590,12,1,2486.2,Yes
+CUST-0150,James Vongpradit,Social Ads,Mobile Web,243,4,0,0.0,No
+CUST-0151,Michael Taylor,Social Ads,Desktop,392,8,0,0.0,No
+CUST-0152,Worawat Taylor,Google Search,Desktop,299,10,1,2986.58,Yes
+CUST-0153,Sarah Davis,Direct,Mobile Web,459,8,0,0.0,No
+CUST-0154,Prasert Kiatnarong,Email Mkt,iOS App,428,12,0,0.0,No
+CUST-0155,Malee Wilson,Social Ads,Mobile Web,207,7,0,0.0,No
+CUST-0156,John Miller,Direct,Mobile Web,202,8,0,0.0,No
+CUST-0157,Anan Wilson,Google Search,Mobile Web,404,13,3,8700.43,Yes
+CUST-0158,Prasert Wilson,Social Ads,Mobile Web,619,13,0,0.0,No
+CUST-0159,Michael Miller,Google Search,Mobile Web,169,3,0,0.0,No
+CUST-0160,Jessica Ruangrit,Social Ads,iOS App,372,10,0,0.0,No
+CUST-0161,Somsak Nantakong,Direct,iOS App,121,5,0,0.0,No
+CUST-0162,Michael Brown,Social Ads,Desktop,215,3,0,0.0,No
+CUST-0163,Supaporn Kiatnarong,Direct,Desktop,326,9,0,0.0,No
+CUST-0164,Emily Saetang,Social Ads,Mobile Web,771,13,1,1424.55,Yes
+CUST-0165,Nattapong Chaiwong,Google Search,Mobile Web,497,8,0,0.0,No
+CUST-0166,Rattana Vongpradit,Google Search,Desktop,321,5,0,0.0,No
+CUST-0167,Michael Rattanakul,Google Search,Android App,38,1,0,0.0,No
+CUST-0168,Rattana Boonma,Email Mkt,Desktop,76,2,0,0.0,No
+CUST-0169,Waraporn Boonma,Social Ads,Mobile Web,542,9,0,0.0,No
+CUST-0170,Kittipong Davis,Affiliate,Desktop,58,1,0,0.0,No
+CUST-0171,Patchara Jaroensuk,Social Ads,Mobile Web,165,5,1,3774.83,Yes
+CUST-0172,Jirayu Miller,Google Search,iOS App,230,4,0,0.0,No
+CUST-0173,Anan Davis,Affiliate,Mobile Web,179,4,1,2786.71,Yes
+CUST-0174,Prapai Miller,Social Ads,Android App,339,11,1,1483.27,Yes
+CUST-0175,Supaporn Kiatnarong,Google Search,Android App,595,11,0,0.0,No
+CUST-0176,Apinya Jaroensuk,Social Ads,Android App,385,6,0,0.0,No
+CUST-0177,Kittipong Thanasuk,Social Ads,Desktop,293,5,0,0.0,No
+CUST-0178,Kittipong Williams,Social Ads,Desktop,237,6,0,0.0,No
+CUST-0179,Anan Nantakong,Social Ads,Desktop,557,10,0,0.0,No
+CUST-0180,Prapai Brown,Social Ads,Mobile Web,59,1,0,0.0,No
+CUST-0181,Emily Chaiwong,Social Ads,Desktop,225,4,0,0.0,No
+CUST-0182,Kanya Miller,Social Ads,Desktop,335,7,0,0.0,No
+CUST-0183,Emily Chaiwong,Social Ads,Mobile Web,287,7,0,0.0,No
+CUST-0184,Supaporn Brown,Google Search,Mobile Web,654,15,0,0.0,No
+CUST-0185,Pongsak Boonma,Social Ads,Android App,304,5,0,0.0,No
+CUST-0186,Emily Boonma,Email Mkt,iOS App,646,12,0,0.0,No
+CUST-0187,Patchara Vongpradit,Social Ads,Desktop,125,3,0,0.0,No
+CUST-0188,Worawat Wongsuwan,Google Search,Desktop,87,2,0,0.0,No
+CUST-0189,Wichai Brown,Affiliate,Mobile Web,454,10,2,7329.01,Yes
+CUST-0190,Kanya Taylor,Google Search,Desktop,453,12,0,0.0,No
+CUST-0191,Apinya Smith,Social Ads,Desktop,667,13,0,0.0,No
+CUST-0192,Apinya Taylor,Email Mkt,iOS App,508,9,0,0.0,No
+CUST-0193,Prapai Nantakong,Google Search,Desktop,578,11,0,0.0,No
+CUST-0194,Chaiwat Vongpradit,Affiliate,Desktop,412,13,0,0.0,No
+CUST-0195,Supaporn Wilson,Google Search,Android App,699,14,0,0.0,No
+CUST-0196,Thanawat Rattanakul,Social Ads,Desktop,203,7,0,0.0,No
+CUST-0197,Sarah Petchcharat,Affiliate,Mobile Web,390,13,3,7723.38,Yes
+CUST-0198,Siriporn Thanasuk,Social Ads,Desktop,63,2,0,0.0,No
+CUST-0199,Supaporn Ruangrit,Direct,Mobile Web,212,7,0,0.0,No
+CUST-0200,Prasert Rattanakul,Google Search,Mobile Web,499,10,3,9084.29,Yes
+CUST-0201,Somsak Kiatnarong,Social Ads,Desktop,146,3,1,2932.92,Yes
+CUST-0202,Waraporn Chaiwong,Social Ads,Desktop,523,9,0,0.0,No
+CUST-0203,Somsak Davis,Affiliate,Desktop,322,7,0,0.0,No
+CUST-0204,Jessica Chaiwong,Social Ads,Mobile Web,328,11,0,0.0,No
+CUST-0205,Emily Boonma,Google Search,Mobile Web,482,14,0,0.0,No
+CUST-0206,Nutthida Kiatnarong,Google Search,Desktop,595,12,0,0.0,No
+CUST-0207,Wichai Wongsuwan,Affiliate,Desktop,290,5,0,0.0,No
+CUST-0208,Nutthida Johnson,Google Search,Mobile Web,218,5,0,0.0,No
+CUST-0209,Emily Johnson,Google Search,Desktop,708,15,0,0.0,No
+CUST-0210,Robert Brown,Direct,Mobile Web,382,8,0,0.0,No
+CUST-0211,Anan Wilson,Google Search,Mobile Web,473,14,0,0.0,No
+CUST-0212,Chaiwat Chaiwong,Social Ads,Desktop,514,8,0,0.0,No
+CUST-0213,Apinya Miller,Social Ads,Mobile Web,674,15,0,0.0,No
+CUST-0214,Alex Kiatnarong,Direct,Android App,150,2,0,0.0,No
+CUST-0215,Kanya Suksom,Google Search,Mobile Web,631,13,1,3204.84,Yes
+CUST-0216,James Davis,Direct,Desktop,172,3,0,0.0,No
+CUST-0217,Kittipong Jaroensuk,Google Search,Desktop,242,6,0,0.0,No
+CUST-0218,Somsak Saetang,Social Ads,Desktop,264,9,0,0.0,No
+CUST-0219,Apinya Wongsuwan,Direct,Desktop,782,15,2,4999.91,Yes
+CUST-0220,Apinya Chaiwong,Affiliate,Android App,302,6,1,4103.36,Yes
+CUST-0221,Kanya Kiatnarong,Google Search,Desktop,125,4,0,0.0,No
+CUST-0222,Sunee Thanasuk,Google Search,Mobile Web,334,6,0,0.0,No
+CUST-0223,Anan Chaiwong,Social Ads,Android App,638,12,0,0.0,No
+CUST-0224,Thanawat Jaroensuk,Google Search,Android App,297,11,0,0.0,No
+CUST-0225,Jessica Boonma,Affiliate,iOS App,643,11,0,0.0,No
+CUST-0226,Siriporn Wilson,Social Ads,iOS App,416,14,0,0.0,No
+CUST-0227,Kanya Saetang,Social Ads,Mobile Web,341,6,0,0.0,No
+CUST-0228,John Wongsuwan,Social Ads,Mobile Web,204,3,0,0.0,No
+CUST-0229,Anan Vongpradit,Social Ads,Mobile Web,305,10,0,0.0,No
+CUST-0230,Emily Jaroensuk,Google Search,iOS App,90,2,0,0.0,No
+CUST-0231,John Kiatnarong,Google Search,Mobile Web,606,10,0,0.0,No
+CUST-0232,David Kiatnarong,Direct,Mobile Web,609,13,0,0.0,No
+CUST-0233,Nattapong Saetang,Social Ads,Mobile Web,207,4,0,0.0,No
+CUST-0234,Sarah Miller,Direct,Desktop,352,6,0,0.0,No
+CUST-0235,Sunee Taylor,Google Search,Desktop,86,3,0,0.0,No
+CUST-0236,Robert Nantakong,Social Ads,Android App,475,15,0,0.0,No
+CUST-0237,Sarah Wongsuwan,Email Mkt,Mobile Web,477,9,0,0.0,No
+CUST-0238,Worawat Suksom,Google Search,Desktop,298,8,0,0.0,No
+CUST-0239,Nattapong Rattanakul,Google Search,Mobile Web,723,14,0,0.0,No
+CUST-0240,Chaiwat Wilson,Google Search,Desktop,298,6,1,2900.63,Yes
+CUST-0241,James Ruangrit,Google Search,Desktop,462,8,0,0.0,No
+CUST-0242,Prasert Boonma,Direct,Desktop,573,13,0,0.0,No
+CUST-0243,Supaporn Wongsuwan,Social Ads,Desktop,29,1,0,0.0,No
+CUST-0244,Emily Thanasuk,Social Ads,Desktop,793,15,0,0.0,No
+CUST-0245,Sarah Saetang,Social Ads,Mobile Web,588,14,0,0.0,No
+CUST-0246,Worawat Jaroensuk,Google Search,iOS App,294,6,0,0.0,No
+CUST-0247,Thanawat Jaroensuk,Social Ads,iOS App,846,14,0,0.0,No
+CUST-0248,John Kiatnarong,Email Mkt,iOS App,348,10,0,0.0,No
+CUST-0249,Kanya Vongpradit,Social Ads,Mobile Web,630,14,0,0.0,No
+CUST-0250,Sunee Rattanakul,Social Ads,Mobile Web,117,4,0,0.0,No
+CUST-0251,Supaporn Wilson,Email Mkt,Desktop,802,13,0,0.0,No
+CUST-0252,Nattapong Boonma,Social Ads,Mobile Web,588,11,0,0.0,No
+CUST-0253,Waraporn Taylor,Affiliate,Desktop,260,6,0,0.0,No
+CUST-0254,Sunee Johnson,Social Ads,Desktop,240,5,0,0.0,No
+CUST-0255,Worawat Brown,Social Ads,Mobile Web,578,15,1,2235.88,Yes
+CUST-0256,Pongsak Miller,Direct,iOS App,133,5,0,0.0,No
+CUST-0257,Anan Miller,Direct,Mobile Web,618,12,0,0.0,No
+CUST-0258,Alex Ruangrit,Email Mkt,Desktop,590,10,0,0.0,No
+CUST-0259,Malee Kiatnarong,Google Search,Desktop,311,6,0,0.0,No
+CUST-0260,Siriporn Suksom,Direct,Android App,184,3,0,0.0,No
+CUST-0261,Nutthida Thanasuk,Email Mkt,iOS App,223,5,0,0.0,No
+CUST-0262,Anan Kiatnarong,Social Ads,Mobile Web,280,12,0,0.0,No
+CUST-0263,Waraporn Rattanakul,Direct,Desktop,271,8,0,0.0,No
+CUST-0264,Somchai Williams,Social Ads,Desktop,262,6,0,0.0,No
+CUST-0265,Worawat Boonma,Affiliate,Mobile Web,134,4,0,0.0,No
+CUST-0266,Jirayu Kiatnarong,Google Search,Desktop,515,12,0,0.0,No
+CUST-0267,Prapai Saetang,Social Ads,Mobile Web,366,7,0,0.0,No
+CUST-0268,Pongsak Petchcharat,Google Search,Desktop,215,6,0,0.0,No
+CUST-0269,Sunee Taylor,Email Mkt,Android App,326,5,1,3378.61,Yes
+CUST-0270,Nattapong Petchcharat,Social Ads,Desktop,622,11,0,0.0,No
+CUST-0271,Prasert Kiatnarong,Affiliate,Desktop,359,10,0,0.0,No
+CUST-0272,Nutthida Boonma,Social Ads,Android App,325,6,0,0.0,No
+CUST-0273,Nutthida Ruangrit,Affiliate,iOS App,503,13,0,0.0,No
+CUST-0274,Anan Vongpradit,Social Ads,Mobile Web,124,2,0,0.0,No
+CUST-0275,Prapai Jaroensuk,Social Ads,Desktop,775,14,1,2978.49,Yes
+CUST-0276,Anan Vongpradit,Social Ads,Desktop,187,3,0,0.0,No
+CUST-0277,Nattapong Ruangrit,Social Ads,iOS App,282,12,0,0.0,No
+CUST-0278,Somchai Wongsuwan,Social Ads,Desktop,183,6,0,0.0,No
+CUST-0279,Kittipong Thanasuk,Google Search,Desktop,410,13,0,0.0,No
+CUST-0280,Thanawat Miller,Direct,Desktop,645,14,3,12126.36,Yes
+CUST-0281,Siriporn Kiatnarong,Affiliate,Desktop,443,9,4,15588.4,Yes
+CUST-0282,Somsak Williams,Social Ads,Mobile Web,407,7,0,0.0,No
+CUST-0283,Sunee Taylor,Social Ads,Desktop,412,15,0,0.0,No
+CUST-0284,Thanawat Nantakong,Email Mkt,iOS App,53,1,0,0.0,No
+CUST-0285,Wichai Taylor,Social Ads,Mobile Web,42,1,0,0.0,No
+CUST-0286,Malee Ruangrit,Google Search,iOS App,65,1,0,0.0,No
+CUST-0287,Malee Jaroensuk,Social Ads,Mobile Web,460,11,0,0.0,No
+CUST-0288,Supaporn Vongpradit,Google Search,Desktop,97,1,0,0.0,No
+CUST-0289,Waraporn Kiatnarong,Email Mkt,Mobile Web,88,1,0,0.0,No
+CUST-0290,Sarah Wilson,Social Ads,Desktop,197,3,0,0.0,No
+CUST-0291,Malee Williams,Affiliate,Desktop,224,8,0,0.0,No
+CUST-0292,Thanawat Ruangrit,Social Ads,Desktop,191,5,0,0.0,No
+CUST-0293,Apinya Miller,Google Search,Mobile Web,114,4,0,0.0,No
+CUST-0294,Wichai Chaiwong,Google Search,iOS App,678,12,0,0.0,No
+CUST-0295,Emily Williams,Direct,Desktop,492,15,0,0.0,No
+CUST-0296,Nutthida Smith,Email Mkt,Mobile Web,285,7,0,0.0,No
+CUST-0297,David Davis,Social Ads,Mobile Web,208,5,0,0.0,No
+CUST-0298,Worawat Taylor,Google Search,Android App,338,8,0,0.0,No
+CUST-0299,Thanawat Rattanakul,Social Ads,Desktop,84,3,0,0.0,No
+CUST-0300,Thanawat Williams,Google Search,Desktop,412,7,0,0.0,No
+CUST-0301,Emily Johnson,Email Mkt,Mobile Web,646,12,0,0.0,No
+CUST-0302,Jessica Saetang,Google Search,Mobile Web,208,3,0,0.0,No
+CUST-0303,Wichai Chaiwong,Direct,Mobile Web,291,13,1,1098.08,Yes
+CUST-0304,Supaporn Suksom,Google Search,Mobile Web,104,1,0,0.0,No
+CUST-0305,Nutthida Thanasuk,Google Search,Mobile Web,146,7,0,0.0,No
+CUST-0306,Alex Ruangrit,Direct,Desktop,674,14,1,1393.48,Yes
+CUST-0307,Prapai Nantakong,Social Ads,iOS App,235,5,0,0.0,No
+CUST-0308,Pongsak Taylor,Social Ads,Android App,204,4,0,0.0,No
+CUST-0309,Anan Kiatnarong,Direct,Mobile Web,55,1,0,0.0,No
+CUST-0310,Nutthida Rattanakul,Social Ads,Mobile Web,134,2,0,0.0,No
+CUST-0311,Emily Jaroensuk,Direct,Android App,802,15,0,0.0,No
+CUST-0312,Nutthida Johnson,Google Search,Desktop,594,15,0,0.0,No
+CUST-0313,Wichai Saetang,Direct,Desktop,242,4,0,0.0,No
+CUST-0314,Pongsak Chaiwong,Google Search,Mobile Web,488,10,0,0.0,No
+CUST-0315,Emily Davis,Email Mkt,Desktop,337,12,0,0.0,No
+CUST-0316,Jessica Rattanakul,Google Search,Desktop,125,2,0,0.0,No
+CUST-0317,Pongsak Brown,Google Search,Desktop,427,8,0,0.0,No
+CUST-0318,Robert Wilson,Google Search,Mobile Web,219,7,0,0.0,No
+CUST-0319,Sunee Chaiwong,Google Search,Desktop,734,12,0,0.0,No
+CUST-0320,Sarah Miller,Google Search,Desktop,268,5,0,0.0,No
+CUST-0321,Chaiwat Boonma,Google Search,Desktop,532,9,0,0.0,No
+CUST-0322,Somsak Chaiwong,Social Ads,Desktop,429,10,1,3693.97,Yes
+CUST-0323,Sunee Jaroensuk,Social Ads,Mobile Web,106,3,0,0.0,No
+CUST-0324,Worawat Boonma,Google Search,Desktop,308,7,0,0.0,No
+CUST-0325,James Johnson,Direct,Mobile Web,508,8,0,0.0,No
+CUST-0326,Chaiwat Boonma,Social Ads,Android App,383,6,0,0.0,No
+CUST-0327,Emily Taylor,Social Ads,iOS App,825,14,0,0.0,No
+CUST-0328,Prapai Thanasuk,Social Ads,Android App,277,6,0,0.0,No
+CUST-0329,Sunee Brown,Social Ads,iOS App,313,7,0,0.0,No
+CUST-0330,Prapai Jaroensuk,Direct,Desktop,721,13,0,0.0,No
+CUST-0331,Jirayu Wongsuwan,Social Ads,Desktop,319,12,0,0.0,No
+CUST-0332,Siriporn Kiatnarong,Social Ads,Desktop,170,3,0,0.0,No
+CUST-0333,Nutthida Jaroensuk,Social Ads,Mobile Web,729,15,3,10232.9,Yes
+CUST-0334,Anan Petchcharat,Email Mkt,Mobile Web,226,6,0,0.0,No
+CUST-0335,Pongsak Brown,Direct,Desktop,47,1,0,0.0,No
+CUST-0336,Malee Taylor,Social Ads,Mobile Web,676,11,0,0.0,No
+CUST-0337,Jessica Suksom,Social Ads,Desktop,387,15,0,0.0,No
+CUST-0338,Supaporn Miller,Social Ads,Mobile Web,247,4,0,0.0,No
+CUST-0339,Chaiwat Taylor,Email Mkt,Mobile Web,85,2,0,0.0,No
+CUST-0340,Prasert Suksom,Affiliate,Mobile Web,350,11,0,0.0,No
+CUST-0341,Kanya Brown,Social Ads,Android App,225,4,0,0.0,No
+CUST-0342,Patchara Davis,Google Search,Mobile Web,234,4,0,0.0,No
+CUST-0343,Somchai Wongsuwan,Google Search,iOS App,353,13,2,3064.81,Yes
+CUST-0344,Sarah Wongsuwan,Social Ads,Desktop,752,14,0,0.0,No
+CUST-0345,Sarah Nantakong,Social Ads,Desktop,111,2,0,0.0,No
+CUST-0346,Waraporn Williams,Affiliate,Mobile Web,333,11,1,1518.11,Yes
+CUST-0347,Supaporn Vongpradit,Social Ads,Mobile Web,472,10,0,0.0,No
+CUST-0348,Waraporn Ruangrit,Google Search,Desktop,153,3,0,0.0,No
+CUST-0349,Jessica Suksom,Social Ads,Desktop,422,7,0,0.0,No
+CUST-0350,Thanawat Thanasuk,Social Ads,iOS App,250,8,0,0.0,No
+CUST-0351,Malee Williams,Google Search,Desktop,184,5,0,0.0,No
+CUST-0352,Worawat Ruangrit,Social Ads,Mobile Web,298,5,0,0.0,No
+CUST-0353,Wichai Taylor,Social Ads,Android App,94,2,0,0.0,No
+CUST-0354,Wichai Taylor,Google Search,iOS App,108,2,0,0.0,No
+CUST-0355,Sunee Wongsuwan,Affiliate,Mobile Web,399,6,0,0.0,No
+CUST-0356,Siriporn Wongsuwan,Affiliate,iOS App,459,10,0,0.0,No
+CUST-0357,Kanya Brown,Direct,Desktop,407,10,0,0.0,No
+CUST-0358,Chaiwat Boonma,Direct,iOS App,367,15,0,0.0,No
+CUST-0359,Siriporn Boonma,Google Search,Mobile Web,538,14,0,0.0,No
+CUST-0360,Supaporn Jaroensuk,Social Ads,Mobile Web,345,7,0,0.0,No
+CUST-0361,Anan Davis,Social Ads,Desktop,679,15,0,0.0,No
+CUST-0362,Sarah Jaroensuk,Google Search,iOS App,334,12,0,0.0,No
+CUST-0363,Jessica Chaiwong,Email Mkt,Desktop,267,7,0,0.0,No
+CUST-0364,David Brown,Social Ads,Desktop,740,14,0,0.0,No
+CUST-0365,Nattapong Rattanakul,Google Search,iOS App,180,8,0,0.0,No
+CUST-0366,Kanya Taylor,Social Ads,Android App,273,7,0,0.0,No
+CUST-0367,Michael Saetang,Affiliate,iOS App,107,2,1,3218.53,Yes
+CUST-0368,Nattapong Davis,Social Ads,Mobile Web,474,13,0,0.0,No
+CUST-0369,Chaiwat Suksom,Google Search,Desktop,378,10,0,0.0,No
+CUST-0370,Somchai Suksom,Email Mkt,iOS App,707,14,1,2248.21,Yes
+CUST-0371,Chaiwat Petchcharat,Social Ads,iOS App,145,3,0,0.0,No
+CUST-0372,Supaporn Chaiwong,Social Ads,Desktop,363,11,0,0.0,No
+CUST-0373,Rattana Kiatnarong,Email Mkt,Android App,498,10,1,3596.43,Yes
+CUST-0374,Robert Miller,Direct,Desktop,127,3,0,0.0,No
+CUST-0375,Sunee Ruangrit,Social Ads,Mobile Web,152,5,0,0.0,No
+CUST-0376,Rattana Vongpradit,Social Ads,Desktop,312,7,2,8669.1,Yes
+CUST-0377,Worawat Davis,Google Search,Mobile Web,278,10,0,0.0,No
+CUST-0378,Somchai Miller,Direct,Desktop,815,14,0,0.0,No
+CUST-0379,Waraporn Thanasuk,Direct,iOS App,66,1,1,4217.41,Yes
+CUST-0380,Pongsak Vongpradit,Google Search,Mobile Web,630,13,0,0.0,No
+CUST-0381,Anan Kiatnarong,Social Ads,Mobile Web,149,5,0,0.0,No
+CUST-0382,Rattana Boonma,Social Ads,Desktop,288,11,0,0.0,No
+CUST-0383,Sunee Rattanakul,Google Search,Android App,142,2,0,0.0,No
+CUST-0384,Michael Saetang,Google Search,Mobile Web,255,12,0,0.0,No
+CUST-0385,Jessica Vongpradit,Social Ads,iOS App,178,5,0,0.0,No
+CUST-0386,Alex Petchcharat,Email Mkt,Desktop,633,13,0,0.0,No
+CUST-0387,John Jaroensuk,Social Ads,Mobile Web,395,9,0,0.0,No
+CUST-0388,Kanya Miller,Google Search,iOS App,888,15,0,0.0,No
+CUST-0389,Malee Vongpradit,Google Search,iOS App,42,1,0,0.0,No
+CUST-0390,Robert Boonma,Google Search,Android App,105,1,0,0.0,No
+CUST-0391,Thanawat Smith,Social Ads,Desktop,502,12,0,0.0,No
+CUST-0392,James Petchcharat,Social Ads,Android App,140,3,0,0.0,No
+CUST-0393,Pongsak Chaiwong,Affiliate,iOS App,532,13,1,2196.56,Yes
+CUST-0394,David Jaroensuk,Email Mkt,Mobile Web,224,4,0,0.0,No
+CUST-0395,Worawat Wongsuwan,Email Mkt,Mobile Web,469,13,1,1700.44,Yes
+CUST-0396,Jessica Kiatnarong,Affiliate,iOS App,167,6,0,0.0,No
+CUST-0397,Michael Petchcharat,Google Search,Android App,365,7,0,0.0,No
+CUST-0398,Supaporn Johnson,Google Search,Android App,826,15,0,0.0,No
+CUST-0399,James Taylor,Direct,Desktop,117,2,0,0.0,No
+CUST-0400,Pongsak Chaiwong,Social Ads,Desktop,328,11,0,0.0,No
+CUST-0401,Sarah Davis,Email Mkt,Mobile Web,310,6,0,0.0,No
+CUST-0402,Prapai Boonma,Email Mkt,Mobile Web,93,3,0,0.0,No
+CUST-0403,Sarah Wilson,Google Search,Desktop,462,13,0,0.0,No
+CUST-0404,John Petchcharat,Google Search,iOS App,297,5,0,0.0,No
+CUST-0405,Sarah Boonma,Google Search,Desktop,307,6,1,3843.33,Yes
+CUST-0406,Waraporn Suksom,Direct,iOS App,515,9,1,3747.41,Yes
+CUST-0407,Prasert Suksom,Google Search,iOS App,129,4,0,0.0,No
+CUST-0408,James Kiatnarong,Direct,Desktop,369,10,1,4144.11,Yes
+CUST-0409,Apinya Boonma,Google Search,iOS App,545,13,1,1463.16,Yes
+CUST-0410,Patchara Davis,Social Ads,Desktop,244,7,0,0.0,No
+CUST-0411,Waraporn Johnson,Google Search,iOS App,103,1,0,0.0,No
+CUST-0412,David Thanasuk,Social Ads,Mobile Web,47,1,0,0.0,No
+CUST-0413,Thanawat Wongsuwan,Social Ads,iOS App,279,4,0,0.0,No
+CUST-0414,Robert Miller,Social Ads,iOS App,373,6,0,0.0,No
+CUST-0415,Alex Saetang,Google Search,Mobile Web,45,1,0,0.0,No
+CUST-0416,Nutthida Vongpradit,Social Ads,Mobile Web,131,4,0,0.0,No
+CUST-0417,Sunee Johnson,Social Ads,iOS App,295,12,0,0.0,No
+CUST-0418,Robert Miller,Direct,Android App,113,3,0,0.0,No
+CUST-0419,Jessica Jaroensuk,Google Search,Mobile Web,574,10,0,0.0,No
+CUST-0420,Prapai Thanasuk,Social Ads,Desktop,33,1,0,0.0,No
+CUST-0421,Malee Suksom,Social Ads,Desktop,902,15,0,0.0,No
+CUST-0422,Emily Saetang,Affiliate,iOS App,144,6,0,0.0,No
+CUST-0423,Supaporn Petchcharat,Affiliate,iOS App,136,2,0,0.0,No
+CUST-0424,Pongsak Jaroensuk,Google Search,Desktop,122,3,0,0.0,No
+CUST-0425,Worawat Kiatnarong,Social Ads,Mobile Web,558,9,0,0.0,No
+CUST-0426,Waraporn Davis,Social Ads,Mobile Web,98,3,0,0.0,No
+CUST-0427,Pongsak Jaroensuk,Google Search,Mobile Web,904,15,0,0.0,No
+CUST-0428,Chaiwat Thanasuk,Google Search,Mobile Web,193,4,0,0.0,No
+CUST-0429,Anan Kiatnarong,Email Mkt,Desktop,54,1,0,0.0,No
+CUST-0430,Kittipong Miller,Google Search,Desktop,52,1,0,0.0,No
+CUST-0431,Thanawat Saetang,Affiliate,Mobile Web,333,7,0,0.0,No
+CUST-0432,Nutthida Jaroensuk,Email Mkt,Mobile Web,153,3,0,0.0,No
+CUST-0433,Wichai Williams,Google Search,Desktop,74,2,0,0.0,No
+CUST-0434,Robert Saetang,Email Mkt,Mobile Web,401,15,0,0.0,No
+CUST-0435,Nutthida Suksom,Social Ads,Mobile Web,485,10,1,4406.55,Yes
+CUST-0436,Thanawat Ruangrit,Email Mkt,Mobile Web,214,5,0,0.0,No
+CUST-0437,Nattapong Davis,Social Ads,iOS App,97,3,1,3857.23,Yes
+CUST-0438,Nutthida Wongsuwan,Google Search,Desktop,428,11,0,0.0,No
+CUST-0439,Prasert Williams,Email Mkt,Mobile Web,550,15,0,0.0,No
+CUST-0440,Robert Saetang,Social Ads,Desktop,151,3,0,0.0,No
+CUST-0441,Jirayu Johnson,Google Search,Desktop,78,1,0,0.0,No
+CUST-0442,Anan Miller,Affiliate,Desktop,760,13,0,0.0,No
+CUST-0443,Robert Vongpradit,Social Ads,Mobile Web,741,14,0,0.0,No
+CUST-0444,Nutthida Williams,Google Search,Android App,301,12,0,0.0,No
+CUST-0445,Supaporn Petchcharat,Direct,Desktop,116,3,0,0.0,No
+CUST-0446,Patchara Chaiwong,Direct,Desktop,854,14,0,0.0,No
+CUST-0447,John Brown,Affiliate,Android App,79,2,0,0.0,No
+CUST-0448,Sarah Johnson,Social Ads,Android App,101,1,0,0.0,No
+CUST-0449,Thanawat Petchcharat,Social Ads,Desktop,581,10,0,0.0,No
+CUST-0450,Chaiwat Williams,Affiliate,iOS App,711,15,0,0.0,No
+CUST-0451,Worawat Jaroensuk,Social Ads,Desktop,239,5,0,0.0,No
+CUST-0452,Pongsak Rattanakul,Social Ads,iOS App,428,12,0,0.0,No
+CUST-0453,Alex Miller,Google Search,iOS App,217,5,0,0.0,No
+CUST-0454,Chaiwat Smith,Google Search,Android App,342,8,0,0.0,No
+CUST-0455,Anan Wongsuwan,Social Ads,Android App,395,7,0,0.0,No
+CUST-0456,Nattapong Vongpradit,Email Mkt,Desktop,654,12,2,8119.13,Yes
+CUST-0457,Somsak Saetang,Google Search,iOS App,342,14,1,2165.37,Yes
+CUST-0458,Prapai Johnson,Social Ads,Mobile Web,432,7,0,0.0,No
+CUST-0459,Sunee Miller,Social Ads,Desktop,742,14,0,0.0,No
+CUST-0460,Jessica Saetang,Affiliate,Desktop,373,14,1,3966.45,Yes
+CUST-0461,Rattana Smith,Social Ads,Mobile Web,267,5,2,7303.28,Yes
+CUST-0462,Somchai Thanasuk,Affiliate,Mobile Web,219,10,0,0.0,No
+CUST-0463,Michael Kiatnarong,Google Search,iOS App,622,14,0,0.0,No
+CUST-0464,Jirayu Williams,Email Mkt,iOS App,410,7,4,17510.69,Yes
+CUST-0465,James Ruangrit,Social Ads,Mobile Web,165,5,0,0.0,No
+CUST-0466,Alex Kiatnarong,Social Ads,Desktop,446,11,2,8267.72,Yes
+CUST-0467,Pongsak Brown,Email Mkt,Mobile Web,584,11,0,0.0,No
+CUST-0468,Thanawat Davis,Social Ads,Desktop,689,12,0,0.0,No
+CUST-0469,Malee Ruangrit,Social Ads,Mobile Web,499,11,0,0.0,No
+CUST-0470,Kanya Ruangrit,Google Search,Desktop,148,3,0,0.0,No
+CUST-0471,Waraporn Brown,Email Mkt,Desktop,187,4,0,0.0,No
+CUST-0472,Emily Miller,Google Search,Desktop,413,14,1,2968.14,Yes
+CUST-0473,Kittipong Thanasuk,Affiliate,Mobile Web,654,14,0,0.0,No
+CUST-0474,Nattapong Boonma,Google Search,Desktop,426,7,2,3016.6,Yes
+CUST-0475,Anan Thanasuk,Social Ads,Android App,368,6,1,3628.36,Yes
+CUST-0476,Kanya Jaroensuk,Email Mkt,Mobile Web,338,13,0,0.0,No
+CUST-0477,Patchara Davis,Social Ads,Mobile Web,61,1,0,0.0,No
+CUST-0478,James Suksom,Affiliate,iOS App,294,9,0,0.0,No
+CUST-0479,Sunee Smith,Email Mkt,Desktop,107,3,0,0.0,No
+CUST-0480,Michael Saetang,Google Search,Desktop,283,5,0,0.0,No
+CUST-0481,Emily Wilson,Affiliate,Android App,333,6,0,0.0,No
+CUST-0482,Kanya Davis,Google Search,Desktop,105,3,0,0.0,No
+CUST-0483,Kanya Petchcharat,Social Ads,Mobile Web,89,1,0,0.0,No
+CUST-0484,Nattapong Nantakong,Direct,Mobile Web,239,11,0,0.0,No
+CUST-0485,Thanawat Taylor,Social Ads,Mobile Web,250,8,0,0.0,No
+CUST-0486,Somchai Williams,Social Ads,Desktop,377,9,0,0.0,No
+CUST-0487,Siriporn Wilson,Affiliate,Desktop,720,12,0,0.0,No
+CUST-0488,Chaiwat Thanasuk,Google Search,Desktop,282,5,0,0.0,No
+CUST-0489,Thanawat Williams,Google Search,Mobile Web,544,15,0,0.0,No
+CUST-0490,Emily Smith,Google Search,Mobile Web,446,15,0,0.0,No
+CUST-0491,Supaporn Chaiwong,Email Mkt,Desktop,333,12,0,0.0,No
+CUST-0492,Jirayu Williams,Google Search,Desktop,441,14,0,0.0,No
+CUST-0493,James Brown,Social Ads,Desktop,313,14,0,0.0,No
+CUST-0494,Kanya Brown,Social Ads,Desktop,380,10,0,0.0,No
+CUST-0495,Emily Saetang,Google Search,Desktop,325,8,0,0.0,No
+CUST-0496,Nutthida Wilson,Social Ads,iOS App,105,2,0,0.0,No
+CUST-0497,Kanya Petchcharat,Social Ads,Mobile Web,776,13,0,0.0,No
+CUST-0498,Robert Miller,Social Ads,iOS App,455,15,0,0.0,No
+CUST-0499,Prasert Wilson,Social Ads,Desktop,445,11,0,0.0,No
+CUST-0500,Malee Brown,Social Ads,Mobile Web,292,10,0,0.0,No
+CUST-0501,Sunee Thanasuk,Social Ads,Mobile Web,243,7,0,0.0,No
+CUST-0502,Nattapong Suksom,Social Ads,Desktop,736,14,0,0.0,No
+CUST-0503,Kittipong Thanasuk,Social Ads,Desktop,152,5,0,0.0,No
+CUST-0504,Robert Davis,Affiliate,Desktop,481,8,1,2003.62,Yes
+CUST-0505,Worawat Kiatnarong,Google Search,Desktop,95,1,1,3055.34,Yes
+CUST-0506,Michael Vongpradit,Social Ads,Mobile Web,356,8,0,0.0,No
+CUST-0507,Malee Taylor,Social Ads,iOS App,550,10,0,0.0,No
+CUST-0508,Apinya Petchcharat,Google Search,Mobile Web,68,1,0,0.0,No
+CUST-0509,David Ruangrit,Social Ads,Mobile Web,66,1,0,0.0,No
+CUST-0510,Thanawat Petchcharat,Google Search,Desktop,108,2,0,0.0,No
+CUST-0511,Prapai Brown,Google Search,Desktop,948,15,0,0.0,No
+CUST-0512,Apinya Taylor,Email Mkt,Android App,158,3,0,0.0,No
+CUST-0513,Nattapong Ruangrit,Direct,iOS App,432,8,0,0.0,No
+CUST-0514,Waraporn Boonma,Google Search,Mobile Web,437,10,0,0.0,No
+CUST-0515,Thanawat Nantakong,Affiliate,iOS App,251,5,0,0.0,No
+CUST-0516,Apinya Boonma,Google Search,Mobile Web,804,15,0,0.0,No
+CUST-0517,Sarah Ruangrit,Social Ads,Desktop,428,10,0,0.0,No
+CUST-0518,Siriporn Kiatnarong,Direct,Desktop,565,9,0,0.0,No
+CUST-0519,Jessica Ruangrit,Social Ads,Mobile Web,554,11,0,0.0,No
+CUST-0520,David Wilson,Affiliate,Mobile Web,58,1,1,1824.47,Yes
+CUST-0521,Kanya Williams,Email Mkt,Desktop,56,1,0,0.0,No
+CUST-0522,Wichai Miller,Affiliate,Desktop,789,14,0,0.0,No
+CUST-0523,Robert Smith,Social Ads,iOS App,505,12,0,0.0,No
+CUST-0524,Robert Davis,Social Ads,iOS App,480,11,2,3182.54,Yes
+CUST-0525,Apinya Smith,Affiliate,Mobile Web,515,11,0,0.0,No
+CUST-0526,Prapai Wongsuwan,Google Search,Desktop,280,11,0,0.0,No
+CUST-0527,Prasert Davis,Google Search,Desktop,155,5,0,0.0,No
+CUST-0528,John Suksom,Social Ads,Mobile Web,80,3,0,0.0,No
+CUST-0529,Nattapong Kiatnarong,Social Ads,Mobile Web,488,8,0,0.0,No
+CUST-0530,Sarah Vongpradit,Google Search,Desktop,119,2,0,0.0,No
+CUST-0531,Pongsak Chaiwong,Social Ads,iOS App,477,11,0,0.0,No
+CUST-0532,Rattana Nantakong,Social Ads,Android App,292,14,0,0.0,No
+CUST-0533,Apinya Smith,Affiliate,Mobile Web,357,10,0,0.0,No
+CUST-0534,Sarah Davis,Affiliate,Android App,291,7,0,0.0,No
+CUST-0535,Somsak Vongpradit,Affiliate,Desktop,709,13,0,0.0,No
+CUST-0536,David Kiatnarong,Google Search,Mobile Web,99,2,0,0.0,No
+CUST-0537,Kittipong Wongsuwan,Email Mkt,iOS App,669,14,0,0.0,No
+CUST-0538,Patchara Kiatnarong,Affiliate,Desktop,325,11,0,0.0,No
+CUST-0539,Emily Rattanakul,Google Search,Desktop,508,13,2,8350.2,Yes
+CUST-0540,Thanawat Davis,Social Ads,Desktop,155,6,0,0.0,No
+CUST-0541,Somchai Kiatnarong,Email Mkt,Desktop,691,12,0,0.0,No
+CUST-0542,Kittipong Miller,Direct,Desktop,550,13,2,4895.04,Yes
+CUST-0543,Pongsak Suksom,Social Ads,Mobile Web,174,3,0,0.0,No
+CUST-0544,Supaporn Williams,Email Mkt,Android App,564,13,0,0.0,No
+CUST-0545,Supaporn Petchcharat,Google Search,Mobile Web,418,7,0,0.0,No
+CUST-0546,Michael Wongsuwan,Email Mkt,Android App,229,6,0,0.0,No
+CUST-0547,Supaporn Saetang,Google Search,Mobile Web,172,5,0,0.0,No
+CUST-0548,Nattapong Ruangrit,Social Ads,Mobile Web,141,5,0,0.0,No
+CUST-0549,Worawat Brown,Social Ads,Mobile Web,127,4,0,0.0,No
+CUST-0550,Prapai Brown,Social Ads,Desktop,478,11,0,0.0,No
+CUST-0551,James Brown,Direct,Desktop,229,6,0,0.0,No
+CUST-0552,Patchara Johnson,Affiliate,Desktop,527,12,0,0.0,No
+CUST-0553,Jessica Williams,Social Ads,Desktop,648,11,0,0.0,No
+CUST-0554,Siriporn Ruangrit,Google Search,Mobile Web,273,11,0,0.0,No
+CUST-0555,Somsak Jaroensuk,Social Ads,iOS App,128,4,0,0.0,No
+CUST-0556,Nutthida Kiatnarong,Email Mkt,Desktop,251,4,0,0.0,No
+CUST-0557,Anan Davis,Social Ads,Desktop,284,4,0,0.0,No
+CUST-0558,Siriporn Taylor,Google Search,Mobile Web,325,10,0,0.0,No
+CUST-0559,Wichai Smith,Email Mkt,Desktop,234,5,0,0.0,No
+CUST-0560,Rattana Vongpradit,Affiliate,Desktop,399,8,1,1226.77,Yes
+CUST-0561,Alex Johnson,Social Ads,Mobile Web,336,7,0,0.0,No
+CUST-0562,Kittipong Vongpradit,Google Search,Android App,242,4,0,0.0,No
+CUST-0563,Jessica Thanasuk,Email Mkt,iOS App,65,1,0,0.0,No
+CUST-0564,Malee Chaiwong,Social Ads,Desktop,108,3,0,0.0,No
+CUST-0565,Prasert Smith,Social Ads,Desktop,148,2,0,0.0,No
+CUST-0566,Rattana Jaroensuk,Google Search,iOS App,42,1,0,0.0,No
+CUST-0567,Kanya Boonma,Social Ads,Desktop,298,10,0,0.0,No
+CUST-0568,Waraporn Vongpradit,Direct,Mobile Web,606,10,0,0.0,No
+CUST-0569,David Chaiwong,Google Search,Mobile Web,415,8,0,0.0,No
+CUST-0570,Thanawat Nantakong,Google Search,Mobile Web,447,13,0,0.0,No
+CUST-0571,John Saetang,Email Mkt,Desktop,506,8,1,1332.58,Yes
+CUST-0572,Somsak Wongsuwan,Social Ads,Android App,520,11,0,0.0,No
+CUST-0573,Waraporn Thanasuk,Affiliate,Mobile Web,847,15,0,0.0,No
+CUST-0574,Anan Thanasuk,Email Mkt,Android App,228,9,0,0.0,No
+CUST-0575,Thanawat Miller,Affiliate,Mobile Web,273,7,0,0.0,No
+CUST-0576,Robert Miller,Social Ads,Mobile Web,739,13,0,0.0,No
+CUST-0577,John Thanasuk,Email Mkt,Android App,119,2,0,0.0,No
+CUST-0578,Thanawat Johnson,Google Search,Mobile Web,301,13,0,0.0,No
+CUST-0579,Somchai Davis,Email Mkt,Mobile Web,304,6,0,0.0,No
+CUST-0580,Patchara Kiatnarong,Social Ads,Desktop,464,9,0,0.0,No
+CUST-0581,Alex Davis,Email Mkt,Desktop,750,13,0,0.0,No
+CUST-0582,Nutthida Johnson,Direct,Mobile Web,598,13,0,0.0,No
+CUST-0583,Prasert Smith,Social Ads,Mobile Web,96,3,0,0.0,No
+CUST-0584,Emily Ruangrit,Social Ads,Mobile Web,59,1,0,0.0,No
+CUST-0585,Somchai Chaiwong,Affiliate,Mobile Web,480,10,1,1142.15,Yes
+CUST-0586,Wichai Davis,Direct,Desktop,606,11,0,0.0,No
+CUST-0587,Nattapong Saetang,Social Ads,Desktop,235,4,0,0.0,No
+CUST-0588,Malee Nantakong,Google Search,Desktop,95,4,1,2307.93,Yes
+CUST-0589,Pongsak Davis,Social Ads,Mobile Web,298,12,0,0.0,No
+CUST-0590,Jessica Miller,Direct,Desktop,354,10,0,0.0,No
+CUST-0591,Somchai Johnson,Google Search,Mobile Web,253,9,0,0.0,No
+CUST-0592,Prasert Vongpradit,Direct,iOS App,805,14,0,0.0,No
+CUST-0593,Robert Jaroensuk,Social Ads,Desktop,342,6,0,0.0,No
+CUST-0594,Somsak Thanasuk,Google Search,Desktop,422,11,0,0.0,No
+CUST-0595,Sarah Wilson,Direct,Mobile Web,56,1,0,0.0,No
+CUST-0596,Pongsak Brown,Google Search,Android App,347,8,0,0.0,No
+CUST-0597,Alex Saetang,Direct,Mobile Web,516,15,0,0.0,No
+CUST-0598,Sunee Smith,Affiliate,Desktop,184,4,0,0.0,No
+CUST-0599,Chaiwat Petchcharat,Direct,Mobile Web,605,11,2,8693.35,Yes
+CUST-0600,Nutthida Miller,Social Ads,Mobile Web,862,15,0,0.0,No
+CUST-0601,Alex Davis,Google Search,Mobile Web,85,1,0,0.0,No
+CUST-0602,Wichai Vongpradit,Social Ads,iOS App,437,13,0,0.0,No
+CUST-0603,Jirayu Brown,Email Mkt,Desktop,218,4,0,0.0,No
+CUST-0604,James Nantakong,Affiliate,Desktop,197,5,0,0.0,No
+CUST-0605,Emily Miller,Google Search,Desktop,329,7,0,0.0,No
+CUST-0606,Alex Taylor,Google Search,Desktop,351,10,0,0.0,No
+CUST-0607,Sunee Ruangrit,Social Ads,Desktop,122,3,0,0.0,No
+CUST-0608,Waraporn Wilson,Social Ads,Android App,878,14,0,0.0,No
+CUST-0609,Sarah Thanasuk,Social Ads,Mobile Web,260,10,1,1636.46,Yes
+CUST-0610,John Thanasuk,Affiliate,Desktop,513,12,0,0.0,No
+CUST-0611,John Miller,Google Search,Desktop,829,14,0,0.0,No
+CUST-0612,Waraporn Williams,Social Ads,Mobile Web,394,8,0,0.0,No
+CUST-0613,David Taylor,Social Ads,Desktop,206,3,0,0.0,No
+CUST-0614,Pongsak Chaiwong,Google Search,Desktop,286,6,0,0.0,No
+CUST-0615,Alex Nantakong,Social Ads,Desktop,386,8,0,0.0,No
+CUST-0616,Apinya Wilson,Google Search,iOS App,152,3,0,0.0,No
+CUST-0617,Anan Wongsuwan,Google Search,Desktop,140,2,2,5525.07,Yes
+CUST-0618,Anan Petchcharat,Google Search,Desktop,508,11,0,0.0,No
+CUST-0619,David Taylor,Social Ads,Desktop,426,14,1,4190.74,Yes
+CUST-0620,Nutthida Taylor,Direct,Mobile Web,308,5,0,0.0,No
+CUST-0621,Waraporn Jaroensuk,Social Ads,Mobile Web,648,11,0,0.0,No
+CUST-0622,Michael Miller,Social Ads,Desktop,120,2,0,0.0,No
+CUST-0623,John Boonma,Social Ads,Desktop,419,14,0,0.0,No
+CUST-0624,Somchai Thanasuk,Direct,Mobile Web,70,1,0,0.0,No
+CUST-0625,Somchai Ruangrit,Social Ads,Desktop,453,9,0,0.0,No
+CUST-0626,Robert Davis,Google Search,Desktop,423,11,0,0.0,No
+CUST-0627,Alex Williams,Social Ads,Mobile Web,247,5,0,0.0,No
+CUST-0628,Waraporn Boonma,Google Search,Mobile Web,502,10,0,0.0,No
+CUST-0629,Worawat Wongsuwan,Social Ads,Desktop,205,9,0,0.0,No
+CUST-0630,David Johnson,Google Search,Desktop,44,1,0,0.0,No
+CUST-0631,Worawat Wongsuwan,Social Ads,Desktop,691,13,0,0.0,No
+CUST-0632,Wichai Brown,Google Search,iOS App,91,3,0,0.0,No
+CUST-0633,Kittipong Ruangrit,Social Ads,Desktop,533,14,0,0.0,No
+CUST-0634,Prasert Smith,Social Ads,Android App,105,4,0,0.0,No
+CUST-0635,Chaiwat Vongpradit,Email Mkt,Desktop,298,7,0,0.0,No
+CUST-0636,Wichai Ruangrit,Social Ads,Desktop,446,11,0,0.0,No
+CUST-0637,Nattapong Wongsuwan,Direct,Desktop,285,7,0,0.0,No
+CUST-0638,Alex Jaroensuk,Google Search,iOS App,64,1,0,0.0,No
+CUST-0639,Nutthida Nantakong,Google Search,iOS App,156,4,0,0.0,No
+CUST-0640,Emily Kiatnarong,Google Search,Desktop,173,3,0,0.0,No
+CUST-0641,Malee Brown,Direct,iOS App,579,13,0,0.0,No
+CUST-0642,Somsak Davis,Social Ads,Desktop,366,15,0,0.0,No
+CUST-0643,David Ruangrit,Email Mkt,Desktop,189,3,0,0.0,No
+CUST-0644,Jirayu Johnson,Affiliate,Mobile Web,785,14,1,1929.21,Yes
+CUST-0645,John Ruangrit,Social Ads,Desktop,601,11,0,0.0,No
+CUST-0646,Somsak Nantakong,Affiliate,iOS App,169,4,0,0.0,No
+CUST-0647,Robert Wongsuwan,Social Ads,Mobile Web,305,9,0,0.0,No
+CUST-0648,Thanawat Kiatnarong,Social Ads,Desktop,271,11,0,0.0,No
+CUST-0649,Siriporn Saetang,Affiliate,Desktop,267,8,1,2268.39,Yes
+CUST-0650,Worawat Vongpradit,Social Ads,Mobile Web,62,1,0,0.0,No
+CUST-0651,Kittipong Suksom,Direct,Desktop,234,8,0,0.0,No
+CUST-0652,Nattapong Miller,Social Ads,Android App,351,7,1,2780.93,Yes
+CUST-0653,Kittipong Williams,Google Search,Desktop,245,9,0,0.0,No
+CUST-0654,Robert Wongsuwan,Google Search,Mobile Web,616,10,0,0.0,No
+CUST-0655,Thanawat Petchcharat,Email Mkt,Mobile Web,588,11,0,0.0,No
+CUST-0656,Chaiwat Saetang,Email Mkt,Mobile Web,416,9,0,0.0,No
+CUST-0657,Apinya Miller,Affiliate,Mobile Web,289,6,0,0.0,No
+CUST-0658,Patchara Brown,Social Ads,Mobile Web,216,4,0,0.0,No
+CUST-0659,John Miller,Direct,Desktop,147,7,0,0.0,No
+CUST-0660,Somsak Vongpradit,Google Search,iOS App,58,1,0,0.0,No
+CUST-0661,Sarah Suksom,Email Mkt,Android App,558,14,0,0.0,No
+CUST-0662,Supaporn Petchcharat,Google Search,Desktop,136,3,0,0.0,No
+CUST-0663,Sunee Smith,Google Search,Desktop,491,10,0,0.0,No
+CUST-0664,Kittipong Brown,Email Mkt,Desktop,795,14,0,0.0,No
+CUST-0665,Michael Rattanakul,Email Mkt,Mobile Web,72,2,0,0.0,No
+CUST-0666,Patchara Wilson,Direct,Desktop,488,13,0,0.0,No
+CUST-0667,Somchai Kiatnarong,Email Mkt,Desktop,272,5,0,0.0,No
+CUST-0668,Supaporn Brown,Social Ads,Desktop,78,1,0,0.0,No
+CUST-0669,Anan Smith,Social Ads,iOS App,110,3,0,0.0,No
+CUST-0670,Nattapong Ruangrit,Social Ads,Desktop,472,9,1,2891.43,Yes
+CUST-0671,Worawat Davis,Email Mkt,Desktop,550,10,0,0.0,No
+CUST-0672,Alex Wilson,Social Ads,Android App,101,2,0,0.0,No
+CUST-0673,James Miller,Google Search,Desktop,255,11,1,3848.78,Yes
+CUST-0674,Apinya Nantakong,Google Search,Desktop,493,14,0,0.0,No
+CUST-0675,Supaporn Chaiwong,Google Search,Desktop,313,10,1,1256.16,Yes
+CUST-0676,Apinya Thanasuk,Google Search,Desktop,315,9,0,0.0,No
+CUST-0677,John Ruangrit,Social Ads,Mobile Web,92,3,0,0.0,No
+CUST-0678,Wichai Johnson,Google Search,Desktop,789,13,1,880.42,Yes
+CUST-0679,Robert Johnson,Email Mkt,Android App,162,6,0,0.0,No
+CUST-0680,Robert Smith,Direct,Mobile Web,337,12,0,0.0,No
+CUST-0681,Anan Saetang,Google Search,Android App,196,9,0,0.0,No
+CUST-0682,Michael Brown,Social Ads,Mobile Web,90,1,0,0.0,No
+CUST-0683,Michael Smith,Direct,Android App,160,5,0,0.0,No
+CUST-0684,Robert Suksom,Direct,Android App,142,4,0,0.0,No
+CUST-0685,Siriporn Chaiwong,Email Mkt,Mobile Web,694,11,0,0.0,No
+CUST-0686,Thanawat Smith,Social Ads,Desktop,316,5,0,0.0,No
+CUST-0687,Siriporn Wongsuwan,Email Mkt,Mobile Web,365,11,0,0.0,No
+CUST-0688,Siriporn Wilson,Direct,Android App,183,3,0,0.0,No
+CUST-0689,Prasert Saetang,Social Ads,iOS App,277,12,0,0.0,No
+CUST-0690,Thanawat Wilson,Social Ads,Mobile Web,862,14,0,0.0,No
+CUST-0691,Prapai Petchcharat,Google Search,Desktop,612,10,0,0.0,No
+CUST-0692,Malee Nantakong,Google Search,Mobile Web,199,6,0,0.0,No
+CUST-0693,Siriporn Vongpradit,Affiliate,Mobile Web,489,11,0,0.0,No
+CUST-0694,Worawat Thanasuk,Google Search,Desktop,51,1,0,0.0,No
+CUST-0695,Thanawat Smith,Email Mkt,Android App,438,13,0,0.0,No
+CUST-0696,Apinya Nantakong,Social Ads,Desktop,312,8,0,0.0,No
+CUST-0697,Wichai Nantakong,Email Mkt,Desktop,314,6,0,0.0,No
+CUST-0698,Wichai Vongpradit,Google Search,Mobile Web,350,15,0,0.0,No
+CUST-0699,Pongsak Rattanakul,Social Ads,Mobile Web,270,11,0,0.0,No
+CUST-0700,Pongsak Williams,Email Mkt,Desktop,164,3,0,0.0,No
+CUST-0701,Nattapong Vongpradit,Affiliate,Mobile Web,538,11,0,0.0,No
+CUST-0702,Prasert Saetang,Email Mkt,Android App,661,12,0,0.0,No
+CUST-0703,Sarah Taylor,Google Search,Mobile Web,514,15,1,3217.3,Yes
+CUST-0704,Kanya Petchcharat,Google Search,Mobile Web,483,11,0,0.0,No
+CUST-0705,Robert Vongpradit,Social Ads,Desktop,403,9,0,0.0,No
+CUST-0706,Emily Jaroensuk,Affiliate,iOS App,103,3,0,0.0,No
+CUST-0707,Nattapong Wilson,Social Ads,Mobile Web,349,8,0,0.0,No
+CUST-0708,Siriporn Wongsuwan,Google Search,iOS App,85,1,0,0.0,No
+CUST-0709,Somchai Nantakong,Affiliate,Desktop,534,10,0,0.0,No
+CUST-0710,Anan Nantakong,Social Ads,Desktop,377,9,0,0.0,No
+CUST-0711,Rattana Rattanakul,Google Search,Desktop,146,6,0,0.0,No
+CUST-0712,Michael Brown,Direct,Desktop,232,7,0,0.0,No
+CUST-0713,Waraporn Taylor,Email Mkt,Desktop,49,1,0,0.0,No
+CUST-0714,Robert Chaiwong,Email Mkt,iOS App,111,2,0,0.0,No
+CUST-0715,Alex Brown,Social Ads,Mobile Web,440,12,1,4424.63,Yes
+CUST-0716,Anan Thanasuk,Email Mkt,Mobile Web,526,13,0,0.0,No
+CUST-0717,Sarah Johnson,Social Ads,Android App,212,6,0,0.0,No
+CUST-0718,Worawat Thanasuk,Affiliate,iOS App,169,4,1,3132.93,Yes
+CUST-0719,Prasert Wongsuwan,Email Mkt,Android App,180,7,0,0.0,No
+CUST-0720,Rattana Suksom,Social Ads,Mobile Web,144,5,0,0.0,No
+CUST-0721,Sarah Suksom,Google Search,Desktop,436,7,0,0.0,No
+CUST-0722,Waraporn Wongsuwan,Social Ads,Desktop,585,11,0,0.0,No
+CUST-0723,Siriporn Thanasuk,Google Search,Mobile Web,782,14,0,0.0,No
+CUST-0724,Thanawat Rattanakul,Affiliate,Desktop,520,12,0,0.0,No
+CUST-0725,Rattana Jaroensuk,Email Mkt,iOS App,639,15,0,0.0,No
+CUST-0726,Alex Suksom,Social Ads,Desktop,311,9,0,0.0,No
+CUST-0727,Waraporn Nantakong,Google Search,iOS App,250,5,1,2664.25,Yes
+CUST-0728,Sunee Miller,Social Ads,Android App,236,4,0,0.0,No
+CUST-0729,James Rattanakul,Email Mkt,Android App,422,8,0,0.0,No
+CUST-0730,Supaporn Wongsuwan,Social Ads,Mobile Web,766,14,0,0.0,No
+CUST-0731,Supaporn Petchcharat,Affiliate,Android App,326,11,0,0.0,No
+CUST-0732,Jirayu Davis,Email Mkt,Mobile Web,46,1,0,0.0,No
+CUST-0733,Anan Brown,Social Ads,Desktop,357,9,0,0.0,No
+CUST-0734,Michael Kiatnarong,Affiliate,Desktop,174,4,0,0.0,No
+CUST-0735,Apinya Petchcharat,Google Search,Desktop,84,2,0,0.0,No
+CUST-0736,Chaiwat Wongsuwan,Social Ads,Mobile Web,195,5,0,0.0,No
+CUST-0737,Sunee Saetang,Google Search,Mobile Web,357,6,1,4147.02,Yes
+CUST-0738,Nattapong Petchcharat,Social Ads,Desktop,267,7,0,0.0,No
+CUST-0739,Apinya Nantakong,Social Ads,Desktop,226,4,0,0.0,No
+CUST-0740,Jirayu Jaroensuk,Google Search,iOS App,746,15,0,0.0,No
+CUST-0741,Jirayu Thanasuk,Google Search,Desktop,847,14,0,0.0,No
+CUST-0742,Pongsak Saetang,Email Mkt,Mobile Web,554,13,0,0.0,No
+CUST-0743,Kittipong Thanasuk,Google Search,Mobile Web,443,14,0,0.0,No
+CUST-0744,Siriporn Vongpradit,Google Search,iOS App,363,13,0,0.0,No
+CUST-0745,Kittipong Williams,Social Ads,Desktop,289,7,0,0.0,No
+CUST-0746,Kanya Thanasuk,Social Ads,Desktop,830,14,0,0.0,No
+CUST-0747,Patchara Jaroensuk,Email Mkt,Mobile Web,171,4,0,0.0,No
+CUST-0748,Worawat Petchcharat,Social Ads,Mobile Web,267,9,0,0.0,No
+CUST-0749,Pongsak Chaiwong,Social Ads,Mobile Web,465,10,0,0.0,No
+CUST-0750,Nattapong Chaiwong,Google Search,Desktop,605,10,0,0.0,No
+CUST-0751,Supaporn Taylor,Social Ads,Desktop,497,10,0,0.0,No
+CUST-0752,Sarah Williams,Social Ads,Android App,285,5,0,0.0,No
+CUST-0753,Jessica Chaiwong,Social Ads,Mobile Web,418,9,0,0.0,No
+CUST-0754,Nattapong Miller,Affiliate,Android App,82,1,0,0.0,No
+CUST-0755,David Suksom,Google Search,Mobile Web,445,7,0,0.0,No
+CUST-0756,Pongsak Davis,Social Ads,Desktop,163,3,0,0.0,No
+CUST-0757,Robert Miller,Affiliate,Desktop,405,14,1,1375.58,Yes
+CUST-0758,Worawat Wilson,Direct,Desktop,172,3,0,0.0,No
+CUST-0759,Patchara Nantakong,Google Search,Mobile Web,461,9,0,0.0,No
+CUST-0760,Waraporn Wilson,Social Ads,Mobile Web,540,14,0,0.0,No
+CUST-0761,Thanawat Ruangrit,Social Ads,Desktop,91,1,0,0.0,No
+CUST-0762,Prasert Jaroensuk,Social Ads,Mobile Web,181,3,0,0.0,No
+CUST-0763,Anan Vongpradit,Affiliate,Desktop,527,8,0,0.0,No
+CUST-0764,Kittipong Kiatnarong,Social Ads,Mobile Web,256,10,0,0.0,No
+CUST-0765,Somchai Thanasuk,Social Ads,Android App,441,10,0,0.0,No
+CUST-0766,David Williams,Google Search,Mobile Web,431,10,0,0.0,No
+CUST-0767,Nutthida Jaroensuk,Google Search,Desktop,301,5,0,0.0,No
+CUST-0768,Anan Boonma,Social Ads,iOS App,193,5,0,0.0,No
+CUST-0769,Alex Johnson,Google Search,Desktop,185,3,0,0.0,No
+CUST-0770,James Saetang,Google Search,Mobile Web,286,8,0,0.0,No
+CUST-0771,Emily Chaiwong,Direct,Mobile Web,442,14,0,0.0,No
+CUST-0772,Thanawat Davis,Google Search,Desktop,348,11,0,0.0,No
+CUST-0773,Jessica Rattanakul,Social Ads,iOS App,61,2,0,0.0,No
+CUST-0774,Nutthida Williams,Social Ads,Android App,829,15,0,0.0,No
+CUST-0775,Robert Thanasuk,Google Search,Mobile Web,163,7,0,0.0,No
+CUST-0776,Apinya Davis,Email Mkt,Android App,253,11,0,0.0,No
+CUST-0777,Jessica Wilson,Social Ads,Mobile Web,227,5,0,0.0,No
+CUST-0778,Chaiwat Johnson,Email Mkt,Desktop,503,13,0,0.0,No
+CUST-0779,Prapai Vongpradit,Social Ads,Mobile Web,160,3,1,1098.02,Yes
+CUST-0780,Thanawat Petchcharat,Social Ads,Mobile Web,227,6,0,0.0,No
+CUST-0781,Wichai Suksom,Social Ads,Desktop,373,10,0,0.0,No
+CUST-0782,Prasert Chaiwong,Affiliate,Desktop,632,11,0,0.0,No
+CUST-0783,Waraporn Johnson,Google Search,Mobile Web,154,2,0,0.0,No
+CUST-0784,Alex Wilson,Email Mkt,Mobile Web,541,13,0,0.0,No
+CUST-0785,Kittipong Johnson,Email Mkt,Desktop,159,6,0,0.0,No
+CUST-0786,John Saetang,Social Ads,Mobile Web,524,15,0,0.0,No
+CUST-0787,Worawat Petchcharat,Google Search,iOS App,282,4,0,0.0,No
+CUST-0788,Apinya Johnson,Google Search,Desktop,393,10,1,3232.96,Yes
+CUST-0789,Somchai Rattanakul,Email Mkt,Desktop,522,12,0,0.0,No
+CUST-0790,Worawat Thanasuk,Social Ads,iOS App,351,13,0,0.0,No
+CUST-0791,Robert Thanasuk,Google Search,Mobile Web,294,6,0,0.0,No
+CUST-0792,Nattapong Kiatnarong,Direct,Mobile Web,350,6,0,0.0,No
+CUST-0793,Jirayu Williams,Social Ads,Desktop,91,1,0,0.0,No
+CUST-0794,Robert Petchcharat,Social Ads,Desktop,153,2,0,0.0,No
+CUST-0795,Siriporn Rattanakul,Google Search,Mobile Web,386,10,0,0.0,No
+CUST-0796,Michael Thanasuk,Social Ads,iOS App,175,8,0,0.0,No
+CUST-0797,Emily Rattanakul,Social Ads,Desktop,617,11,0,0.0,No
+CUST-0798,Supaporn Jaroensuk,Google Search,Desktop,384,12,0,0.0,No
+CUST-0799,Nutthida Nantakong,Google Search,Mobile Web,76,3,0,0.0,No
+CUST-0800,Michael Petchcharat,Social Ads,Desktop,251,10,1,3097.04,Yes
+CUST-0801,Kittipong Wongsuwan,Social Ads,iOS App,565,12,1,2842.48,Yes
+CUST-0802,Sarah Wongsuwan,Email Mkt,Mobile Web,156,6,0,0.0,No
+CUST-0803,Thanawat Saetang,Email Mkt,Mobile Web,322,8,1,3942.89,Yes
+CUST-0804,Robert Saetang,Google Search,Mobile Web,36,1,0,0.0,No
+CUST-0805,David Wilson,Email Mkt,iOS App,242,8,1,2494.03,Yes
+CUST-0806,Sunee Saetang,Social Ads,Desktop,197,3,0,0.0,No
+CUST-0807,Michael Miller,Social Ads,Mobile Web,146,4,0,0.0,No
+CUST-0808,James Ruangrit,Social Ads,Mobile Web,385,11,1,1394.64,Yes
+CUST-0809,Nutthida Thanasuk,Google Search,Mobile Web,69,1,0,0.0,No
+CUST-0810,Rattana Wilson,Google Search,Mobile Web,742,15,1,2811.37,Yes
+CUST-0811,Kanya Suksom,Social Ads,Desktop,558,15,0,0.0,No
+CUST-0812,Sarah Wilson,Google Search,Mobile Web,216,6,0,0.0,No
+CUST-0813,Chaiwat Smith,Email Mkt,iOS App,247,7,0,0.0,No
+CUST-0814,Worawat Rattanakul,Affiliate,Desktop,919,15,1,2520.75,Yes
+CUST-0815,Prapai Kiatnarong,Social Ads,Desktop,175,6,0,0.0,No
+CUST-0816,Nattapong Johnson,Google Search,iOS App,383,8,0,0.0,No
+CUST-0817,Malee Williams,Social Ads,iOS App,664,11,0,0.0,No
+CUST-0818,Malee Chaiwong,Social Ads,Mobile Web,504,14,0,0.0,No
+CUST-0819,Jirayu Johnson,Google Search,Desktop,510,14,0,0.0,No
+CUST-0820,Malee Jaroensuk,Direct,Android App,331,15,0,0.0,No
+CUST-0821,Wichai Thanasuk,Email Mkt,Mobile Web,401,7,0,0.0,No
+CUST-0822,Chaiwat Taylor,Social Ads,Desktop,309,13,0,0.0,No
+CUST-0823,Rattana Boonma,Social Ads,Desktop,77,2,0,0.0,No
+CUST-0824,Kanya Taylor,Affiliate,Mobile Web,83,1,0,0.0,No
+CUST-0825,Pongsak Saetang,Email Mkt,Desktop,485,8,0,0.0,No
+CUST-0826,Kittipong Davis,Affiliate,Desktop,70,1,0,0.0,No
+CUST-0827,Rattana Chaiwong,Social Ads,Desktop,382,15,0,0.0,No
+CUST-0828,James Rattanakul,Google Search,Desktop,248,10,0,0.0,No
+CUST-0829,Kittipong Ruangrit,Email Mkt,Desktop,249,6,0,0.0,No
+CUST-0830,Nutthida Jaroensuk,Affiliate,Mobile Web,467,13,0,0.0,No
+CUST-0831,Alex Vongpradit,Email Mkt,Desktop,113,2,0,0.0,No
+CUST-0832,Prasert Thanasuk,Email Mkt,Mobile Web,375,9,0,0.0,No
+CUST-0833,Kittipong Wongsuwan,Affiliate,Mobile Web,106,2,0,0.0,No
+CUST-0834,Kittipong Petchcharat,Google Search,Desktop,167,3,0,0.0,No
+CUST-0835,Somsak Williams,Social Ads,Mobile Web,455,15,0,0.0,No
+CUST-0836,Apinya Kiatnarong,Google Search,Desktop,72,1,0,0.0,No
+CUST-0837,Thanawat Jaroensuk,Social Ads,Mobile Web,348,6,0,0.0,No
+CUST-0838,Apinya Taylor,Social Ads,Desktop,522,13,0,0.0,No
+CUST-0839,Malee Thanasuk,Social Ads,Desktop,336,14,0,0.0,No
+CUST-0840,Jirayu Saetang,Social Ads,Desktop,358,9,0,0.0,No
+CUST-0841,Supaporn Saetang,Google Search,Desktop,349,6,0,0.0,No
+CUST-0842,James Saetang,Google Search,Mobile Web,467,11,1,4410.45,Yes
+CUST-0843,Michael Petchcharat,Direct,Desktop,266,8,0,0.0,No
+CUST-0844,Supaporn Suksom,Direct,Mobile Web,415,9,0,0.0,No
+CUST-0845,Nutthida Williams,Direct,iOS App,331,10,0,0.0,No
+CUST-0846,Apinya Brown,Email Mkt,Mobile Web,343,15,0,0.0,No
+CUST-0847,Prasert Williams,Google Search,Mobile Web,219,4,0,0.0,No
+CUST-0848,Nattapong Nantakong,Social Ads,Mobile Web,165,4,1,2475.92,Yes
+CUST-0849,Anan Vongpradit,Social Ads,Mobile Web,617,10,0,0.0,No
+CUST-0850,James Davis,Google Search,iOS App,292,6,1,1974.51,Yes
+CUST-0851,Apinya Ruangrit,Google Search,Mobile Web,401,8,0,0.0,No
+CUST-0852,Patchara Wilson,Google Search,Mobile Web,76,2,0,0.0,No
+CUST-0853,Emily Chaiwong,Direct,Mobile Web,180,7,0,0.0,No
+CUST-0854,Alex Wilson,Google Search,Mobile Web,297,10,1,2871.61,Yes
+CUST-0855,Wichai Williams,Affiliate,Desktop,460,9,1,1808.77,Yes
+CUST-0856,Nutthida Petchcharat,Email Mkt,iOS App,253,7,0,0.0,No
+CUST-0857,Sunee Suksom,Google Search,Desktop,144,2,0,0.0,No
+CUST-0858,Patchara Johnson,Social Ads,Mobile Web,352,12,0,0.0,No
+CUST-0859,Somsak Johnson,Google Search,Desktop,343,6,0,0.0,No
+CUST-0860,Kanya Rattanakul,Google Search,Desktop,638,15,0,0.0,No
+CUST-0861,Kittipong Vongpradit,Google Search,Mobile Web,381,13,0,0.0,No
+CUST-0862,Sarah Brown,Affiliate,Mobile Web,233,5,0,0.0,No
+CUST-0863,James Petchcharat,Social Ads,Desktop,73,3,0,0.0,No
+CUST-0864,James Thanasuk,Social Ads,Android App,96,3,0,0.0,No
+CUST-0865,Malee Wongsuwan,Email Mkt,Mobile Web,675,12,0,0.0,No
+CUST-0866,Prasert Wilson,Social Ads,Desktop,398,14,0,0.0,No
+CUST-0867,Michael Miller,Google Search,Desktop,556,10,1,3567.28,Yes
+CUST-0868,Prasert Smith,Google Search,Mobile Web,432,12,1,1136.91,Yes
+CUST-0869,Prasert Chaiwong,Google Search,Mobile Web,171,7,2,5448.4,Yes
+CUST-0870,Nattapong Thanasuk,Google Search,Desktop,125,2,1,1301.85,Yes
+CUST-0871,Rattana Jaroensuk,Affiliate,Desktop,136,6,0,0.0,No
+CUST-0872,Alex Jaroensuk,Social Ads,Desktop,551,9,0,0.0,No
+CUST-0873,Kittipong Petchcharat,Affiliate,iOS App,347,9,1,4141.06,Yes
+CUST-0874,Somchai Petchcharat,Direct,Android App,728,14,0,0.0,No
+CUST-0875,Waraporn Taylor,Email Mkt,Desktop,617,14,0,0.0,No
+CUST-0876,Malee Wilson,Google Search,Android App,110,2,0,0.0,No
+CUST-0877,Worawat Miller,Email Mkt,Mobile Web,50,1,0,0.0,No
+CUST-0878,Robert Williams,Social Ads,Mobile Web,547,11,0,0.0,No
+CUST-0879,David Wilson,Google Search,Desktop,748,14,0,0.0,No
+CUST-0880,Somchai Thanasuk,Email Mkt,Desktop,237,9,1,3005.53,Yes
+CUST-0881,Chaiwat Saetang,Google Search,Android App,235,6,0,0.0,No
+CUST-0882,Pongsak Petchcharat,Google Search,Desktop,346,8,0,0.0,No
+CUST-0883,Alex Kiatnarong,Direct,Desktop,668,11,0,0.0,No
+CUST-0884,Alex Boonma,Email Mkt,Desktop,291,5,0,0.0,No
+CUST-0885,Siriporn Suksom,Google Search,Desktop,150,2,1,3056.73,Yes
+CUST-0886,Sarah Boonma,Social Ads,Mobile Web,359,13,0,0.0,No
+CUST-0887,Worawat Taylor,Google Search,Mobile Web,437,8,0,0.0,No
+CUST-0888,Somsak Rattanakul,Direct,iOS App,121,2,0,0.0,No
+CUST-0889,Robert Taylor,Social Ads,Desktop,401,9,0,0.0,No
+CUST-0890,Patchara Boonma,Social Ads,Desktop,392,13,0,0.0,No
+CUST-0891,Nutthida Thanasuk,Social Ads,Desktop,66,1,0,0.0,No
+CUST-0892,Robert Nantakong,Email Mkt,iOS App,208,5,1,3904.81,Yes
+CUST-0893,Jessica Jaroensuk,Google Search,iOS App,275,6,0,0.0,No
+CUST-0894,Jessica Wilson,Social Ads,Mobile Web,186,4,0,0.0,No
+CUST-0895,Anan Chaiwong,Affiliate,Desktop,102,3,0,0.0,No
+CUST-0896,Jirayu Wilson,Social Ads,Android App,154,5,0,0.0,No
+CUST-0897,Somsak Brown,Social Ads,Desktop,296,10,1,2076.28,Yes
+CUST-0898,Emily Saetang,Social Ads,Desktop,260,7,0,0.0,No
+CUST-0899,Kittipong Ruangrit,Google Search,Desktop,310,5,0,0.0,No
+CUST-0900,Anan Jaroensuk,Google Search,Desktop,150,2,0,0.0,No
+CUST-0901,Rattana Miller,Email Mkt,Mobile Web,284,5,0,0.0,No
+CUST-0902,Sarah Wongsuwan,Social Ads,Desktop,488,9,0,0.0,No
+CUST-0903,Waraporn Suksom,Social Ads,Mobile Web,204,3,0,0.0,No
+CUST-0904,Jirayu Johnson,Direct,Mobile Web,511,10,0,0.0,No
+CUST-0905,Nattapong Vongpradit,Google Search,Mobile Web,164,4,0,0.0,No
+CUST-0906,Patchara Wilson,Social Ads,iOS App,138,2,0,0.0,No
+CUST-0907,Alex Williams,Social Ads,Desktop,380,10,0,0.0,No
+CUST-0908,Supaporn Wongsuwan,Google Search,iOS App,281,5,0,0.0,No
+CUST-0909,Patchara Wilson,Social Ads,Desktop,124,3,2,3727.74,Yes
+CUST-0910,Waraporn Kiatnarong,Affiliate,Android App,176,8,0,0.0,No
+CUST-0911,Anan Brown,Social Ads,iOS App,718,15,0,0.0,No
+CUST-0912,Anan Davis,Direct,Mobile Web,117,3,0,0.0,No
+CUST-0913,Prasert Vongpradit,Email Mkt,Mobile Web,710,13,0,0.0,No
+CUST-0914,Anan Smith,Social Ads,iOS App,288,6,0,0.0,No
+CUST-0915,Sunee Wilson,Google Search,Desktop,181,4,0,0.0,No
+CUST-0916,Nattapong Thanasuk,Social Ads,Mobile Web,119,2,0,0.0,No
+CUST-0917,Sunee Johnson,Affiliate,Android App,350,6,0,0.0,No
+CUST-0918,Michael Suksom,Social Ads,Android App,72,1,0,0.0,No
+CUST-0919,Sunee Johnson,Social Ads,Desktop,564,12,2,7960.82,Yes
+CUST-0920,Robert Suksom,Affiliate,Desktop,564,15,2,3418.86,Yes
+CUST-0921,Rattana Saetang,Affiliate,Mobile Web,697,15,0,0.0,No
+CUST-0922,Anan Thanasuk,Social Ads,Desktop,624,14,0,0.0,No
+CUST-0923,Chaiwat Saetang,Email Mkt,Mobile Web,319,6,0,0.0,No
+CUST-0924,Sarah Taylor,Email Mkt,iOS App,386,11,0,0.0,No
+CUST-0925,Siriporn Suksom,Social Ads,Mobile Web,346,6,0,0.0,No
+CUST-0926,Sunee Vongpradit,Email Mkt,iOS App,351,11,0,0.0,No
+CUST-0927,Sarah Taylor,Social Ads,Mobile Web,203,5,0,0.0,No
+CUST-0928,Sarah Williams,Google Search,Desktop,164,3,0,0.0,No
+CUST-0929,Malee Suksom,Direct,Android App,694,11,0,0.0,No
+CUST-0930,Anan Taylor,Google Search,Mobile Web,99,3,0,0.0,No
+CUST-0931,John Boonma,Google Search,Desktop,275,10,0,0.0,No
+CUST-0932,Patchara Taylor,Affiliate,Mobile Web,149,4,0,0.0,No
+CUST-0933,Alex Williams,Email Mkt,Desktop,274,7,0,0.0,No
+CUST-0934,David Wongsuwan,Social Ads,Desktop,86,3,0,0.0,No
+CUST-0935,Sunee Nantakong,Social Ads,Desktop,500,10,1,2029.85,Yes
+CUST-0936,Pongsak Wongsuwan,Email Mkt,Mobile Web,717,12,1,1040.21,Yes
+CUST-0937,Sunee Thanasuk,Affiliate,Android App,688,11,0,0.0,No
+CUST-0938,Wichai Suksom,Google Search,Mobile Web,272,5,0,0.0,No
+CUST-0939,Wichai Jaroensuk,Google Search,Desktop,362,8,1,2786.05,Yes
+CUST-0940,Supaporn Johnson,Google Search,Desktop,175,3,0,0.0,No
+CUST-0941,Patchara Williams,Affiliate,Desktop,542,14,0,0.0,No
+CUST-0942,Kanya Brown,Email Mkt,Mobile Web,212,3,0,0.0,No
+CUST-0943,Apinya Rattanakul,Google Search,Desktop,101,3,0,0.0,No
+CUST-0944,Jirayu Wilson,Google Search,iOS App,209,8,0,0.0,No
+CUST-0945,Worawat Taylor,Social Ads,iOS App,418,14,0,0.0,No
+CUST-0946,Rattana Williams,Google Search,Desktop,374,9,0,0.0,No
+CUST-0947,Rattana Jaroensuk,Direct,Desktop,744,13,0,0.0,No
+CUST-0948,Kittipong Smith,Email Mkt,Mobile Web,621,15,0,0.0,No
+CUST-0949,Prasert Davis,Social Ads,Android App,94,2,1,3433.13,Yes
+CUST-0950,Nutthida Taylor,Social Ads,Desktop,246,11,0,0.0,No
+CUST-0951,Apinya Brown,Direct,Android App,853,15,0,0.0,No
+CUST-0952,Nattapong Kiatnarong,Google Search,iOS App,328,12,0,0.0,No
+CUST-0953,Robert Chaiwong,Social Ads,Desktop,595,13,1,2268.04,Yes
+CUST-0954,Pongsak Williams,Social Ads,Android App,105,3,0,0.0,No
+CUST-0955,Patchara Williams,Affiliate,Mobile Web,184,6,0,0.0,No
+CUST-0956,Worawat Taylor,Affiliate,Mobile Web,612,10,1,2194.06,Yes
+CUST-0957,Waraporn Wilson,Social Ads,Desktop,403,9,0,0.0,No
+CUST-0958,Supaporn Thanasuk,Social Ads,Mobile Web,110,2,0,0.0,No
+CUST-0959,Nutthida Williams,Google Search,Desktop,605,15,0,0.0,No
+CUST-0960,David Jaroensuk,Google Search,Desktop,63,1,0,0.0,No
+CUST-0961,Thanawat Petchcharat,Social Ads,Mobile Web,531,14,0,0.0,No
+CUST-0962,Anan Vongpradit,Google Search,Mobile Web,264,8,0,0.0,No
+CUST-0963,Wichai Chaiwong,Social Ads,Mobile Web,376,6,0,0.0,No
+CUST-0964,Apinya Nantakong,Affiliate,Desktop,483,15,2,6109.59,Yes
+CUST-0965,Chaiwat Wilson,Social Ads,Desktop,55,2,0,0.0,No
+CUST-0966,Jirayu Davis,Affiliate,Android App,534,10,0,0.0,No
+CUST-0967,James Davis,Affiliate,Desktop,77,3,0,0.0,No
+CUST-0968,Somsak Wongsuwan,Affiliate,Desktop,365,11,0,0.0,No
+CUST-0969,Prapai Chaiwong,Social Ads,Mobile Web,382,8,3,10639.65,Yes
+CUST-0970,Apinya Thanasuk,Social Ads,iOS App,367,10,0,0.0,No
+CUST-0971,Pongsak Rattanakul,Social Ads,Desktop,689,14,0,0.0,No
+CUST-0972,David Rattanakul,Social Ads,Mobile Web,638,10,0,0.0,No
+CUST-0973,Worawat Smith,Email Mkt,Mobile Web,417,7,0,0.0,No
+CUST-0974,Alex Kiatnarong,Social Ads,Mobile Web,518,8,0,0.0,No
+CUST-0975,Patchara Suksom,Google Search,Mobile Web,369,8,0,0.0,No
+CUST-0976,Malee Jaroensuk,Affiliate,Desktop,503,10,0,0.0,No
+CUST-0977,Robert Wilson,Affiliate,Mobile Web,551,12,0,0.0,No
+CUST-0978,Kanya Nantakong,Google Search,Mobile Web,113,2,0,0.0,No
+CUST-0979,Kanya Nantakong,Social Ads,iOS App,332,8,0,0.0,No
+CUST-0980,Nattapong Suksom,Social Ads,Desktop,346,11,0,0.0,No
+CUST-0981,Wichai Chaiwong,Social Ads,Desktop,148,4,0,0.0,No
+CUST-0982,John Brown,Email Mkt,iOS App,737,13,0,0.0,No
+CUST-0983,Chaiwat Rattanakul,Direct,Desktop,227,8,0,0.0,No
+CUST-0984,Chaiwat Ruangrit,Google Search,Desktop,315,11,0,0.0,No
+CUST-0985,Kanya Williams,Email Mkt,iOS App,222,8,0,0.0,No
+CUST-0986,Emily Boonma,Google Search,Desktop,160,7,0,0.0,No
+CUST-0987,Nutthida Brown,Google Search,Desktop,265,5,0,0.0,No
+CUST-0988,James Kiatnarong,Email Mkt,Desktop,720,13,0,0.0,No
+CUST-0989,Siriporn Wilson,Social Ads,Desktop,472,8,0,0.0,No
+CUST-0990,Somsak Taylor,Google Search,Desktop,698,13,1,4434.1,Yes
+CUST-0991,Kanya Wilson,Google Search,iOS App,360,11,1,3453.8,Yes
+CUST-0992,David Wilson,Social Ads,Mobile Web,376,9,0,0.0,No
+CUST-0993,Somchai Johnson,Affiliate,Mobile Web,168,3,0,0.0,No
+CUST-0994,Apinya Miller,Affiliate,iOS App,248,7,1,2273.48,Yes
+CUST-0995,Siriporn Vongpradit,Direct,Desktop,144,2,0,0.0,No
+CUST-0996,Emily Kiatnarong,Google Search,Desktop,744,13,0,0.0,No
+CUST-0997,Michael Wilson,Direct,Desktop,64,1,0,0.0,No
+CUST-0998,Jessica Petchcharat,Google Search,Mobile Web,120,2,0,0.0,No
+CUST-0999,Somchai Taylor,Social Ads,Desktop,725,12,0,0.0,No
+CUST-1000,Malee Miller,Google Search,Mobile Web,832,14,1,3541.92,Yes
