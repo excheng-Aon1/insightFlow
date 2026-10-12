@@ -940,5 +940,53 @@ html[data-theme="light"] .apple-cinema-player {
   border-color: rgba(251, 191, 36, 0.45) !important;
 }
 
+/* ==========================================================================
+   SOLUTIONS SECTION LIVE INTERACTIVE ANIMATION ENGINE
+   ========================================================================== */
+@keyframes solScanBeam {
+  0%, 100% {
+    transform: translateY(0%);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(340%);
+    opacity: 0.95;
+  }
+}
+
+@keyframes solDataStream {
+  0% {
+    stroke-dashoffset: 60;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes solPulseRing {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.85;
+  }
+  70%, 100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+
+.sol-scan-beam {
+  animation: solScanBeam 2.8s ease-in-out infinite;
+}
+
+.sol-data-stream {
+  stroke-dasharray: 8 6;
+  animation: solDataStream 1.6s linear infinite;
+}
+
+.sol-pulse-ring {
+  animation: solPulseRing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+
 
 

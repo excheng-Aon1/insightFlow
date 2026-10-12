@@ -3119,6 +3119,404 @@ export function AppleKeynoteLogoFilm({
   );
 }
 
+/**
+ * Interactive 60FPS Animated Solutions Showcase ("บริการครบวงจรสำหรับเจ้าของร้าน")
+ * - Each of the 4 core store owner services has its own live 60FPS animated HUD stage
+ * - Auto-cycles spotlight across the 4 services or lets the user click/hover any card
+ * - 1-click button on each card launches the live interactive dashboard tab
+ */
+export function AnimatedSolutionsShowcase({ lang = 'th', t, onLaunchSolution }) {
+  const isEn = lang === 'en';
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+
+  const items = [
+    {
+      idx: 0,
+      tabId: 'overview',
+      stepBadge: isEn ? 'SERVICE 01 • AI GOAL ENGINE' : 'บริการที่ 01 • วางแผนเป้าหมายอัจฉริยะ',
+      title: t.s1Title,
+      desc: t.s1Desc,
+      iconType: 'overview',
+      variant: 'gold',
+      liveBadge: isEn ? 'Live Target: ฿10,000,000' : 'เป้าหมายสด: ฿10,000,000',
+      kpiLabel: isEn ? 'Goal Progress' : 'ความคืบหน้าเป้าหมาย',
+      kpiVal: '89.2%',
+      kpiSub: isEn ? '+฿333,333 / day on track' : 'เติบโตตามแผน +14.2%',
+      borderActive: 'border-amber-400 shadow-[0_18px_50px_-12px_rgba(251,191,36,0.45)]',
+      pillBg: 'bg-amber-400/20 text-amber-300 border-amber-400/45',
+      ctaBg: 'from-amber-400 to-amber-300 text-slate-950'
+    },
+    {
+      idx: 1,
+      tabId: 'customers',
+      stepBadge: isEn ? 'SERVICE 02 • VIP & CHURN RADAR' : 'บริการที่ 02 • เรดาร์ดูแลลูกค้าประจำ',
+      title: t.s2Title,
+      desc: t.s2Desc,
+      iconType: 'customers',
+      variant: 'ruby',
+      liveBadge: isEn ? 'Auto Win-Back Active' : 'ดึงลูกค้าเก่ากลับอัตโนมัติ',
+      kpiLabel: isEn ? 'Returning VIP Buyers' : 'ลูกค้ากลับมาซื้อซ้ำ',
+      kpiVal: '+142 ราย',
+      kpiSub: isEn ? '99.1% VIP Retention Rate' : 'รักษาลูกค้าชั้นดีได้ 99.1%',
+      borderActive: 'border-rose-400 shadow-[0_18px_50px_-12px_rgba(244,63,94,0.42)]',
+      pillBg: 'bg-rose-500/20 text-rose-300 border-rose-400/45',
+      ctaBg: 'from-rose-400 to-amber-300 text-slate-950'
+    },
+    {
+      idx: 2,
+      tabId: 'staff_pos',
+      stepBadge: isEn ? 'SERVICE 03 • POS & CASHIER SHIELD' : 'บริการที่ 03 • สแกนแคชเชียร์ & ป้องกันรั่วไหล',
+      title: t.s3Title,
+      desc: t.s3Desc,
+      iconType: 'staff_pos',
+      variant: 'sapphire',
+      liveBadge: isEn ? '24/7 POS Fraud Guard' : 'สแกนบิลผิดปกติ 24 ชม.',
+      kpiLabel: isEn ? 'Bill Audit Accuracy' : 'ความโปร่งใสหน้าแคชเชียร์',
+      kpiVal: '99.8%',
+      kpiSub: isEn ? 'Instant 0.2s Void Bill Alert' : 'เตือนยกเลิกบิลผิดปกติใน 0.2 วินาที',
+      borderActive: 'border-sky-400 shadow-[0_18px_50px_-12px_rgba(56,189,248,0.42)]',
+      pillBg: 'bg-sky-500/20 text-sky-300 border-sky-400/45',
+      ctaBg: 'from-sky-400 to-cyan-300 text-slate-950'
+    },
+    {
+      idx: 3,
+      tabId: 'multi_channel',
+      stepBadge: isEn ? 'SERVICE 04 • OMNICHANNEL HUB' : 'บริการที่ 04 • เชื่อมทุกสาขา & ออนไลน์',
+      title: t.s4Title,
+      desc: t.s4Desc,
+      iconType: 'multi_channel',
+      variant: 'emerald',
+      liveBadge: isEn ? 'POS + Online Synced' : 'ซิงค์หน้าร้าน + ออนไลน์ครบ',
+      kpiLabel: isEn ? 'Net Omnichannel Margin' : 'กำไรสุทธิรวมทุกช่องทาง',
+      kpiVal: '+34.8%',
+      kpiSub: isEn ? 'Storefront • Shopee • TikTok • LINE' : 'หน้าร้าน • Shopee • TikTok • LINE',
+      borderActive: 'border-emerald-400 shadow-[0_18px_50px_-12px_rgba(52,211,153,0.42)]',
+      pillBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/45',
+      ctaBg: 'from-emerald-400 to-teal-300 text-slate-950'
+    }
+  ];
+
+  useEffect(() => {
+    if (!isAutoPlay) return undefined;
+    const timer = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % items.length);
+    }, 3800);
+    return () => clearInterval(timer);
+  }, [isAutoPlay, items.length]);
+
+  const renderMiniAnimationStage = idx => {
+    if (idx === 0) {
+      // Animated 3D Rising Revenue Pillars + Golden Trajectory Wave
+      return (
+        <div className="cyber-toast-hud relative h-36 w-full rounded-2xl bg-[#050915] border border-amber-400/30 p-3.5 overflow-hidden flex flex-col justify-between">
+          <div className="pointer-events-none absolute -top-8 -right-8 w-28 h-28 rounded-full bg-amber-400/20 blur-2xl" />
+          <div className="relative z-10 flex items-center justify-between text-[11px]">
+            <span className="font-black text-amber-300 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+              {isEn ? 'AI GOAL TRAJECTORY' : 'จำลองเส้นทางสู่ ฿10,000,000'}
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px]">
+              89.2%
+            </span>
+          </div>
+
+          <div className="relative z-10 flex items-end justify-between gap-2 h-20 pt-2 px-1">
+            <svg viewBox="0 0 220 70" className="w-full h-full overflow-visible">
+              <defs>
+                <linearGradient id="solGoldBar" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#FEF08A" />
+                  <stop offset="50%" stopColor="#FBBF24" />
+                  <stop offset="100%" stopColor="#B45309" />
+                </linearGradient>
+                <linearGradient id="solCyanBar" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#BAE6FD" />
+                  <stop offset="100%" stopColor="#0284C7" />
+                </linearGradient>
+              </defs>
+              {/* Animated Rising Bars */}
+              <rect className="apple-pillar-1" x="14" y="42" width="22" height="24" rx="4" fill="url(#solCyanBar)" opacity="0.75" />
+              <rect className="apple-pillar-2" x="52" y="32" width="22" height="34" rx="4" fill="url(#solCyanBar)" opacity="0.9" />
+              <rect className="apple-pillar-1" x="90" y="24" width="22" height="42" rx="4" fill="#34D399" opacity="0.9" />
+              <rect className="apple-pillar-2" x="128" y="16" width="22" height="50" rx="4" fill="url(#solGoldBar)" />
+              <rect className="apple-pillar-3" x="166" y="6" width="26" height="60" rx="5" fill="url(#solGoldBar)" />
+
+              {/* Animated Golden Laser Wave */}
+              <path
+                className="apple-trajectory-wave"
+                d="M 18 52 C 65 44, 118 28, 182 8"
+                fill="none"
+                stroke="#FFFBEB"
+                strokeWidth="3.2"
+                strokeLinecap="round"
+              />
+              <circle cx="182" cy="8" r="5" fill="#FDE047" className="animate-ping" />
+              <circle cx="182" cy="8" r="4" fill="#FFFBEB" />
+            </svg>
+          </div>
+        </div>
+      );
+    }
+
+    if (idx === 1) {
+      // Animated VIP Customer Retention Radar & Win-Back Pulse
+      return (
+        <div className="cyber-toast-hud relative h-36 w-full rounded-2xl bg-[#050915] border border-rose-400/30 p-3.5 overflow-hidden flex flex-col justify-between">
+          <div className="pointer-events-none absolute -top-8 -left-8 w-28 h-28 rounded-full bg-rose-500/20 blur-2xl" />
+          <div className="relative z-10 flex items-center justify-between text-[11px]">
+            <span className="font-black text-rose-300 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
+              {isEn ? 'VIP & CHURN RADAR' : 'เรดาร์ดึงลูกค้าประจำกลับมาซื้อ'}
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px]">
+              +142 VIP
+            </span>
+          </div>
+
+          <div className="relative z-10 flex items-center justify-between gap-3 my-auto">
+            {/* Radar Circle */}
+            <div className="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+              <span className="sol-pulse-ring absolute inset-0 rounded-full border-2 border-rose-400/60" />
+              <span
+                className="absolute inset-1 rounded-full border border-dashed border-amber-300/60"
+                style={{ animation: 'appleHaloRotate 10s linear infinite' }}
+              />
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 to-amber-500 flex items-center justify-center text-white font-black text-xs shadow-lg">
+                VIP
+              </div>
+            </div>
+
+            {/* Animated Customer Segments */}
+            <div className="flex-1 space-y-1.5 text-[11px]">
+              <div className="flex items-center justify-between px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/30">
+                <span className="text-emerald-300 font-bold">
+                  {isEn ? '💎 Loyal VIPs' : '💎 ขาประจำ VIP'}
+                </span>
+                <span className="text-white font-black">89.4%</span>
+              </div>
+              <div className="flex items-center justify-between px-2.5 py-1 rounded-lg bg-amber-400/15 border border-amber-400/35">
+                <span className="text-amber-300 font-bold">
+                  {isEn ? '📲 Auto LINE Coupon' : '📲 ส่งคูปองดึงกลับ'}
+                </span>
+                <span className="text-emerald-300 font-black animate-pulse">
+                  {isEn ? 'Sent ✓' : 'สำเร็จ ✓'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (idx === 2) {
+      // Animated Cashier & POS Fraud Security Laser Scanner
+      return (
+        <div className="cyber-toast-hud relative h-36 w-full rounded-2xl bg-[#050915] border border-sky-400/30 p-3.5 overflow-hidden flex flex-col justify-between">
+          {/* Scanning Horizontal Laser Beam */}
+          <div className="sol-scan-beam pointer-events-none absolute inset-x-0 top-4 h-6 bg-gradient-to-b from-sky-400/30 via-sky-300/10 to-transparent border-t border-sky-300/80" />
+
+          <div className="relative z-10 flex items-center justify-between text-[11px]">
+            <span className="font-black text-sky-300 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+              {isEn ? 'LIVE POS SHIELD SCAN' : 'สแกนบิลแคชเชียร์เรียลไทม์'}
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-sky-400 text-slate-950 font-black text-[10px]">
+              99.8% SAFE
+            </span>
+          </div>
+
+          <div className="relative z-10 space-y-1.5 my-auto text-[11px]">
+            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10">
+              <span className="text-slate-200 font-bold">
+                {isEn ? '🛡️ Cashier #01 - #04' : '🛡️ เครื่องคิดเงิน #01 - #04'}
+              </span>
+              <span className="text-emerald-400 font-black">
+                {isEn ? 'Verified Normal' : 'บิลปกติ 100%'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-rose-500/20 border border-rose-400/50">
+              <span className="text-rose-200 font-bold">
+                {isEn ? '🚨 Void Bill Detect' : '🚨 จับบิลยกเลิกผิดปกติ'}
+              </span>
+              <span className="text-amber-300 font-black animate-pulse">
+                {isEn ? 'Alert in 0.2s' : 'แจ้งเตือนใน 0.2 วิ'}
+              </span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // idx === 3: Animated Omnichannel & Multi-Branch Data Stream
+    return (
+      <div className="cyber-toast-hud relative h-36 w-full rounded-2xl bg-[#050915] border border-emerald-400/30 p-3.5 overflow-hidden flex flex-col justify-between">
+        <div className="pointer-events-none absolute -bottom-8 -right-8 w-28 h-28 rounded-full bg-emerald-400/20 blur-2xl" />
+        <div className="relative z-10 flex items-center justify-between text-[11px]">
+          <span className="font-black text-emerald-300 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            {isEn ? 'OMNICHANNEL LIVE SYNC' : 'ซิงค์ยอดทุกสาขา & ออนไลน์'}
+          </span>
+          <span className="px-2 py-0.5 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px]">
+            +34.8%
+          </span>
+        </div>
+
+        <div className="relative z-10 flex items-center justify-between gap-2 my-auto">
+          <div className="space-y-1 text-[10px] font-black">
+            <div className="px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40">
+              🏪 {isEn ? 'Store POS' : 'หน้าร้าน POS'}
+            </div>
+            <div className="px-2 py-0.5 rounded bg-sky-400/20 text-sky-300 border border-sky-400/40">
+              🛒 Shopee • TikTok
+            </div>
+            <div className="px-2 py-0.5 rounded bg-emerald-400/20 text-emerald-300 border border-emerald-400/40">
+              💬 LINE OA 22:00
+            </div>
+          </div>
+
+          {/* Animated Data Stream Lines */}
+          <svg viewBox="0 0 80 54" className="w-16 h-14 flex-shrink-0 overflow-visible">
+            <path
+              className="sol-data-stream"
+              d="M 2 10 C 35 10, 45 27, 76 27"
+              fill="none"
+              stroke="#FBBF24"
+              strokeWidth="2.2"
+            />
+            <path
+              className="sol-data-stream"
+              d="M 2 27 L 76 27"
+              fill="none"
+              stroke="#38BDF8"
+              strokeWidth="2.2"
+            />
+            <path
+              className="sol-data-stream"
+              d="M 2 44 C 35 44, 45 27, 76 27"
+              fill="none"
+              stroke="#34D399"
+              strokeWidth="2.2"
+            />
+            <circle cx="76" cy="27" r="5" fill="#34D399" className="animate-ping" />
+          </svg>
+
+          <div className="px-2.5 py-2 rounded-xl bg-gradient-to-br from-emerald-500/25 to-amber-400/20 border border-emerald-400/50 text-center">
+            <div className="text-[10px] text-emerald-300 font-bold">
+              {isEn ? 'Net Profit' : 'กำไรสุทธิรวม'}
+            </div>
+            <div className="text-sm font-black text-white">฿1.84M</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      {/* Interactive Animation Control Bar */}
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/15 border border-amber-400/35 text-xs font-black text-amber-300">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+          <span>
+            {isEn
+              ? '✨ Interactive Live Animation — Click any card to preview or launch'
+              : '✨ แอนิเมชันจำลองการทำงานจริง — กดที่การ์ดเพื่อดูไฮไลท์หรือทดลองใช้งานจริง'}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsAutoPlay(p => !p)}
+          className="px-3.5 py-1.5 rounded-full bg-[#0b1120] hover:bg-slate-800 border border-white/15 text-xs font-black text-white transition cursor-pointer"
+        >
+          {isAutoPlay
+            ? isEn
+              ? '⏸ Pause Auto-Tour'
+              : '⏸ หยุดสลับการ์ดอัตโนมัติ'
+            : isEn
+            ? '▶ Play Auto-Tour'
+            : '▶ เล่นสลับการ์ดอัตโนมัติ'}
+        </button>
+      </div>
+
+      {/* 4 Animated Solution Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {items.map((sol, idx) => {
+          const isCurrent = activeIdx === idx;
+          return (
+            <div
+              key={idx}
+              onMouseEnter={() => setActiveIdx(idx)}
+              onClick={() => setActiveIdx(idx)}
+              className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-500 cursor-pointer flex flex-col justify-between bg-[#0b1120]/90 border-2 ${
+                isCurrent
+                  ? `${sol.borderActive} -translate-y-2`
+                  : 'border-white/10 hover:border-amber-400/40 hover:-translate-y-1 shadow-xl'
+              }`}
+            >
+              {/* Moving Shimmer Beam on Active Card */}
+              {isCurrent && (
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                  <div className="apple-light-sweep absolute -inset-y-10 w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
+              )}
+
+              <div>
+                {/* Top Header: 3D Icon + Step Badge */}
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <div className="transform group-hover:scale-110 transition duration-300">
+                    <LuxuryIconBadge variant={sol.variant} size="lg" active={isCurrent}>
+                      <LuxuryModuleIcon type={sol.iconType} size={28} />
+                    </LuxuryIconBadge>
+                  </div>
+                  <span
+                    className={`px-2.5 py-1 rounded-full text-[10px] font-black border ${sol.pillBg}`}
+                  >
+                    {sol.liveBadge}
+                  </span>
+                </div>
+
+                {/* Live 60FPS Mini Animation Stage inside Card */}
+                <div className="mb-4">{renderMiniAnimationStage(idx)}</div>
+
+                <div className="text-[11px] font-black text-amber-400 mb-1">
+                  {sol.stepBadge}
+                </div>
+                <h3 className="text-lg font-black text-white mb-2 leading-snug">
+                  {sol.title}
+                </h3>
+                <p className="text-sm text-slate-300 leading-relaxed mb-5">
+                  {sol.desc}
+                </p>
+              </div>
+
+              {/* Bottom Live KPI & Launch Action */}
+              <div className="pt-3.5 border-t border-white/10">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-slate-400">{sol.kpiLabel}</span>
+                  <span className="text-base font-black text-amber-300">{sol.kpiVal}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={e => {
+                    e.stopPropagation();
+                    if (onLaunchSolution) onLaunchSolution(sol.tabId);
+                  }}
+                  className={`w-full py-2.5 px-4 rounded-xl bg-gradient-to-r ${sol.ctaBg} font-black text-xs shadow-lg hover:brightness-110 transition cursor-pointer flex items-center justify-center gap-1.5`}
+                >
+                  <span>
+                    {isEn ? '⚡ Launch Live Module' : '⚡ กดทดลองใช้บริการนี้ทันที'}
+                  </span>
+                  <span>→</span>
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 
 // --- MODULE 3: OVERVIEW & CUSTOMER INSIGHTS ---
 
@@ -12709,31 +13107,21 @@ function App() {
             </div>
           )}
 
-          {/* Solutions Section */}
+          {/* Solutions Section (Interactive 60FPS Animated Store Owner Services Showcase) */}
           <div id="solutions" className="py-16 border-t border-white/10">
-            <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="text-center max-w-3xl mx-auto mb-8">
               <div className="text-amber-400 text-xs font-black uppercase mb-2">{t.solutionsHeading}</div>
               <h2 className="text-3xl font-black text-white mb-3">{t.solutionsTitle}</h2>
               <p className="text-slate-400">{t.solutionsDesc}</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { title: t.s1Title, desc: t.s1Desc, iconType: 'overview', variant: 'gold' },
-                { title: t.s2Title, desc: t.s2Desc, iconType: 'customers', variant: 'ruby' },
-                { title: t.s3Title, desc: t.s3Desc, iconType: 'staff_pos', variant: 'sapphire' },
-                { title: t.s4Title, desc: t.s4Desc, iconType: 'multi_channel', variant: 'emerald' }
-              ].map((sol, idx) => (
-                <div key={idx} className="bg-[#0b1120]/80 border border-white/10 hover:border-amber-400/40 transition p-7 rounded-3xl shadow-xl">
-                  <div className="mb-5">
-                    <LuxuryIconBadge variant={sol.variant} size="lg" active>
-                      <LuxuryModuleIcon type={sol.iconType} size={28} />
-                    </LuxuryIconBadge>
-                  </div>
-                  <h3 className="text-lg font-black text-white mb-2">{sol.title}</h3>
-                  <p className="text-sm text-slate-300 leading-relaxed">{sol.desc}</p>
-                </div>
-              ))}
-            </div>
+            <AnimatedSolutionsShowcase
+              lang={lang}
+              t={t}
+              onLaunchSolution={tabId => {
+                setActiveTab(tabId);
+                setIsLoginOpen(true);
+              }}
+            />
           </div>
 
           {/* Why Us Section */}
