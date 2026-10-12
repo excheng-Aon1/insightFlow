@@ -510,6 +510,133 @@ export function LuxuryModuleIcon({ type = 'overview', size = 26 }) {
         </svg>
       );
 
+    case 'procurement':
+      return (
+        <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="luxProcGold" x1="3" y1="4" x2="29" y2="28" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FEF08A" />
+              <stop offset="50%" stopColor="#FBBF24" />
+              <stop offset="100%" stopColor="#D97706" />
+            </linearGradient>
+            <linearGradient id="luxProcCyan" x1="4" y1="6" x2="28" y2="26" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#BAE6FD" />
+              <stop offset="55%" stopColor="#38BDF8" />
+              <stop offset="100%" stopColor="#0284C7" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M16 3.5L27.5 9.5V21.5L16 27.5L4.5 21.5V9.5L16 3.5Z"
+            fill="rgba(245, 158, 11, 0.16)"
+            stroke="url(#luxProcGold)"
+            strokeWidth="2.1"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M4.5 9.5L16 15.5L27.5 9.5M16 15.5V27.5"
+            stroke="url(#luxProcCyan)"
+            strokeWidth="1.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="22.5" cy="22.5" r="5.5" fill="#064E3B" stroke="#34D399" strokeWidth="2" />
+          <path d="M20.2 22.5L21.8 24.1L25 20.9" stroke="#A7F3D0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+
+    case 'speed_engine':
+      return (
+        <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="luxSpeedGold" x1="6" y1="2" x2="26" y2="30" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FFFBEB" />
+              <stop offset="45%" stopColor="#FDE047" />
+              <stop offset="100%" stopColor="#D97706" />
+            </linearGradient>
+            <linearGradient id="luxSpeedCyan" x1="2" y1="4" x2="30" y2="28" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#E0F2FE" />
+              <stop offset="50%" stopColor="#38BDF8" />
+              <stop offset="100%" stopColor="#0284C7" />
+            </linearGradient>
+          </defs>
+          <circle cx="16" cy="16" r="13" stroke="url(#luxSpeedCyan)" strokeWidth="1.8" strokeDasharray="6 3" opacity="0.75" />
+          <circle cx="16" cy="16" r="9.5" fill="rgba(251, 191, 36, 0.14)" stroke="rgba(253, 224, 71, 0.35)" strokeWidth="1.2" />
+          <path
+            d="M17.8 3.5L7.5 17.2H15.2L13.8 28.5L24.5 14.2H16.6L17.8 3.5Z"
+            fill="url(#luxSpeedGold)"
+            stroke="#FFFBEB"
+            strokeWidth="1.1"
+            strokeLinejoin="round"
+          />
+          <circle cx="5" cy="10" r="1.6" fill="#38BDF8" />
+          <circle cx="27" cy="22" r="1.6" fill="#FEF08A" />
+        </svg>
+      );
+
+    case 'precision_target':
+      return (
+        <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="luxTargetGold" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FEF08A" />
+              <stop offset="50%" stopColor="#FBBF24" />
+              <stop offset="100%" stopColor="#B45309" />
+            </linearGradient>
+            <linearGradient id="luxTargetRuby" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FECDD3" />
+              <stop offset="50%" stopColor="#F43F5E" />
+              <stop offset="100%" stopColor="#BE123C" />
+            </linearGradient>
+            <linearGradient id="luxTargetEmerald" x1="12" y1="4" x2="29" y2="18" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#A7F3D0" />
+              <stop offset="100%" stopColor="#10B981" />
+            </linearGradient>
+          </defs>
+          <circle cx="15.5" cy="16.5" r="11.5" fill="rgba(244, 63, 94, 0.12)" stroke="url(#luxTargetGold)" strokeWidth="2" />
+          <circle cx="15.5" cy="16.5" r="7.2" fill="rgba(251, 191, 36, 0.12)" stroke="url(#luxTargetRuby)" strokeWidth="1.8" />
+          <path d="M15.5 2.5V5.5M15.5 27.5V30M2 16.5H4.5M26.5 16.5H29" stroke="#FDE047" strokeWidth="1.6" strokeLinecap="round" />
+          <circle cx="15.5" cy="16.5" r="3.2" fill="#FEF08A" stroke="#F43F5E" strokeWidth="1.4" />
+          <path d="M28.5 3.5L16.2 15.8" stroke="url(#luxTargetEmerald)" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M23.5 3.5H28.5V8.5" stroke="#A7F3D0" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+
+    case 'global_shield':
+      return (
+        <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="luxShieldEmerald" x1="5" y1="3" x2="27" y2="29" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#D1FAE5" />
+              <stop offset="45%" stopColor="#10B981" />
+              <stop offset="100%" stopColor="#065F46" />
+            </linearGradient>
+            <linearGradient id="luxShieldGold" x1="6" y1="3" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FFFBEB" />
+              <stop offset="50%" stopColor="#FBBF24" />
+              <stop offset="100%" stopColor="#B45309" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M16 2.8L26.8 6.8V15.4C26.8 22.3 22.1 27.4 16 29.5C9.9 27.4 5.2 22.3 5.2 15.4V6.8L16 2.8Z"
+            fill="rgba(16, 185, 129, 0.18)"
+            stroke="url(#luxShieldGold)"
+            strokeWidth="2.1"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M16 5.6L24 8.6V15.1C24 20.4 20.5 24.4 16 26.3C11.5 24.4 8 20.4 8 15.1V8.6L16 5.6Z"
+            fill="url(#luxShieldEmerald)"
+            fillOpacity="0.28"
+            stroke="#6EE7B7"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+          <ellipse cx="16" cy="15.8" rx="6.5" ry="3.2" stroke="rgba(254, 240, 138, 0.45)" strokeWidth="1" />
+          <circle cx="16" cy="15.8" r="4.8" fill="#064E3B" stroke="url(#luxShieldGold)" strokeWidth="1.6" />
+          <path d="M13.6 15.8L15.3 17.5L18.7 14.1" stroke="#FEF08A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+
     default:
       return null;
   }
