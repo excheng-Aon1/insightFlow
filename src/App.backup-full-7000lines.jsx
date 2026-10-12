@@ -7145,7 +7145,13 @@ export function DatabaseTab({
   );
 }
 
-export function AdminTab({ lang, user }) {
+export function AdminTab({
+  lang,
+  user,
+  registeredWebCustomers = [],
+  setRegisteredWebCustomers,
+  onSyncContactWithBackend
+}) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
 
@@ -7153,8 +7159,207 @@ export function AdminTab({ lang, user }) {
   const [requirePinForRefund, setRequirePinForRefund] = useState(true);
   const [autoBackupDaily, setAutoBackupDaily] = useState(true);
 
+  // Admin Registered Customer Registry State
+  const [memberSearch, setMemberSearch] = useState('');
+  const [memberPlanFilter, setMemberPlanFilter] = useState('all');
+  const [showAddMemberForm, setShowAddMemberForm] = useState(false);
+  const [newMemName, setNewMemName] = useState('');
+  const [newMemPhone, setNewMemPhone] = useState('');
+  const [newMemLineId, setNewMemLineId] = useState('');
+  const [newMemEmail, setNewMemEmail] = useState('');
+  const [newMemPlan, setNewMemPlan] = useState('premium');
+
+  // Inline Editing State for Registered Customer
+  const [editingMemberId, setEditingMemberId] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editLineId, setEditLineId] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPlan, setEditPlan] = useState('premium');
+
+  const persistMembers = nextList => {
+    if (setRegisteredWebCustomers) {
+      setRegisteredWebCustomers(nextList);
+    }
+    try {
+      localStorage.setItem('insightflow_registered_web_customers', JSON.stringify(nextList));
+    } catch {
+      // ignore storage error
+    }
+  };
+
+  const handleAddMemberSubmit = e => {
+    e.preventDefault();
+    if (!newMemName.trim() || !newMemPhone.trim() || !newMemLineId.trim()) {
+      toast.error(
+        tx(
+          'กรุณากรอก ชื่อลูกค้า เบอร์โทรศัพท์ และ ID LINE ให้ครบถ้วน',
+          'Please fill in Customer Name, Phone Number, and LINE ID'
+        )
+      );
+      return;
+    }
+    const formattedLine = newMemLineId.trim().startsWith('@')
+      ? newMemLineId.trim()
+      : `@${newMemLineId.trim()}`;
+    const nowTime = new Date().toLocaleString(isEn ? 'en-GB' : 'th-TH', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    const newMember = {
+      id: `MEM-2026-${String(registeredWebCustomers.length + 1).padStart(3, '0')}`,
+      nameTh: newMemName.trim(),
+      nameEn: newMemName.trim(),
+      phone: newMemPhone.trim(),
+      lineId: formattedLine,
+      email: (newMemEmail.trim() || `member${registeredWebCustomers.length + 1}@insightflow.app`).toLowerCase(),
+      plan: newMemPlan,
+      registeredAtTh: `สมัครเมื่อ ${nowTime} น.`,
+      registeredAtEn: `Registered ${nowTime}`,
+      notifyTime: '22:00',
+      lineLinked: true
+    };
+    const nextList = [newMember, ...registeredWebCustomers];
+    persistMembers(nextList);
+    if (onSyncContactWithBackend) {
+      onSyncContactWithBackend(newMember.phone, newMember.lineId, newMember.email, newMember.nameTh);
+    }
+    setNewMemName('');
+    setNewMemPhone('');
+    setNewMemLineId('');
+    setNewMemEmail('');
+    setShowAddMemberForm(false);
+    toast.success(
+      tx(
+        `✅ เพิ่มลูกค้า "${newMember.nameTh}" (เบอร์ ${newMember.phone} • LINE ${newMember.lineId}) เข้าหน้าต่าง Admin เรียบร้อยแล้ว!`,
+        `✅ Added "${newMember.nameEn}" (Phone ${newMember.phone} • LINE ${newMember.lineId}) to Admin Registry!`
+      )
+    );
+  };
+
+  const handleStartEditMember = mem => {
+    setEditingMemberId(mem.id);
+    setEditName(isEn ? mem.nameEn || mem.nameTh : mem.nameTh || mem.nameEn);
+    setEditPhone(mem.phone || '');
+    setEditLineId(mem.lineId || '');
+    setEditEmail(mem.email || '');
+    setEditPlan(mem.plan || 'premium');
+  };
+
+  const handleSaveEditMember = memId => {
+    const nextList = registeredWebCustomers.map(m => {
+      if (m.id !== memId) return m;
+      const updated = {
+        ...m,
+        nameTh: editName.trim() || m.nameTh,
+        nameEn: editName.trim() || m.nameEn,
+        phone: editPhone.trim() || m.phone,
+        lineId: editLineId.trim() || m.lineId,
+        email: editEmail.trim() || m.email,
+        plan: editPlan
+      };
+      if (onSyncContactWithBackend) {
+        onSyncContactWithBackend(updated.phone, updated.lineId, updated.email, updated.nameTh);
+      }
+      return updated;
+    });
+    persistMembers(nextList);
+    setEditingMemberId(null);
+    toast.success(
+      tx(
+        '💾 บันทึกการแก้ไข ชื่อ เบอร์โทร และ ID LINE ของลูกค้าในหน้า Admin เรียบร้อยแล้ว!',
+        '💾 Saved updated customer Name, Phone, and LINE ID in Admin Registry!'
+      )
+    );
+  };
+
+  const handleDeleteMember = mem => {
+    const displayName = isEn ? mem.nameEn || mem.nameTh : mem.nameTh;
+    const nextList = registeredWebCustomers.filter(m => m.id !== mem.id);
+    persistMembers(nextList);
+    toast.success(
+      tx(
+        `🗑️ ลบรายชื่อ "${displayName}" ออกจากทะเบียน Admin เรียบร้อยแล้ว`,
+        `🗑️ Removed "${displayName}" from Admin customer registry`
+      )
+    );
+  };
+
+  const handleChangeMemberPlan = (memId, nextPlan) => {
+    const nextList = registeredWebCustomers.map(m =>
+      m.id === memId ? { ...m, plan: nextPlan } : m
+    );
+    persistMembers(nextList);
+    toast.success(
+      tx(
+        `อัปเดตแพ็กเกจของลูกค้าเป็น ${nextPlan.toUpperCase()} เรียบร้อยแล้ว`,
+        `Updated customer subscription plan to ${nextPlan.toUpperCase()}`
+      )
+    );
+  };
+
+  const handleExportRegisteredMembersCsv = () => {
+    const headers = isEn
+      ? ['Member ID', 'Customer Name', 'Phone Number', 'LINE ID', 'Email', 'Package Plan', 'Auto-Notify Time', 'Registered Date']
+      : ['รหัสสมาชิก', 'ชื่อลูกค้าที่สมัครเว็บ', 'เบอร์โทรศัพท์', 'ไอดีไลน์ (LINE ID)', 'อีเมล', 'แพ็กเกจ', 'เวลาส่งยอดขายอัตโนมัติ', 'วันที่สมัคร'];
+    const rows = registeredWebCustomers.map(m => [
+      `"${m.id}"`,
+      `"${isEn ? m.nameEn || m.nameTh : m.nameTh}"`,
+      `"${m.phone}"`,
+      `"${m.lineId}"`,
+      `"${m.email || '-'}"`,
+      `"${(m.plan || 'premium').toUpperCase()}"`,
+      `"${m.notifyTime || '22:00'} น."`,
+      `"${isEn ? m.registeredAtEn || m.registeredAtTh : m.registeredAtTh}"`
+    ]);
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', isEn ? 'Admin_Registered_Website_Customers.csv' : 'รายชื่อลูกค้าที่สมัครเว็บไซต์ทั้งหมด_Admin.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success(
+      tx(
+        '📥 ดาวน์โหลดไฟล์รายชื่อลูกค้าที่สมัครเว็บไซต์ทั้งหมด (ชื่อ • เบอร์โทร • ไลน์) สำเร็จ!',
+        '📥 Downloaded complete Admin Registered Website Customers CSV!'
+      )
+    );
+  };
+
+  const filteredMembers = registeredWebCustomers.filter(m => {
+    const matchPlan = memberPlanFilter === 'all' || m.plan === memberPlanFilter;
+    const q = memberSearch.trim().toLowerCase();
+    if (!q) return matchPlan;
+    const nameStr = `${m.nameTh || ''} ${m.nameEn || ''}`.toLowerCase();
+    return (
+      matchPlan &&
+      (nameStr.includes(q) ||
+        (m.phone || '').toLowerCase().includes(q) ||
+        (m.lineId || '').toLowerCase().includes(q) ||
+        (m.email || '').toLowerCase().includes(q) ||
+        (m.id || '').toLowerCase().includes(q))
+    );
+  });
+
+  const planBadgeMeta = planKey => {
+    if (planKey === 'starter') {
+      return { label: 'STARTER (1,990.-)', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.16)' };
+    }
+    if (planKey === 'professional') {
+      return { label: 'PRO (2,900.-)', color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.18)' };
+    }
+    return { label: 'PREMIUM (4,900.-)', color: '#c084fc', bg: 'rgba(192, 132, 252, 0.18)' };
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* 1. SUPER ADMIN HEADER BANNER */}
       <div
         className="glass-card"
         style={{
@@ -7185,7 +7390,7 @@ export function AdminTab({ lang, user }) {
                   color: '#0f172a'
                 }}
               >
-                👑 {tx('SUPER ADMIN • ยกเว้นแพ็กเกจทั้งหมด', 'SUPER ADMIN • EXEMPT FROM PACKAGES')}
+                👑 {tx('SUPER ADMIN • ศูนย์จัดการลูกค้าที่สมัครเว็บไซต์ทั้งหมด', 'SUPER ADMIN • REGISTERED WEBSITE CUSTOMERS')}
               </span>
               <span
                 style={{
@@ -7202,15 +7407,734 @@ export function AdminTab({ lang, user }) {
               </span>
             </div>
             <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: '#f8fafc' }}>
-              {tx('ศูนย์ควบคุมสิทธิ์ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin & Executive Security Control Center')}
+              {tx(
+                'หน้าต่างผู้ดูแลระบบสูงสุด (Admin): ทะเบียนลูกค้าที่สมัครเว็บไซต์ (ชื่อ • เบอร์โทร • ไลน์)',
+                'Super Admin Control Center: All Website Registered Customers (Name • Phone • LINE ID)'
+              )}
             </h3>
             <p style={{ margin: '0.35rem 0 0 0', color: '#cbd5e1', fontSize: '0.92rem' }}>
               {tx(
-                `บัญชีผู้ดูแลระบบสูงสุด (${user?.email || 'pongsatornnantakong88@gmail.com'}) ได้รับสิทธิ์ยกเว้นข้อจำกัดแพ็กเกจทั้งหมด (ปลดล็อกครบ 11 ระบบ ไม่จำกัดสาขาและจำนวนลูกค้า)`,
-                `Super Admin account (${user?.email || 'pongsatornnantakong88@gmail.com'}) is 100% exempt from subscription package limits (all 11 modules unlocked, unlimited branches & customers).`
+                'รวบรวมรายชื่อลูกค้าทั้งหมดที่สมัครเข้าใช้งานเว็บไซต์ พร้อมชื่อ-นามสกุล เบอร์โทรศัพท์ และไอดีไลน์ (LINE ID) สำหรับส่งสรุปยอดขายอัตโนมัติ',
+                'Central registry of every customer who signed up on the website with their Full Name, Mobile Phone Number, and LINE ID.'
               )}
             </p>
           </div>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem' }}>
+          <button
+            type="button"
+            onClick={() => setShowAddMemberForm(!showAddMemberForm)}
+            style={{
+              padding: '0.7rem 1.15rem',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: '#fff',
+              fontWeight: 900,
+              fontSize: '0.84rem',
+              cursor: 'pointer'
+            }}
+          >
+            ➕ {tx('เพิ่มรายชื่อลูกค้าใหม่เข้าหน้า Admin', 'Add Registered Customer')}
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              toast.success(
+                tx(
+                  `📲 ส่งการ์ดสรุปยอดขายอัตโนมัติไปยัง LINE และเบอร์โทรศัพท์ของลูกค้าที่สมัครเว็บทั้งหมด ${registeredWebCustomers.length} ราย สำเร็จ!`,
+                  `📲 Dispatched automated sales summary to all ${registeredWebCustomers.length} registered customers' LINE & Phone!`
+                )
+              )
+            }
+            style={{
+              padding: '0.7rem 1.15rem',
+              borderRadius: '12px',
+              border: '1px solid rgba(251, 191, 36, 0.6)',
+              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+              color: '#0f172a',
+              fontWeight: 900,
+              fontSize: '0.84rem',
+              cursor: 'pointer'
+            }}
+          >
+            🚀 {tx(`ส่งยอดขายเข้า LINE ลูกค้าทุกคน (${registeredWebCustomers.length} ราย)`, `Broadcast Sales to All (${registeredWebCustomers.length})`)}
+          </button>
+          <button
+            type="button"
+            onClick={handleExportRegisteredMembersCsv}
+            style={{
+              padding: '0.7rem 1.1rem',
+              borderRadius: '12px',
+              border: '1px solid rgba(56, 189, 248, 0.45)',
+              background: 'rgba(56, 189, 248, 0.15)',
+              color: '#38bdf8',
+              fontWeight: 800,
+              fontSize: '0.84rem',
+              cursor: 'pointer'
+            }}
+          >
+            📥 {tx('ดาวน์โหลดรายชื่อ (Excel / CSV)', 'Export CSV')}
+          </button>
+        </div>
+      </div>
+
+      {/* 2. REGISTERED WEBSITE CUSTOMERS SUMMARY KPI CARDS */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+        <div className="glass-card" style={{ padding: '1.2rem', borderRadius: '16px', borderLeft: '4px solid #fbbf24' }}>
+          <div style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: 800 }}>
+            👥 {tx('ลูกค้าที่สมัครเว็บไซต์ทั้งหมด', 'Total Registered Website Customers')}
+          </div>
+          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.3rem' }}>
+            {registeredWebCustomers.length} {tx('ราย', 'Accounts')}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#fde68a', marginTop: '0.2rem', fontWeight: 700 }}>
+            {tx('บันทึกชื่อ เบอร์โทร และไลน์อัตโนมัติทุกครั้งที่สมัคร', 'Auto-synced Name, Phone & LINE on signup')}
+          </div>
+        </div>
+
+        <div className="glass-card" style={{ padding: '1.2rem', borderRadius: '16px', borderLeft: '4px solid #10b981' }}>
+          <div style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: 800 }}>
+            💬 {tx('ผูกเบอร์โทร + ID LINE ครบถ้วน', 'Phone + LINE ID Linked')}
+          </div>
+          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#34d399', marginTop: '0.3rem' }}>
+            {registeredWebCustomers.filter(m => m.phone && m.lineId).length}/{registeredWebCustomers.length} {tx('ราย', 'Linked')}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#a7f3d0', marginTop: '0.2rem', fontWeight: 700 }}>
+            {tx('พร้อมส่งสรุปยอดขายเข้าแชท LINE เวลา 22:00 น.', 'Ready for 22:00 Automated LINE Sales Summary')}
+          </div>
+        </div>
+
+        <div className="glass-card" style={{ padding: '1.2rem', borderRadius: '16px', borderLeft: '4px solid #c084fc' }}>
+          <div style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: 800 }}>
+            💎 {tx('ลูกค้าแพ็กเกจ Premium & Pro', 'Premium & Professional Accounts')}
+          </div>
+          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#e9d5ff', marginTop: '0.3rem' }}>
+            {registeredWebCustomers.filter(m => m.plan === 'premium' || m.plan === 'professional').length} {tx('ราย', 'Accounts')}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#d8b4fe', marginTop: '0.2rem', fontWeight: 700 }}>
+            {tx(
+              `Starter อีก ${registeredWebCustomers.filter(m => m.plan === 'starter').length} ราย`,
+              `Plus ${registeredWebCustomers.filter(m => m.plan === 'starter').length} Starter accounts`
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. MAIN ADMIN TABLE: ALL WEBSITE REGISTERED CUSTOMERS (ชื่อ • เบอร์โทร • ไลน์) */}
+      <div
+        className="glass-card"
+        style={{
+          padding: '1.4rem',
+          borderRadius: '18px',
+          border: '1.5px solid rgba(16, 185, 129, 0.45)',
+          background: 'rgba(15, 23, 42, 0.9)'
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '1rem',
+            marginBottom: '1.1rem'
+          }}
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+              <span
+                style={{
+                  fontSize: '0.74rem',
+                  fontWeight: 900,
+                  padding: '0.2rem 0.65rem',
+                  borderRadius: '999px',
+                  background: 'rgba(16, 185, 129, 0.2)',
+                  color: '#34d399',
+                  border: '1px solid rgba(16, 185, 129, 0.4)'
+                }}
+              >
+                📋 {tx('ข้อมูลลูกค้าที่สมัครผ่านหน้าเว็บทั้งหมด', 'LIVE WEBSITE MEMBER DIRECTORY')}
+              </span>
+            </div>
+            <h4 style={{ margin: '0.35rem 0 0 0', fontSize: '1.22rem', fontWeight: 900, color: '#f8fafc' }}>
+              {tx(
+                `ตารางรายชื่อลูกค้าทั้งหมดที่สมัครเว็บไซต์: ชื่อ • เบอร์โทรศัพท์ • ไอดีไลน์ (${filteredMembers.length} ราย)`,
+                `All Website Registered Customers: Full Name • Phone Number • LINE ID (${filteredMembers.length})`
+              )}
+            </h4>
+            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>
+              {tx(
+                'เมื่อลูกค้าสมัครสมาชิกหรือล็อกอินที่หน้าเว็บไซต์ ข้อมูลชื่อ เบอร์โทร และ LINE ID จะถูกส่งเข้ามาเก็บในตารางหน้า Admin นี้โดยอัตโนมัติทันที',
+                'Whenever a customer registers or signs in on the website, their Name, Phone Number, and LINE ID are automatically recorded here.'
+              )}
+            </p>
+          </div>
+
+          {/* Search & Package Filter */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={memberSearch}
+              onChange={e => setMemberSearch(e.target.value)}
+              placeholder={tx('🔍 ค้นหา ชื่อลูกค้า, เบอร์โทร, ID LINE...', '🔍 Search Name, Phone, LINE ID...')}
+              style={{
+                padding: '0.6rem 0.95rem',
+                borderRadius: '10px',
+                border: '1px solid rgba(148,163,184,0.35)',
+                background: '#090e1c',
+                color: '#f8fafc',
+                minWidth: '240px',
+                fontWeight: 700,
+                fontSize: '0.85rem'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+              {[
+                { id: 'all', th: 'ทั้งหมด', en: 'All' },
+                { id: 'premium', th: 'Premium', en: 'Premium' },
+                { id: 'professional', th: 'Pro', en: 'Pro' },
+                { id: 'starter', th: 'Starter', en: 'Starter' }
+              ].map(fTab => (
+                <button
+                  key={fTab.id}
+                  type="button"
+                  onClick={() => setMemberPlanFilter(fTab.id)}
+                  style={{
+                    padding: '0.5rem 0.85rem',
+                    borderRadius: '10px',
+                    border:
+                      memberPlanFilter === fTab.id
+                        ? '1.5px solid #fbbf24'
+                        : '1px solid rgba(148,163,184,0.25)',
+                    background:
+                      memberPlanFilter === fTab.id
+                        ? 'rgba(251, 191, 36, 0.2)'
+                        : 'rgba(15, 23, 42, 0.7)',
+                    color: memberPlanFilter === fTab.id ? '#fbbf24' : '#cbd5e1',
+                    fontWeight: 800,
+                    fontSize: '0.8rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isEn ? fTab.en : fTab.th}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Form to Manually Add a Registered Website Customer inside Admin */}
+        {showAddMemberForm && (
+          <form
+            onSubmit={handleAddMemberSubmit}
+            style={{
+              marginBottom: '1.2rem',
+              padding: '1.15rem',
+              borderRadius: '14px',
+              background: 'rgba(6, 12, 26, 0.95)',
+              border: '1.5px solid rgba(16, 185, 129, 0.5)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: '0.8rem',
+              alignItems: 'end'
+            }}
+          >
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#fbbf24', marginBottom: '0.25rem' }}>
+                👤 {tx('ชื่อ - นามสกุล / ชื่อร้านค้า', 'Customer / Store Name')}
+              </label>
+              <input
+                type="text"
+                value={newMemName}
+                onChange={e => setNewMemName(e.target.value)}
+                placeholder={tx('เช่น คุณสมชาย เจริญกิจ', 'e.g. Mr. Somchai Charoenkit')}
+                style={{
+                  width: '100%',
+                  padding: '0.58rem 0.75rem',
+                  borderRadius: '10px',
+                  background: '#0f172a',
+                  color: '#fff',
+                  border: '1px solid rgba(251,191,36,0.4)',
+                  fontWeight: 700
+                }}
+                required
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#38bdf8', marginBottom: '0.25rem' }}>
+                📱 {tx('เบอร์โทรศัพท์มือถือ', 'Mobile Phone Number')}
+              </label>
+              <input
+                type="tel"
+                value={newMemPhone}
+                onChange={e => setNewMemPhone(e.target.value)}
+                placeholder="089-999-8888"
+                style={{
+                  width: '100%',
+                  padding: '0.58rem 0.75rem',
+                  borderRadius: '10px',
+                  background: '#0f172a',
+                  color: '#fff',
+                  border: '1px solid rgba(56,189,248,0.45)',
+                  fontWeight: 700
+                }}
+                required
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#34d399', marginBottom: '0.25rem' }}>
+                💬 {tx('ไอดีไลน์ (ID LINE)', 'LINE ID')}
+              </label>
+              <input
+                type="text"
+                value={newMemLineId}
+                onChange={e => setNewMemLineId(e.target.value)}
+                placeholder="@somchai.vip"
+                style={{
+                  width: '100%',
+                  padding: '0.58rem 0.75rem',
+                  borderRadius: '10px',
+                  background: '#0f172a',
+                  color: '#fff',
+                  border: '1px solid rgba(16,185,129,0.45)',
+                  fontWeight: 700
+                }}
+                required
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#cbd5e1', marginBottom: '0.25rem' }}>
+                ✉️ {tx('อีเมลที่สมัคร', 'Email Address')}
+              </label>
+              <input
+                type="email"
+                value={newMemEmail}
+                onChange={e => setNewMemEmail(e.target.value)}
+                placeholder="owner@store.co.th"
+                style={{
+                  width: '100%',
+                  padding: '0.58rem 0.75rem',
+                  borderRadius: '10px',
+                  background: '#0f172a',
+                  color: '#fff',
+                  border: '1px solid rgba(148,163,184,0.35)',
+                  fontWeight: 700
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#c084fc', marginBottom: '0.25rem' }}>
+                💎 {tx('แพ็กเกจที่สมัคร', 'Subscription Plan')}
+              </label>
+              <select
+                value={newMemPlan}
+                onChange={e => setNewMemPlan(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.58rem 0.75rem',
+                  borderRadius: '10px',
+                  background: '#0f172a',
+                  color: '#fff',
+                  border: '1px solid rgba(192,132,252,0.45)',
+                  fontWeight: 800
+                }}
+              >
+                <option value="premium">Premium (4,900.-/m)</option>
+                <option value="professional">Professional (2,900.-/m)</option>
+                <option value="starter">Starter (1,990.-/m)</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              style={{
+                padding: '0.62rem 1rem',
+                borderRadius: '10px',
+                border: 'none',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                color: '#fff',
+                fontWeight: 900,
+                cursor: 'pointer'
+              }}
+            >
+              ✓ {tx('บันทึกลูกค้าเข้า Admin', 'Save Customer')}
+            </button>
+          </form>
+        )}
+
+        {/* Table of Registered Website Customers */}
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '820px' }}>
+            <thead>
+              <tr
+                style={{
+                  borderBottom: '1.5px solid rgba(148,163,184,0.25)',
+                  background: 'rgba(15, 23, 42, 0.95)',
+                  textAlign: 'left',
+                  color: '#fbbf24',
+                  fontSize: '0.84rem'
+                }}
+              >
+                <th style={{ padding: '0.85rem 0.75rem' }}>{tx('ลำดับ / รหัสสมาชิก', '# / Member ID')}</th>
+                <th style={{ padding: '0.85rem 0.75rem' }}>👤 {tx('ชื่อลูกค้าที่สมัครเว็บไซต์', 'Registered Customer Name')}</th>
+                <th style={{ padding: '0.85rem 0.75rem' }}>📱 {tx('เบอร์โทรศัพท์', 'Phone Number')}</th>
+                <th style={{ padding: '0.85rem 0.75rem' }}>💬 {tx('ไอดีไลน์ (LINE ID)', 'LINE ID')}</th>
+                <th style={{ padding: '0.85rem 0.75rem' }}>💎 {tx('แพ็กเกจ & เวลาสมัคร', 'Package & Registered Time')}</th>
+                <th style={{ padding: '0.85rem 0.75rem' }}>⚡ {tx('การจัดการโดย Admin', 'Admin Actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredMembers.map((mem, idx) => {
+                const isEditing = editingMemberId === mem.id;
+                const displayName = isEn ? mem.nameEn || mem.nameTh : mem.nameTh || mem.nameEn;
+                const displayDate = isEn ? mem.registeredAtEn || mem.registeredAtTh : mem.registeredAtTh || mem.registeredAtEn;
+                const pMeta = planBadgeMeta(mem.plan);
+
+                return (
+                  <tr
+                    key={mem.id}
+                    style={{
+                      borderBottom: '1px solid rgba(148,163,184,0.14)',
+                      background: idx === 0 ? 'rgba(16, 185, 129, 0.06)' : 'transparent'
+                    }}
+                  >
+                    {/* 1. Member ID */}
+                    <td style={{ padding: '0.9rem 0.75rem' }}>
+                      <div style={{ fontWeight: 900, color: '#94a3b8', fontSize: '0.82rem' }}>
+                        #{idx + 1} • <span style={{ color: '#38bdf8' }}>{mem.id}</span>
+                      </div>
+                      {idx === 0 && (
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            marginTop: '0.2rem',
+                            fontSize: '0.68rem',
+                            fontWeight: 900,
+                            padding: '0.1rem 0.45rem',
+                            borderRadius: '999px',
+                            background: 'rgba(16, 185, 129, 0.22)',
+                            color: '#34d399'
+                          }}
+                        >
+                          {tx('ล่าสุด', 'LATEST')}
+                        </span>
+                      )}
+                    </td>
+
+                    {/* 2. Customer Full Name & Email */}
+                    <td style={{ padding: '0.9rem 0.75rem' }}>
+                      {isEditing ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                          <input
+                            type="text"
+                            value={editName}
+                            onChange={e => setEditName(e.target.value)}
+                            style={{
+                              padding: '0.4rem 0.6rem',
+                              borderRadius: '8px',
+                              background: '#050814',
+                              color: '#fff',
+                              border: '1px solid #fbbf24',
+                              fontWeight: 800
+                            }}
+                          />
+                          <input
+                            type="email"
+                            value={editEmail}
+                            onChange={e => setEditEmail(e.target.value)}
+                            style={{
+                              padding: '0.35rem 0.6rem',
+                              borderRadius: '8px',
+                              background: '#050814',
+                              color: '#cbd5e1',
+                              border: '1px solid rgba(148,163,184,0.35)',
+                              fontSize: '0.78rem'
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <div style={{ fontWeight: 900, fontSize: '0.98rem', color: '#f8fafc' }}>
+                            {displayName}
+                          </div>
+                          <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.15rem' }}>
+                            ✉️ {mem.email || 'customer@insightflow.app'}
+                          </div>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* 3. Phone Number */}
+                    <td style={{ padding: '0.9rem 0.75rem' }}>
+                      {isEditing ? (
+                        <input
+                          type="tel"
+                          value={editPhone}
+                          onChange={e => setEditPhone(e.target.value)}
+                          style={{
+                            padding: '0.45rem 0.6rem',
+                            borderRadius: '8px',
+                            background: '#050814',
+                            color: '#38bdf8',
+                            border: '1px solid #38bdf8',
+                            fontWeight: 800,
+                            width: '135px'
+                          }}
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (navigator.clipboard) {
+                              navigator.clipboard.writeText(mem.phone);
+                            }
+                            toast.success(
+                              tx(
+                                `📞 คัดลอกเบอร์โทรศัพท์ "${mem.phone}" ของ ${displayName} แล้ว!`,
+                                `📞 Copied phone number "${mem.phone}" for ${displayName}!`
+                              )
+                            );
+                          }}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            padding: '0.42rem 0.75rem',
+                            borderRadius: '10px',
+                            background: 'rgba(56, 189, 248, 0.15)',
+                            border: '1px solid rgba(56, 189, 248, 0.45)',
+                            color: '#38bdf8',
+                            fontWeight: 900,
+                            fontSize: '0.9rem',
+                            cursor: 'pointer'
+                          }}
+                          title={tx('คลิกเพื่อคัดลอกเบอร์โทรศัพท์', 'Click to copy phone number')}
+                        >
+                          <span>📱</span>
+                          <span>{mem.phone}</span>
+                        </button>
+                      )}
+                    </td>
+
+                    {/* 4. LINE ID */}
+                    <td style={{ padding: '0.9rem 0.75rem' }}>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editLineId}
+                          onChange={e => setEditLineId(e.target.value)}
+                          style={{
+                            padding: '0.45rem 0.6rem',
+                            borderRadius: '8px',
+                            background: '#050814',
+                            color: '#34d399',
+                            border: '1px solid #10b981',
+                            fontWeight: 800,
+                            width: '145px'
+                          }}
+                        />
+                      ) : (
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (navigator.clipboard) {
+                                navigator.clipboard.writeText(mem.lineId);
+                              }
+                              toast.success(
+                                tx(
+                                  `💬 คัดลอก ID LINE "${mem.lineId}" ของ ${displayName} แล้ว!`,
+                                  `💬 Copied LINE ID "${mem.lineId}" for ${displayName}!`
+                                )
+                              );
+                            }}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.4rem',
+                              padding: '0.42rem 0.75rem',
+                              borderRadius: '10px',
+                              background: 'rgba(16, 185, 129, 0.16)',
+                              border: '1px solid rgba(16, 185, 129, 0.45)',
+                              color: '#34d399',
+                              fontWeight: 900,
+                              fontSize: '0.9rem',
+                              cursor: 'pointer'
+                            }}
+                            title={tx('คลิกเพื่อคัดลอก ID LINE', 'Click to copy LINE ID')}
+                          >
+                            <span>💬</span>
+                            <span>{mem.lineId}</span>
+                          </button>
+                          <div style={{ fontSize: '0.73rem', color: '#10b981', marginTop: '0.22rem', fontWeight: 700 }}>
+                            ✓ {tx(`รับสรุปยอดอัตโนมัติ ${mem.notifyTime || '22:00'} น.`, `Auto-Summary at ${mem.notifyTime || '22:00'}`)}
+                          </div>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* 5. Package Plan & Registered Date */}
+                    <td style={{ padding: '0.9rem 0.75rem' }}>
+                      {isEditing ? (
+                        <select
+                          value={editPlan}
+                          onChange={e => setEditPlan(e.target.value)}
+                          style={{
+                            padding: '0.42rem 0.6rem',
+                            borderRadius: '8px',
+                            background: '#050814',
+                            color: '#fbbf24',
+                            border: '1px solid #fbbf24',
+                            fontWeight: 800
+                          }}
+                        >
+                          <option value="premium">PREMIUM (4,900.-)</option>
+                          <option value="professional">PRO (2,900.-)</option>
+                          <option value="starter">STARTER (1,990.-)</option>
+                        </select>
+                      ) : (
+                        <div>
+                          <select
+                            value={mem.plan || 'premium'}
+                            onChange={e => handleChangeMemberPlan(mem.id, e.target.value)}
+                            style={{
+                              padding: '0.28rem 0.65rem',
+                              borderRadius: '999px',
+                              background: pMeta.bg,
+                              color: pMeta.color,
+                              border: `1px solid ${pMeta.color}66`,
+                              fontWeight: 900,
+                              fontSize: '0.76rem',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <option value="premium" style={{ background: '#0f172a', color: '#c084fc' }}>
+                              PREMIUM (4,900.-)
+                            </option>
+                            <option value="professional" style={{ background: '#0f172a', color: '#fbbf24' }}>
+                              PRO (2,900.-)
+                            </option>
+                            <option value="starter" style={{ background: '#0f172a', color: '#38bdf8' }}>
+                              STARTER (1,990.-)
+                            </option>
+                          </select>
+                          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.25rem' }}>
+                            🕒 {displayDate}
+                          </div>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* 6. Admin Actions */}
+                    <td style={{ padding: '0.9rem 0.75rem' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        {isEditing ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveEditMember(mem.id)}
+                              style={{
+                                padding: '0.4rem 0.75rem',
+                                borderRadius: '8px',
+                                border: 'none',
+                                background: '#10b981',
+                                color: '#fff',
+                                fontWeight: 900,
+                                fontSize: '0.78rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              💾 {tx('บันทึก', 'Save')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingMemberId(null)}
+                              style={{
+                                padding: '0.4rem 0.65rem',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(148,163,184,0.35)',
+                                background: 'transparent',
+                                color: '#cbd5e1',
+                                fontWeight: 800,
+                                fontSize: '0.78rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {tx('ยกเลิก', 'Cancel')}
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                toast.success(
+                                  tx(
+                                    `📲 ส่งการ์ดสรุปยอดขายเข้า LINE "${mem.lineId}" และเบอร์ "${mem.phone}" ของ ${displayName} เรียบร้อยแล้ว!`,
+                                    `📲 Sent sales summary card to LINE "${mem.lineId}" & Phone "${mem.phone}" (${displayName})!`
+                                  )
+                                )
+                              }
+                              style={{
+                                padding: '0.4rem 0.7rem',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(16, 185, 129, 0.45)',
+                                background: 'rgba(16, 185, 129, 0.16)',
+                                color: '#34d399',
+                                fontWeight: 800,
+                                fontSize: '0.76rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              📲 {tx('ส่งยอดเข้า LINE', 'Send LINE Report')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditMember(mem)}
+                              style={{
+                                padding: '0.4rem 0.65rem',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(251, 191, 36, 0.45)',
+                                background: 'rgba(251, 191, 36, 0.14)',
+                                color: '#fbbf24',
+                                fontWeight: 800,
+                                fontSize: '0.76rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              ✏️ {tx('แก้ไข', 'Edit')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMember(mem)}
+                              style={{
+                                padding: '0.4rem 0.6rem',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(244, 63, 94, 0.4)',
+                                background: 'rgba(244, 63, 94, 0.14)',
+                                color: '#fda4af',
+                                fontWeight: 800,
+                                fontSize: '0.76rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              🗑️
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -9680,7 +10604,167 @@ function App() {
     );
   };
 
-  // Load saved credentials & user session (including Phone & LINE ID)
+  // Central Registry of All Customers Who Registered on the Website (Displayed in AdminTab)
+  const defaultRegisteredWebCustomers = [
+    {
+      id: 'MEM-2026-001',
+      nameTh: 'คุณพิมพ์ชนก วงศ์สุวรรณ (สยามบิวตี้ แอนด์ คลินิก)',
+      nameEn: 'Ms. Pimchanok Wongsuwan (Siam Beauty & Clinic)',
+      phone: '081-234-5678',
+      lineId: '@pimchanok.vip',
+      email: 'pimchanok@siambeauty.co.th',
+      plan: 'premium',
+      registeredAtTh: 'สมัครเมื่อ 12/10/2569 09:15 น.',
+      registeredAtEn: 'Registered 12/10/2026 09:15',
+      notifyTime: '22:00',
+      lineLinked: true
+    },
+    {
+      id: 'MEM-2026-002',
+      nameTh: 'คุณกิตติพงศ์ เจริญทรัพย์ (เจริญทรัพย์ คาเฟ่ 4 สาขา)',
+      nameEn: 'Mr. Kittipong Charoensap (Charoensap Cafe 4 Branches)',
+      phone: '089-876-5432',
+      lineId: '@kittipong88',
+      email: 'kittipong@charoensapcafe.com',
+      plan: 'professional',
+      registeredAtTh: 'สมัครเมื่อ 11/10/2569 18:40 น.',
+      registeredAtEn: 'Registered 11/10/2026 18:40',
+      notifyTime: '22:00',
+      lineLinked: true
+    },
+    {
+      id: 'MEM-2026-003',
+      nameTh: 'คุณณัฐนิชา อัศวเดช (ณัฐนิชา แฟชั่น ออนไลน์)',
+      nameEn: 'Ms. Nattanicha Asawadech (Nattanicha Fashion Online)',
+      phone: '086-555-4321',
+      lineId: '@nattanicha.a',
+      email: 'nattanicha@fashionhub.co.th',
+      plan: 'professional',
+      registeredAtTh: 'สมัครเมื่อ 10/10/2569 14:20 น.',
+      registeredAtEn: 'Registered 10/10/2026 14:20',
+      notifyTime: '22:00',
+      lineLinked: true
+    },
+    {
+      id: 'MEM-2026-004',
+      nameTh: 'คุณธนดล รัตนโชติ (ธนดล โฮลเซลล์ แอนด์ แฟคทอรี่)',
+      nameEn: 'Mr. Thanadon Rattanachot (Thanadon Wholesale & Factory)',
+      phone: '092-456-7890',
+      lineId: '@thanadon.factory',
+      email: 'thanadon@rattanachot.co.th',
+      plan: 'premium',
+      registeredAtTh: 'สมัครเมื่อ 09/10/2569 11:05 น.',
+      registeredAtEn: 'Registered 09/10/2026 11:05',
+      notifyTime: '22:00',
+      lineLinked: true
+    },
+    {
+      id: 'MEM-2026-005',
+      nameTh: 'คุณศิริพร วัฒนากุล (เดอะโกลว์ เวลเนส คลินิก)',
+      nameEn: 'Ms. Siriporn Wattanakul (The Glow Wellness Clinic)',
+      phone: '084-111-2233',
+      lineId: '@siriporn.glow',
+      email: 'siriporn@theglowclinic.com',
+      plan: 'premium',
+      registeredAtTh: 'สมัครเมื่อ 08/10/2569 16:30 น.',
+      registeredAtEn: 'Registered 08/10/2026 16:30',
+      notifyTime: '22:00',
+      lineLinked: true
+    },
+    {
+      id: 'MEM-2026-006',
+      nameTh: 'คุณวรวุฒิ เกียรติไพศาล (วรวุฒิ มินิมาร์ท & โชห่วยยุคใหม่)',
+      nameEn: 'Mr. Worawut Kiatpaisan (Worawut Modern Minimart)',
+      phone: '095-888-7766',
+      lineId: '@worawut.mart',
+      email: 'worawut@minimart.co.th',
+      plan: 'starter',
+      registeredAtTh: 'สมัครเมื่อ 07/10/2569 10:12 น.',
+      registeredAtEn: 'Registered 07/10/2026 10:12',
+      notifyTime: '22:00',
+      lineLinked: true
+    }
+  ];
+
+  const [registeredWebCustomers, setRegisteredWebCustomers] = useState(() => {
+    try {
+      const savedRaw = localStorage.getItem('insightflow_registered_web_customers');
+      if (savedRaw) {
+        const parsed = JSON.parse(savedRaw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore localStorage error
+    }
+    return defaultRegisteredWebCustomers;
+  });
+
+  // Upsert customer into Admin Registered Website Customers Registry whenever they sign up or sign in
+  const registerOrUpdateWebCustomer = ({ name, email, phone, lineId, plan }) => {
+    const cleanPhone = (phone || '089-999-8888').trim();
+    const rawLine = (lineId || '@insightflow.vip').trim();
+    const cleanLine = rawLine.startsWith('@') ? rawLine : `@${rawLine}`;
+    const cleanEmail = (email || 'customer@insightflow.app').trim().toLowerCase();
+    const cleanName = (name || cleanEmail.split('@')[0] || 'ลูกค้าเว็บไซต์ InsightFlow').trim();
+    const chosenPlan = plan || subscriptionPlan || 'premium';
+    const nowTime = new Date().toLocaleString(isEn ? 'en-GB' : 'th-TH', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    setRegisteredWebCustomers(prev => {
+      const existingIdx = prev.findIndex(
+        m =>
+          (m.email && m.email.toLowerCase() === cleanEmail) ||
+          (m.phone && m.phone.replace(/\D/g, '') === cleanPhone.replace(/\D/g, ''))
+      );
+      let nextList;
+      if (existingIdx >= 0) {
+        const updatedItem = {
+          ...prev[existingIdx],
+          nameTh: cleanName || prev[existingIdx].nameTh,
+          nameEn: cleanName || prev[existingIdx].nameEn,
+          phone: cleanPhone,
+          lineId: cleanLine,
+          email: cleanEmail,
+          plan: chosenPlan,
+          registeredAtTh: `อัปเดตเมื่อ ${nowTime} น.`,
+          registeredAtEn: `Updated ${nowTime}`,
+          notifyTime: lineNotifyTime || '22:00',
+          lineLinked: true
+        };
+        nextList = [updatedItem, ...prev.filter((_, i) => i !== existingIdx)];
+      } else {
+        const newEntry = {
+          id: `MEM-2026-${String(prev.length + 1).padStart(3, '0')}`,
+          nameTh: cleanName,
+          nameEn: cleanName,
+          phone: cleanPhone,
+          lineId: cleanLine,
+          email: cleanEmail,
+          plan: chosenPlan,
+          registeredAtTh: `สมัครเมื่อ ${nowTime} น.`,
+          registeredAtEn: `Registered ${nowTime}`,
+          notifyTime: lineNotifyTime || '22:00',
+          lineLinked: true
+        };
+        nextList = [newEntry, ...prev];
+      }
+      try {
+        localStorage.setItem('insightflow_registered_web_customers', JSON.stringify(nextList));
+      } catch {
+        // ignore storage error
+      }
+      return nextList;
+    });
+  };
+
+  // Load saved credentials & user session (including Phone & LINE ID) + sync backend LINE contacts
   useEffect(() => {
     try {
       const savedCredsRaw = localStorage.getItem('insightflow_saved_credentials');
@@ -9690,6 +10774,7 @@ function App() {
         if (savedCreds.password) setAuthPassword(savedCreds.password);
         if (savedCreds.phone) setAuthPhone(savedCreds.phone);
         if (savedCreds.lineId) setAuthLineId(savedCreds.lineId);
+        if (savedCreds.name) setAuthName(savedCreds.name);
       }
       const savedUserRaw = localStorage.getItem('insightflow_saved_user');
       if (savedUserRaw) {
@@ -9698,10 +10783,36 @@ function App() {
           setUser(parsedUser);
           if (parsedUser.phone) setAuthPhone(parsedUser.phone);
           if (parsedUser.lineId) setAuthLineId(parsedUser.lineId);
+          if (parsedUser.name) setAuthName(parsedUser.name);
         }
       }
     } catch {
       // ignore localStorage error
+    }
+
+    // If running locally with backend/main.py, merge any registered LINE contacts into Admin Registry
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ) {
+      fetch('http://127.0.0.1:8000/api/line/contacts')
+        .then(r => r.json())
+        .then(data => {
+          if (data && Array.isArray(data.contacts) && data.contacts.length > 0) {
+            data.contacts.forEach(c => {
+              if (c.phone && c.line_id) {
+                registerOrUpdateWebCustomer({
+                  name: c.name || 'ลูกค้าเว็บไซต์ InsightFlow',
+                  email: c.email || 'customer@insightflow.app',
+                  phone: c.phone,
+                  lineId: c.line_id,
+                  plan: 'premium'
+                });
+              }
+            });
+          }
+        })
+        .catch(() => {});
     }
   }, []);
 
@@ -9742,6 +10853,13 @@ function App() {
       }
       return updated;
     });
+    registerOrUpdateWebCustomer({
+      name: user?.name || authName || 'เจ้าของร้าน InsightFlow',
+      email: user?.email || authEmail || 'owner@insightflow.app',
+      phone: newPhone,
+      lineId: newLineId,
+      plan: subscriptionPlan
+    });
     syncContactWithLineBackend(newPhone, newLineId);
   };
 
@@ -9777,14 +10895,16 @@ function App() {
     e.preventDefault();
     const emailToUse = (authEmail.trim() || 'customer@insightflow.app').toLowerCase();
     const phoneToUse = authPhone.trim() || '089-999-8888';
-    const lineIdToUse = authLineId.trim() || '@insightflow.vip';
+    const rawLine = authLineId.trim() || '@insightflow.vip';
+    const lineIdToUse = rawLine.startsWith('@') ? rawLine : `@${rawLine}`;
     const isEnteringSuperAdmin = emailToUse === SUPER_ADMIN_EMAIL;
+    const resolvedName =
+      authName.trim() ||
+      (isEnteringSuperAdmin
+        ? tx('ผู้ดูแลระบบสูงสุด (Admin)', 'Super Admin')
+        : emailToUse.split('@')[0]);
     const loggedInUser = {
-      name:
-        authName.trim() ||
-        (isEnteringSuperAdmin
-          ? tx('ผู้ดูแลระบบสูงสุด (Admin)', 'Super Admin')
-          : emailToUse.split('@')[0]),
+      name: resolvedName,
       email: emailToUse,
       phone: phoneToUse,
       lineId: lineIdToUse,
@@ -9800,6 +10920,7 @@ function App() {
       localStorage.setItem(
         'insightflow_saved_credentials',
         JSON.stringify({
+          name: resolvedName,
           email: emailToUse,
           password: authPassword || '••••••••',
           phone: phoneToUse,
@@ -9810,18 +10931,26 @@ function App() {
       localStorage.removeItem('insightflow_saved_user');
       localStorage.removeItem('insightflow_saved_credentials');
     }
+    // Save customer's Name, Phone Number, and LINE ID into the Admin Registered Website Customers Registry!
+    registerOrUpdateWebCustomer({
+      name: resolvedName,
+      email: emailToUse,
+      phone: phoneToUse,
+      lineId: lineIdToUse,
+      plan: subscriptionPlan
+    });
     setUser(loggedInUser);
     setIsLoginOpen(false);
     syncContactWithLineBackend(phoneToUse, lineIdToUse, emailToUse, loggedInUser.name);
     toast.success(
       isEnteringSuperAdmin
         ? tx(
-            `👑 เข้าสู่ระบบ Super Admin (${emailToUse}) • ผูกเบอร์ ${phoneToUse} & LINE ${lineIdToUse} สำหรับส่งยอดขายอัตโนมัติแล้ว!`,
-            `👑 Signed in as Super Admin (${emailToUse}) • Linked Phone ${phoneToUse} & LINE ${lineIdToUse}!`
+            `👑 เข้าสู่ระบบ Super Admin (${emailToUse}) • บันทึกชื่อ เบอร์ ${phoneToUse} & LINE ${lineIdToUse} ในหน้า Admin แล้ว!`,
+            `👑 Signed in as Super Admin (${emailToUse}) • Saved Phone ${phoneToUse} & LINE ${lineIdToUse} in Admin!`
           )
         : tx(
-            `✅ เข้าสู่ระบบสำเร็จ! ระบบผูกเบอร์ ${phoneToUse} และ LINE ID ${lineIdToUse} เพื่อส่งสรุปยอดขายอัตโนมัติเวลา ${lineNotifyTime} น.`,
-            `✅ Signed in! Linked Phone ${phoneToUse} & LINE ${lineIdToUse} for automated ${lineNotifyTime} sales alerts.`
+            `✅ สมัคร/เข้าสู่ระบบสำเร็จ! บันทึกชื่อ "${resolvedName}" เบอร์ ${phoneToUse} และ LINE ${lineIdToUse} เข้าสู่หน้าต่าง Admin เรียบร้อยแล้ว`,
+            `✅ Signed in! Recorded Name "${resolvedName}", Phone ${phoneToUse} & LINE ${lineIdToUse} into the Admin Registry.`
           )
     );
   };
@@ -10623,9 +11752,11 @@ function App() {
                     const chosenMeta = planTiersMap[subscriptionPlan] || planTiersMap.starter;
                     const cleanPhone = (authPhone || '089-999-8888').trim();
                     const cleanLine = (authLineId || '@owner_insightflow').trim();
+                    const cleanName =
+                      authName.trim() || tx(`ลูกค้าแพ็กเกจ ${chosenMeta.code}`, `${chosenMeta.code} Customer`);
                     const customerUser = {
-                      name: tx(`ลูกค้าแพ็กเกจ ${chosenMeta.code}`, `${chosenMeta.code} Customer`),
-                      email: 'customer@insightflow.app',
+                      name: cleanName,
+                      email: authEmail.trim() || 'customer@insightflow.app',
                       phone: cleanPhone,
                       lineId: cleanLine,
                       sub: 'customer-account',
@@ -10637,12 +11768,19 @@ function App() {
                     if (rememberPassword) {
                       localStorage.setItem('insightflow_saved_user', JSON.stringify(customerUser));
                     }
+                    registerOrUpdateWebCustomer({
+                      name: customerUser.name,
+                      email: customerUser.email,
+                      phone: cleanPhone,
+                      lineId: cleanLine,
+                      plan: subscriptionPlan
+                    });
                     setUser(customerUser);
                     setIsLoginOpen(false);
                     toast.success(
                       tx(
-                        `🛍️ เข้าสู่ระบบลูกค้า "${chosenMeta.name}" เรียบร้อยแล้ว!`,
-                        `🛍️ Signed in on "${chosenMeta.name}"!`
+                        `🛍️ เข้าสู่ระบบลูกค้า "${chosenMeta.name}" • บันทึกชื่อ เบอร์โทร และไลน์เข้าหน้าต่าง Admin แล้ว!`,
+                        `🛍️ Signed in on "${chosenMeta.name}" • Saved Name, Phone & LINE into Admin Registry!`
                       )
                     );
                   }}
@@ -10656,20 +11794,18 @@ function App() {
               </div>
 
               <form onSubmit={handleAuthSubmit} className="flex flex-col gap-3.5 mb-4">
-                {authMode === 'register' && (
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
-                      {tx('ชื่อ - นามสกุลของคุณ', 'Your Full Name')}
-                    </label>
-                    <input
-                      type="text"
-                      placeholder={tx('เช่น คุณสมชาย เจริญกิจ', 'e.g. Mr. Somchai Charoenkit')}
-                      value={authName}
-                      onChange={e => setAuthName(e.target.value)}
-                      className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    👤 {tx('ชื่อ - นามสกุล / ชื่อร้านค้าของคุณ (ซิงก์เข้าหน้า Admin อัตโนมัติ)', 'Your Full Name / Store Name (Synced to Admin)')}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={tx('เช่น คุณสมชาย เจริญกิจ', 'e.g. Mr. Somchai Charoenkit')}
+                    value={authName}
+                    onChange={e => setAuthName(e.target.value)}
+                    className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
+                  />
+                </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1">
@@ -11902,9 +13038,9 @@ function App() {
     },
     {
       id: 'admin',
-      label: tx('ผู้ดูแลระบบสูงสุด', 'Security & Permissions'),
-      subLabel: tx('เฉพาะ Admin (pongsatornnantakong88@gmail.com)', 'Super Admin Exclusive Control'),
-      badge: 'ADMIN',
+      label: tx('หน้าต่าง Admin (ลูกค้าที่สมัครเว็บ)', 'Admin (Website Customers)'),
+      subLabel: tx(`ชื่อ • เบอร์โทร • ไลน์ (${registeredWebCustomers.length} ราย)`, `Name • Phone • LINE (${registeredWebCustomers.length})`),
+      badge: `ADMIN (${registeredWebCustomers.length})`,
       variant: 'ruby',
       minPlan: 'super_admin'
     },
@@ -11915,16 +13051,11 @@ function App() {
       variant: 'platinum',
       minPlan: 'starter'
     }
-  ].filter(item => {
-    if (item.id === 'admin') {
-      return isSuperAdmin;
-    }
-    return true;
-  });
+  ];
 
   const currentTabMeta = sidebarMenuItems.find(m => m.id === activeTab) || sidebarMenuItems[0];
   const isTabUnlocked = tabId => {
-    if (tabId === 'admin') return isSuperAdmin;
+    if (tabId === 'admin') return true;
     if (isExemptAdminMode) return true;
     return activePlanMeta.allowedTabs.includes(tabId);
   };
@@ -12308,6 +13439,30 @@ function App() {
 
               {/* 1-Click Super Admin Exempt Button + Customer Package Switcher Pills (Swipeable on Mobile) */}
               <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('admin');
+                    setAdminPreviewCustomerPlan(false);
+                    toast.success(
+                      tx(
+                        `👥 เปิดหน้าต่าง Admin: แสดงรายชื่อลูกค้าที่สมัครเว็บไซต์ทั้งหมด (${registeredWebCustomers.length} ราย • ชื่อ เบอร์โทร ไลน์)`,
+                        `👥 Opened Admin Registry: All ${registeredWebCustomers.length} Registered Website Customers (Name • Phone • LINE)`
+                      )
+                    );
+                  }}
+                  className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black transition cursor-pointer border whitespace-nowrap flex-shrink-0 ${
+                    activeTab === 'admin'
+                      ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 border-emerald-300 shadow-lg'
+                      : 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border-emerald-400/50'
+                  }`}
+                >
+                  {tx(
+                    `👥 หน้าต่าง Admin (ลูกค้าที่สมัครเว็บ ${registeredWebCustomers.length} ราย)`,
+                    `👥 Admin (${registeredWebCustomers.length} Registered Customers)`
+                  )}
+                </button>
+
                 {isSuperAdmin ? (
                   <button
                     type="button"
@@ -12336,10 +13491,11 @@ function App() {
                       setAdminPreviewCustomerPlan(false);
                       localStorage.setItem('insightflow_saved_user', JSON.stringify(adminUser));
                       setUser(adminUser);
+                      setActiveTab('admin');
                       toast.success(
                         tx(
-                          '👑 สลับเข้าสู่บัญชี Super Admin (pongsatornnantakong88@gmail.com) ยกเว้นแพ็กเกจทั้งหมดแล้ว!',
-                          '👑 Switched to Super Admin (pongsatornnantakong88@gmail.com) — Exempt from all packages!'
+                          '👑 สลับเข้าสู่หน้าต่าง Admin (pongsatornnantakong88@gmail.com) เรียบร้อยแล้ว!',
+                          '👑 Switched to Super Admin (pongsatornnantakong88@gmail.com)!'
                         )
                       );
                     }}
@@ -12394,8 +13550,8 @@ function App() {
             </div>
             <div className="flex lg:grid lg:grid-cols-8 gap-2 overflow-x-auto no-scrollbar pb-0.5">
               {sidebarMenuItems.map((nav, idx) => {
-                // Show all items in mobile horizontal swipe strip; show top 8 on desktop grid
-                const hideOnDesktop = idx >= 8 ? 'lg:hidden' : '';
+                // Show all items in mobile horizontal swipe strip; on desktop grid show top 7 + Admin
+                const hideOnDesktop = idx >= 7 && nav.id !== 'admin' ? 'lg:hidden' : '';
                 const unlocked = isTabUnlocked(nav.id);
                 const reqPlan = planTiersMap[nav.minPlan || 'starter'];
                 return (
@@ -12649,7 +13805,15 @@ function App() {
                 />
               )}
 
-              {activeTab === 'admin' && <AdminTab lang={lang} user={user} />}
+              {activeTab === 'admin' && (
+                <AdminTab
+                  lang={lang}
+                  user={user}
+                  registeredWebCustomers={registeredWebCustomers}
+                  setRegisteredWebCustomers={setRegisteredWebCustomers}
+                  onSyncContactWithBackend={syncContactWithLineBackend}
+                />
+              )}
 
               {activeTab === 'settings' && (
                 <SettingsTab
