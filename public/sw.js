@@ -1,7 +1,5 @@
-const CACHE_NAME = 'insightflow-executive-v2';
+const CACHE_NAME = 'insightflow-executive-v5';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/app-icon.svg',
   '/manifest.webmanifest'
 ];
@@ -35,8 +33,20 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
-  // API requests always go straight to the live FastAPI + QueuePool + Redis server
-  if (request.url.includes('/api/') || request.url.includes(':8000')) {
+  // API requests and hashed Vite build assets go directly to the network
+  if (
+    request.url.includes('/api/') ||
+    request.url.includes(':8000') ||
+    request.url.includes('/assets/')
+  ) {
+    return;
+  }
+
+  // Always network-first with no-cache for HTML navigation so mobile devices never get stuck on old deployments
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request, { cache: 'no-store' }).catch(() => caches.match('/index.html'))
+    );
     return;
   }
 
@@ -51,7 +61,6 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       })
-      .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
+      .catch(() => caches.match(request))
   );
 });
-

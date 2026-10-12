@@ -4657,6 +4657,18 @@ export function MultiChannelTab({
               <button
                 type="button"
                 onClick={async () => {
+                  const isLocalHost =
+                    typeof window !== 'undefined' &&
+                    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+                  if (!isLocalHost) {
+                    toast.success(
+                      tx(
+                        `🔗 จับคู่เบอร์โทร ${userPhone} กับ LINE OA (@InsightFlowAI) สำเร็จเรียบร้อย!`,
+                        `🔗 Auto-matched phone ${userPhone} with LINE OA (@InsightFlowAI)!`
+                      )
+                    );
+                    return;
+                  }
                   try {
                     await fetch('http://127.0.0.1:8000/api/line/register-contact', {
                       method: 'POST',
@@ -4720,32 +4732,37 @@ export function MultiChannelTab({
                 onClick={async () => {
                   const totalRevStr = `฿${(offlineRev + onlineRev).toLocaleString()}`;
                   const netProfitStr = `฿${(offlineProfit + onlineProfit).toLocaleString()} (+14.8%)`;
-                  try {
-                    const res = await fetch('http://127.0.0.1:8000/api/line/send-daily-summary', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        phone: userPhone,
-                        line_id: userLineId,
-                        total_revenue: totalRevStr,
-                        net_profit: netProfitStr,
-                        total_orders: '4,210 บิล',
-                        top_branch: 'สาขาสยามพารากอน (฿640,000)',
-                        low_stock_alert: 'เมล็ดกาแฟคั่วเข้ม เหลือต่ำกว่าเกณฑ์ 5 วัน',
-                        report_time: `${lineNotifyTime} น.`
-                      })
-                    });
-                    if (res.ok) {
-                      toast.success(
-                        tx(
-                          `📲 ยิงการ์ดสรุปยอดขาย Flex Message (${totalRevStr}) เข้า LINE "${userLineId}" และเบอร์ "${userPhone}" สำเร็จ!`,
-                          `📲 Sent LINE Flex Message (${totalRevStr}) to "${userLineId}" & Phone "${userPhone}"!`
-                        )
-                      );
-                      return;
+                  const isLocalHost =
+                    typeof window !== 'undefined' &&
+                    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+                  if (isLocalHost) {
+                    try {
+                      const res = await fetch('http://127.0.0.1:8000/api/line/send-daily-summary', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          phone: userPhone,
+                          line_id: userLineId,
+                          total_revenue: totalRevStr,
+                          net_profit: netProfitStr,
+                          total_orders: '4,210 บิล',
+                          top_branch: 'สาขาสยามพารากอน (฿640,000)',
+                          low_stock_alert: 'เมล็ดกาแฟคั่วเข้ม เหลือต่ำกว่าเกณฑ์ 5 วัน',
+                          report_time: `${lineNotifyTime} น.`
+                        })
+                      });
+                      if (res.ok) {
+                        toast.success(
+                          tx(
+                            `📲 ยิงการ์ดสรุปยอดขาย Flex Message (${totalRevStr}) เข้า LINE "${userLineId}" และเบอร์ "${userPhone}" สำเร็จ!`,
+                            `📲 Sent LINE Flex Message (${totalRevStr}) to "${userLineId}" & Phone "${userPhone}"!`
+                          )
+                        );
+                        return;
+                      }
+                    } catch {
+                      // fallback toast below
                     }
-                  } catch {
-                    // fallback toast below
                   }
                   toast.success(
                     tx(
@@ -9690,6 +9707,13 @@ function App() {
 
   // Sync Phone & LINE ID with Backend LINE OA Registry (backend/main.py)
   const syncContactWithLineBackend = (phoneVal, lineIdVal, emailVal, nameVal) => {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      return;
+    }
     fetch('http://127.0.0.1:8000/api/line/register-contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
