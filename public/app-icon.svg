@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="obsidianCore" cx="30%" cy="22%" r="80%">
+      <stop offset="0%" stop-color="#172554" />
+      <stop offset="55%" stop-color="#070C1E" />
+      <stop offset="100%" stop-color="#02040A" />
+    </radialGradient>
+    <linearGradient id="rimMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="28%" stop-color="#F59E0B" />
+      <stop offset="65%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#FBBF24" />
+    </linearGradient>
+    <linearGradient id="gold24k" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B45309" />
+      <stop offset="45%" stop-color="#F59E0B" />
+      <stop offset="80%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#FFFBEB" />
+    </linearGradient>
+    <linearGradient id="cyanCrystal" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0369A1" />
+      <stop offset="55%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#E0F2FE" />
+    </linearGradient>
+    <linearGradient id="emeraldCrystal" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#047857" />
+      <stop offset="60%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#D1FAE5" />
+    </linearGradient>
+    <filter id="luxGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Metallic Jewel Bevel -->
+  <rect width="512" height="512" rx="128" fill="url(#rimMetallic)" />
+  <rect x="12" y="12" width="488" height="488" rx="118" fill="url(#obsidianCore)" />
+
+  <!-- Ambient Royal Glow -->
+  <circle cx="256" cy="240" r="190" fill="#F59E0B" fill-opacity="0.12" />
+  <circle cx="340" cy="160" r="130" fill="#38BDF8" fill-opacity="0.12" />
+
+  <!-- Outer Precision Octagon Frame -->
+  <polygon points="256,42 408,105 470,256 408,407 256,470 104,407 42,256 104,105" fill="none" stroke="url(#gold24k)" stroke-width="8" stroke-opacity="0.55" />
+
+  <!-- Inner Dashed Halo -->
+  <circle cx="256" cy="256" r="176" fill="none" stroke="url(#cyanCrystal)" stroke-width="5" stroke-dasharray="18 14" stroke-opacity="0.45" />
+
+  <!-- 3D Faceted Diamond Crest -->
+  <polygon points="256,68 316,126 256,180 196,126" fill="url(#gold24k)" filter="url(#luxGlow)" />
+  <polygon points="256,68 316,126 256,126" fill="#FFFBEB" fill-opacity="0.7" />
+  <polygon points="196,126 256,126 256,180" fill="#92400E" fill-opacity="0.55" />
+
+  <!-- 3 Ascending Crystal Data Pillars -->
+  <rect x="124" y="274" width="58" height="118" rx="16" fill="url(#cyanCrystal)" />
+  <rect x="220" y="214" width="58" height="178" rx="16" fill="url(#emeraldCrystal)" />
+  <rect x="316" y="146" width="62" height="246" rx="18" fill="url(#gold24k)" filter="url(#luxGlow)" />
+
+  <!-- Sweeping Golden Trajectory -->
+  <path d="M92 348 C 180 330, 265 238, 398 106" fill="none" stroke="#FFFBEB" stroke-width="22" stroke-linecap="round" filter="url(#luxGlow)" />
+  <path d="M92 348 C 180 330, 265 238, 398 106" fill="none" stroke="url(#gold24k)" stroke-width="14" stroke-linecap="round" />
+
+  <!-- Apex Star Spark -->
+  <polygon points="424,80 356,94 404,148" fill="#FEF08A" />
+  <path d="M418 54 L425 78 L449 85 L425 92 L418 116 L411 92 L387 85 L411 78 Z" fill="#FFFFFF" />
+
+  <!-- Base Pedestal Line -->
+  <line x1="96" y1="408" x2="416" y2="408" stroke="url(#gold24k)" stroke-width="12" stroke-linecap="round" />
+</svg>

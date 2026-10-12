@@ -2,8 +2,200 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   INSIGHTFLOW MODERN & SENIOR-FRIENDLY TYPOGRAPHY SYSTEM
+   - ฟอนต์ร่วมสมัย อ่านง่าย สบายตาสำหรับทุกวัยและผู้สูงอายุ (IBM Plex Sans Thai + Plus Jakarta Sans)
+   - แยกน้ำหนักตัวหนา (Bold 700 / SemiBold 600) และตัวปกติ (Regular 400 / Medium 500) อย่างชัดเจน
+   - สระและวรรณยุกต์ภาษาไทยไม่ซ้อนทับกัน และมีขนาดขั้นต่ำที่อ่านได้ชัดเจนไม่ต้องเพ่ง
+   ========================================================================== */
+
+:root {
+  --font-sans: 'Prompt', 'IBM Plex Sans Thai', 'Plus Jakarta Sans', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Prompt', ui-monospace, SFMono-Regular, monospace;
+  font-size: 17.5px;
+}
+
+html[data-font-scale="normal"] {
+  font-size: 17px;
+}
+
+html[data-font-scale="large"] {
+  font-size: 19px;
+}
+
+html[data-font-scale="xlarge"] {
+  font-size: 21px;
+}
+
+html,
 body {
-    font-family: 'Prompt', sans-serif;
-    background-color: #0f172a;
-    color: #f8fafc;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  background-color: #050814;
+  color: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 1. หัวข้อหลักและตัวเลขสำคัญ (Bold 700 คมชัด อ่านง่ายสำหรับผู้ใหญ่วัย 60-70+) */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+}
+
+.font-black {
+  font-weight: 700 !important;
+  letter-spacing: -0.005em;
+}
+
+.font-extrabold,
+.font-bold,
+strong,
+b {
+  font-weight: 700 !important;
+}
+
+/* 2. หัวข้อย่อย ปุ่มกด และหัวตาราง (น้ำหนักกึ่งหนา SemiBold 600 กดง่ายชัดเจน) */
+.font-semibold,
+th,
+button {
+  font-weight: 600;
+}
+
+/* 3. เนื้อหาทั่วไป คำอธิบาย ตารางข้อมูล และช่องกรอกข้อมูล */
+p,
+li,
+td,
+dd,
+blockquote,
+.font-normal {
+  font-weight: 400;
+  line-height: 1.78;
+}
+
+label,
+input,
+select,
+textarea,
+.font-medium {
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+/* 4. ตัวเลข รหัสธุรกรรม และตารางการเงิน (Tabular Monospace เรียงหลักตรงกัน อ่านตัวเลขง่าย) */
+.font-mono {
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.015em;
+}
+
+/* 5. ยกระดับขนาดตัวอักษรขนาดจิ๋ว (Senior-Friendly 60-70+ Readability Guard) ไม่ให้มีตัวหนังสือเล็กจนต้องเพ่ง */
+.text-\[8px\],
+.text-\[9px\],
+.text-\[10px\] {
+  font-size: 0.875rem !important; /* ขั้นต่ำ ~15.5px - 18.5px */
+  line-height: 1.55 !important;
+  letter-spacing: 0.015em !important;
+}
+
+.text-\[11px\],
+.text-xs {
+  font-size: 0.925rem !important; /* ขั้นต่ำ ~16.2px - 19.5px อ่านสบายตา */
+  line-height: 1.6 !important;
+}
+
+/* 6. ยกระดับความคมชัดของสีตัวอักษรรอง (High-Contrast Readability Guard) */
+.text-slate-400 {
+  color: #e2e8f0 !important; /* สว่างคมชัดขึ้นมากบนพื้นหลังมืด */
+}
+
+.text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+/* 7. เพิ่มระยะห่างภายในตาราง ปุ่มกด และช่องกรอกข้อมูลให้กดง่าย ไม่พลาดเป้า */
+table th {
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+table td {
+  font-weight: 400;
+  line-height: 1.7;
+  padding-top: 1.05rem !important;
+  padding-bottom: 1.05rem !important;
+}
+
+input,
+select {
+  min-height: 2.85rem;
+}
+
+/* ==========================================================================
+   INSIGHTFLOW MOTION ANIMATION ENGINE
+   ========================================================================== */
+@keyframes motionPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.15), 0 0 30px rgba(56, 189, 248, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(251, 191, 36, 0.35), 0 0 50px rgba(56, 189, 248, 0.2);
+  }
+}
+
+@keyframes motionFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes motionShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes motionSlideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-motion-glow {
+  animation: motionPulseGlow 4s ease-in-out infinite;
+}
+
+.animate-motion-float {
+  animation: motionFloat 5s ease-in-out infinite;
+}
+
+.animate-motion-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: motionShimmer 3s infinite linear;
+}
+
+.animate-motion-enter {
+  animation: motionSlideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

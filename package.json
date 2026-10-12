@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "backend:dev": "cd backend && ./venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --reload",
+    "backend:prod": "cd backend && ./venv/bin/gunicorn main:app --config gunicorn_conf.py --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
@@ -15,7 +17,8 @@
     "jwt-decode": "^4.0.0",
     "react": "^19.2.8",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-hot-toast": "^2.6.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",
