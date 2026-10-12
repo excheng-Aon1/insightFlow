@@ -731,3 +731,214 @@ html[data-theme="light"] .border-slate-700\/50 {
   border-color: #cbd5e1 !important;
 }
 
+/* ==========================================================================
+   APPLE KEYNOTE 3D MOTION LOGO ENGINE (INSIGHTFLOW EMBLEM SHORT VIDEO LOOP)
+   ========================================================================== */
+@keyframes appleOctagonLaser {
+  0% {
+    stroke-dashoffset: 360;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes appleHaloRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes appleHaloReverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes appleCrownFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.75));
+  }
+  50% {
+    transform: translateY(-4.5px) scale(1.07);
+    filter: drop-shadow(0 0 18px rgba(254, 240, 138, 1));
+  }
+}
+
+@keyframes applePillarRise1 {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  40% {
+    transform: scaleY(0.35);
+  }
+  75% {
+    transform: scaleY(1.08);
+  }
+}
+
+@keyframes applePillarRise2 {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  35% {
+    transform: scaleY(0.28);
+  }
+  70% {
+    transform: scaleY(1.1);
+  }
+}
+
+@keyframes applePillarRise3 {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  30% {
+    transform: scaleY(0.22);
+  }
+  68% {
+    transform: scaleY(1.12);
+  }
+}
+
+@keyframes appleTrajectoryDraw {
+  0% {
+    stroke-dashoffset: 140;
+    opacity: 0.25;
+  }
+  35% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  85% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -140;
+    opacity: 0.35;
+  }
+}
+
+@keyframes appleApexStarBurst {
+  0%, 20% {
+    transform: scale(0.4) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.28) rotate(45deg);
+    opacity: 1;
+  }
+  85% {
+    transform: scale(1) rotate(90deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.4) rotate(180deg);
+    opacity: 0.3;
+  }
+}
+
+@keyframes appleLogo3DBreathe {
+  0%, 100% {
+    transform: perspective(900px) rotateY(-8deg) rotateX(5deg) translateY(0px) scale(1);
+  }
+  50% {
+    transform: perspective(900px) rotateY(8deg) rotateX(-4deg) translateY(-6px) scale(1.04);
+  }
+}
+
+@keyframes appleLightSweep {
+  0% {
+    transform: translateX(-140%) skewX(-22deg);
+  }
+  55%, 100% {
+    transform: translateX(240%) skewX(-22deg);
+  }
+}
+
+@keyframes appleAuroraPulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.22) rotate(12deg);
+    opacity: 0.95;
+  }
+}
+
+.apple-logo-3d-stage {
+  animation: appleLogo3DBreathe 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.apple-octagon-laser {
+  stroke-dasharray: 90 270;
+  animation: appleOctagonLaser 3.6s linear infinite;
+}
+
+.apple-halo-orbit {
+  transform-origin: 60px 60px;
+  animation: appleHaloRotate 14s linear infinite;
+}
+
+.apple-halo-reverse {
+  transform-origin: 60px 60px;
+  animation: appleHaloReverse 10s linear infinite;
+}
+
+.apple-crown-float {
+  transform-origin: 60px 28px;
+  animation: appleCrownFloat 3.2s ease-in-out infinite;
+}
+
+.apple-pillar-1 {
+  transform-origin: 35px 92px;
+  animation: applePillarRise1 3.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.apple-pillar-2 {
+  transform-origin: 58px 92px;
+  animation: applePillarRise2 3.6s cubic-bezier(0.22, 1, 0.36, 1) 0.18s infinite;
+}
+
+.apple-pillar-3 {
+  transform-origin: 81px 92px;
+  animation: applePillarRise3 3.6s cubic-bezier(0.22, 1, 0.36, 1) 0.36s infinite;
+}
+
+.apple-trajectory-wave {
+  stroke-dasharray: 140;
+  animation: appleTrajectoryDraw 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.apple-apex-star {
+  transform-origin: 98px 20px;
+  animation: appleApexStarBurst 3.6s ease-in-out infinite;
+}
+
+.apple-light-sweep {
+  animation: appleLightSweep 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.apple-aurora-orb {
+  animation: appleAuroraPulse 5s ease-in-out infinite;
+}
+
+/* Preserve pure cinema dark look inside .apple-cinema-player even in light theme */
+html[data-theme="light"] .apple-cinema-player {
+  background: radial-gradient(circle at 50% 35%, #111c38 0%, #060a17 62%, #02040a 100%) !important;
+  color: #f8fafc !important;
+  border-color: rgba(251, 191, 36, 0.45) !important;
+}
+
+
+

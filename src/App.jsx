@@ -2618,6 +2618,507 @@ export function LuxuryBrandLogo({ size = 48, className = '' }) {
   );
 }
 
+/**
+ * Apple Keynote / Apple Event Style Short Motion Video Loop using InsightFlow's Own Logo
+ * - Auto-loops through 4 cinematic chapters at 60 FPS
+ * - Features 3D perspective breathing, octagon laser trace, levitating diamond crown,
+ *   animated 3D isometric pillars, and golden trajectory laser wave
+ */
+export function AppleKeynoteLogoFilm({
+  lang = 'th',
+  isFullscreen = false,
+  onOpenFullscreen,
+  onCloseFullscreen,
+  onEnterSystem
+}) {
+  const isEn = lang === 'en';
+  const rawId = React.useId();
+  const uid = `apple-${rawId.replace(/:/g, '')}`;
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [replayKey, setReplayKey] = useState(0);
+
+  const scenes = isEn
+    ? [
+        {
+          badge: 'SCENE 01 • ROYAL AI CROWN',
+          title: 'InsightFlow 3D Neural Emblem',
+          subtitle: '99.4% AI Forecast Precision & Executive Decision Intelligence',
+          metric: '99.4% AI Accuracy',
+          accent: 'from-amber-300 via-yellow-400 to-amber-500',
+          orb: 'rgba(251, 191, 36, 0.35)'
+        },
+        {
+          badge: 'SCENE 02 • ISOMETRIC PILLARS',
+          title: 'Real-Time Omnichannel & POS Sync',
+          subtitle: 'Unifying Storefront POS, Multi-Branch & Online Channels in 0.2s',
+          metric: '0.2s Live Sync',
+          accent: 'from-sky-300 via-cyan-400 to-blue-500',
+          orb: 'rgba(56, 189, 248, 0.35)'
+        },
+        {
+          badge: 'SCENE 03 • GOLDEN TRAJECTORY',
+          title: '฿10,000,000 Revenue Target Engine',
+          subtitle: 'Automated Growth Simulation, Margin Optimization & Restock AI',
+          metric: '+34.8% Growth',
+          accent: 'from-emerald-300 via-teal-400 to-emerald-500',
+          orb: 'rgba(52, 211, 153, 0.35)'
+        },
+        {
+          badge: 'SCENE 04 • 22:00 LINE OA REPORT',
+          title: 'Direct Executive Briefing to LINE',
+          subtitle: 'Nightly Net Profit, Top Branch & Low-Stock Alerts at 22:00',
+          metric: '22:00 Auto-Push',
+          accent: 'from-amber-200 via-emerald-300 to-cyan-400',
+          orb: 'rgba(16, 185, 129, 0.35)'
+        }
+      ]
+    : [
+        {
+          badge: 'ฉากที่ 01 • มงกุฎเพชรอัจฉริยะ',
+          title: 'InsightFlow AI ขุมพลังสมองกลธุรกิจ',
+          subtitle: 'พยากรณ์ยอดขายและวิเคราะห์กำไรแม่นยำสูงถึง 99.4% ระดับผู้บริหาร',
+          metric: 'แม่นยำ 99.4%',
+          accent: 'from-amber-300 via-yellow-400 to-amber-500',
+          orb: 'rgba(251, 191, 36, 0.38)'
+        },
+        {
+          badge: 'ฉากที่ 02 • แท่งคริสตัล 3 มิติ',
+          title: 'เชื่อมยอดขายทุกสาขา & ออนไลน์วินาทีต่อวินาที',
+          subtitle: 'ซิงค์ข้อมูลหน้าร้าน POS • Shopee • Lazada • TikTok เข้าศูนย์กลางอัตโนมัติ',
+          metric: 'ซิงค์ไว 0.2 วินาที',
+          accent: 'from-sky-300 via-cyan-400 to-blue-500',
+          orb: 'rgba(56, 189, 248, 0.38)'
+        },
+        {
+          badge: 'ฉากที่ 03 • เส้นแสงทองคำทะยานฟ้า',
+          title: 'วางแผนพิชิตเป้าหมาย ฿10,000,000',
+          subtitle: 'จำลองกลยุทธ์การเติบโต ป้องกันของขาดสต็อก และอุดรอยรั่วต้นทุนทันที',
+          metric: 'กำไรโต +34.8%',
+          accent: 'from-emerald-300 via-teal-400 to-emerald-500',
+          orb: 'rgba(52, 211, 153, 0.38)'
+        },
+        {
+          badge: 'ฉากที่ 04 • แจ้งเตือนเข้า LINE 22:00 น.',
+          title: 'ส่งการ์ดสรุปยอดขายเข้า LINE OA ทุกคืน',
+          subtitle: 'รายงานยอดขายรายวัน กำไรสุทธิ และสาขาขายดี ส่งตรงถึงมือถือผู้บริหารอัตโนมัติ',
+          metric: 'ส่งตรง 22:00 น.',
+          accent: 'from-amber-200 via-emerald-300 to-cyan-400',
+          orb: 'rgba(16, 185, 129, 0.38)'
+        }
+      ];
+
+  useEffect(() => {
+    if (!isPlaying) return undefined;
+    const timer = setInterval(() => {
+      setSceneIdx(prev => (prev + 1) % scenes.length);
+    }, 3400);
+    return () => clearInterval(timer);
+  }, [isPlaying, scenes.length]);
+
+  const currentScene = scenes[sceneIdx] || scenes[0];
+  const logoPx = isFullscreen ? 176 : 118;
+
+  return (
+    <div
+      key={replayKey}
+      className={`cyber-toast-hud apple-cinema-player relative overflow-hidden rounded-3xl border border-amber-400/40 shadow-[0_20px_60px_-15px_rgba(251,191,36,0.35),0_0_40px_rgba(56,189,248,0.2)] select-none ${
+        isFullscreen ? 'p-6 sm:p-10' : 'p-4 sm:p-5 mb-5'
+      }`}
+      style={{
+        background:
+          'radial-gradient(circle at 50% 32%, #132042 0%, #060b18 62%, #02040a 100%)'
+      }}
+    >
+      {/* Sweeping Apple Keynote Specular Light Beam */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className={`apple-light-sweep absolute -inset-y-12 w-28 bg-gradient-to-r from-transparent via-amber-200/15 to-transparent ${
+            !isPlaying ? '[animation-play-state:paused]' : ''
+          }`}
+        />
+      </div>
+
+      {/* Dynamic Ambient Aurora Orbs behind our Logo */}
+      <div
+        className="apple-aurora-orb pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-56 h-56 sm:w-72 sm:h-72 rounded-full blur-3xl transition-all duration-700"
+        style={{ background: currentScene.orb }}
+      />
+
+      {/* Top Cinema Status Bar */}
+      <div className="relative z-10 flex items-center justify-between gap-2 pb-3 mb-3 border-b border-white/10">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span
+              className={` absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 ${
+                isPlaying ? 'animate-ping' : ''
+              }`}
+            />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400" />
+          </span>
+          <span className="text-[11px] sm:text-xs font-black tracking-wider uppercase text-amber-300">
+            {isEn ? 'APPLE-STYLE 3D LOGO MOTION FILM' : 'วิดีโอสั้นเปิดตัวโลโก้ 3 มิติ • INSIGHTFLOW MOTION'}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setIsPlaying(p => !p)}
+            className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-[11px] font-black text-white transition cursor-pointer"
+            title={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying
+              ? isEn
+                ? '⏸ Pause'
+                : '⏸ หยุดพัก'
+              : isEn
+              ? '▶ Play'
+              : '▶ เล่นต่อ'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setReplayKey(k => k + 1);
+              setSceneIdx(0);
+              setIsPlaying(true);
+            }}
+            className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-[11px] font-black text-amber-300 transition cursor-pointer"
+            title="Replay"
+          >
+            {isEn ? '🔄 Replay' : '🔄 เล่นซ้ำ'}
+          </button>
+          {!isFullscreen && onOpenFullscreen && (
+            <button
+              type="button"
+              onClick={onOpenFullscreen}
+              className="px-2.5 py-1 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/50 text-[11px] font-black text-amber-200 transition cursor-pointer"
+            >
+              {isEn ? '🎬 Fullscreen' : '🎬 ขยายเต็มจอ'}
+            </button>
+          )}
+          {isFullscreen && onCloseFullscreen && (
+            <button
+              type="button"
+              onClick={onCloseFullscreen}
+              className="px-3 py-1 rounded-lg bg-rose-500/25 hover:bg-rose-500/40 border border-rose-400/50 text-xs font-black text-white transition cursor-pointer"
+            >
+              {isEn ? '✕ Close' : '✕ ปิดหน้าต่าง'}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Main Cinema Stage: 3D Animated InsightFlow Emblem + Keynote Story Typography */}
+      <div
+        className={`relative z-10 flex flex-col ${
+          isFullscreen ? 'items-center text-center py-6 gap-7' : 'sm:flex-row items-center gap-5 py-2'
+        }`}
+      >
+        {/* Centerpiece: Our Own InsightFlow Logo in 3D Apple Keynote Motion */}
+        <div className="relative flex-shrink-0 flex items-center justify-center">
+          {/* Outer Pulsing Sonar Rings */}
+          <div
+            className="pointer-events-none absolute -inset-4 rounded-full border border-amber-400/30 animate-pulse"
+            style={{ borderRadius: '34%' }}
+          />
+          <div
+            className="pointer-events-none absolute -inset-2 rounded-full border border-dashed border-sky-400/35"
+            style={{
+              borderRadius: '32%',
+              animation: isPlaying ? 'appleHaloRotate 16s linear infinite' : 'none'
+            }}
+          />
+
+          {/* 3D Animated Emblem Housing */}
+          <div
+            className={isPlaying ? 'apple-logo-3d-stage' : ''}
+            style={{
+              width: logoPx,
+              height: logoPx,
+              borderRadius: Math.round(logoPx * 0.28),
+              padding: 3,
+              background:
+                'linear-gradient(135deg, #FEF08A 0%, #F59E0B 30%, #38BDF8 68%, #FBBF24 100%)',
+              boxShadow:
+                '0 18px 45px -8px rgba(245, 158, 11, 0.65), 0 0 32px rgba(56, 189, 248, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.85)'
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: Math.max(10, Math.round(logoPx * 0.28) - 3),
+                background:
+                  'radial-gradient(circle at 28% 22%, #192a56 0%, #070C1E 58%, #02040c 100%)',
+                position: 'relative',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {/* Top Specular Glass Reflection */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '8%',
+                  right: '8%',
+                  height: '42%',
+                  borderRadius: '0 0 999px 999px',
+                  background:
+                    'linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 100%)',
+                  pointerEvents: 'none'
+                }}
+              />
+
+              {/* Animated SVG of Our Own InsightFlow Logo */}
+              <svg
+                viewBox="0 0 120 120"
+                width="92%"
+                height="92%"
+                style={{
+                  overflow: 'visible',
+                  filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7))'
+                }}
+              >
+                <defs>
+                  <linearGradient id={`${uid}-gold`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FFFBEB" />
+                    <stop offset="28%" stopColor="#FDE047" />
+                    <stop offset="65%" stopColor="#F59E0B" />
+                    <stop offset="100%" stopColor="#B45309" />
+                  </linearGradient>
+                  <linearGradient id={`${uid}-goldBright`} x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#D97706" />
+                    <stop offset="50%" stopColor="#FBBF24" />
+                    <stop offset="100%" stopColor="#FEF9C3" />
+                  </linearGradient>
+                  <linearGradient id={`${uid}-cyan`} x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#0284C7" />
+                    <stop offset="55%" stopColor="#38BDF8" />
+                    <stop offset="100%" stopColor="#E0F2FE" />
+                  </linearGradient>
+                  <linearGradient id={`${uid}-emerald`} x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#059669" />
+                    <stop offset="60%" stopColor="#34D399" />
+                    <stop offset="100%" stopColor="#D1FAE5" />
+                  </linearGradient>
+                </defs>
+
+                {/* Base Octagon Frame */}
+                <polygon
+                  points="60,8 96,23 112,60 96,97 60,112 24,97 8,60 24,23"
+                  fill="none"
+                  stroke={`url(#${uid}-gold)`}
+                  strokeWidth="2.2"
+                  strokeOpacity="0.4"
+                />
+                {/* Animated Laser Light Trace on Our Octagon Frame */}
+                <polygon
+                  className={isPlaying ? 'apple-octagon-laser' : ''}
+                  points="60,8 96,23 112,60 96,97 60,112 24,97 8,60 24,23"
+                  fill="none"
+                  stroke="#FEF08A"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                />
+
+                {/* Rotating Quantum Halo Ring */}
+                <circle
+                  className={isPlaying ? 'apple-halo-orbit' : ''}
+                  cx="60"
+                  cy="60"
+                  r="42"
+                  fill="none"
+                  stroke={`url(#${uid}-cyan)`}
+                  strokeWidth="1.8"
+                  strokeDasharray="6 4"
+                  strokeOpacity="0.7"
+                />
+                <circle
+                  className={isPlaying ? 'apple-halo-reverse' : ''}
+                  cx="60"
+                  cy="60"
+                  r="35"
+                  fill="none"
+                  stroke={`url(#${uid}-gold)`}
+                  strokeWidth="1.2"
+                  strokeDasharray="3 6"
+                  strokeOpacity="0.45"
+                />
+
+                {/* Levitating 3D Faceted Royal Diamond & Crown Crest at Top */}
+                <g className={isPlaying ? 'apple-crown-float' : ''}>
+                  <polygon
+                    points="60,15 74,29 60,41 46,29"
+                    fill={`url(#${uid}-goldBright)`}
+                  />
+                  <polygon
+                    points="60,15 74,29 60,29"
+                    fill="#FFFBEB"
+                    fillOpacity="0.72"
+                  />
+                  <polygon
+                    points="46,29 60,29 60,41"
+                    fill="#B45309"
+                    fillOpacity="0.55"
+                  />
+                </g>
+
+                {/* 3 Ascending 3D Isometric Data Pillars with Spring Motion */}
+                <rect
+                  className={isPlaying ? 'apple-pillar-1' : ''}
+                  x="28"
+                  y="64"
+                  width="14"
+                  height="28"
+                  rx="4"
+                  fill={`url(#${uid}-cyan)`}
+                />
+                <rect
+                  className={isPlaying ? 'apple-pillar-2' : ''}
+                  x="51"
+                  y="50"
+                  width="14"
+                  height="42"
+                  rx="4"
+                  fill={`url(#${uid}-emerald)`}
+                />
+                <rect
+                  className={isPlaying ? 'apple-pillar-3' : ''}
+                  x="74"
+                  y="34"
+                  width="15"
+                  height="58"
+                  rx="4.5"
+                  fill={`url(#${uid}-goldBright)`}
+                />
+
+                {/* Dynamic Sweeping Golden Trajectory Wave */}
+                <path
+                  className={isPlaying ? 'apple-trajectory-wave' : ''}
+                  d="M 20 82 C 42 78, 62 56, 94 24"
+                  fill="none"
+                  stroke="#FFFBEB"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                <path
+                  className={isPlaying ? 'apple-trajectory-wave' : ''}
+                  d="M 20 82 C 42 78, 62 56, 94 24"
+                  fill="none"
+                  stroke={`url(#${uid}-gold)`}
+                  strokeWidth="3.8"
+                  strokeLinecap="round"
+                />
+
+                {/* Arrowhead & Animated 4-Point Star Spark at Apex */}
+                <polygon points="100,18 83,21 95,35" fill="#FEF08A" />
+                <path
+                  className={isPlaying ? 'apple-apex-star' : ''}
+                  d="M98 12 L100 18 L106 20 L100 22 L98 28 L96 22 L90 20 L96 18 Z"
+                  fill="#FFFFFF"
+                />
+
+                {/* Base Pedestal Gold Line */}
+                <line
+                  x1="22"
+                  y1="96"
+                  x2="98"
+                  y2="96"
+                  stroke={`url(#${uid}-gold)`}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Apple Keynote Storyboard Text & Scene Switcher */}
+        <div className="flex-1 min-w-0">
+          <div
+            className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-amber-400/35 text-[11px] font-black text-amber-300 mb-2`}
+          >
+            <span>✨ {currentScene.badge}</span>
+            <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] apple-gold-pill">
+              {currentScene.metric}
+            </span>
+          </div>
+
+          <h3
+            className={`${
+              isFullscreen ? 'text-2xl sm:text-4xl' : 'text-lg sm:text-xl'
+            } font-black text-white tracking-tight leading-snug mb-1.5`}
+          >
+            {currentScene.title}
+          </h3>
+
+          <p
+            className={`${
+              isFullscreen ? 'text-base sm:text-lg max-w-2xl mx-auto' : 'text-xs sm:text-sm'
+            } text-slate-200 font-semibold leading-relaxed mb-3.5`}
+          >
+            {currentScene.subtitle}
+          </p>
+
+          {/* Interactive 4-Scene Apple Keynote Progress Chapters */}
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+            {scenes.map((sc, idx) => {
+              const isActive = idx === sceneIdx;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSceneIdx(idx)}
+                  className={`text-left p-1.5 sm:p-2 rounded-xl border transition cursor-pointer ${
+                    isActive
+                      ? 'bg-amber-400/20 border-amber-400/70 shadow-[0_0_15px_rgba(251,191,36,0.25)]'
+                      : 'bg-white/5 hover:bg-white/10 border-white/10'
+                  }`}
+                >
+                  <div className="h-1 w-full rounded-full bg-white/15 overflow-hidden mb-1">
+                    <div
+                      className={`h-full rounded-full bg-gradient-to-r ${sc.accent} transition-all duration-500`}
+                      style={{ width: isActive ? '100%' : idx < sceneIdx ? '100%' : '0%' }}
+                    />
+                  </div>
+                  <div className="text-[10px] font-black text-amber-300 truncate">
+                    0{idx + 1} • {sc.metric}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {isFullscreen && onEnterSystem && (
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={onEnterSystem}
+                className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black text-sm sm:text-base shadow-xl cursor-pointer apple-gold-pill"
+              >
+                {isEn
+                  ? '🚀 Enter InsightFlow Live System Now'
+                  : '🚀 เข้าสู่ระบบ InsightFlow ทันที'}
+              </button>
+              <button
+                type="button"
+                onClick={onCloseFullscreen}
+                className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm sm:text-base cursor-pointer"
+              >
+                {isEn ? 'Back to Front Page' : 'กลับสู่หน้าหลัก'}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 // --- MODULE 3: OVERVIEW & CUSTOMER INSIGHTS ---
 
@@ -10885,6 +11386,8 @@ function App() {
     document.body.classList.toggle('theme-dark', theme === 'dark');
   }, [theme]);
 
+  const [isAppleFilmOpen, setIsAppleFilmOpen] = useState(false);
+
   const scrollToSection = id => {
     setActiveSection(id);
     const el = document.getElementById(id);
@@ -12087,10 +12590,11 @@ function App() {
                   {t.freeTrial}
                 </button>
                 <button
-                  onClick={() => scrollToSection('solutions')}
-                  className="w-full sm:w-auto bg-[#0b1120] hover:bg-slate-800 text-white font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl border border-white/15 text-base sm:text-lg cursor-pointer text-center"
+                  onClick={() => setIsAppleFilmOpen(true)}
+                  className="w-full sm:w-auto bg-[#0b1120] hover:bg-slate-800 text-white font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl border border-amber-400/40 shadow-[0_0_25px_rgba(251,191,36,0.2)] text-base sm:text-lg cursor-pointer text-center flex items-center justify-center gap-2"
                 >
-                  ▶ {t.watchDemo}
+                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+                  <span>▶ {t.watchDemo}</span>
                 </button>
               </div>
 
@@ -12143,6 +12647,12 @@ function App() {
             </div>
 
             <div className="lg:col-span-6">
+              {/* Apple-Style 3D Motion Short Video Loop using Our Own InsightFlow Logo */}
+              <AppleKeynoteLogoFilm
+                lang={lang}
+                onOpenFullscreen={() => setIsAppleFilmOpen(true)}
+              />
+
               <div className="bg-[#0b1120]/95 border border-amber-400/30 rounded-3xl p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10 text-xs">
                   <span className="font-black text-white flex items-center gap-2.5">
@@ -12175,6 +12685,29 @@ function App() {
               </div>
             </div>
           </div>
+
+          {/* Fullscreen Apple Keynote Logo Motion Film Modal */}
+          {isAppleFilmOpen && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl"
+              onClick={() => setIsAppleFilmOpen(false)}
+            >
+              <div
+                className="w-full max-w-4xl"
+                onClick={e => e.stopPropagation()}
+              >
+                <AppleKeynoteLogoFilm
+                  lang={lang}
+                  isFullscreen
+                  onCloseFullscreen={() => setIsAppleFilmOpen(false)}
+                  onEnterSystem={() => {
+                    setIsAppleFilmOpen(false);
+                    setIsLoginOpen(true);
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Solutions Section */}
           <div id="solutions" className="py-16 border-t border-white/10">
