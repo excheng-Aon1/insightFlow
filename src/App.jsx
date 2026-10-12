@@ -71,7 +71,7 @@ const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
     <div
       className={`cyber-toast-hud ${
         t.visible ? 'toast-cyber-enter' : 'toast-cyber-exit'
-      } pointer-events-auto relative w-full max-w-[430px] overflow-hidden rounded-2xl bg-[#070c1a]/95 backdrop-blur-2xl border-2 ${
+      } pointer-events-auto relative w-full max-w-[92vw] sm:max-w-[430px] overflow-hidden rounded-2xl bg-[#070c1a]/95 backdrop-blur-2xl border-2 ${
         cfg.borderGlow
       } text-white select-none`}
     >
@@ -88,7 +88,7 @@ const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
         className={`pointer-events-none absolute -top-10 -left-10 w-32 h-32 rounded-full blur-2xl ${cfg.ambientOrb}`}
       />
 
-      <div className="relative p-4 sm:px-5 sm:py-4 flex items-start gap-4">
+      <div className="relative p-3.5 sm:px-5 sm:py-4 flex items-start gap-3 sm:gap-4">
         {/* 3D Animated Emblem with Sonar Pulse & Rotating Orbit Ring */}
         <div className="relative flex-shrink-0 w-12 h-12 flex items-center justify-center mt-0.5">
           {/* Expanding Sonar Ring */}
@@ -9745,16 +9745,11 @@ function App() {
     syncContactWithLineBackend(newPhone, newLineId);
   };
 
-  // Apply font scale to root document for senior-friendly readability
+  // Apply font scale to root document via data-font-scale so mobile/tablet/desktop media queries scale proportionally
   useEffect(() => {
     const htmlEl = document.documentElement;
-    if (fontScale === 'normal') {
-      htmlEl.style.fontSize = '16px';
-    } else if (fontScale === 'large') {
-      htmlEl.style.fontSize = '18px';
-    } else {
-      htmlEl.style.fontSize = '20px';
-    }
+    htmlEl.setAttribute('data-font-scale', fontScale);
+    htmlEl.style.fontSize = '';
   }, [fontScale]);
 
   // Apply theme to root document and body for global high-contrast Light/Dark styling
@@ -10183,62 +10178,64 @@ function App() {
 
     return (
       <div
-        className={`p-5 rounded-3xl border-2 border-dashed transition-all shadow-lg ${
+        className={`p-3 sm:p-5 rounded-2xl sm:rounded-3xl border-2 border-dashed transition-all shadow-lg ${
           theme === 'dark'
             ? 'bg-gradient-to-r from-amber-500/10 via-[#081024] to-emerald-500/10 border-amber-400/50'
             : 'bg-gradient-to-r from-amber-50 via-white to-emerald-50 border-amber-400'
         }`}
       >
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-4">
-            <LuxuryIconBadge variant="gold" size="lg" active>
-              <LuxuryModuleIcon type="upload" size={28} />
-            </LuxuryIconBadge>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950">
-                  {tx('อัปโหลดไฟล์เพื่อให้ข้อความและตัวเลขเปลี่ยนตามไฟล์จริง', 'Live Dynamic Data File Upload')}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
+            <div className="hidden sm:block flex-shrink-0">
+              <LuxuryIconBadge variant="gold" size="lg" active>
+                <LuxuryModuleIcon type="upload" size={28} />
+              </LuxuryIconBadge>
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span className="text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950">
+                  {tx('ซิงก์ไฟล์ข้อมูลจริง', 'Live File Sync')}
                 </span>
-                <span className="text-xs text-emerald-300 font-semibold">
-                  • {tx('ไฟล์ที่ใช้อยู่:', 'Active File:')} <strong>{fileMeta.filename}</strong> (
-                  {fileMeta.rows.toLocaleString()} {tx('รายการ', 'rows')} •{' '}
-                  {isEn ? fileMeta.updatedAtEn : fileMeta.updatedAtTh})
+                <span className="text-xs text-emerald-300 font-semibold truncate">
+                  • <strong>{fileMeta.filename}</strong> ({fileMeta.rows.toLocaleString()} {tx('แถว', 'rows')})
                 </span>
               </div>
-              <h4 className={`text-base font-black mt-1 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                {tx(
-                  `อัปโหลดไฟล์ตารางข้อมูลสำหรับหน้า "${pageNameDisplay}" — ข้อความ รายชื่อ และตัวเลขในหน้านี้จะเปลี่ยนตามไฟล์ทันที`,
-                  `Upload your file for "${pageNameDisplay}" — text, names & numbers on this page update immediately`
-                )}
+              <h4 className={`text-sm sm:text-base font-black mt-1 leading-snug ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                <span className="sm:hidden">
+                  {tx(`อัปโหลดไฟล์หน้า "${pageNameDisplay}" เพื่ออัปเดตตัวเลขทันที`, `Upload file for "${pageNameDisplay}"`)}
+                </span>
+                <span className="hidden sm:inline">
+                  {tx(
+                    `อัปโหลดไฟล์ตารางข้อมูลสำหรับหน้า "${pageNameDisplay}" — ข้อความ รายชื่อ และตัวเลขในหน้านี้จะเปลี่ยนตามไฟล์ทันที`,
+                    `Upload your file for "${pageNameDisplay}" — text, names & numbers on this page update immediately`
+                  )}
+                </span>
               </h4>
               {(fileMeta.changeSummaryTh || fileMeta.changeSummaryEn) && (
-                <p className="text-xs font-bold text-emerald-400 mt-1">
+                <p className="hidden sm:block text-xs font-bold text-emerald-400 mt-1">
                   ✓ {isEn ? fileMeta.changeSummaryEn : fileMeta.changeSummaryTh}
                 </p>
               )}
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 flex-shrink-0">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 flex-shrink-0">
             <button
               type="button"
               onClick={() => setInspectingUploadTab(tabKey)}
-              className="px-4 py-3 rounded-2xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-400/45 font-black text-xs sm:text-sm transition cursor-pointer flex items-center gap-2"
+              className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-400/45 font-black text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2"
             >
               <span>📂</span>
-              <span>
-                {tx(
-                  `ดูไฟล์ที่อัปโหลดแล้ว (${totalUploadedCount} ไฟล์)`,
-                  `View Uploaded Files (${totalUploadedCount})`
-                )}
+              <span className="truncate">
+                {tx(`ดูไฟล์ (${totalUploadedCount})`, `Files (${totalUploadedCount})`)}
               </span>
             </button>
 
-            <label className="bg-gradient-to-r from-amber-400 to-amber-300 hover:brightness-105 text-slate-950 font-black px-5 py-3 rounded-2xl text-xs sm:text-sm shadow-lg transition flex items-center gap-2 cursor-pointer flex-shrink-0">
-              <span>
+            <label className="bg-gradient-to-r from-amber-400 to-amber-300 hover:brightness-105 text-slate-950 font-black px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm shadow-lg transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer flex-shrink-0">
+              <span className="truncate">
                 {isUploading
-                  ? tx('⏳ กำลังอ่านข้อมูลไฟล์...', '⏳ Reading file...')
-                  : tx('📤 อัปโหลดไฟล์ใหม่ (.csv / .xlsx)', '📤 Upload New File (.csv / .xlsx)')}
+                  ? tx('⏳ กำลังอ่าน...', '⏳ Reading...')
+                  : tx('📤 อัปโหลดไฟล์ใหม่', '📤 Upload File')}
               </span>
               <input
                 type="file"
@@ -10493,10 +10490,10 @@ function App() {
     ]
   };
 
-  // Language Toggle Component (Strict 100% Thai vs 100% English)
+  // Language Toggle Component (Strict 100% Thai vs 100% English, Compact on Mobile)
   const renderLanguageSwitcher = () => (
     <div
-      className={`flex items-center gap-1 p-1 rounded-2xl border shadow-inner ${
+      className={`flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-xl sm:rounded-2xl border shadow-inner ${
         theme === 'dark' ? 'bg-[#0b1120] border-white/15' : 'bg-slate-100 border-slate-300'
       }`}
       title={tx('สลับภาษา: ภาษาไทยล้วน หรือ ภาษาอังกฤษล้วน', 'Switch Language: 100% Thai or 100% English')}
@@ -10507,7 +10504,7 @@ function App() {
           handleSwitchLanguage('th');
           toast.success('🇹🇭 เปลี่ยนเป็นโหมดภาษาไทยล้วนเรียบร้อยแล้ว');
         }}
-        className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black transition cursor-pointer whitespace-nowrap ${
           lang === 'th'
             ? 'bg-amber-400 text-slate-950 shadow-md'
             : theme === 'dark'
@@ -10515,7 +10512,8 @@ function App() {
             : 'text-slate-800 hover:text-slate-950'
         }`}
       >
-        🇹🇭 ภาษาไทย
+        <span className="sm:hidden">🇹🇭 ไทย</span>
+        <span className="hidden sm:inline">🇹🇭 ภาษาไทย</span>
       </button>
       <button
         type="button"
@@ -10523,7 +10521,7 @@ function App() {
           handleSwitchLanguage('en');
           toast.success('🇬🇧 Switched to 100% English Mode');
         }}
-        className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black transition cursor-pointer whitespace-nowrap ${
           lang === 'en'
             ? 'bg-amber-400 text-slate-950 shadow-md'
             : theme === 'dark'
@@ -10531,7 +10529,8 @@ function App() {
             : 'text-slate-800 hover:text-slate-950'
         }`}
       >
-        🇬🇧 English
+        <span className="sm:hidden">🇬🇧 EN</span>
+        <span className="hidden sm:inline">🇬🇧 English</span>
       </button>
     </div>
   );
@@ -10542,39 +10541,121 @@ function App() {
   if (!user) {
     return (
       <div
-        className={`min-h-screen flex flex-col font-sans select-none relative transition-colors duration-300 ${
+        className={`min-h-screen flex flex-col font-sans select-none relative pb-20 md:pb-0 transition-colors duration-300 ${
           theme === 'dark' ? 'theme-dark bg-[#050814] text-slate-100' : 'theme-light bg-[#f8fafc] text-slate-900'
         }`}
       >
-        <Toaster position="top-right" gutter={14} containerStyle={{ top: 18, right: 18, zIndex: 9999 }} />
+        <Toaster position="top-right" gutter={14} containerStyle={{ top: 14, right: 14, left: 14, zIndex: 9999 }} />
 
-        {/* Login Modal */}
+        {/* Login Modal (Scrollable & Mobile-Optimized with 1-Tap Instant Access at Top) */}
         {isLoginOpen && (
-          <div className="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center z-50 p-4">
-            <div className="bg-[#0c1222] border border-white/15 rounded-3xl w-full max-w-md p-8 shadow-2xl relative">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-start sm:items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+            <div className="bg-[#0c1222] border border-white/15 rounded-3xl w-full max-w-md max-h-[92dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative my-auto">
               <button
                 onClick={() => setIsLoginOpen(false)}
-                className="absolute top-5 right-5 text-slate-400 hover:text-white transition text-lg"
+                className="sticky top-0 float-right w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 hover:text-white transition text-base font-black z-10 cursor-pointer"
+                aria-label="Close"
               >
                 ✕
               </button>
-              <div className="flex flex-col items-center justify-center gap-3 mb-4">
-                <AppLogo size={64} />
+              <div className="flex flex-col items-center justify-center gap-2.5 mb-3 clear-both">
+                <AppLogo size={54} />
                 {renderLanguageSwitcher()}
               </div>
-              <h2 className="text-2xl font-black text-center mb-2 text-white">
+              <h2 className="text-xl sm:text-2xl font-black text-center mb-1.5 text-white">
                 {authMode === 'login'
                   ? tx('เข้าสู่ระบบจัดการร้านค้า', 'Sign In to Your Store Console')
                   : tx('ลงทะเบียนเจ้าของร้านใหม่', 'Create New Store Account')}
               </h2>
-              <p className="text-slate-400 text-center text-sm mb-6">
+              <p className="text-slate-300 text-center text-xs sm:text-sm mb-4">
                 {tx(
-                  'กรอกอีเมลและรหัสผ่าน หรือกดปุ่มเข้าใช้งานด่วนด้านล่างได้เลยครับ',
-                  'Enter your email and password or click Quick Owner Access below.'
+                  'กดปุ่มทางลัดด้านล่างเพื่อเข้าใช้งานได้ทันทีใน 1 คลิก หรือกรอกข้อมูลด้านล่างครับ',
+                  'Tap 1-Click Quick Access below to enter immediately, or fill in the form.'
                 )}
               </p>
 
-              <form onSubmit={handleAuthSubmit} className="flex flex-col gap-4 mb-5">
+              {/* 1-Tap Mobile & Desktop Quick Access Buttons right at the top so mobile users never have to scroll to enter */}
+              <div className="grid grid-cols-1 gap-2 mb-4 p-3 rounded-2xl bg-amber-400/10 border border-amber-400/35">
+                <div className="text-[11px] font-black uppercase text-amber-300 text-center">
+                  ⚡ {tx('ทางลัดเข้าใช้งานทันที (ไม่ต้องพิมพ์รหัสผ่าน)', '1-Tap Instant Access (No Typing Needed)')}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const cleanPhone = (authPhone || '089-999-8888').trim();
+                    const cleanLine = (authLineId || '@owner_insightflow').trim();
+                    const adminUser = {
+                      name: tx('ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin'),
+                      email: SUPER_ADMIN_EMAIL,
+                      phone: cleanPhone,
+                      lineId: cleanLine,
+                      sub: 'super-admin',
+                      role: 'admin',
+                      picture: 'https://ui-avatars.com/api/?name=Super+Admin&background=fbbf24&color=0f172a&bold=true'
+                    };
+                    setAuthEmail(SUPER_ADMIN_EMAIL);
+                    setAdminPreviewCustomerPlan(false);
+                    localStorage.setItem('insightflow_saved_phone', cleanPhone);
+                    localStorage.setItem('insightflow_saved_line_id', cleanLine);
+                    if (rememberPassword) {
+                      localStorage.setItem('insightflow_saved_user', JSON.stringify(adminUser));
+                    }
+                    setUser(adminUser);
+                    setIsLoginOpen(false);
+                    toast.success(
+                      tx(
+                        `👑 เข้าสู่ระบบ Super Admin (${SUPER_ADMIN_EMAIL}) เรียบร้อยแล้ว!`,
+                        `👑 Signed in as Super Admin (${SUPER_ADMIN_EMAIL})!`
+                      )
+                    );
+                  }}
+                  className="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition cursor-pointer"
+                >
+                  {tx(
+                    '👑 เข้าสู่ระบบ Admin สูงสุด (ปลดล็อกครบ 11 หน้า • 1 คลิก)',
+                    '👑 1-Click Super Admin Access (All 11 Modules Unlocked)'
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const chosenMeta = planTiersMap[subscriptionPlan] || planTiersMap.starter;
+                    const cleanPhone = (authPhone || '089-999-8888').trim();
+                    const cleanLine = (authLineId || '@owner_insightflow').trim();
+                    const customerUser = {
+                      name: tx(`ลูกค้าแพ็กเกจ ${chosenMeta.code}`, `${chosenMeta.code} Customer`),
+                      email: 'customer@insightflow.app',
+                      phone: cleanPhone,
+                      lineId: cleanLine,
+                      sub: 'customer-account',
+                      role: 'customer',
+                      picture: 'https://ui-avatars.com/api/?name=Customer&background=38bdf8&color=0f172a&bold=true'
+                    };
+                    localStorage.setItem('insightflow_saved_phone', cleanPhone);
+                    localStorage.setItem('insightflow_saved_line_id', cleanLine);
+                    if (rememberPassword) {
+                      localStorage.setItem('insightflow_saved_user', JSON.stringify(customerUser));
+                    }
+                    setUser(customerUser);
+                    setIsLoginOpen(false);
+                    toast.success(
+                      tx(
+                        `🛍️ เข้าสู่ระบบลูกค้า "${chosenMeta.name}" เรียบร้อยแล้ว!`,
+                        `🛍️ Signed in on "${chosenMeta.name}"!`
+                      )
+                    );
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/40 font-black text-xs transition cursor-pointer"
+                >
+                  {tx(
+                    `🛍️ ทดลองเข้าในฐานะลูกค้า (${(planTiersMap[subscriptionPlan] || planTiersMap.starter).code})`,
+                    `🛍️ 1-Click Customer Access (${(planTiersMap[subscriptionPlan] || planTiersMap.starter).code})`
+                  )}
+                </button>
+              </div>
+
+              <form onSubmit={handleAuthSubmit} className="flex flex-col gap-3.5 mb-4">
                 {authMode === 'register' && (
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
@@ -10585,7 +10666,7 @@ function App() {
                       placeholder={tx('เช่น คุณสมชาย เจริญกิจ', 'e.g. Mr. Somchai Charoenkit')}
                       value={authName}
                       onChange={e => setAuthName(e.target.value)}
-                      className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-400"
+                      className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
                     />
                   </div>
                 )}
@@ -10599,7 +10680,7 @@ function App() {
                     placeholder={tx('กรอกอีเมลของคุณ', 'owner@yourstore.com')}
                     value={authEmail}
                     onChange={e => setAuthEmail(e.target.value)}
-                    className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-400"
+                    className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
                     required
                   />
                 </div>
@@ -10624,62 +10705,53 @@ function App() {
                     placeholder={tx('กรอกรหัสผ่าน', 'Enter your password')}
                     value={authPassword}
                     onChange={e => setAuthPassword(e.target.value)}
-                    className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-400"
+                    className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
                     required
                   />
                 </div>
 
                 {/* เบอร์โทรศัพท์ & ID LINE สำหรับส่งข้อความสรุปยอดขายอัตโนมัติ */}
-                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/35 space-y-3">
+                <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/35 space-y-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-black text-emerald-300">
-                      📲 {tx('เบอร์โทรศัพท์ & ID LINE สำหรับส่งยอดขายอัตโนมัติ (22:00 น.)', 'Phone & LINE ID for Automated Daily Sales Alert (22:00)')}
-                    </span>
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
-                      Auto-Notify
+                      📲 {tx('เบอร์โทร & ID LINE รับสรุปยอดขายอัตโนมัติ (22:00 น.)', 'Phone & LINE ID for 22:00 Sales Alert')}
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                        {tx('เบอร์โทรศัพท์มือถือ (SMS / โทรแจ้ง)', 'Mobile Phone Number')}
+                        {tx('เบอร์โทรศัพท์มือถือ', 'Mobile Phone Number')}
                       </label>
                       <input
                         type="tel"
                         placeholder={tx('เช่น 089-999-8888', 'e.g. 089-999-8888')}
                         value={authPhone}
                         onChange={e => setAuthPhone(e.target.value)}
-                        className="w-full bg-[#050814] border border-emerald-400/40 rounded-xl px-3 py-2.5 text-sm font-bold text-white outline-none focus:border-emerald-400"
+                        className="w-full bg-[#050814] border border-emerald-400/40 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none focus:border-emerald-400"
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                        {tx('ID LINE (รับสรุปยอดขายอัตโนมัติ)', 'LINE ID (Daily Sales Bot)')}
+                        {tx('ID LINE', 'LINE ID')}
                       </label>
                       <input
                         type="text"
                         placeholder={tx('เช่น @owner_insightflow', 'e.g. @owner_insightflow')}
                         value={authLineId}
                         onChange={e => setAuthLineId(e.target.value)}
-                        className="w-full bg-[#050814] border border-emerald-400/40 rounded-xl px-3 py-2.5 text-sm font-bold text-white outline-none focus:border-emerald-400"
+                        className="w-full bg-[#050814] border border-emerald-400/40 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none focus:border-emerald-400"
                         required
                       />
                     </div>
                   </div>
-                  <p className="text-[11px] text-emerald-200/90 leading-relaxed">
-                    {tx(
-                      '✓ ระบบจะบันทึกเบอร์โทรและ ID LINE ของคุณเพื่อส่งข้อความสรุปยอดขาย กำไรสุทธิ และแจ้งเตือนสต็อกอัตโนมัติทุกวัน',
-                      '✓ Saved automatically to send your daily sales summary, net profit, and stock alerts every night.'
-                    )}
-                  </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                    {tx('เลือกแพ็กเกจสำหรับบัญชีลูกค้า (ยกเว้น Admin pongsatornnantakong88@gmail.com):', 'Customer Subscription Plan (pongsatornnantakong88@gmail.com is Exempt as Admin):')}
+                    {tx('เลือกแพ็กเกจลูกค้า:', 'Customer Subscription Plan:')}
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                     {[
                       { id: 'starter', title: 'Starter', price: '1,990.-/m' },
                       { id: 'professional', title: 'Professional', price: '2,900.-/m' },
@@ -10695,14 +10767,14 @@ function App() {
                             : 'bg-[#050814] border-white/15 text-slate-300 hover:border-white/30'
                         }`}
                       >
-                        <div className="text-xs font-black">{pk.title}</div>
+                        <div className="text-xs font-black truncate">{pk.title}</div>
                         <div className="text-[11px] text-slate-300">{pk.price}</div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-400/10 border border-amber-400/30 cursor-pointer">
+                <label className="flex items-start gap-2.5 p-3 rounded-2xl bg-amber-400/10 border border-amber-400/30 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={rememberPassword}
@@ -10710,106 +10782,23 @@ function App() {
                     className="w-5 h-5 mt-0.5 accent-amber-400 rounded cursor-pointer flex-shrink-0"
                   />
                   <div>
-                    <span className="text-sm font-bold text-amber-300 block">
-                      {tx('จดจำอีเมล เบอร์โทร ID LINE และรหัสผ่านไว้ในเครื่องนี้', 'Remember Email, Phone, LINE ID & Password on This Device')}
-                    </span>
-                    <span className="text-xs text-slate-300 block mt-0.5">
-                      {tx(
-                        'เข้าเว็บไซต์ครั้งต่อไปได้ทันทีพร้อมเชื่อมต่อระบบแจ้งเตือนยอดขายอัตโนมัติ',
-                        'Sign in automatically next time with your daily sales notification channels ready.'
-                      )}
+                    <span className="text-xs sm:text-sm font-bold text-amber-300 block">
+                      {tx('จดจำอีเมล เบอร์โทร ID LINE และรหัสผ่านไว้ในเครื่องนี้', 'Remember Email, Phone, LINE ID & Password')}
                     </span>
                   </div>
                 </label>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl text-slate-950 font-black text-base transition shadow-lg cursor-pointer"
+                  className="w-full py-3.5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl text-slate-950 font-black text-sm sm:text-base transition shadow-lg cursor-pointer"
                 >
                   {authMode === 'login'
-                    ? tx('เข้าสู่ระบบและบันทึกช่องทางแจ้งเตือนยอดขาย', 'Sign In & Save Sales Alert Channels')
+                    ? tx('เข้าสู่ระบบด้วยอีเมลและรหัสผ่าน', 'Sign In with Email & Password')
                     : tx('สร้างบัญชีและเข้าใช้งาน', 'Create Account & Sign In')}
                 </button>
-
-                <div className="grid grid-cols-1 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const cleanPhone = (authPhone || '089-999-8888').trim();
-                      const cleanLine = (authLineId || '@owner_insightflow').trim();
-                      const adminUser = {
-                        name: tx('ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin'),
-                        email: SUPER_ADMIN_EMAIL,
-                        phone: cleanPhone,
-                        lineId: cleanLine,
-                        sub: 'super-admin',
-                        role: 'admin',
-                        picture: 'https://ui-avatars.com/api/?name=Super+Admin&background=fbbf24&color=0f172a&bold=true'
-                      };
-                      setAuthEmail(SUPER_ADMIN_EMAIL);
-                      setAdminPreviewCustomerPlan(false);
-                      localStorage.setItem('insightflow_saved_phone', cleanPhone);
-                      localStorage.setItem('insightflow_saved_line_id', cleanLine);
-                      if (rememberPassword) {
-                        localStorage.setItem('insightflow_saved_user', JSON.stringify(adminUser));
-                      }
-                      setUser(adminUser);
-                      setIsLoginOpen(false);
-                      toast.success(
-                        tx(
-                          `👑 เข้าสู่ระบบ Super Admin (${SUPER_ADMIN_EMAIL}) พร้อมผูกเบอร์ ${cleanPhone} และ LINE ${cleanLine} เรียบร้อยแล้ว!`,
-                          `👑 Signed in as Super Admin (${SUPER_ADMIN_EMAIL}) with Phone ${cleanPhone} & LINE ${cleanLine}!`
-                        )
-                      );
-                    }}
-                    className="w-full py-3 px-3 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/45 font-black text-xs transition cursor-pointer"
-                  >
-                    {tx(
-                      '👑 เข้าสู่ระบบ Admin สูงสุด (pongsatornnantakong88@gmail.com • เว้นแพ็กเกจ)',
-                      '👑 1-Click Super Admin Access (pongsatornnantakong88@gmail.com • Exempt)'
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const chosenMeta = planTiersMap[subscriptionPlan] || planTiersMap.starter;
-                      const cleanPhone = (authPhone || '089-999-8888').trim();
-                      const cleanLine = (authLineId || '@owner_insightflow').trim();
-                      const customerUser = {
-                        name: tx(`ลูกค้าแพ็กเกจ ${chosenMeta.code}`, `${chosenMeta.code} Customer`),
-                        email: 'customer@insightflow.app',
-                        phone: cleanPhone,
-                        lineId: cleanLine,
-                        sub: 'customer-account',
-                        role: 'customer',
-                        picture: 'https://ui-avatars.com/api/?name=Customer&background=38bdf8&color=0f172a&bold=true'
-                      };
-                      localStorage.setItem('insightflow_saved_phone', cleanPhone);
-                      localStorage.setItem('insightflow_saved_line_id', cleanLine);
-                      if (rememberPassword) {
-                        localStorage.setItem('insightflow_saved_user', JSON.stringify(customerUser));
-                      }
-                      setUser(customerUser);
-                      setIsLoginOpen(false);
-                      toast.success(
-                        tx(
-                          `🛍️ เข้าสู่ระบบลูกค้า "${chosenMeta.name}" พร้อมผูกเบอร์ ${cleanPhone} และ LINE ${cleanLine} สำหรับส่งยอดขายอัตโนมัติ!`,
-                          `🛍️ Signed in on "${chosenMeta.name}" with Phone ${cleanPhone} & LINE ${cleanLine}!`
-                        )
-                      );
-                    }}
-                    className="w-full py-2.5 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 font-bold text-xs transition cursor-pointer"
-                  >
-                    {tx(
-                      `🛍️ ทดลองเข้าใช้งานในฐานะลูกค้าตามแพ็กเกจ (${(planTiersMap[subscriptionPlan] || planTiersMap.starter).code})`,
-                      `🛍️ Test Customer Account with Selected Plan (${(planTiersMap[subscriptionPlan] || planTiersMap.starter).code})`
-                    )}
-                  </button>
-                </div>
               </form>
 
-              <div className="text-center text-xs text-slate-400">
+              <div className="text-center text-xs text-slate-400 pb-1">
                 <button
                   type="button"
                   onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
@@ -10824,18 +10813,18 @@ function App() {
           </div>
         )}
 
-        {/* Landing Header (Responsive for Smartphone, Tablet & Desktop) */}
+        {/* Landing Header (Responsive & Compact for Smartphone, Tablet & Desktop) */}
         <header
-          className={`border-b backdrop-blur-xl sticky top-0 z-40 px-4 sm:px-8 lg:px-16 py-3 sm:py-4 ${
+          className={`border-b backdrop-blur-xl sticky top-0 z-40 px-3 sm:px-8 lg:px-16 py-2.5 sm:py-4 ${
             theme === 'dark' ? 'border-white/10 bg-[#050814]/95' : 'border-slate-300 bg-white/95 shadow-sm'
           }`}
         >
-          <div className="flex justify-between items-center gap-2">
-            <div className="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group min-w-0" onClick={() => scrollToSection('home')}>
-              <AppLogo size={44} className="transition-transform duration-300 group-hover:scale-105 flex-shrink-0" />
+          <div className="flex justify-between items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-2 sm:gap-3.5 cursor-pointer group min-w-0" onClick={() => scrollToSection('home')}>
+              <AppLogo size={38} className="transition-transform duration-300 group-hover:scale-105 flex-shrink-0" />
               <div className="min-w-0">
                 <span
-                  className={`text-lg sm:text-2xl font-black tracking-tight block truncate ${
+                  className={`text-base sm:text-2xl font-black tracking-tight block truncate ${
                     theme === 'dark'
                       ? 'bg-gradient-to-r from-white via-amber-100 to-amber-300 bg-clip-text text-transparent'
                       : 'text-slate-950'
@@ -10843,7 +10832,7 @@ function App() {
                 >
                   {tx('อินไซต์โฟลว์', 'InsightFlow')}
                 </span>
-                <p className={`text-[10px] sm:text-[11px] font-bold truncate ${theme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
+                <p className={`hidden xs:block text-[10px] sm:text-[11px] font-bold truncate ${theme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
                   {t.brandSub}
                 </p>
               </div>
@@ -10875,32 +10864,34 @@ function App() {
               ))}
             </nav>
 
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
               {renderLanguageSwitcher()}
               <button
                 type="button"
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className={`px-2.5 sm:px-3 py-2 rounded-xl border text-xs font-black cursor-pointer transition ${
+                className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border text-xs font-black cursor-pointer transition ${
                   theme === 'dark'
                     ? 'border-white/15 bg-white/5 text-amber-300 hover:bg-white/10'
                     : 'border-slate-300 bg-slate-100 text-slate-900 hover:bg-slate-200'
                 }`}
                 title={tx('สลับโหมดมืด / โหมดสว่าง', 'Switch Dark / Light Mode')}
               >
-                {theme === 'dark' ? tx('☀️ สว่าง', '☀️ Light') : tx('🌙 มืด', '🌙 Dark')}
+                <span className="sm:hidden">{theme === 'dark' ? '☀️' : '🌙'}</span>
+                <span className="hidden sm:inline">{theme === 'dark' ? tx('☀️ สว่าง', '☀️ Light') : tx('🌙 มืด', '🌙 Dark')}</span>
               </button>
               <button
                 onClick={() => setIsLoginOpen(true)}
-                className="bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition shadow-lg cursor-pointer whitespace-nowrap"
+                className="bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition shadow-lg cursor-pointer whitespace-nowrap"
               >
-                {t.freeTrial}
+                <span className="sm:hidden">{tx('เข้าใช้งาน', 'Sign In')}</span>
+                <span className="hidden sm:inline">{t.freeTrial}</span>
               </button>
             </div>
           </div>
 
           {/* Mobile & Small Tablet Touch-Scrollable Section Bar */}
           <nav
-            className={`flex md:hidden items-center gap-2 overflow-x-auto no-scrollbar pt-2.5 mt-2.5 border-t ${
+            className={`flex md:hidden items-center gap-1.5 overflow-x-auto no-scrollbar pt-2 mt-2 border-t ${
               theme === 'dark' ? 'border-white/10' : 'border-slate-200'
             }`}
           >
@@ -10914,7 +10905,7 @@ function App() {
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-black whitespace-nowrap transition cursor-pointer ${
                   activeSection === item.id
                     ? 'bg-amber-400 text-slate-950 shadow'
                     : theme === 'dark'
@@ -10929,18 +10920,18 @@ function App() {
         </header>
 
         {/* Hero Section */}
-        <main className="flex-1 px-4 sm:px-8 lg:px-16 py-8 sm:py-14 max-w-[1600px] mx-auto w-full">
-          <div id="home" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-16 sm:mb-24">
+        <main className="flex-1 px-4 sm:px-8 lg:px-16 py-6 sm:py-14 max-w-[1600px] mx-auto w-full">
+          <div id="home" className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center mb-12 sm:mb-24">
             <div className="lg:col-span-6">
-              <div className="inline-flex items-center gap-2 bg-amber-400/10 text-amber-400 text-xs font-black px-4 py-2 rounded-full mb-6 border border-amber-400/20">
+              <div className="inline-flex items-center gap-2 bg-amber-400/10 text-amber-400 text-xs font-black px-3.5 py-1.5 rounded-full mb-4 sm:mb-6 border border-amber-400/20">
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
                 <span>{t.badgeHero}</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-6 leading-tight">
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4 sm:mb-6 leading-tight">
                 <span className={`block ${theme === 'dark' ? 'text-white' : 'text-slate-950'}`}>{t.tagline1}</span>
                 <span
-                  className={`block mt-2 bg-clip-text text-transparent ${
+                  className={`block mt-1.5 sm:mt-2 bg-clip-text text-transparent ${
                     theme === 'dark'
                       ? 'bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500'
                       : 'bg-gradient-to-r from-amber-700 via-orange-600 to-amber-800'
@@ -10950,18 +10941,18 @@ function App() {
                 </span>
               </h1>
 
-              <p className="text-slate-300 text-base lg:text-lg mb-8 leading-relaxed">{t.description}</p>
+              <p className="text-slate-300 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed">{t.description}</p>
 
-              <div className="flex flex-wrap gap-4 items-center mb-10">
+              <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 sm:gap-4 items-center mb-8 sm:mb-10">
                 <button
                   onClick={() => setIsLoginOpen(true)}
-                  className="bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black px-8 py-4 rounded-2xl shadow-xl text-lg cursor-pointer"
+                  className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl shadow-xl text-base sm:text-lg cursor-pointer text-center"
                 >
                   {t.freeTrial}
                 </button>
                 <button
                   onClick={() => scrollToSection('solutions')}
-                  className="bg-[#0b1120] hover:bg-slate-800 text-white font-bold px-7 py-4 rounded-2xl border border-white/15 text-lg cursor-pointer"
+                  className="w-full sm:w-auto bg-[#0b1120] hover:bg-slate-800 text-white font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl border border-white/15 text-base sm:text-lg cursor-pointer text-center"
                 >
                   ▶ {t.watchDemo}
                 </button>
@@ -11779,6 +11770,58 @@ function App() {
             </div>
           </div>
         </main>
+
+        {/* Smartphone Fixed Bottom Quick-Entry Bar on Landing Page */}
+        <div
+          className={`fixed bottom-0 inset-x-0 z-40 md:hidden border-t backdrop-blur-2xl px-3 py-2.5 shadow-2xl ${
+            theme === 'dark' ? 'bg-[#050814]/95 border-white/15' : 'bg-white/95 border-slate-300'
+          }`}
+          style={{ paddingBottom: 'max(0.6rem, env(safe-area-inset-bottom))' }}
+        >
+          <div className="grid grid-cols-2 gap-2 max-w-md mx-auto">
+            <button
+              type="button"
+              onClick={() => {
+                const adminUser = {
+                  name: tx('ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin'),
+                  email: SUPER_ADMIN_EMAIL,
+                  phone: authPhone || '089-999-8888',
+                  lineId: authLineId || '@owner_insightflow',
+                  sub: 'super-admin',
+                  role: 'admin',
+                  picture: 'https://ui-avatars.com/api/?name=Super+Admin&background=fbbf24&color=0f172a&bold=true'
+                };
+                setAdminPreviewCustomerPlan(false);
+                try {
+                  localStorage.setItem('insightflow_saved_user', JSON.stringify(adminUser));
+                } catch {
+                  // ignore storage error
+                }
+                setUser(adminUser);
+                toast.success(
+                  tx(
+                    '🚀 เข้าสู่หน้าแดชบอร์ดจัดการร้านค้าทันทีเรียบร้อยแล้ว!',
+                    '🚀 Entered Store Intelligence Dashboard!'
+                  )
+                );
+              }}
+              className="py-3 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black text-xs shadow-lg cursor-pointer text-center truncate"
+            >
+              {tx('🚀 เข้าแดชบอร์ดทันที (1 คลิก)', '🚀 1-Tap Enter Dashboard')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsLoginOpen(true)}
+              className={`py-3 px-3 rounded-xl font-black text-xs border cursor-pointer text-center truncate ${
+                theme === 'dark'
+                  ? 'bg-white/10 text-white border-white/20'
+                  : 'bg-slate-900 text-white border-slate-900'
+              }`}
+            >
+              {tx('🔑 ล็อกอิน / ผูกเบอร์ LINE', '🔑 Sign In / Link LINE')}
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -12032,7 +12075,36 @@ function App() {
           </nav>
         </div>
 
-        <div className="p-3 border-t border-white/10">
+        <div className="p-3 border-t border-white/10 space-y-2.5">
+          {/* Mobile Drawer Font Scale Switcher */}
+          {(isSidebarOpen || isMobileMenuOpen) && (
+            <div className="xl:hidden p-2 rounded-2xl bg-white/5 border border-white/10">
+              <div className="text-[11px] font-bold text-slate-400 mb-1.5 px-1">
+                {tx('ปรับขนาดตัวอักษร:', 'Text Size:')}
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                {[
+                  { id: 'normal', th: 'ก ปกติ', en: 'A Normal' },
+                  { id: 'large', th: 'ก+ ใหญ่', en: 'A+ Large' },
+                  { id: 'xlarge', th: 'ก++ ใหญ่มาก', en: 'A++ Extra' }
+                ].map(sz => (
+                  <button
+                    key={sz.id}
+                    type="button"
+                    onClick={() => setFontScale(sz.id)}
+                    className={`py-1.5 px-1.5 rounded-xl text-[11px] font-bold transition cursor-pointer ${
+                      fontScale === sz.id
+                        ? 'bg-amber-400 text-slate-950 shadow'
+                        : 'text-slate-300 bg-white/5'
+                    }`}
+                  >
+                    {isEn ? sz.en : sz.th}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between gap-2 p-2 rounded-2xl bg-white/5">
             {(isSidebarOpen || isMobileMenuOpen) && (
               <div className="min-w-0">
@@ -12059,28 +12131,30 @@ function App() {
         <header
           className={`border-b ${
             theme === 'dark' ? 'border-white/10 bg-[#040816]/95' : 'border-slate-300 bg-white/95 shadow-sm'
-          } backdrop-blur-xl px-4 sm:px-8 py-3.5 sm:py-4 flex flex-wrap justify-between items-center gap-3 sticky top-0 z-20`}
+          } backdrop-blur-xl px-3 sm:px-8 py-2.5 sm:py-4 flex justify-between items-center gap-2 sticky top-0 z-20`}
         >
-          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1">
             {/* Mobile & Tablet Drawer Toggle Button */}
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden px-3 py-2 rounded-xl bg-amber-400/20 border border-amber-400/40 text-amber-300 font-black text-xs flex items-center gap-1.5 cursor-pointer flex-shrink-0"
+              className="lg:hidden px-2.5 py-2 rounded-xl bg-amber-400/20 border border-amber-400/40 text-amber-300 font-black text-xs flex items-center gap-1 cursor-pointer flex-shrink-0"
               title={tx('เปิดเมนูทั้งหมด', 'Open Full Menu')}
             >
               <span>☰</span>
-              <span className="hidden xs:inline">{tx('เมนู', 'Menu')}</span>
+              <span className="hidden sm:inline">{tx('เมนู', 'Menu')}</span>
             </button>
 
-            <LuxuryIconBadge variant={currentTabMeta.variant} size="md" active>
-              <LuxuryModuleIcon type={currentTabMeta.id} size={24} />
-            </LuxuryIconBadge>
+            <div className="hidden xs:block flex-shrink-0">
+              <LuxuryIconBadge variant={currentTabMeta.variant} size="sm" active>
+                <LuxuryModuleIcon type={currentTabMeta.id} size={20} />
+              </LuxuryIconBadge>
+            </div>
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-2xl font-black tracking-tight flex flex-wrap items-center gap-2 sm:gap-3">
+              <h1 className="text-sm sm:text-2xl font-black tracking-tight flex items-center gap-2 min-w-0">
                 <span className="truncate">{currentTabMeta.label}</span>
                 <span
-                  className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border"
+                  className="hidden md:inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border flex-shrink-0"
                   style={{
                     color: activePlanMeta.accentColor,
                     borderColor: `${activePlanMeta.accentColor}55`,
@@ -12093,11 +12167,11 @@ function App() {
                   </span>
                 </span>
               </h1>
-              <p className="text-xs text-slate-400 mt-0.5 truncate">{currentTabMeta.subLabel}</p>
+              <p className="hidden sm:block text-xs text-slate-400 mt-0.5 truncate">{currentTabMeta.subLabel}</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
             {/* 1-Click Test Animated Cyber-Luxury Notification Button */}
             <button
               type="button"
@@ -12109,18 +12183,19 @@ function App() {
                   )
                 )
               }
-              className="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500/25 via-amber-400/20 to-teal-500/25 hover:from-emerald-500/35 hover:to-amber-400/35 border border-emerald-400/50 text-emerald-300 text-xs font-black cursor-pointer transition shadow-md"
+              className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-500/25 via-amber-400/20 to-teal-500/25 hover:from-emerald-500/35 hover:to-amber-400/35 border border-emerald-400/50 text-emerald-300 text-xs font-black cursor-pointer transition shadow-md"
               title={tx('กดเพื่อดูตัวอย่างป้ายแจ้งเตือนแอนิเมชันใหม่', 'Click to preview the new 3D animated notification badge')}
             >
-              ✨ {tx('ทดสอบป้ายแจ้งเตือน', 'Test Alert Badge')}
+              <span className="md:hidden">✨</span>
+              <span className="hidden md:inline">✨ {tx('ทดสอบป้ายแจ้งเตือน', 'Test Alert Badge')}</span>
             </button>
 
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
             {renderLanguageSwitcher()}
 
-            {/* Font Size Control for Senior Users */}
+            {/* Font Size Control for Senior Users (Desktop Top Bar; Mobile in Drawer) */}
             <div
-              className={`flex items-center gap-1 p-1 rounded-2xl border ${
+              className={`hidden xl:flex items-center gap-1 p-1 rounded-2xl border ${
                 theme === 'dark' ? 'bg-[#0b1020] border-white/15' : 'bg-slate-100 border-slate-300'
               }`}
             >
@@ -12150,63 +12225,66 @@ function App() {
             <button
               type="button"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className={`px-2.5 sm:px-3 py-2 rounded-xl border text-xs font-black cursor-pointer transition ${
+              className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border text-xs font-black cursor-pointer transition ${
                 theme === 'dark'
                   ? 'border-white/15 bg-white/5 text-amber-300 hover:bg-white/10'
                   : 'border-slate-300 bg-slate-100 text-slate-900 hover:bg-slate-200'
               }`}
             >
-              {theme === 'dark' ? tx('☀️ สว่าง', '☀️ Light') : tx('🌙 มืด', '🌙 Dark')}
+              <span className="sm:hidden">{theme === 'dark' ? '☀️' : '🌙'}</span>
+              <span className="hidden sm:inline">{theme === 'dark' ? tx('☀️ สว่าง', '☀️ Light') : tx('🌙 มืด', '🌙 Dark')}</span>
             </button>
           </div>
         </header>
 
-        <main className="p-4 sm:p-6 lg:p-8 pb-28 lg:pb-8 space-y-6 flex-1 max-w-full overflow-x-hidden">
-          {/* Active Subscription Package Switcher & Super Admin Exemption Bar */}
+        <main className="p-3 sm:p-6 lg:p-8 pb-28 lg:pb-8 space-y-3.5 sm:space-y-6 flex-1 max-w-full overflow-x-hidden">
+          {/* Active Subscription Package Switcher & Super Admin Exemption Bar (Compact Horizontal Scroll on Mobile) */}
           <div
-            className={`p-4 sm:p-5 rounded-3xl border shadow-xl ${
+            className={`p-3 sm:p-5 rounded-2xl sm:rounded-3xl border shadow-xl ${
               theme === 'dark'
                 ? 'bg-gradient-to-r from-[#0b1326] via-[#091020] to-[#0b1326] border-amber-400/30'
                 : 'bg-white border-slate-200'
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-start sm:items-center gap-3.5">
-                <LuxuryIconBadge
-                  variant={
-                    isExemptAdminMode
-                      ? 'gold'
-                      : subscriptionPlan === 'premium'
-                      ? 'amethyst'
-                      : subscriptionPlan === 'professional'
-                      ? 'gold'
-                      : 'sapphire'
-                  }
-                  size="md"
-                  active
-                >
-                  <LuxuryModuleIcon
-                    type={
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-4">
+              <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+                <div className="hidden sm:block flex-shrink-0">
+                  <LuxuryIconBadge
+                    variant={
                       isExemptAdminMode
-                        ? 'admin'
+                        ? 'gold'
                         : subscriptionPlan === 'premium'
-                        ? 'crown'
+                        ? 'amethyst'
                         : subscriptionPlan === 'professional'
-                        ? 'trophy'
-                        : 'rocket'
+                        ? 'gold'
+                        : 'sapphire'
                     }
-                    size={24}
-                  />
-                </LuxuryIconBadge>
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-black text-white">
+                    size="md"
+                    active
+                  >
+                    <LuxuryModuleIcon
+                      type={
+                        isExemptAdminMode
+                          ? 'admin'
+                          : subscriptionPlan === 'premium'
+                          ? 'crown'
+                          : subscriptionPlan === 'professional'
+                          ? 'trophy'
+                          : 'rocket'
+                      }
+                      size={24}
+                    />
+                  </LuxuryIconBadge>
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="text-xs sm:text-sm font-black text-white">
                       {isExemptAdminMode
-                        ? tx('สถานะผู้ดูแลระบบสูงสุด (Admin):', 'Super Admin Status:')
-                        : tx('ระบบกำลังทำงานตามแผนลูกค้า:', 'Active Customer Plan:')}
+                        ? tx('สถานะ Admin:', 'Admin Status:')
+                        : tx('แผนปัจจุบัน:', 'Current Plan:')}
                     </span>
                     <span
-                      className="text-xs font-black px-3 py-0.5 rounded-full border"
+                      className="text-[11px] sm:text-xs font-black px-2.5 py-0.5 rounded-full border"
                       style={{
                         color: activePlanMeta.accentColor,
                         borderColor: `${activePlanMeta.accentColor}66`,
@@ -12215,34 +12293,34 @@ function App() {
                     >
                       {activePlanMeta.name} ({activePlanMeta.price}{activePlanMeta.unit})
                     </span>
-                    <span className="text-xs font-bold text-emerald-400">
+                    <span className="hidden sm:inline text-xs font-bold text-emerald-400">
                       •{' '}
                       {isExemptAdminMode
                         ? tx('ปลดล็อกครบ 11/11 ระบบ (รวมหน้า Admin)', '11/11 Modules Unlocked (Includes Admin)')
                         : tx(`เปิดใช้งาน ${activePlanMeta.allowedTabs.length}/10 ระบบลูกค้า`, `${activePlanMeta.allowedTabs.length}/10 Customer Modules`)}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-1 font-semibold">
+                  <p className="hidden md:block text-xs text-slate-300 mt-1 font-semibold">
                     {activePlanMeta.quotaSummary}
                   </p>
                 </div>
               </div>
 
-              {/* 1-Click Super Admin Exempt Button + Customer Package Switcher Pills */}
-              <div className="flex flex-wrap items-center gap-2">
+              {/* 1-Click Super Admin Exempt Button + Customer Package Switcher Pills (Swipeable on Mobile) */}
+              <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-0.5">
                 {isSuperAdmin ? (
                   <button
                     type="button"
                     onClick={handleActivateSuperAdminExemptMode}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer border ${
+                    className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black transition cursor-pointer border whitespace-nowrap flex-shrink-0 ${
                       isExemptAdminMode
-                        ? 'bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 border-amber-300 shadow-lg scale-[1.02]'
+                        ? 'bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 border-amber-300 shadow-lg'
                         : 'bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border-amber-400/40'
                     }`}
                   >
                     {isExemptAdminMode
-                      ? tx('👑 โหมด Admin (เว้นแพ็กเกจ • ใช้งานอยู่)', '👑 Super Admin (Exempt • Active)')
-                      : tx('👑 กลับสู่โหมด Admin (เว้นแพ็กเกจ)', '👑 Return to Super Admin (Exempt)')}
+                      ? tx('👑 Admin (เว้นแพ็กเกจ)', '👑 Admin (Exempt)')
+                      : tx('👑 กลับสู่ Admin', '👑 Back to Admin')}
                   </button>
                 ) : (
                   <button
@@ -12265,19 +12343,16 @@ function App() {
                         )
                       );
                     }}
-                    className="px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer border bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border-amber-400/40"
+                    className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black transition cursor-pointer border bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border-amber-400/40 whitespace-nowrap flex-shrink-0"
                   >
-                    {tx('👑 สลับเป็น Admin (เว้นแพ็กเกจ)', '👑 Switch to Admin (Exempt)')}
+                    {tx('👑 สลับเป็น Admin', '👑 Switch to Admin')}
                   </button>
                 )}
 
-                <span className="text-xs font-bold text-slate-400 mx-1">
-                  {tx('ทดสอบแพ็กเกจลูกค้า:', 'Customer Plans:')}
-                </span>
                 {[
-                  { id: 'starter', label: 'Starter 1,990.-/m', color: '#38bdf8' },
-                  { id: 'professional', label: 'Professional 2,900.-/m', color: '#fbbf24' },
-                  { id: 'premium', label: 'Premium 4,900.-/m', color: '#c084fc' }
+                  { id: 'starter', label: 'Starter 1,990.-', color: '#38bdf8' },
+                  { id: 'professional', label: 'Pro 2,900.-', color: '#fbbf24' },
+                  { id: 'premium', label: 'Premium 4,900.-', color: '#c084fc' }
                 ].map(pBtn => {
                   const isCurrent = !isExemptAdminMode && subscriptionPlan === pBtn.id;
                   return (
@@ -12285,9 +12360,9 @@ function App() {
                       key={pBtn.id}
                       type="button"
                       onClick={() => handleSelectSubscriptionPlan(pBtn.id, null, true)}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer border ${
+                      className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black transition cursor-pointer border whitespace-nowrap flex-shrink-0 ${
                         isCurrent
-                          ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-lg scale-[1.02]'
+                          ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-lg'
                           : 'bg-white/5 hover:bg-white/10 text-slate-200 border-white/15'
                       }`}
                     >
@@ -12299,13 +12374,13 @@ function App() {
             </div>
           </div>
 
-          {/* Quick Navigation Bar (Zero Leading Numbers, Luxury 3D Icons) */}
+          {/* Quick Navigation Bar (1-Line Touch Swipe Strip on Mobile/Tablet, 8-Column Grid on Desktop) */}
           <div
-            className={`p-4 rounded-3xl border shadow-lg ${
+            className={`p-2.5 sm:p-4 rounded-2xl sm:rounded-3xl border shadow-lg ${
               theme === 'dark' ? 'bg-[#091022]/90 border-white/15' : 'bg-white border-slate-200'
             }`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div className="hidden sm:flex flex-wrap items-center justify-between gap-2 mb-3">
               <span className="text-sm font-black text-amber-400 flex items-center gap-2">
                 <LuxuryModuleIcon type="crown" size={20} />
                 {tx('ทางลัดเลือกหน้าใช้งานด่วน (คลิกปุ่มที่ต้องการได้เลย):', 'Quick Page Switcher (Click Any Module):')}
@@ -12317,8 +12392,10 @@ function App() {
                 )}
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
-              {sidebarMenuItems.slice(0, 8).map(nav => {
+            <div className="flex lg:grid lg:grid-cols-8 gap-2 overflow-x-auto no-scrollbar pb-0.5">
+              {sidebarMenuItems.map((nav, idx) => {
+                // Show all items in mobile horizontal swipe strip; show top 8 on desktop grid
+                const hideOnDesktop = idx >= 8 ? 'lg:hidden' : '';
                 const unlocked = isTabUnlocked(nav.id);
                 const reqPlan = planTiersMap[nav.minPlan || 'starter'];
                 return (
@@ -12326,22 +12403,22 @@ function App() {
                     key={nav.id}
                     type="button"
                     onClick={() => setActiveTab(nav.id)}
-                    className={`p-3 rounded-2xl border-2 text-left transition-all flex items-center gap-3 cursor-pointer relative ${
+                    className={`${hideOnDesktop} flex-shrink-0 px-3 py-2 sm:p-3 rounded-xl sm:rounded-2xl border-2 text-left transition-all flex items-center gap-2 sm:gap-3 cursor-pointer relative ${
                       activeTab === nav.id
-                        ? 'bg-amber-400/20 border-amber-400 shadow-lg scale-[1.01]'
+                        ? 'bg-amber-400/20 border-amber-400 shadow-lg'
                         : unlocked
                         ? 'bg-black/20 border-white/10 hover:border-amber-400/40'
                         : 'bg-black/10 border-dashed border-white/10 opacity-80 hover:opacity-100'
                     }`}
                   >
                     <LuxuryIconBadge variant={nav.variant} size="sm" active={activeTab === nav.id}>
-                      <LuxuryModuleIcon type={nav.id} size={20} />
+                      <LuxuryModuleIcon type={nav.id} size={18} />
                     </LuxuryIconBadge>
                     <div className="min-w-0">
-                      <p className="text-xs font-black truncate">
+                      <p className="text-xs font-black whitespace-nowrap lg:truncate">
                         {!unlocked ? `🔒 ${nav.label}` : nav.label}
                       </p>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="hidden sm:block text-[11px] text-slate-400 truncate">
                         {!unlocked ? `${reqPlan.code} (${reqPlan.price})` : nav.subLabel}
                       </p>
                     </div>

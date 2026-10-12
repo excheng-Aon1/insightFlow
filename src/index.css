@@ -97,19 +97,21 @@ textarea,
   letter-spacing: 0.015em;
 }
 
-/* 5. ยกระดับขนาดตัวอักษรขนาดจิ๋ว (Senior-Friendly 60-70+ Readability Guard) ไม่ให้มีตัวหนังสือเล็กจนต้องเพ่ง */
-.text-\[8px\],
-.text-\[9px\],
-.text-\[10px\] {
-  font-size: 0.875rem !important; /* ขั้นต่ำ ~15.5px - 18.5px */
-  line-height: 1.55 !important;
-  letter-spacing: 0.015em !important;
-}
+/* 5. ยกระดับขนาดตัวอักษรขนาดจิ๋วบนแท็บเล็ตและคอมพิวเตอร์ (Senior-Friendly Readability Guard) */
+@media (min-width: 641px) {
+  .text-\[8px\],
+  .text-\[9px\],
+  .text-\[10px\] {
+    font-size: 0.875rem !important; /* ขั้นต่ำ ~15.5px - 18.5px บนจอใหญ่ */
+    line-height: 1.55 !important;
+    letter-spacing: 0.015em !important;
+  }
 
-.text-\[11px\],
-.text-xs {
-  font-size: 0.925rem !important; /* ขั้นต่ำ ~16.2px - 19.5px อ่านสบายตา */
-  line-height: 1.6 !important;
+  .text-\[11px\],
+  .text-xs {
+    font-size: 0.925rem !important; /* ขั้นต่ำ ~16.2px - 19.5px อ่านสบายตา */
+    line-height: 1.6 !important;
+  }
 }
 
 /* 6. ยกระดับความคมชัดของสีตัวอักษรรองแยกตามโหมดมืด/สว่าง (High-Contrast Readability Guard) */
@@ -232,16 +234,16 @@ body {
 /* Tablet Viewport (768px - 1024px) */
 @media (max-width: 1024px) {
   :root {
-    font-size: 16.5px;
-  }
-  html[data-font-scale="normal"] {
     font-size: 16px;
   }
+  html[data-font-scale="normal"] {
+    font-size: 15.5px;
+  }
   html[data-font-scale="large"] {
-    font-size: 17.5px;
+    font-size: 16.5px;
   }
   html[data-font-scale="xlarge"] {
-    font-size: 19px;
+    font-size: 18px;
   }
   .glass-card {
     max-width: 100%;
@@ -250,28 +252,73 @@ body {
   }
 }
 
-/* Smartphone Viewport (< 640px) */
+/* Smartphone Native-App Ergonomics (< 640px) */
 @media (max-width: 640px) {
   :root {
-    font-size: 15.5px;
+    font-size: 14.8px;
   }
   html[data-font-scale="normal"] {
-    font-size: 15px;
+    font-size: 14.2px;
   }
   html[data-font-scale="large"] {
-    font-size: 16.5px;
+    font-size: 15.2px;
   }
   html[data-font-scale="xlarge"] {
-    font-size: 18px;
+    font-size: 16.4px;
+  }
+
+  /* ปรับขนาดตัวหนังสือเล็กบนมือถือให้อ่านชัดแต่ไม่ล้นปุ่มกด */
+  .text-\[8px\],
+  .text-\[9px\],
+  .text-\[10px\] {
+    font-size: 0.74rem !important;
+    line-height: 1.35 !important;
+  }
+  .text-\[11px\],
+  .text-xs {
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+  }
+
+  /* จัดการ์ดและกริดแบบ Inline ในทุกแท็บให้เรียง 1 คอลัมน์เต็มจอมือถืออัตโนมัติ ไม่เบียดกัน */
+  .glass-card:not(.cyber-toast-hud) {
+    padding: 1rem !important;
+    border-radius: 18px !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  main [style*="display: grid"],
+  main [style*="display:grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* ปรับตารางข้อมูลให้เลื่อนซ้าย-ขวาได้ลื่นไหลบนมือถือโดยตัวหนังสือไม่พับคำเป็นแนวตั้ง */
+  table {
+    min-width: 520px;
+  }
+  table th {
+    white-space: nowrap;
   }
   table th,
   table td {
-    padding-top: 0.75rem !important;
-    padding-bottom: 0.75rem !important;
-    padding-left: 0.65rem !important;
-    padding-right: 0.65rem !important;
-    font-size: 0.88rem !important;
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+    padding-left: 0.6rem !important;
+    padding-right: 0.6rem !important;
+    font-size: 0.85rem !important;
   }
+
+  /* ป้องกัน iPhone Safari ซูมหน้าจอเองเวลากดช่องกรอกข้อมูล */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+    min-height: 2.75rem !important;
+  }
+
   button,
   input,
   select {
