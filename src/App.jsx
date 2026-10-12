@@ -11785,6 +11785,8 @@ function App() {
   }, [theme]);
 
   const [isAppleFilmOpen, setIsAppleFilmOpen] = useState(false);
+  const [activatingPlanId, setActivatingPlanId] = useState(null);
+  const [previewSelectedPlanId, setPreviewSelectedPlanId] = useState('professional');
 
   const scrollToSection = id => {
     setActiveSection(id);
@@ -12785,29 +12787,85 @@ function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                    {tx('เลือกแพ็กเกจลูกค้า:', 'Customer Subscription Plan:')}
-                  </label>
-                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-black text-amber-300">
+                      {tx('🎁 เลือกแพ็กเกจที่ต้องการใช้งาน (กดเลือกได้เลย):', '🎁 Choose Your Subscription Plan (Tap to Select):')}
+                    </label>
+                    <span className="text-[11px] font-black text-emerald-400 animate-pulse">
+                      ✨ {tx('เปลี่ยนได้ตลอดเวลา', 'Switch anytime')}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: 'starter', title: 'Starter', price: '1,990.-/m' },
-                      { id: 'professional', title: 'Professional', price: '2,900.-/m' },
-                      { id: 'premium', title: 'Premium', price: '4,900.-/m' }
-                    ].map(pk => (
-                      <button
-                        key={pk.id}
-                        type="button"
-                        onClick={() => handleSelectSubscriptionPlan(pk.id)}
-                        className={`p-2 rounded-xl border text-center transition cursor-pointer ${
-                          subscriptionPlan === pk.id
-                            ? 'bg-amber-400/20 border-amber-400 text-amber-300 font-black'
-                            : 'bg-[#050814] border-white/15 text-slate-300 hover:border-white/30'
-                        }`}
-                      >
-                        <div className="text-xs font-black truncate">{pk.title}</div>
-                        <div className="text-[11px] text-slate-300">{pk.price}</div>
-                      </button>
-                    ))}
+                      {
+                        id: 'starter',
+                        title: 'Starter',
+                        price: '1,990.-/m',
+                        emoji: '🚀',
+                        tag: tx('เริ่มต้นคุ้มค่า', 'Essential'),
+                        activeClass:
+                          'bg-gradient-to-b from-sky-500/30 to-sky-900/30 border-2 border-sky-400 text-sky-200 shadow-[0_10px_25px_-5px_rgba(56,189,248,0.45)]'
+                      },
+                      {
+                        id: 'professional',
+                        title: 'Professional',
+                        price: '2,900.-/m',
+                        emoji: '🏆',
+                        tag: tx('⭐ ขายดีที่สุด', '⭐ Popular'),
+                        activeClass:
+                          'bg-gradient-to-b from-amber-400/30 to-amber-900/30 border-2 border-amber-400 text-amber-200 shadow-[0_10px_25px_-5px_rgba(251,191,36,0.5)]'
+                      },
+                      {
+                        id: 'premium',
+                        title: 'Premium',
+                        price: '4,900.-/m',
+                        emoji: '👑',
+                        tag: tx('ครบวงจรสูงสุด', 'Enterprise'),
+                        activeClass:
+                          'bg-gradient-to-b from-purple-500/30 to-purple-900/30 border-2 border-purple-400 text-purple-200 shadow-[0_10px_25px_-5px_rgba(192,132,252,0.45)]'
+                      }
+                    ].map(pk => {
+                      const isSelected = subscriptionPlan === pk.id;
+                      return (
+                        <button
+                          key={pk.id}
+                          type="button"
+                          onClick={() => handleSelectSubscriptionPlan(pk.id)}
+                          className={`relative overflow-hidden p-2.5 rounded-2xl text-center transition-all duration-300 cursor-pointer active:scale-90 ${
+                            isSelected
+                              ? `${pk.activeClass} pkg-card-selected`
+                              : 'bg-[#050814] border border-white/15 text-slate-300 hover:border-amber-400/40 hover:-translate-y-0.5'
+                          }`}
+                        >
+                          {/* Cute Floating Confetti Sparkles when Selected */}
+                          {isSelected && (
+                            <>
+                              <span className="pkg-confetti-1 pointer-events-none absolute top-2 left-2 text-xs">
+                                ✨
+                              </span>
+                              <span className="pkg-confetti-2 pointer-events-none absolute top-2 right-2 text-xs">
+                                🎉
+                              </span>
+                              <span className="pkg-check-pop absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black flex items-center justify-center shadow">
+                                ✓
+                              </span>
+                            </>
+                          )}
+                          <div
+                            className={`text-xl mb-0.5 inline-block ${
+                              isSelected ? 'pkg-cute-mascot' : ''
+                            }`}
+                          >
+                            {pk.emoji}
+                          </div>
+                          <div className="text-xs font-black truncate text-white">{pk.title}</div>
+                          <div className="text-[11px] font-bold text-amber-300">{pk.price}</div>
+                          <div className="text-[9px] font-black mt-0.5 px-1.5 py-0.5 rounded-full bg-white/10 text-slate-200 truncate">
+                            {pk.tag}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -13625,10 +13683,46 @@ function App() {
 
           {/* Pricing Section: Starter 1,990.-/m, Professional 2,900.-/m, Premium 4,900.-/m */}
           <div id="pricing" className="py-16 border-t border-white/10">
-            <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="text-center max-w-3xl mx-auto mb-8">
               <div className="text-amber-400 text-xs font-black uppercase mb-2">{t.pricingHeading}</div>
               <h2 className="text-3xl sm:text-4xl font-black text-white mb-3">{t.pricingTitle}</h2>
-              <p className="text-slate-400 text-base">{t.pricingDesc}</p>
+              <p className="text-slate-400 text-base mb-6">{t.pricingDesc}</p>
+
+              {/* Cute Interactive Package Quick-Selector Bar */}
+              <div className="inline-flex flex-wrap items-center justify-center gap-2 p-2 rounded-3xl bg-[#070b16] border border-amber-400/35 shadow-xl">
+                {[
+                  { id: 'starter', emoji: '🚀', label: 'Starter • 1,990.-', color: 'sky' },
+                  { id: 'professional', emoji: '🏆', label: 'Professional • 2,900.-', color: 'amber' },
+                  { id: 'premium', emoji: '👑', label: 'Premium • 4,900.-', color: 'purple' }
+                ].map(tab => {
+                  const isPicked = previewSelectedPlanId === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => {
+                        setPreviewSelectedPlanId(tab.id);
+                        handleSelectSubscriptionPlan(tab.id, null, true);
+                      }}
+                      className={`relative px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition-all duration-300 cursor-pointer active:scale-90 flex items-center gap-2 ${
+                        isPicked
+                          ? 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-slate-950 shadow-[0_8px_25px_rgba(251,191,36,0.45)] scale-105'
+                          : 'bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10'
+                      }`}
+                    >
+                      <span className={isPicked ? 'pkg-cute-mascot inline-block text-base' : 'text-base'}>
+                        {tab.emoji}
+                      </span>
+                      <span>{tab.label}</span>
+                      {isPicked && (
+                        <span className="pkg-check-pop inline-flex items-center justify-center px-1.5 py-0.5 rounded-full bg-slate-950 text-amber-300 text-[10px] font-black">
+                          ✨ {tx('เลือกอยู่', 'Active')}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
@@ -13637,6 +13731,9 @@ function App() {
                   id: 'starter',
                   name: tx('แพ็กเกจเริ่มต้น (Starter)', 'Starter'),
                   tierCode: 'STARTER',
+                  emoji: '🚀',
+                  cuteNote: tx('🚀 จรวดเริ่มต้น • ปลดล็อก 5/10 ระบบหลัก', '🚀 Rocket Starter • 5/10 Core Modules'),
+                  unlockPct: 50,
                   price: '1,990.-',
                   unit: tx('/ เดือน', '/ m'),
                   subtitle: tx(
@@ -13648,11 +13745,12 @@ function App() {
                   variant: 'sapphire',
                   popular: false,
                   accentColor: '#38bdf8',
-                  borderClass: 'border-white/15 hover:border-sky-400/60',
+                  borderClass: 'border-white/15 hover:border-sky-400/70',
+                  selectedBorder: 'border-2 border-sky-400 shadow-[0_20px_50px_-10px_rgba(56,189,248,0.42)]',
                   bgClass: 'bg-[#0b1120]/90',
                   buttonClass:
-                    'bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 border border-sky-400/40',
-                  buttonLabel: tx('เลือกแพ็กเกจ Starter (1,990.-/เดือน)', 'Select Starter (1,990.- / m)'),
+                    'bg-gradient-to-r from-sky-400 to-cyan-300 hover:from-sky-300 hover:to-cyan-200 text-slate-950 shadow-lg',
+                  buttonLabel: tx('🚀 กดใช้แพ็กเกจ Starter (1,990.-/เดือน)', '🚀 Activate Starter (1,990.- / m)'),
                   targetTab: 'overview',
                   features: [
                     tx('รองรับ 1 สาขาหลัก พร้อมเชื่อมยอดขายออนไลน์', 'Supports 1 main store + online channel sync'),
@@ -13666,6 +13764,9 @@ function App() {
                   id: 'professional',
                   name: tx('แพ็กเกจมืออาชีพ (Professional)', 'Professional'),
                   tierCode: 'PROFESSIONAL',
+                  emoji: '🏆',
+                  cuteNote: tx('🏆 ขายดีอันดับ 1 • ปลดล็อก 8/10 ระบบ AI + LINE 22:00 น.', '🏆 #1 Best Seller • 8/10 AI Modules + LINE 22:00'),
+                  unlockPct: 80,
                   price: '2,900.-',
                   unit: tx('/ เดือน', '/ m'),
                   subtitle: tx(
@@ -13677,11 +13778,12 @@ function App() {
                   variant: 'gold',
                   popular: true,
                   accentColor: '#fbbf24',
-                  borderClass: 'border-2 border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.22)]',
+                  borderClass: 'border-2 border-amber-400/70 shadow-[0_0_40px_rgba(251,191,36,0.22)]',
+                  selectedBorder: 'border-2 border-amber-400 shadow-[0_22px_60px_-10px_rgba(251,191,36,0.55)]',
                   bgClass: 'bg-gradient-to-b from-[#131c33] via-[#0c1324] to-[#080d1a]',
                   buttonClass:
-                    'bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 shadow-xl',
-                  buttonLabel: tx('เลือกแพ็กเกจ Professional (2,900.-/เดือน)', 'Select Professional (2,900.- / m)'),
+                    'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:brightness-105 text-slate-950 shadow-xl',
+                  buttonLabel: tx('🏆 กดใช้แพ็กเกจ Professional (2,900.-/เดือน)', '🏆 Activate Professional (2,900.- / m)'),
                   targetTab: 'insights',
                   features: [
                     tx('ครบทุกความสามารถในแพ็กเกจ Starter + รองรับสูงสุด 5 สาขา', 'Everything in Starter + supports up to 5 branches'),
@@ -13695,6 +13797,9 @@ function App() {
                   id: 'premium',
                   name: tx('แพ็กเกจพรีเมียม (Premium)', 'Premium'),
                   tierCode: 'PREMIUM',
+                  emoji: '👑',
+                  cuteNote: tx('👑 มงกุฎเพชรสูงสุด • ปลดล็อกครบ 10/10 ระบบ + จัดซื้อรวมศูนย์', '👑 Royal Enterprise • All 10/10 Modules + Central PO'),
+                  unlockPct: 100,
                   price: '4,900.-',
                   unit: tx('/ เดือน', '/ m'),
                   subtitle: tx(
@@ -13706,11 +13811,12 @@ function App() {
                   variant: 'amethyst',
                   popular: false,
                   accentColor: '#c084fc',
-                  borderClass: 'border-white/15 hover:border-purple-400/60',
+                  borderClass: 'border-white/15 hover:border-purple-400/70',
+                  selectedBorder: 'border-2 border-purple-400 shadow-[0_20px_50px_-10px_rgba(192,132,252,0.45)]',
                   bgClass: 'bg-[#0b1120]/90',
                   buttonClass:
-                    'bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 border border-purple-400/40',
-                  buttonLabel: tx('เลือกแพ็กเกจ Premium (4,900.-/เดือน)', 'Select Premium (4,900.- / m)'),
+                    'bg-gradient-to-r from-purple-400 via-fuchsia-300 to-amber-300 hover:brightness-105 text-slate-950 shadow-lg',
+                  buttonLabel: tx('👑 กดใช้แพ็กเกจ Premium (4,900.-/เดือน)', '👑 Activate Premium (4,900.- / m)'),
                   targetTab: 'procurement',
                   features: [
                     tx('ครบทุกความสามารถใน Professional + ไม่จำกัดจำนวนสาขา/คลังสินค้า', 'Everything in Professional + unlimited branches & depots'),
@@ -13720,110 +13826,192 @@ function App() {
                     tx('ตั้งค่ารหัสผ่านอนุมัติผู้บริหารสูงสุด + ทีมผู้เชี่ยวชาญดูแลพิเศษ', 'Executive PIN security controls + dedicated priority support')
                   ]
                 }
-              ].map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`rounded-3xl p-7 lg:p-8 flex flex-col justify-between transition-all duration-300 relative ${plan.bgClass} ${plan.borderClass} ${
-                    plan.popular ? 'lg:-translate-y-2' : ''
-                  }`}
-                >
-                  <div>
-                    {/* Top Badge & Luxury Icon */}
-                    <div className="flex items-center justify-between gap-3 mb-5">
-                      <span
-                        className="text-xs font-black px-3.5 py-1.5 rounded-full border"
-                        style={{
-                          color: plan.accentColor,
-                          borderColor: `${plan.accentColor}55`,
-                          backgroundColor: `${plan.accentColor}1a`
-                        }}
-                      >
-                        {plan.badgeText}
-                      </span>
-                      <LuxuryIconBadge variant={plan.variant} size="md" active>
-                        <LuxuryModuleIcon type={plan.iconType} size={26} />
-                      </LuxuryIconBadge>
-                    </div>
-
-                    {/* Package Name & Description */}
-                    <div className="text-xs font-black tracking-widest uppercase text-slate-400 mb-1">
-                      {plan.tierCode}
-                    </div>
-                    <h3 className="text-2xl font-black text-white mb-2">{plan.name}</h3>
-                    <p className="text-sm text-slate-300 leading-relaxed mb-6">{plan.subtitle}</p>
-
-                    {/* Price Box */}
-                    <div className="p-5 rounded-2xl bg-[#050814]/90 border border-white/10 mb-6">
-                      <div className="text-xs text-slate-400 font-bold mb-1">
-                        {tx('ค่าบริการรายเดือน (ไม่มีสัญญาผูกมัด)', 'Monthly Subscription (Cancel Anytime)')}
-                      </div>
-                      <div className="flex items-baseline gap-2">
-                        <span
-                          className="text-4xl sm:text-5xl font-black tracking-tight"
-                          style={{ color: plan.popular ? '#fbbf24' : '#ffffff' }}
-                        >
-                          {plan.price}
-                        </span>
-                        <span className="text-base font-bold text-slate-300">{plan.unit}</span>
-                      </div>
-                      <div className="text-xs text-emerald-400 font-bold mt-2">
-                        ✓ {tx('อัปเดตฟีเจอร์ใหม่ฟรีตลอดการใช้งาน', 'Includes free lifetime feature updates')}
-                      </div>
-                    </div>
-
-                    {/* Feature Checklist */}
-                    <div className="space-y-3 mb-8">
-                      <div className="text-xs font-black uppercase text-slate-400 tracking-wider">
-                        {tx('สิ่งที่ได้รับในแพ็กเกจนี้:', 'What is included:')}
-                      </div>
-                      {plan.features.map((feat, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 text-sm text-slate-200 font-semibold leading-snug">
-                          <span
-                            className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5"
-                            style={{
-                              backgroundColor: `${plan.accentColor}22`,
-                              color: plan.accentColor,
-                              border: `1px solid ${plan.accentColor}55`
-                            }}
-                          >
-                            ✓
-                          </span>
-                          <span>{feat}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const enteredEmail = String(authEmail || '').trim().toLowerCase();
-                      const isAdminEmail = enteredEmail === SUPER_ADMIN_EMAIL;
-                      const quickUser = isAdminEmail
-                        ? {
-                            name: tx('ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin'),
-                            email: SUPER_ADMIN_EMAIL,
-                            sub: 'super-admin',
-                            role: 'admin',
-                            picture: 'https://ui-avatars.com/api/?name=Super+Admin&background=fbbf24&color=0f172a&bold=true'
-                          }
-                        : {
-                            name: tx(`ลูกค้าแพ็กเกจ ${plan.tierCode}`, `${plan.tierCode} Customer`),
-                            email: enteredEmail || 'customer@insightflow.app',
-                            sub: 'customer-account',
-                            role: 'customer',
-                            picture: 'https://ui-avatars.com/api/?name=Customer&background=38bdf8&color=0f172a&bold=true'
-                          };
-                      handleSelectSubscriptionPlan(plan.id, plan.targetTab);
-                      setUser(quickUser);
-                    }}
-                    className={`w-full py-4 px-5 rounded-2xl font-black text-sm transition cursor-pointer ${plan.buttonClass}`}
+              ].map((plan) => {
+                const isSelectedCard = previewSelectedPlanId === plan.id;
+                const isActivating = activatingPlanId === plan.id;
+                return (
+                  <div
+                    key={plan.id}
+                    onClick={() => setPreviewSelectedPlanId(plan.id)}
+                    className={`group rounded-3xl p-7 lg:p-8 flex flex-col justify-between transition-all duration-500 relative overflow-hidden cursor-pointer ${
+                      plan.bgClass
+                    } ${
+                      isSelectedCard ? `${plan.selectedBorder} pkg-card-selected` : plan.borderClass
+                    }`}
                   >
-                    {plan.buttonLabel}
-                  </button>
-                </div>
-              ))}
+                    {/* Cute Floating Sparkles & Confetti when Card is Selected or Activating */}
+                    {(isSelectedCard || isActivating) && (
+                      <>
+                        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                          <div className="apple-light-sweep absolute -inset-y-10 w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                        </div>
+                        <span className="pkg-confetti-1 pointer-events-none absolute top-5 left-1/3 text-lg">
+                          ✨
+                        </span>
+                        <span className="pkg-confetti-2 pointer-events-none absolute top-6 right-1/4 text-lg">
+                          🎉
+                        </span>
+                        <span className="pkg-confetti-3 pointer-events-none absolute top-4 left-1/2 text-base">
+                          💖
+                        </span>
+                      </>
+                    )}
+
+                    <div>
+                      {/* Top Badge & Cute Animated Luxury Icon */}
+                      <div className="flex items-center justify-between gap-3 mb-5">
+                        <span
+                          className="text-xs font-black px-3.5 py-1.5 rounded-full border flex items-center gap-1.5"
+                          style={{
+                            color: plan.accentColor,
+                            borderColor: `${plan.accentColor}55`,
+                            backgroundColor: `${plan.accentColor}1a`
+                          }}
+                        >
+                          <span className={isSelectedCard ? 'pkg-cute-mascot inline-block' : ''}>
+                            {plan.emoji}
+                          </span>
+                          <span>{plan.badgeText}</span>
+                        </span>
+                        <div className={isSelectedCard ? 'pkg-cute-mascot' : 'group-hover:scale-110 transition'}>
+                          <LuxuryIconBadge variant={plan.variant} size="md" active={isSelectedCard || plan.popular}>
+                            <LuxuryModuleIcon type={plan.iconType} size={26} />
+                          </LuxuryIconBadge>
+                        </div>
+                      </div>
+
+                      {/* Package Name & Description */}
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-black tracking-widest uppercase text-slate-400">
+                          {plan.tierCode}
+                        </span>
+                        {isSelectedCard && (
+                          <span className="pkg-check-pop inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black shadow">
+                            ✓ {tx('เลือกแพ็กเกจนี้แล้ว', 'Selected')}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-2xl font-black text-white mb-2">{plan.name}</h3>
+                      <p className="text-sm text-slate-300 leading-relaxed mb-4">{plan.subtitle}</p>
+
+                      {/* Cute Animated Mascot & Quota Progress Pill */}
+                      <div className="cyber-toast-hud p-3 rounded-2xl bg-[#050915] border border-white/10 mb-5">
+                        <div className="flex items-center justify-between text-xs font-black text-amber-300 mb-1.5">
+                          <span>{plan.cuteNote}</span>
+                          <span>{plan.unlockPct}%</span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{
+                              width: `${plan.unlockPct}%`,
+                              background: `linear-gradient(90deg, ${plan.accentColor}, #fef08a)`
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Price Box */}
+                      <div className="p-5 rounded-2xl bg-[#050814]/90 border border-white/10 mb-6">
+                        <div className="text-xs text-slate-400 font-bold mb-1">
+                          {tx('ค่าบริการรายเดือน (ไม่มีสัญญาผูกมัด)', 'Monthly Subscription (Cancel Anytime)')}
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <span
+                            className="text-4xl sm:text-5xl font-black tracking-tight"
+                            style={{ color: plan.popular || isSelectedCard ? '#fbbf24' : '#ffffff' }}
+                          >
+                            {plan.price}
+                          </span>
+                          <span className="text-base font-bold text-slate-300">{plan.unit}</span>
+                        </div>
+                        <div className="text-xs text-emerald-400 font-bold mt-2">
+                          ✓ {tx('อัปเดตฟีเจอร์ใหม่ฟรีตลอดการใช้งาน', 'Includes free lifetime feature updates')}
+                        </div>
+                      </div>
+
+                      {/* Feature Checklist */}
+                      <div className="space-y-3 mb-8">
+                        <div className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                          {tx('สิ่งที่ได้รับในแพ็กเกจนี้:', 'What is included:')}
+                        </div>
+                        {plan.features.map((feat, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 text-sm text-slate-200 font-semibold leading-snug">
+                            <span
+                              className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5"
+                              style={{
+                                backgroundColor: `${plan.accentColor}22`,
+                                color: plan.accentColor,
+                                border: `1px solid ${plan.accentColor}55`
+                              }}
+                            >
+                              ✓
+                            </span>
+                            <span>{feat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Cute & Modern Animated Activation Button */}
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation();
+                        setPreviewSelectedPlanId(plan.id);
+                        setActivatingPlanId(plan.id);
+                        setTimeout(() => {
+                          const enteredEmail = String(authEmail || '').trim().toLowerCase();
+                          const isAdminEmail = enteredEmail === SUPER_ADMIN_EMAIL;
+                          const quickUser = isAdminEmail
+                            ? {
+                                name: tx('ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin'),
+                                email: SUPER_ADMIN_EMAIL,
+                                sub: 'super-admin',
+                                role: 'admin',
+                                picture: 'https://ui-avatars.com/api/?name=Super+Admin&background=fbbf24&color=0f172a&bold=true'
+                              }
+                            : {
+                                name: tx(`ลูกค้าแพ็กเกจ ${plan.tierCode}`, `${plan.tierCode} Customer`),
+                                email: enteredEmail || 'customer@insightflow.app',
+                                sub: 'customer-account',
+                                role: 'customer',
+                                picture: 'https://ui-avatars.com/api/?name=Customer&background=38bdf8&color=0f172a&bold=true'
+                              };
+                          setActivatingPlanId(null);
+                          handleSelectSubscriptionPlan(plan.id, plan.targetTab);
+                          setUser(quickUser);
+                        }, 620);
+                      }}
+                      className={`relative overflow-hidden w-full py-4 px-5 rounded-2xl font-black text-sm transition-all duration-300 cursor-pointer active:scale-95 ${plan.buttonClass}`}
+                    >
+                      {isActivating ? (
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-center gap-2 text-slate-950 font-black">
+                            <span className="animate-bounce text-lg">🎉</span>
+                            <span>
+                              {tx(
+                                `กำลังเปิดใช้งาน ${plan.tierCode}... ✨`,
+                                `Activating ${plan.tierCode}... ✨`
+                              )}
+                            </span>
+                            <span className="animate-bounce text-lg">💖</span>
+                          </div>
+                          <div className="h-1.5 w-full rounded-full bg-slate-950/25 overflow-hidden">
+                            <div className="pkg-unlock-bar h-full rounded-full bg-slate-950" />
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="pkg-cute-mascot inline-block text-base">{plan.emoji}</span>
+                          <span>{plan.buttonLabel}</span>
+                          <span>✨</span>
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </main>
@@ -14427,9 +14615,9 @@ function App() {
                 )}
 
                 {[
-                  { id: 'starter', label: 'Starter 1,990.-', color: '#38bdf8' },
-                  { id: 'professional', label: 'Pro 2,900.-', color: '#fbbf24' },
-                  { id: 'premium', label: 'Premium 4,900.-', color: '#c084fc' }
+                  { id: 'starter', emoji: '🚀', label: 'Starter 1,990.-', color: '#38bdf8' },
+                  { id: 'professional', emoji: '🏆', label: 'Pro 2,900.-', color: '#fbbf24' },
+                  { id: 'premium', emoji: '👑', label: 'Premium 4,900.-', color: '#c084fc' }
                 ].map(pBtn => {
                   const isCurrent = !isExemptAdminMode && subscriptionPlan === pBtn.id;
                   return (
@@ -14437,13 +14625,21 @@ function App() {
                       key={pBtn.id}
                       type="button"
                       onClick={() => handleSelectSubscriptionPlan(pBtn.id, null, true)}
-                      className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black transition cursor-pointer border whitespace-nowrap flex-shrink-0 ${
+                      className={`relative px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black transition-all duration-300 cursor-pointer border whitespace-nowrap flex-shrink-0 active:scale-90 flex items-center gap-1.5 ${
                         isCurrent
-                          ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-lg'
-                          : 'bg-white/5 hover:bg-white/10 text-slate-200 border-white/15'
+                          ? 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-slate-950 border-amber-300 shadow-[0_8px_20px_rgba(251,191,36,0.45)] pkg-card-selected'
+                          : 'bg-white/5 hover:bg-white/10 text-slate-200 border-white/15 hover:-translate-y-0.5'
                       }`}
                     >
-                      {isCurrent ? `✓ ${pBtn.label}` : pBtn.label}
+                      <span className={isCurrent ? 'pkg-cute-mascot inline-block' : ''}>
+                        {pBtn.emoji}
+                      </span>
+                      <span>{pBtn.label}</span>
+                      {isCurrent && (
+                        <span className="pkg-check-pop inline-flex items-center justify-center px-1.5 py-0.5 rounded-full bg-slate-950 text-amber-300 text-[10px] font-black">
+                          ✓ ✨
+                        </span>
+                      )}
                     </button>
                   );
                 })}
