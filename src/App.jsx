@@ -14120,6 +14120,7 @@ function App() {
       subLabel: tx('เช็คของใกล้หมดและเติมสต็อก', 'Low Stock & Reordering'),
       badge: tx('สต็อก', 'SKU'),
       variant: 'emerald',
+      
       minPlan: 'starter'
     },
     {
