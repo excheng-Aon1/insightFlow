@@ -21,16 +21,24 @@ from passlib.context import CryptContext
 
 load_dotenv()
 
+import secrets
+
 # ------------------------------------------------------------------------------
 # 1. JWT CONFIGURATION FROM .ENV
 # ------------------------------------------------------------------------------
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "super-secret-enterprise-key-change-this-in-production-2026",
-).strip()
+SECRET_KEY = (
+    os.getenv("SECRET_KEY", "").strip()
+    or os.getenv("JWT_SECRET_KEY", "").strip()
+    or secrets.token_urlsafe(48)
+)
 ALGORITHM = os.getenv("ALGORITHM", "HS256").strip()
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
-SUPER_ADMIN_EMAIL = "pongsatorn.nan@gmail.com"
+SUPER_ADMIN_EMAIL = os.getenv("SUPER_ADMIN_EMAIL", "pongsatornnantakong88@gmail.com").strip().lower()
+SUPER_ADMIN_EMAILS = {
+    SUPER_ADMIN_EMAIL,
+    "pongsatornnantakong88@gmail.com",
+    "pongsatorn.nan@gmail.com",
+}
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token", auto_error=False)
 
@@ -97,7 +105,7 @@ def create_access_token(
     email = str(to_encode.get("email") or sub)
     role = str(
         to_encode.get("role")
-        or ("admin" if email.lower() == SUPER_ADMIN_EMAIL else "member")
+        or ("admin" if email.lower() in SUPER_ADMIN_EMAILS else "member")
     )
 
     to_encode.update(
@@ -164,7 +172,7 @@ def require_super_admin(current_user: Dict[str, Any] = Depends(get_current_user)
     """ตรวจสอบสิทธิ์เฉพาะ Super Admin สำหรับ API ข้อมูลความลับองค์กรและ PDPA"""
     email = str(current_user.get("email", "")).lower()
     role = str(current_user.get("role", "")).lower()
-    if email != SUPER_ADMIN_EMAIL and role != "admin":
+    if email not in SUPER_ADMIN_EMAILS and role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="⛔ จำกัดสิทธิ์เฉพาะ Super Admin เท่านั้น",

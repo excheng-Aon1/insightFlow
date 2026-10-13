@@ -1113,3 +1113,205 @@ html[data-theme="light"] .apple-cinema-player {
 .pkg-unlock-bar {
   animation: pkgUnlockBar 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+/* ==========================================================================
+   CYBER-CUTE CAPSULE UPLOAD BUTTON ANIMATION ENGINE (OPTION A)
+   แอนิเมชันปุ่มอัปโหลดแคปซูลไฮเทคน่ารัก: ลอยดุ๊กดิ๊ก, แสงนีออนหายใจ, ดาววิบวับ
+   และสปริงเจลลี่ตอนกดสัมผัส (Apple Spring Physics)
+   ========================================================================== */
+@keyframes cyberCapsuleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3.5px);
+  }
+}
+
+@keyframes cyberCapsuleHalo {
+  0%, 100% {
+    box-shadow: 0 8px 24px -4px rgba(251, 191, 36, 0.35), 0 0 12px rgba(251, 191, 36, 0.2);
+  }
+  50% {
+    box-shadow: 0 14px 34px -4px rgba(251, 191, 36, 0.65), 0 0 24px rgba(251, 191, 36, 0.45);
+  }
+}
+
+@keyframes cyberSparkleTwinkle {
+  0%, 100% {
+    transform: scale(0.85) rotate(0deg);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.28) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+@keyframes cyberArrowBounce {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  40% {
+    transform: translateY(-4px) scale(1.15);
+  }
+  75% {
+    transform: translateY(1px) scale(0.96);
+  }
+}
+
+@keyframes cyberRadarSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cyberDropWave {
+  0%, 100% {
+    transform: scale(1);
+    border-color: rgba(251, 191, 36, 0.45);
+  }
+  50% {
+    transform: scale(1.02);
+    border-color: rgba(52, 211, 153, 0.85);
+  }
+}
+
+.cyber-cute-upload-btn {
+  transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, box-shadow;
+  animation: cyberCapsuleHalo 3.2s ease-in-out infinite;
+}
+
+.cyber-cute-upload-btn:hover {
+  transform: translateY(-2.5px) scale(1.02);
+  box-shadow: 0 16px 38px -4px rgba(251, 191, 36, 0.7), 0 0 28px rgba(251, 191, 36, 0.5) !important;
+}
+
+.cyber-cute-upload-btn:active {
+  transform: translateY(1px) scale(0.94) !important;
+  transition: transform 0.09s ease-out;
+}
+
+.cyber-cute-upload-btn:hover .cyber-arrow-icon {
+  animation: cyberArrowBounce 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.cyber-cute-float {
+  animation: cyberCapsuleFloat 3.4s ease-in-out infinite;
+}
+
+.cyber-sparkle-spin {
+  animation: cyberSparkleTwinkle 2.4s ease-in-out infinite;
+}
+
+.cyber-radar-spin {
+  animation: cyberRadarSpin 1.4s linear infinite;
+}
+
+.cyber-drag-active {
+  animation: cyberDropWave 1.6s ease-in-out infinite;
+  background: radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+  border-color: #34d399 !important;
+}
+
+/* =========================================================================
+   MISS UNIVERSE EXECUTIVE STAGE & CROWN PODIUM ANIMATIONS
+   ========================================================================= */
+@keyframes muCrownFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 35px rgba(245, 158, 11, 0.6));
+  }
+  50% {
+    transform: translateY(-8px) rotate(-1.5deg) scale(1.08);
+    filter: drop-shadow(0 0 26px rgba(251, 191, 36, 1)) drop-shadow(0 0 50px rgba(253, 224, 71, 0.85));
+  }
+}
+
+@keyframes muStageShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes muSpotlightSweep {
+  0%, 100% {
+    opacity: 0.55;
+    transform: rotate(-15deg) scale(0.95);
+  }
+  50% {
+    opacity: 0.95;
+    transform: rotate(15deg) scale(1.1);
+  }
+}
+
+@keyframes muSashGleam {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes muDiamondSparkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.7) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25) rotate(180deg);
+  }
+}
+
+.mu-crown-anim {
+  animation: muCrownFloat 3.8s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+.mu-stage-card {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.16) 0%, rgba(15, 23, 42, 0.92) 55%, #050814 100%);
+  border: 2px solid rgba(251, 191, 36, 0.45);
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.8), 0 0 40px rgba(251, 191, 36, 0.22);
+  transition: all 0.35s ease;
+}
+
+.mu-stage-card:hover {
+  border-color: rgba(251, 191, 36, 0.75);
+  box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.9), 0 0 55px rgba(251, 191, 36, 0.35);
+}
+
+.mu-shimmer-text {
+  background: linear-gradient(90deg, #fef08a 0%, #fbbf24 25%, #ffffff 50%, #f59e0b 75%, #fef08a 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: muStageShimmer 4s linear infinite;
+}
+
+.mu-sash-badge {
+  background: linear-gradient(135deg, #b45309 0%, #f59e0b 25%, #fef08a 50%, #d97706 75%, #78350f 100%);
+  background-size: 200% 200%;
+  animation: muSashGleam 4.5s ease infinite;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+.mu-sparkle-star {
+  animation: muDiamondSparkle 2s ease-in-out infinite;
+}
+
+

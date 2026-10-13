@@ -11,7 +11,7 @@ if ('serviceWorker' in navigator) {
     if ('caches' in window) {
       caches.keys().then((keys) => {
         keys.forEach((key) => {
-          if (key !== 'insightflow-executive-v5') {
+          if (key !== 'insightflow-executive-v6') {
             caches.delete(key).catch(() => {})
           }
         })

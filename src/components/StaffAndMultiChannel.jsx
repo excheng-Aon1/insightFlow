@@ -924,13 +924,14 @@ export function MultiChannelTab({
                 borderRadius: '12px',
                 background: 'rgba(16, 185, 129, 0.1)',
                 color: '#f8fafc',
-                fontSize: '0.88rem',
-                lineHeight: 1.6
+                fontSize: '0.84rem',
+                lineHeight: 1.6,
+                fontFamily: 'monospace'
               }}
             >
               {tx(
-                `📊 สรุปปิดยอดร้านประจำวัน (${lineNotifyTime} น.) • ยอดขายรวมทุกช่องทาง: ฿${(offlineRev + onlineRev).toLocaleString()} • กำไรสุทธิเข้ากระเป๋า: ฿${(offlineProfit + onlineProfit).toLocaleString()} • สาขาอันดับ 1: สาขาสยามพารากอน`,
-                `📊 Daily Closing Summary (${lineNotifyTime}) • Total Omnichannel Revenue: ฿${(offlineRev + onlineRev).toLocaleString()} • Net Profit: ฿${(offlineProfit + onlineProfit).toLocaleString()} • #1 Branch: Siam Paragon`
+                `📊 สรุปปิดยอดร้านประจำวัน (${lineNotifyTime} น.)\n💰 ยอดขายรวม: ฿${(offlineRev + onlineRev).toLocaleString()} (หน้าร้าน ฿${offlineRev.toLocaleString()} | ออนไลน์ ฿${onlineRev.toLocaleString()})\n📉 ต้นทุน & ค่าใช้จ่าย: -฿${Math.max(0, (offlineRev + onlineRev) - (offlineProfit + onlineProfit)).toLocaleString()}\n🟢 กำไรสุทธิ: +฿${(offlineProfit + onlineProfit).toLocaleString()} (Margin ${offlineRev + onlineRev > 0 ? (((offlineProfit + onlineProfit) / (offlineRev + onlineRev)) * 100).toFixed(1) : 0}%)\n🏆 สาขาอันดับ 1: สาขาสยามพารากอน`,
+                `📊 Daily Closing Summary (${lineNotifyTime})\n💰 Revenue: ฿${(offlineRev + onlineRev).toLocaleString()} (POS ฿${offlineRev.toLocaleString()} | Online ฿${onlineRev.toLocaleString()})\n📉 Cost: -฿${Math.max(0, (offlineRev + onlineRev) - (offlineProfit + onlineProfit)).toLocaleString()}\n🟢 Net Profit: +฿${(offlineProfit + onlineProfit).toLocaleString()} (Margin ${offlineRev + onlineRev > 0 ? (((offlineProfit + onlineProfit) / (offlineRev + onlineRev)) * 100).toFixed(1) : 0}%)\n🏆 Top Store: Siam Paragon`
               )}
             </div>
           </div>

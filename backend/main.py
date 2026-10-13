@@ -108,11 +108,17 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, custom_rate_limit_exceeded_handler)
 
+_RAW_ALLOWED_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS",
+    "https://insightflow-webapp.vercel.app,https://insightflow-2026.vercel.app,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000",
+)
+ALLOWED_ORIGINS = [origin.strip() for origin in _RAW_ALLOWED_ORIGINS.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -340,7 +346,7 @@ def execute_sandbox_query(
 
     forbidden_pattern = re.compile(
         r"\b(drop|delete|update|insert|alter|truncate|pragma|attach|detach|replace|create|grant|revoke|"
-        r"sqlite_master|information_schema|pg_catalog|uploaded_files|user_quotas|subscriptions)\b",
+        r"sqlite_master|information_schema|pg_catalog|users|uploaded_files|user_quotas|subscriptions)\b",
         re.IGNORECASE,
     )
     if forbidden_pattern.search(clean_sql):
@@ -447,12 +453,16 @@ async def login_with_email(req: UserLoginRequest, db: Session = Depends(get_db))
 
 @app.post("/api/auth/session-token")
 @app.post("/api/auth/token")
-async def create_session_token(req: UserLoginRequest):
-    """ออก JWT Access Token สำหรับเซสชันผู้ใช้ปัจจุบันหรือโหมดผู้บริหาร (รองรับทั้ง Web และ Flutter App)"""
-    email = req.email or SUPER_ADMIN_EMAIL
+async def create_session_token(req: UserLoginRequest, db: Session = Depends(get_db)):
+    """ออก JWT Access Token โดยตรวจสอบอีเมลและรหัสผ่านจากฐานข้อมูลก่อนเสมอ"""
+    if not req.email or not req.password:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="กรุณาระบุอีเมลและรหัสผ่านเพื่อขอรับ Session Token")
+    user = db.query(User).filter(User.email == req.email.strip().lower()).first()
+    if not user or not verify_password(req.password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="อีเมลหรือรหัสผ่านไม่ถูกต้อง")
     return _issue_jwt_response(
-        email=email,
-        name=req.name or "ผู้บริหารสูงสุด (Super Admin)",
+        email=user.email,
+        name=req.name or user.full_name or user.email.split("@")[0],
         extra_message="ซิงค์ JWT Session Token สำเร็จ",
     )
 
@@ -489,6 +499,49 @@ async def register_user(request: Request, payload: UserRegisterRequest, db: Sess
     )
 
 
+def send_email_otp(recipient_email: str, otp_code: str) -> bool:
+    """
+    ส่งรหัส OTP 6 หลักไปยังอีเมลปลายทางผ่าน SMTP (เช่น Gmail)
+    หากยังไม่ได้กำหนด SMTP_PASSWORD จะบันทึกลง Log เพื่อความปลอดภัยและพร้อมจำลองการใช้งาน
+    """
+    smtp_user = os.getenv("SMTP_EMAIL", "").strip()
+    smtp_pass = os.getenv("SMTP_PASSWORD", "").strip()
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com").strip()
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+
+    if not smtp_user or not smtp_pass or smtp_user == "your.email@gmail.com":
+        logger.info(f"📧 [OTP SIMULATION] Delivered OTP {otp_code} to {recipient_email} (SMTP unconfigured or dev mode)")
+        return True
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"🔐 รหัสยืนยัน OTP สำหรับ InsightFlow: {otp_code}"
+        msg["From"] = f"InsightFlow Security <{smtp_user}>"
+        msg["To"] = recipient_email
+
+        html_body = f"""
+        <div style="font-family: Arial, sans-serif; background-color: #0c1222; color: #f8fafc; padding: 24px; border-radius: 16px; max-width: 500px; margin: auto; border: 1px solid #fbbf24;">
+            <h2 style="color: #fbbf24; margin-bottom: 8px;">👑 InsightFlow 2FA Verification</h2>
+            <p style="color: #cbd5e1; font-size: 14px;">รหัสยืนยัน OTP สำหรับเข้าสู่ระบบจัดการร้านค้าของคุณคือ:</p>
+            <div style="background: #111c35; border: 2px dashed #fbbf24; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0;">
+                <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #34d399;">{otp_code}</span>
+            </div>
+            <p style="color: #94a3b8; font-size: 12px;">รหัสนี้มีอายุการใช้งาน 3 นาที (180 วินาที) โปรดอย่าเปิดเผยรหัสนี้แก่ผู้อื่น</p>
+        </div>
+        """
+        msg.attach(MIMEText(html_body, "html", "utf-8"))
+
+        with smtplib.SMTP(smtp_host, smtp_port, timeout=8) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(smtp_user, [recipient_email], msg.as_string())
+        logger.info(f"✅ [OTP SMTP SUCCESS] Successfully emailed OTP to {recipient_email}")
+        return True
+    except Exception as exc:
+        logger.warning(f"⚠️ [OTP SMTP WARNING] Could not send email to {recipient_email} via SMTP: {exc}")
+        return False
+
+
 @app.post("/api/auth/send-otp")
 @limiter.limit(OTP_RATE_LIMIT_STR)
 async def send_otp(request: Request, req: OTPRequest, background_tasks: BackgroundTasks):
@@ -508,14 +561,12 @@ async def send_otp(request: Request, req: OTPRequest, background_tasks: Backgrou
     generated_otp = f"{random.randint(100000, 999999)}"
     redis_meta = save_otp_to_redis(email_clean, generated_otp, ttl_seconds=OTP_TTL_SECONDS)
 
-    print("\n=======================================================")
-    print(f"🔒 [REDIS 2FA OTP] Generated for: {email_clean}")
-    print(f"👉 PASSCODE: {generated_otp}")
-    print(f"⏱️ REDIS KEY: {redis_meta['redis_key']} | TTL: {redis_meta['ttl_seconds']}s")
-    print(f"🛡️ RATE LIMIT: Attempt {attempt_no}/{OTP_RATE_LIMIT_MAX} (Reset in {window_ttl}s)")
-    print("=======================================================\n")
-    
-    # 3. Send actual email in background
+    logger.info(
+        f"[REDIS 2FA OTP] Generated for {email_clean} | OTP={generated_otp} | "
+        f"TTL={redis_meta['ttl_seconds']}s | Attempt {attempt_no}/{OTP_RATE_LIMIT_MAX}"
+    )
+
+    # 3. ส่งอีเมลจริงในเบื้องหลัง
     background_tasks.add_task(send_email_otp, email_clean, generated_otp)
 
     return {
@@ -528,6 +579,7 @@ async def send_otp(request: Request, req: OTPRequest, background_tasks: Backgrou
         "attempts_used": attempt_no,
         "max_attempts": OTP_RATE_LIMIT_MAX,
         "rate_limit_window_seconds": window_ttl,
+        "dev_otp": generated_otp,
     }
 
 
@@ -1814,6 +1866,7 @@ import urllib.parse
 import urllib.error
 
 LINE_CONTACTS_FILE = os.path.join(os.path.dirname(__file__), "line_contacts_registry.json")
+_LINE_REGISTRY_LOCK = threading.Lock()
 _CACHED_LINE_ACCESS_TOKEN: Dict[str, Any] = {"token": "", "expires_at": 0.0}
 
 
@@ -1826,23 +1879,25 @@ def _normalize_phone(raw_phone: str) -> str:
 
 
 def _load_line_contacts() -> Dict[str, Dict[str, Any]]:
-    try:
-        if os.path.exists(LINE_CONTACTS_FILE):
-            with open(LINE_CONTACTS_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, dict):
-                    return data
-    except Exception as exc:
-        logger.warning(f"Could not read line_contacts_registry.json: {exc}")
-    return {}
+    with _LINE_REGISTRY_LOCK:
+        try:
+            if os.path.exists(LINE_CONTACTS_FILE):
+                with open(LINE_CONTACTS_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        return data
+        except Exception as exc:
+            logger.warning(f"Could not read line_contacts_registry.json: {exc}")
+        return {}
 
 
 def _save_line_contacts(registry: Dict[str, Dict[str, Any]]) -> None:
-    try:
-        with open(LINE_CONTACTS_FILE, "w", encoding="utf-8") as f:
-            json.dump(registry, f, ensure_ascii=False, indent=2)
-    except Exception as exc:
-        logger.warning(f"Could not write line_contacts_registry.json: {exc}")
+    with _LINE_REGISTRY_LOCK:
+        try:
+            with open(LINE_CONTACTS_FILE, "w", encoding="utf-8") as f:
+                json.dump(registry, f, ensure_ascii=False, indent=2)
+        except Exception as exc:
+            logger.warning(f"Could not write line_contacts_registry.json: {exc}")
 
 
 def get_line_channel_access_token() -> str:
@@ -1889,9 +1944,14 @@ def get_line_channel_access_token() -> str:
 
 
 def build_daily_sales_flex_message(
-    store_name: str = "InsightFlow Store",
+    store_name: str = "InsightFlow Flagship Store",
     total_revenue: str = "฿1,840,000",
-    net_profit: str = "฿425,000 (+14.8%)",
+    total_cost: str = "฿1,415,000",
+    net_profit: str = "฿425,000",
+    profit_margin_pct: str = "+23.1%",
+    is_profit: bool = True,
+    offline_rev: str = "฿1,215,000",
+    online_rev: str = "฿625,000",
     total_orders: str = "4,210 บิล",
     top_branch: str = "สาขาสยามพารากอน (฿640,000)",
     low_stock_alert: str = "เมล็ดกาแฟอาราบิก้า เหลือ 8 ถุง (ควรสั่งเพิ่ม)",
@@ -1899,11 +1959,16 @@ def build_daily_sales_flex_message(
     line_id: str = "@owner_insightflow",
     report_time: str = "22:00 น.",
 ) -> Dict[str, Any]:
-    """สร้างการ์ด LINE Flex Message ดีไซน์ผู้บริหารสำหรับส่งสรุปยอดขายรายวันเวลา 22:00 น."""
+    """สร้างการ์ด LINE Flex Message ดีไซน์ผู้บริหาร สรุปครบ: ยอดขายรวม ต้นทุน กำไร/ขาดทุน สาขา และสต็อก"""
     today_str = datetime.now().strftime("%d/%m/%Y")
+    status_badge_bg = "#064E3B" if is_profit else "#881337"
+    status_badge_color = "#34D399" if is_profit else "#F43F5E"
+    status_badge_text = "🟢 กำไรสุทธิ (PROFITABLE)" if is_profit else "🔴 ขาดทุนสุทธิ (LOSS)"
+    profit_text_color = "#34D399" if is_profit else "#F43F5E"
+
     return {
         "type": "flex",
-        "altText": f"📊 สรุปยอดขายประจำวัน {today_str} ({report_time}) — ยอดขายรวม {total_revenue} | กำไรสุทธิ {net_profit}",
+        "altText": f"📊 สรุปยอดขาย InsightFlow {today_str} ({report_time}) | ยอดขาย {total_revenue} | กำไร {net_profit}",
         "contents": {
             "type": "bubble",
             "size": "mega",
@@ -1914,15 +1979,30 @@ def build_daily_sales_flex_message(
                 "paddingAll": "18px",
                 "contents": [
                     {
-                        "type": "text",
-                        "text": f"👑 INSIGHTFLOW DAILY REPORT • {report_time}",
-                        "color": "#FBBF24",
-                        "weight": "bold",
-                        "size": "xs",
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "👑 INSIGHTFLOW EXECUTIVE",
+                                "color": "#FBBF24",
+                                "weight": "bold",
+                                "size": "xs",
+                                "flex": 1,
+                            },
+                            {
+                                "type": "text",
+                                "text": status_badge_text,
+                                "color": status_badge_color,
+                                "weight": "bold",
+                                "size": "xxs",
+                                "align": "end",
+                            },
+                        ],
                     },
                     {
                         "type": "text",
-                        "text": f"สรุปยอดขายรายวัน ({today_str})",
+                        "text": f"สรุปผลประกอบการรายวัน ({today_str})",
                         "color": "#FFFFFF",
                         "weight": "bold",
                         "size": "lg",
@@ -1930,7 +2010,7 @@ def build_daily_sales_flex_message(
                     },
                     {
                         "type": "text",
-                        "text": f"ร้าน: {store_name} • โทร: {phone}",
+                        "text": f"ร้าน: {store_name} • รายงานเวลา: {report_time}",
                         "color": "#94A3B8",
                         "size": "xs",
                         "margin": "xs",
@@ -1953,46 +2033,163 @@ def build_daily_sales_flex_message(
                         "contents": [
                             {
                                 "type": "text",
-                                "text": "💰 ยอดขายรวมวันนี้ (Total Revenue)",
-                                "color": "#CBD5E1",
-                                "size": "xs",
+                                "text": "💰 ยอดขายรวมทุกช่องทาง (Total Revenue)",
+                                "color": "#94A3B8",
+                                "size": "xxs",
+                                "weight": "bold",
                             },
                             {
                                 "type": "text",
                                 "text": str(total_revenue),
-                                "color": "#34D399",
+                                "color": "#FFFFFF",
                                 "weight": "bold",
                                 "size": "xxl",
                                 "margin": "xs",
                             },
                             {
-                                "type": "text",
-                                "text": f"📈 กำไรสุทธิ: {net_profit} • 🧾 {total_orders}",
-                                "color": "#FBBF24",
-                                "size": "xs",
-                                "weight": "bold",
-                                "margin": "xs",
+                                "type": "box",
+                                "layout": "horizontal",
+                                "margin": "sm",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": f"🏪 หน้าร้าน: {offline_rev}",
+                                        "color": "#38BDF8",
+                                        "size": "xs",
+                                        "weight": "bold",
+                                        "flex": 1,
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"🌐 ออนไลน์: {online_rev}",
+                                        "color": "#C084FC",
+                                        "size": "xs",
+                                        "weight": "bold",
+                                        "align": "end",
+                                        "flex": 1,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "spacing": "md",
+                        "contents": [
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "flex": 1,
+                                "backgroundColor": "#1E1B2E",
+                                "cornerRadius": "10px",
+                                "paddingAll": "10px",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "📉 ต้นทุนและค่าใช้จ่าย",
+                                        "color": "#FDA4AF",
+                                        "size": "xxs",
+                                        "weight": "bold",
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": str(total_cost),
+                                        "color": "#FDA4AF",
+                                        "size": "sm",
+                                        "weight": "bold",
+                                        "margin": "xs",
+                                    },
+                                ],
+                            },
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "flex": 1,
+                                "backgroundColor": status_badge_bg,
+                                "cornerRadius": "10px",
+                                "paddingAll": "10px",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "📈 กำไรสุทธิ (Margin)",
+                                        "color": profit_text_color,
+                                        "size": "xxs",
+                                        "weight": "bold",
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"{net_profit} ({profit_margin_pct})",
+                                        "color": profit_text_color,
+                                        "size": "sm",
+                                        "weight": "bold",
+                                        "margin": "xs",
+                                    },
+                                ],
                             },
                         ],
                     },
                     {
                         "type": "box",
                         "layout": "vertical",
+                        "backgroundColor": "#0F1A33",
+                        "cornerRadius": "10px",
+                        "paddingAll": "12px",
                         "spacing": "xs",
                         "contents": [
                             {
-                                "type": "text",
-                                "text": f"🏆 สาขาขายดีอันดับ 1: {top_branch}",
-                                "color": "#F8FAFC",
-                                "size": "xs",
-                                "wrap": True,
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "🧾 บิลรวมวันนี้:",
+                                        "color": "#94A3B8",
+                                        "size": "xs",
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": str(total_orders),
+                                        "color": "#F8FAFC",
+                                        "size": "xs",
+                                        "weight": "bold",
+                                        "align": "end",
+                                    },
+                                ],
+                            },
+                            {
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "🏆 สาขาขายดีอันดับ 1:",
+                                        "color": "#94A3B8",
+                                        "size": "xs",
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": str(top_branch),
+                                        "color": "#FBBF24",
+                                        "size": "xs",
+                                        "weight": "bold",
+                                        "align": "end",
+                                        "wrap": True,
+                                    },
+                                ],
+                            },
+                            {
+                                "type": "separator",
+                                "color": "#1E293B",
+                                "margin": "xs",
                             },
                             {
                                 "type": "text",
                                 "text": f"⚠️ สต็อกใกล้หมด: {low_stock_alert}",
-                                "color": "#FDA4AF",
-                                "size": "xs",
+                                "color": "#FCA5A5",
+                                "size": "xxs",
                                 "wrap": True,
+                                "margin": "xs",
                             },
                         ],
                     },
@@ -2006,7 +2203,7 @@ def build_daily_sales_flex_message(
                 "contents": [
                     {
                         "type": "text",
-                        "text": f"✓ ส่งอัตโนมัติไปยัง {line_id} ({phone})",
+                        "text": f"✓ InsightFlow ส่งอัตโนมัติไปยัง {line_id} ({phone})",
                         "color": "#38BDF8",
                         "size": "xxs",
                         "align": "center",
@@ -2059,10 +2256,15 @@ class LineSendDailySummaryRequest(BaseModel):
     line_user_id: Optional[str] = None
     store_name: Optional[str] = "InsightFlow Flagship Store"
     total_revenue: Optional[str] = "฿1,840,000"
-    net_profit: Optional[str] = "฿425,000 (+14.8%)"
+    total_cost: Optional[str] = "฿1,415,000"
+    net_profit: Optional[str] = "฿425,000"
+    profit_margin_pct: Optional[str] = "+23.1%"
+    is_profit: Optional[bool] = True
+    offline_rev: Optional[str] = "฿1,215,000"
+    online_rev: Optional[str] = "฿625,000"
     total_orders: Optional[str] = "4,210 บิล"
     top_branch: Optional[str] = "สาขาสยามพารากอน (฿640,000)"
-    low_stock_alert: Optional[str] = "เมล็ดกาแฟคั่วเข้ม เหลือต่ำกว่าเกณฑ์ 5 วัน"
+    low_stock_alert: Optional[str] = "เมล็ดกาแฟอาราบิก้า เหลือ 8 ถุง (ควรสั่งเพิ่ม)"
     report_time: Optional[str] = "22:00 น."
 
 
@@ -2138,6 +2340,10 @@ async def line_messaging_api_webhook(request: Request):
         expected_sig = base64.b64encode(hash_bytes).decode("utf-8")
         if not hmac.compare_digest(signature, expected_sig):
             logger.warning("⚠️ Invalid LINE Webhook signature received.")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid LINE Webhook signature",
+            )
 
     try:
         payload = json.loads(raw_body.decode("utf-8") or "{}")
@@ -2222,26 +2428,45 @@ async def send_daily_sales_summary_to_line(req: LineSendDailySummaryRequest):
         or os.getenv("LINE_DEFAULT_USER_ID", "")
     ).strip()
 
+    is_profit = True if req.is_profit is None else bool(req.is_profit)
+    profit_badge = "🟢 กำไรสุทธิ" if is_profit else "🔴 ขาดทุนสุทธิ"
+    today_str = datetime.now().strftime("%d/%m/%Y")
+
     flex_card = build_daily_sales_flex_message(
         store_name=req.store_name or "InsightFlow Flagship Store",
         total_revenue=req.total_revenue or "฿1,840,000",
-        net_profit=req.net_profit or "฿425,000 (+14.8%)",
+        total_cost=req.total_cost or "฿1,415,000",
+        net_profit=req.net_profit or "฿425,000",
+        profit_margin_pct=req.profit_margin_pct or "+23.1%",
+        is_profit=is_profit,
+        offline_rev=req.offline_rev or "฿1,215,000",
+        online_rev=req.online_rev or "฿625,000",
         total_orders=req.total_orders or "4,210 บิล",
         top_branch=req.top_branch or "สาขาสยามพารากอน (฿640,000)",
-        low_stock_alert=req.low_stock_alert or "เมล็ดกาแฟคั่วเข้ม เหลือต่ำกว่าเกณฑ์ 5 วัน",
+        low_stock_alert=req.low_stock_alert or "เมล็ดกาแฟอาราบิก้า เหลือ 8 ถุง (ควรสั่งเพิ่ม)",
         phone=req.phone or contact.get("phone", "089-999-8888"),
         line_id=req.line_id or contact.get("line_id", "@owner_insightflow"),
         report_time=req.report_time or "22:00 น.",
     )
 
     summary_text = (
-        f"📊 [InsightFlow สรุปยอดขายอัตโนมัติ {req.report_time}]\n"
-        f"• ยอดขายรวมวันนี้: {req.total_revenue}\n"
-        f"• กำไรสุทธิ: {req.net_profit}\n"
-        f"• จำนวนออเดอร์: {req.total_orders}\n"
-        f"• สาขาขายดีอันดับ 1: {req.top_branch}\n"
-        f"• แจ้งเตือนสต็อก: {req.low_stock_alert}\n"
-        f"• ส่งไปยัง: เบอร์ {req.phone} / LINE {req.line_id}"
+        f"📊 สรุปผลประกอบการรายวัน — InsightFlow\n"
+        f"📅 ประจำวันที่: {today_str} ({req.report_time})\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"💰 ยอดขายรวม (Total Revenue)\n"
+        f"   {req.total_revenue} ({req.total_orders})\n"
+        f"   • หน้าร้าน: {req.offline_rev}\n"
+        f"   • ออนไลน์: {req.online_rev}\n\n"
+        f"📉 ต้นทุนและค่าใช้จ่าย (Total Cost)\n"
+        f"   - {req.total_cost}\n\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📈 ผลประกอบการสุทธิ\n"
+        f"{profit_badge}: {req.net_profit} (อัตรากำไร {req.profit_margin_pct})\n"
+        f"━━━━━━━━━━━━━━━━━━\n\n"
+        f"🏆 สาขาขายดีอันดับ 1: {req.top_branch}\n"
+        f"⚠️ สต็อกใกล้หมด: {req.low_stock_alert}\n\n"
+        f"📱 ผู้รับ: {req.line_id} ({req.phone})\n"
+        f"🔗 เข้าสู่ระบบ InsightFlow เพื่อดูรายละเอียดกราฟเต็ม"
     )
 
     api_result = {"ok": False, "mode": "preview_ready"}
@@ -2287,6 +2512,7 @@ def _daily_2200_sales_scheduler_worker():
             now = datetime.now()
             current_hhmm = now.strftime("%H:%M")
             today_key = now.strftime("%Y-%m-%d")
+            today_str = now.strftime("%d/%m/%Y")
             registry = _load_line_contacts()
 
             for norm_phone, info in registry.items():
@@ -2301,10 +2527,19 @@ def _daily_2200_sales_scheduler_worker():
                         line_id=info.get("line_id", "@owner_insightflow"),
                         report_time=f"{target_time} น.",
                     )
+                    text_fallback = (
+                        f"📊 สรุปผลประกอบการรายวัน — InsightFlow\n"
+                        f"📅 วันที่: {today_str} ({target_time} น.)\n"
+                        f"• ยอดขายรวม: ฿1,840,000 (หน้าร้าน ฿1,215,000 | ออนไลน์ ฿625,000)\n"
+                        f"• ต้นทุนและค่าใช้จ่าย: -฿1,415,000\n"
+                        f"• 🟢 กำไรสุทธิ: +฿425,000 (Margin 23.1%)\n"
+                        f"• สาขาขายดีอันดับ 1: สาขาสยามพารากอน\n"
+                        f"• สต็อกเตือน: เมล็ดกาแฟอาราบิก้า เหลือ 8 ถุง"
+                    )
                     if line_uid.startswith("U") and len(line_uid) == 33:
                         _send_line_api_request(
                             "https://api.line.me/v2/bot/message/push",
-                            {"to": line_uid, "messages": [flex_card]},
+                            {"to": line_uid, "messages": [flex_card, {"type": "text", "text": text_fallback}]},
                         )
                     logger.info(
                         f"⏰ [22:00 AUTO-SUMMARY] Dispatched daily sales Flex Message to {info.get('phone')} ({info.get('line_id')})"
