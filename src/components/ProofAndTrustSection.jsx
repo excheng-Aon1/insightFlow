@@ -628,106 +628,193 @@ export default function ProofAndTrustSection({
           {/* TAB CONTENT 1: LINE DAILY PROFIT SUMMARY CARD */}
           {activeTab === 'line_card' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-fadeIn">
-              {/* Latest iPhone 16 Pro Mockup Frame */}
-              <div className="lg:col-span-5 flex justify-center">
-                <div className="relative mx-auto w-full max-w-[340px]">
-                  
-                  {/* Left Physical Buttons: Action Button & Volume Up/Down */}
-                  <div className="absolute -left-[4px] top-20 w-[4px] h-8 bg-gradient-to-r from-[#2a2d36] to-[#474d5c] rounded-l-md shadow-sm" />
-                  <div className="absolute -left-[4px] top-32 w-[4px] h-12 bg-gradient-to-r from-[#2a2d36] to-[#474d5c] rounded-l-md shadow-sm" />
-                  <div className="absolute -left-[4px] top-48 w-[4px] h-12 bg-gradient-to-r from-[#2a2d36] to-[#474d5c] rounded-l-md shadow-sm" />
+              {/* Real-Scale iPhone 16 Pro Mockup Frame (Physical Ratio 71.5mm : 149.6mm) */}
+              <div className="lg:col-span-5 flex justify-center items-center py-2">
+                <div 
+                  className="relative w-full max-w-[335px] sm:max-w-[350px] select-none"
+                  style={{ aspectRatio: '71.5 / 149.6' }}
+                >
+                  {/* === PHYSICAL EXTERIOR HARDWARE BUTTONS (iPhone 16 Pro) === */}
+                  {/* Left Edge: Action Button */}
+                  <div className="absolute -left-[4.5px] top-[14%] w-[3px] h-[18px] bg-gradient-to-r from-[#2a2d34] to-[#4a505e] rounded-l-sm shadow-sm" />
+                  {/* Left Edge: Volume Up */}
+                  <div className="absolute -left-[4.5px] top-[20%] w-[3px] h-[36px] bg-gradient-to-r from-[#2a2d34] to-[#4a505e] rounded-l-sm shadow-sm" />
+                  {/* Left Edge: Volume Down */}
+                  <div className="absolute -left-[4.5px] top-[28%] w-[3px] h-[36px] bg-gradient-to-r from-[#2a2d34] to-[#4a505e] rounded-l-sm shadow-sm" />
 
-                  {/* Right Physical Buttons: Power Lock & New iPhone 16 Camera Control */}
-                  <div className="absolute -right-[4px] top-28 w-[4px] h-16 bg-gradient-to-l from-[#2a2d36] to-[#474d5c] rounded-r-md shadow-sm" />
-                  <div className="absolute -right-[4px] top-52 w-[4px] h-11 bg-gradient-to-l from-[#1e2026] to-[#3a3f4d] rounded-r-md border-r border-[#64748b]/40 shadow-inner" title="Camera Control" />
+                  {/* Right Edge: Side / Power Button */}
+                  <div className="absolute -right-[4.5px] top-[21%] w-[3px] h-[52px] bg-gradient-to-l from-[#2a2d34] to-[#4a505e] rounded-r-sm shadow-sm" />
+                  {/* Right Edge: iPhone 16 Pro NEW Camera Control Button (Recessed Sapphire Capacitive Surface) */}
+                  <div className="absolute -right-[3.5px] bottom-[16%] w-[2.5px] h-[46px] bg-gradient-to-l from-[#1e2026] via-[#353942] to-[#515764] rounded-r-sm shadow-[0_0_4px_rgba(0,0,0,0.5)] border-r border-[#64748b]/40" />
 
-                  {/* Outer Grade 5 Titanium Chassis */}
-                  <div className="relative rounded-[52px] p-[10px] bg-gradient-to-b from-[#383d4a] via-[#1f222a] to-[#111317] border border-[#525a6c]/60 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(16,185,129,0.22)]">
+                  {/* === TITANIUM CHASSIS FRAME (Grade 5 Titanium Bevel) === */}
+                  <div className="relative w-full h-full rounded-[48px] sm:rounded-[52px] p-[3px] sm:p-[3.5px] bg-gradient-to-b from-[#484c56] via-[#23262d] to-[#17191e] shadow-[0_25px_60px_-10px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.12),0_0_50px_rgba(16,185,129,0.22)]">
                     
-                    {/* Inner OLED Display with Ultra-Thin Bezels */}
-                    <div className="relative rounded-[43px] bg-[#070b16] overflow-hidden p-3 pt-2.5 border border-white/10 shadow-inner">
-                      
-                      {/* iOS 18 Top Status Bar with Dynamic Island */}
-                      <div className="flex items-center justify-between px-3 pt-1 pb-2">
-                        {/* Time */}
-                        <span className="text-[12px] font-bold text-white font-mono tracking-tight">22:00</span>
+                    {/* Titanium Antenna Bands (Top & Bottom on both edges) */}
+                    <div className="absolute left-0 top-[11%] w-[3.5px] h-[2.5px] bg-[#111317]" />
+                    <div className="absolute left-0 bottom-[11%] w-[3.5px] h-[2.5px] bg-[#111317]" />
+                    <div className="absolute right-0 top-[11%] w-[3.5px] h-[2.5px] bg-[#111317]" />
+                    <div className="absolute right-0 bottom-[11%] w-[3.5px] h-[2.5px] bg-[#111317]" />
+
+                    {/* === DISPLAY PANEL (1.15mm Ultra-Thin Uniform Black Borders) === */}
+                    <div className="relative w-full h-full rounded-[45px] sm:rounded-[49px] bg-black p-[2.5px] overflow-hidden flex flex-col justify-between">
+
+                      {/* Display Surface Screen Canvas */}
+                      <div className="relative w-full h-full rounded-[42px] sm:rounded-[46px] bg-[#0c1220] overflow-hidden flex flex-col justify-between">
                         
-                        {/* Dynamic Island (Pill Shape with Camera Lens & Status Glow) */}
-                        <div className="h-6 w-26 bg-black rounded-full flex items-center justify-between px-2.5 shadow-md border border-white/5 mx-1">
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#121622] border border-white/10 flex items-center justify-center">
-                            <div className="w-1 h-1 rounded-full bg-blue-500/80" />
+                        {/* Glass Glare Highlight Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent pointer-events-none z-20" />
+
+                        {/* Top: Status Bar + Dynamic Island */}
+                        <div className="relative z-30 pt-2 px-5 pb-1 flex items-center justify-between text-white">
+                          {/* iOS Time (matching 22:00 nightly closing) */}
+                          <div className="text-[12px] font-bold tracking-tight text-white/90 pl-1 font-sans">
+                            22:00
                           </div>
-                          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                        </div>
-                        
-                        {/* Cellular 5G + WiFi + Battery */}
-                        <div className="flex items-center gap-1.5 text-white text-[10px] font-bold">
-                          <span>5G</span>
-                          <span className="text-xs">📶</span>
-                          <div className="w-5 h-2.5 rounded-[4px] border border-white/80 p-[1px] flex items-center">
-                            <div className="h-full w-full bg-emerald-400 rounded-[2px]" />
+
+                          {/* Dynamic Island (iPhone 16 Pro Pill with Optics) */}
+                          <div className="absolute left-1/2 -translate-x-1/2 top-2.5 w-[96px] sm:w-[104px] h-[25px] bg-black rounded-full flex items-center justify-between px-2.5 shadow-[0_2px_10px_rgba(0,0,0,0.9)] border border-white/5">
+                            {/* Ambient Sensor */}
+                            <div className="w-2 h-2 rounded-full bg-[#0a0f1d] border border-[#1e293b]/60" />
+                            {/* Camera Lens Reflection */}
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#070b14] border border-[#334155]/80 flex items-center justify-center">
+                              <div className="w-1 h-1 rounded-full bg-[#1d4ed8]/70" />
+                            </div>
+                          </div>
+
+                          {/* iOS Status Glyphs (Signal, 5G, Battery) */}
+                          <div className="flex items-center gap-1.5 text-white/90 pr-1">
+                            {/* Cellular Signal (4 bars) */}
+                            <div className="flex items-end gap-[1.5px] h-2.5">
+                              <div className="w-[2.5px] h-[3px] bg-white rounded-[0.5px]" />
+                              <div className="w-[2.5px] h-[5px] bg-white rounded-[0.5px]" />
+                              <div className="w-[2.5px] h-[7px] bg-white rounded-[0.5px]" />
+                              <div className="w-[2.5px] h-[9px] bg-white rounded-[0.5px]" />
+                            </div>
+                            <span className="text-[9px] font-black tracking-tighter">5G</span>
+                            {/* Battery Glyph with Green Fill */}
+                            <div className="relative w-4 h-2 rounded-[2.5px] border border-white/80 p-[1px] flex items-center">
+                              <div className="w-full h-full bg-emerald-400 rounded-[1.5px]" />
+                              <div className="absolute -right-[2.5px] top-1/2 -translate-y-1/2 w-[1.5px] h-[3px] bg-white/80 rounded-r-sm" />
+                            </div>
                           </div>
                         </div>
+
+                        {/* LINE Chat Header Bar */}
+                        <div className="relative z-10 px-3.5 py-2 bg-[#10192a]/95 border-b border-white/10 flex items-center justify-between backdrop-blur-md">
+                          <div className="flex items-center gap-2">
+                            {/* LINE Back Arrow */}
+                            <span className="text-emerald-400 text-xs font-bold flex items-center">
+                              ‹ <span className="text-[10px] ml-0.5 font-semibold text-slate-300">99+</span>
+                            </span>
+                            {/* Official Account Avatar */}
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-emerald-600 to-green-400 p-[1px] shadow-sm flex-shrink-0">
+                              <div className="w-full h-full rounded-full bg-[#070c18] flex items-center justify-center text-emerald-400 font-black text-[10px]">
+                                IF
+                              </div>
+                            </div>
+                            {/* Account Name with LINE Verified Shield */}
+                            <div className="leading-tight">
+                              <div className="text-[11px] font-black text-white flex items-center gap-1">
+                                <span>InsightFlow Official</span>
+                                <span className="inline-flex items-center justify-center w-3 h-3 rounded-full bg-emerald-500 text-slate-950 text-[8px] font-black">
+                                  ✓
+                                </span>
+                              </div>
+                              <div className="text-[9px] text-emerald-400/90 font-medium">ส่งรายงานอัตโนมัติ 22:00 น.</div>
+                            </div>
+                          </div>
+                          {/* Top Right LINE Actions */}
+                          <div className="flex items-center gap-2 text-slate-400 text-xs">
+                            <span>🔍</span>
+                            <span className="font-mono text-sm leading-none">≡</span>
+                          </div>
+                        </div>
+
+                        {/* LINE Chat Content Body */}
+                        <div className="relative z-10 flex-1 px-3 py-2 flex flex-col justify-center overflow-hidden">
+                          {/* Date Stamp */}
+                          <div className="text-center mb-2">
+                            <span className="inline-block px-2.5 py-0.5 rounded-full bg-black/40 text-slate-400 text-[9px] font-medium border border-white/5">
+                              วันนี้ 22:00 น.
+                            </span>
+                          </div>
+
+                          {/* LINE Flex Message Bubble (InsightFlow Executive Report) */}
+                          <div className="bg-[#090f1d] border border-emerald-400/35 rounded-2xl p-3 text-[11px] space-y-2 shadow-[0_10px_25px_rgba(0,0,0,0.6)]">
+                            {/* Card Header */}
+                            <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs">📊</span>
+                                <span className="font-black text-white text-xs">สรุปยอดขายและผลกำไรวันนี้</span>
+                              </div>
+                              <span className="text-emerald-400 font-mono text-[9px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                Realtime
+                              </span>
+                            </div>
+
+                            {/* Key Financial Metrics */}
+                            <div className="space-y-1">
+                              <div className="flex justify-between items-center text-slate-300">
+                                <span>ยอดขายรวม (142 บิล)</span>
+                                <span className="font-bold text-white text-xs">฿48,920</span>
+                              </div>
+                              <div className="flex justify-between items-center text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
+                                <span>กำไรแท้จริง (หักต้นทุนแฝง)</span>
+                                <span className="text-xs font-black text-emerald-300">฿18,450 (37.7%)</span>
+                              </div>
+                              <div className="flex justify-between items-center text-slate-400 text-[10px]">
+                                <span>เทียบสัปดาห์ก่อนหน้า</span>
+                                <span className="text-emerald-400 font-bold">+18.4% 🚀</span>
+                              </div>
+                            </div>
+
+                            {/* Best Seller Pill */}
+                            <div className="p-2 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-200 text-[10px] leading-tight">
+                              <div className="font-black text-amber-300 mb-0.5 flex items-center gap-1">
+                                <span>⭐</span>
+                                <span>สินค้าขายดีประจำวัน:</span>
+                              </div>
+                              <div>• เซรั่มทองคำ 30 มล. (38 ชิ้น)</div>
+                              <div>• ชุดกิฟต์เซ็ตพรีเมียม (14 ชุด)</div>
+                            </div>
+
+                            {/* Low Stock Alert */}
+                            <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[10px] leading-tight">
+                              <div className="font-black text-rose-300 mb-0.5 flex items-center gap-1">
+                                <span>🚨</span>
+                                <span>แจ้งเตือนสต็อกใกล้หมด:</span>
+                              </div>
+                              <div>• ครีมกันแดด SPF50 (เหลือ 4 ชิ้น ต้องสั่งเพิ่ม)</div>
+                            </div>
+
+                            {/* Action CTA Button */}
+                            <button
+                              type="button"
+                              onClick={onOpenLogin}
+                              className="w-full py-1.5 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-slate-950 font-black rounded-xl text-[10px] transition cursor-pointer text-center shadow-md active:scale-98"
+                            >
+                              แตะเพื่อเปิด Dashboard ตัวเต็ม →
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Bottom: Authentic LINE Composer Bar */}
+                        <div className="relative z-10 px-3 py-1.5 bg-[#10192a]/95 border-t border-white/10 flex items-center gap-2">
+                          <span className="text-slate-400 text-xs">➕</span>
+                          <span className="text-slate-400 text-xs">📷</span>
+                          <div className="flex-1 bg-[#1a2334] rounded-full px-3 py-1 text-slate-400 text-[10px] border border-white/5">
+                            ส่งข้อความถึง InsightFlow...
+                          </div>
+                          <span className="text-emerald-400 text-xs">🎤</span>
+                        </div>
+
+                        {/* iOS Bottom Home Indicator Bar */}
+                        <div className="relative z-30 pb-1.5 pt-0.5 flex justify-center">
+                          <div className="w-28 sm:w-32 h-[3.5px] bg-white/70 rounded-full" />
+                        </div>
+
                       </div>
-
-                      {/* LINE Chat Header inside iPhone */}
-                      <div className="bg-[#1e2b40]/90 backdrop-blur-md rounded-2xl p-3 mb-3 flex items-center gap-3 border border-white/10 shadow-md">
-                        <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white font-black text-lg shadow-md flex-shrink-0">
-                          IF
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-xs font-black text-white flex items-center gap-1.5 truncate">
-                            <span>InsightFlow Assistant</span>
-                            <span className="text-[10px] bg-emerald-400/20 text-emerald-300 px-1.5 py-0.2 rounded font-bold">✓ Official</span>
-                          </div>
-                          <div className="text-[11px] text-emerald-400 font-semibold truncate">ส่งรายงานอัตโนมัติ 22:00 น.</div>
-                        </div>
-                      </div>
-
-                      {/* LINE Message Bubble Card */}
-                      <div className="bg-[#0b1222] border border-emerald-400/30 rounded-2xl p-4 text-xs space-y-3 shadow-xl">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                          <span className="font-black text-white text-sm">📊 สรุปยอดขายวันนี้</span>
-                          <span className="text-slate-400 font-mono text-[10px]">22:00 น.</span>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <div className="flex justify-between items-center text-slate-300">
-                            <span>ยอดขายรวม (142 บิล)</span>
-                            <span className="font-bold text-white text-sm">฿48,920</span>
-                          </div>
-                          <div className="flex justify-between items-center text-emerald-400 font-bold">
-                            <span>กำไรแท้จริง (หักต้นทุนแฝง)</span>
-                            <span className="text-sm font-black">฿18,450 (37.7%)</span>
-                          </div>
-                          <div className="flex justify-between items-center text-slate-300">
-                            <span>เทียบกับสัปดาห์ก่อน</span>
-                            <span className="text-emerald-400 font-bold">+18.4% 🚀</span>
-                          </div>
-                        </div>
-
-                        <div className="p-2.5 rounded-xl bg-amber-400/10 border border-amber-400/25 text-amber-200">
-                          <div className="font-black mb-1">⭐ สินค้าขายดีประจำวัน:</div>
-                          <div>• เซรั่มทองคำ 30 มล. (38 ชิ้น)</div>
-                          <div>• ชุดกิฟต์เซ็ตพรีเมียม (14 ชุด)</div>
-                        </div>
-
-                        <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-300">
-                          <div className="font-black mb-1">🚨 สินค้าใกล้หมดสต็อก:</div>
-                          <div>• ครีมกันแดด SPF50 (เหลือ 4 ชิ้น ต้องสั่งเพิ่ม)</div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={onOpenLogin}
-                          className="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition cursor-pointer text-center"
-                        >
-                          แตะเพื่อดูรายงานฉบับเต็ม →
-                        </button>
-                      </div>
-
-                      {/* iOS Bottom Home Indicator Bar */}
-                      <div className="w-28 h-1 bg-white/40 rounded-full mx-auto mt-3 mb-1" />
                     </div>
                   </div>
                 </div>
