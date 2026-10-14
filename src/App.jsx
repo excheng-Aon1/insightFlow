@@ -18,6 +18,8 @@ import { Toaster, toast as hotToast } from 'react-hot-toast';
 import { ActionablePlaybooks } from './components/ActionablePlaybooks';
 import { CashFlowAndDemandForecast } from './components/CashFlowAndDemandForecast';
 import { IndustryBenchmarkAndGoalDecomposition } from './components/IndustryBenchmarkAndGoalDecomposition';
+import { GoogleSheetCuteButton, GoogleSheetSyncModal } from './components/GoogleSheetSyncModal';
+import ProofAndTrustSection from './components/ProofAndTrustSection';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -233,17 +235,18 @@ const toast = Object.assign(
 export const landingTranslations = {
   th: {
     brandSub: "ระบบวิเคราะห์ข้อมูลร้านค้าอัจฉริยะ",
-    badgeHero: "แพลตฟอร์มวิเคราะห์ข้อมูลธุรกิจอัจฉริยะ",
+    badgeHero: "✨ ผู้ช่วย AI จัดการร้านค้า & สรุปกำไรรายวัน สำหรับเจ้าของ SME",
     home: "หน้าหลัก",
     solutions: "บริการของเรา",
     whyUs: "จุดเด่นของระบบ",
     useCases: "ตัวอย่างธุรกิจ",
     pricing: "แพ็กเกจราคา",
     freeTrial: "เข้าใช้งานระบบ →",
-    tagline1: "เปลี่ยนข้อมูลร้านค้าของคุณ",
-    tagline2: "สู่การตัดสินใจที่แม่นยำและทำกำไรจริง",
-    description: "ระบบผู้ช่วยวิเคราะห์ธุรกิจอัจฉริยะ ช่วยดูแลยอดขาย ลูกค้าประจำ พนักงานหน้าร้าน สาขาออนไลน์ และคลังสินค้าในที่เดียว ออกแบบให้อ่านง่าย ตัวหนังสือใหญ่ชัดเจน ใช้งานได้ทันที",
-    watchDemo: "ดูความสามารถของระบบ",
+    heroCtaPrimary: "ทดลองใช้ Starter ฟรี 14 วัน (ไม่ต้องผูกบัตร)",
+    tagline1: "เปลี่ยนยอดขายและสต็อกหน้าร้าน",
+    tagline2: "ให้เป็นสรุปผลกำไรและสินค้าขายดีรายวัน อัตโนมัติผ่าน LINE",
+    description: "ไม่ต้องนั่งคีย์ Excel ไม่ต้องเดาตัวเลขเอง ระบบดึงยอดขายหน้าร้าน POS และ Google Sheet มาคำนวณกำไรแท้จริง สินค้าขายดี และสต็อกใกล้หมด ส่งตรงเข้า LINE ทุกวัน",
+    watchDemo: "ดูตัวอย่างระบบสำหรับร้านคุณ",
     feat1: "ประมวลผลข้อมูลรวดเร็ว\nสรุปรายงานอัตโนมัติเข้าใจง่าย",
     feat2: "คาดการณ์ยอดขายแม่นยำ\nแจ้งเตือนของใกล้หมดและคนหาย",
     feat3: "ปลอดภัยมาตรฐานสากล\nปกป้องข้อมูลธุรกิจของคุณเต็มร้อย",
@@ -301,17 +304,18 @@ export const landingTranslations = {
   },
   en: {
     brandSub: "Intelligent Business Analytics Platform",
-    badgeHero: "ENTERPRISE DATA INTELLIGENCE PLATFORM",
+    badgeHero: "✨ AI STORE ASSISTANT & DAILY PROFIT SUMMARY FOR SMES",
     home: "Home",
     solutions: "Solutions",
     whyUs: "Why Us",
     useCases: "Use Cases",
     pricing: "Pricing",
     freeTrial: "Launch App →",
-    tagline1: "Turn Your Store Data Into",
-    tagline2: "Clear, Profitable Business Decisions",
-    description: "An all-in-one intelligent business assistant that tracks sales targets, loyal customers, cashier performance, online channels, and inventory. Designed with large, clear typography for effortless daily use.",
-    watchDemo: "Explore Features",
+    heroCtaPrimary: "Start Starter Plan 14-Day Free Trial (No Card Required)",
+    tagline1: "Turn Store Sales & Inventory",
+    tagline2: "Into Daily Net Profit & Best-Seller Reports via LINE",
+    description: "No manual spreadsheets, no guesswork. Connect your POS and Google Sheets to automatically calculate true net profits, best-selling items, and restock alerts directly to your LINE every day.",
+    watchDemo: "Explore Interactive Demo",
     feat1: "10x Faster Data Processing\nInstant automated daily reports",
     feat2: "Accurate Sales Forecasting\nLow-stock & inactive customer alerts",
     feat3: "Enterprise-Grade Security\n100% protection for your store data",
@@ -6136,6 +6140,7 @@ export function InventoryTab({
   const [invFilter, setInvFilter] = useState('all');
   const [invSearch, setInvSearch] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [isGSheetModalOpen, setIsGSheetModalOpen] = useState(false);
   const [newSku, setNewSku] = useState('');
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('');
@@ -6372,6 +6377,12 @@ export function InventoryTab({
             >
               {tx('➕ เพิ่มรายการสินค้าใหม่', '➕ Add New Product')}
             </button>
+            <GoogleSheetCuteButton
+              onClick={() => setIsGSheetModalOpen(true)}
+              labelTh="เชื่อมต่อ Google Sheet สด"
+              labelEn="Connect Google Sheet"
+              isEn={isEn}
+            />
           </div>
         </div>
 
@@ -6560,6 +6571,16 @@ export function InventoryTab({
           </table>
         </div>
       </div>
+
+      {/* Google Sheet Live Sync Modal */}
+      <GoogleSheetSyncModal
+        isOpen={isGSheetModalOpen}
+        onClose={() => setIsGSheetModalOpen(false)}
+        lang={lang}
+        targetModule="inventory"
+        inventoryList={inventoryList}
+        setInventoryList={setInventoryList}
+      />
     </div>
   );
 }
@@ -6596,6 +6617,7 @@ export function InsightsTab({
   const [isScanningStore, setIsScanningStore] = useState(false);
   const [lastScanTime, setLastScanTime] = useState(isEn ? 'Just now (99.4% Confidence)' : 'เพิ่งสแกนล่าสุด (ความแม่นยำ 99.4%)');
   const [executedPlaybooks, setExecutedPlaybooks] = useState({});
+  const [isGSheetModalOpen, setIsGSheetModalOpen] = useState(false);
 
   const atRiskCount = customersList.filter(c => c.segment === 'at_risk').length;
   const lowStockCount = inventoryList.filter(i => i.status === 'low_stock' || i.status === 'out_of_stock').length;
@@ -6926,6 +6948,12 @@ export function InsightsTab({
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+          <GoogleSheetCuteButton
+            onClick={() => setIsGSheetModalOpen(true)}
+            labelTh="เชื่อมต่อ Google Sheet สด"
+            labelEn="Connect Google Sheet"
+            isEn={isEn}
+          />
           <button
             type="button"
             onClick={handleRunFullAiDiagnostic}
@@ -7516,6 +7544,23 @@ export function InsightsTab({
           </button>
         </form>
       </div>
+
+      {/* Google Sheet Live Sync Modal */}
+      <GoogleSheetSyncModal
+        isOpen={isGSheetModalOpen}
+        onClose={() => setIsGSheetModalOpen(false)}
+        lang={lang}
+        targetModule="insights"
+        inventoryList={inventoryList}
+        setInventoryList={setInventoryList}
+        onSheetDataSynced={(info) => {
+          handleAskBusinessAi(
+            isEn
+              ? 'Summarize the latest synced Google Sheet data and recommend immediate strategic priorities.'
+              : 'สรุปข้อมูลที่เพิ่งซิงก์จาก Google Sheet ล่าสุด และแนะนำภารกิจที่ควรทำทันทีให้หน่อย'
+          );
+        }}
+      />
     </div>
   );
 }
@@ -12953,6 +12998,13 @@ function App() {
                   : tx('เลือกวิธีเข้าสู่ระบบที่คุณสะดวก หรือกดทางลัด 1 คลิกด้านล่างครับ', 'Choose your preferred sign-in method or use 1-Tap access below.')}
               </p>
 
+              {previewSelectedPlanId === 'starter' && (
+                <div className="mb-3 p-2.5 rounded-xl bg-amber-400/15 border border-amber-400/35 flex items-center justify-center gap-2 text-xs font-black text-amber-300">
+                  <span className="animate-bounce">🎉</span>
+                  <span>{tx('สิทธิ์พิเศษ: ทดลองใช้ฟรี 14 วัน (เฉพาะแพ็กเกจ Starter)', 'Special Privilege: 14-Day Free Trial (Starter Only)')}</span>
+                </div>
+              )}
+
               {/* Auth Mode Toggle Tabs (Password / OTP 2FA / Register) */}
               <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-[#060a14] border border-white/10 mb-4">
                 <button
@@ -13511,20 +13563,37 @@ function App() {
 
               <p className="text-slate-300 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed">{t.description}</p>
 
-              <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 sm:gap-4 items-center mb-8 sm:mb-10">
+              <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 sm:gap-4 items-center mb-4 sm:mb-6">
                 <button
-                  onClick={() => setIsLoginOpen(true)}
-                  className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl shadow-xl text-base sm:text-lg cursor-pointer text-center"
+                  onClick={() => {
+                    setPreviewSelectedPlanId('starter');
+                    handleSelectSubscriptionPlan('starter', null, true);
+                    setIsLoginOpen(true);
+                  }}
+                  className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl shadow-xl text-base sm:text-lg cursor-pointer text-center transition-all duration-200 transform hover:scale-[1.02]"
                 >
-                  {t.freeTrial}
+                  {t.heroCtaPrimary || t.freeTrial}
                 </button>
                 <button
                   onClick={() => setIsAppleFilmOpen(true)}
-                  className="w-full sm:w-auto bg-[#0b1120] hover:bg-slate-800 text-white font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl border border-amber-400/40 shadow-[0_0_25px_rgba(251,191,36,0.2)] text-base sm:text-lg cursor-pointer text-center flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto bg-[#0b1120] hover:bg-slate-800 text-white font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl border border-amber-400/40 shadow-[0_0_25px_rgba(251,191,36,0.2)] text-base sm:text-lg cursor-pointer text-center flex items-center justify-center gap-2 transition-all duration-200"
                 >
                   <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
                   <span>▶ {t.watchDemo}</span>
                 </button>
+              </div>
+
+              {/* Trust Badges: The 5-Second Test Assurance */}
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-xs sm:text-sm font-semibold text-slate-300 mb-8 sm:mb-10">
+                <span className="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-300 px-3 py-1 rounded-full border border-amber-500/30">
+                  <span className="font-black text-sm">🎉</span> {isEn ? '14-Day Free Trial exclusive to Starter Plan' : 'ทดลองฟรี 14 วันเฉพาะแพ็กเกจ Starter'}
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
+                  <span className="font-black text-sm">✓</span> {isEn ? 'No credit card required' : 'ไม่ต้องกรอกบัตรเครดิต'}
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-cyan-500/10 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/20">
+                  <span className="font-black text-sm">✓</span> {isEn ? 'Mobile & Desktop' : 'รองรับทั้งมือถือและคอม'}
+                </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 pt-8 border-t border-white/10 gap-4">
@@ -13637,6 +13706,13 @@ function App() {
               </div>
             </div>
           )}
+
+          {/* Proof & Trust Section (Live Interactive Preview, Modern Web Dashboard Icon, Social Proof, and Enterprise Security) */}
+          <ProofAndTrustSection
+            lang={lang}
+            onOpenLogin={() => setIsLoginOpen(true)}
+            onOpenDemo={() => setIsAppleFilmOpen(true)}
+          />
 
           {/* Solutions Section (Interactive 60FPS Animated Store Owner Services Showcase) */}
           <div id="solutions" className="py-16 border-t border-white/10">
@@ -14213,7 +14289,7 @@ function App() {
                     'เหมาะสำหรับร้านค้าปลีกเดี่ยวและร้านขายของออนไลน์ที่ต้องการเห็นกำไรชัดเจนทุกวัน',
                     'Ideal for single retail shops and online sellers seeking clear daily profit tracking.'
                   ),
-                  badgeText: tx('เริ่มต้นคุ้มค่า', 'ESSENTIAL PLAN'),
+                  badgeText: tx('🎉 สิทธิ์พิเศษ: ทดลองใช้ฟรี 14 วันแรก (เฉพาะ Starter)', '🎉 EXCLUSIVE: 14-DAY TRIAL (STARTER ONLY)'),
                   iconType: 'rocket',
                   variant: 'sapphire',
                   popular: false,
@@ -14223,7 +14299,7 @@ function App() {
                   bgClass: 'bg-[#0b1120]/90',
                   buttonClass:
                     'bg-gradient-to-r from-sky-400 to-cyan-300 hover:from-sky-300 hover:to-cyan-200 text-slate-950 shadow-lg',
-                  buttonLabel: tx('🚀 กดใช้แพ็กเกจ Starter (1,990.-/เดือน)', '🚀 Activate Starter (1,990.- / m)'),
+                  buttonLabel: tx('🚀 เริ่มทดลองใช้ Starter ฟรี 14 วัน (ไม่ต้องผูกบัตร)', '🚀 Start Starter 14-Day Free Trial (No Card)'),
                   targetTab: 'overview',
                   features: [
                     tx('รองรับ 1 สาขาหลัก พร้อมเชื่อมยอดขายออนไลน์', 'Supports 1 main store + online channel sync'),
@@ -14398,6 +14474,19 @@ function App() {
                           </span>
                           <span className="text-base font-bold text-slate-300">{plan.unit}</span>
                         </div>
+
+                        {/* Exclusive 14-Day Free Trial Notice for Starter vs Paid Direct */}
+                        {plan.id === 'starter' ? (
+                          <div className="mt-2.5 p-2 rounded-xl bg-amber-400/15 border border-amber-400/35 text-xs text-amber-300 font-black flex items-center gap-1.5">
+                            <span>🎉</span>
+                            <span>{tx('สิทธิ์พิเศษ: ทดลองใช้ฟรี 14 วันแรก (เฉพาะ Starter)', 'Exclusive: 14-Day Free Trial (Starter Only)')}</span>
+                          </div>
+                        ) : (
+                          <div className="mt-2 text-[11px] text-slate-400 font-medium">
+                            {tx('*ชำระรายเดือนตามจริง (สิทธิ์ทดลองฟรี 14 วันมีเฉพาะแพ็กเกจ Starter เท่านั้น)', '*Monthly billing (14-day free trial applies exclusively to Starter Plan)')}
+                          </div>
+                        )}
+
                         <div className="text-xs text-emerald-400 font-bold mt-2">
                           ✓ {tx('อัปเดตฟีเจอร์ใหม่ฟรีตลอดการใช้งาน', 'Includes free lifetime feature updates')}
                         </div>
