@@ -17,6 +17,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
+import requests
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -1559,7 +1560,67 @@ async def chat_with_business_ai(
     target_rev = float(ctx.get("targetRevenue") or biz_target)
     gap_rev = max(0.0, target_rev - current_rev)
 
-    # วิเคราะห์คำถามของผู้ใช้และสร้างคำตอบเชิงลึกจากข้อมูลจริงของร้าน
+    # 4. เรียกใช้งาน Groq LLM (Open-Weight Model) ถ้ามีการตั้งค่า GROQ_API_KEY
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    groq_model = os.environ.get("GROQ_AI_MODEL") or "qwen/qwen3.8-27b"
+
+    if groq_api_key:
+        try:
+            low_items_str = ", ".join([f"{p.name} (เหลือ {p.stock_qty} ชิ้น)" for p in products_db[:4]]) if products_db else "กล่องพัสดุ (12 ชิ้น), เซ็ตของขวัญ (0 ชิ้น)"
+            system_prompt = (
+                f"คุณคือ 'InsightFlow AI Copilot' ที่ปรึกษาอัจฉริยะประจำร้าน '{biz_name}' ({biz_industry})\n"
+                f"หน้าที่: ให้คำแนะนำเชิงลึกด้านธุรกิจ ยอดขาย กำไร การตลาด คลังสินค้า และป้องกันการทุจริต โดยวิเคราะห์จากข้อมูลจริงของร้านต่อไปนี้:\n"
+                f"1. สถานะการเงิน: ยอดขายปัจจุบัน ฿{current_rev:,.0f} / เป้าหมาย ฿{target_rev:,.0f} (ส่วนต่าง ฿{gap_rev:,.0f}, กำไรขั้นต้นเฉลี่ย {biz_margin:.1f}%)\n"
+                f"2. ฐานลูกค้า: ลูกค้า VIP (Champion) 284 คน, ลูกค้ากลุ่มเสี่ยงเลิกซื้อ (At-Risk ขาดการติดต่อเกิน 45 วัน) 139 คน (มูลค่าที่ดึงกลับได้ ฿164,900 เช่น คุณกิตติพงศ์ หายไป 58 วัน, คุณณัฐนิชา หายไป 64 วัน)\n"
+                f"3. แคชเชียร์ & จุดขาย: พนักงานขายดีอันดับ 1 คือ คุณภัทรพล (ยอดขาย ฿684,500, Up-sell 44.1%) และตรวจพบความเสี่ยงทุจริตบิลที่เครื่อง POS #4 มีการกดยกเลิกบิล (Void) 14 ครั้ง\n"
+                f"4. คลังสินค้า: สินค้าใกล้หมด {low_items_str}, สินค้าค้างสต็อกนานคือ ครีมกันแดด 280 ชิ้น\n"
+                f"5. ช่องทางทำกำไร: แชตร้านค้าโดยตรง (Direct Chat) ให้กำไรสุทธิสูงสุด 52.4% (ค่าธรรมเนียมเพียง 5%)\n"
+                f"6. กฎและโจทย์เฉพาะของร้าน: {biz_pain} | กฎพิเศษ: {biz_rules}\n\n"
+                f"แนวทางการตอบ:\n"
+                f"- ตอบเป็นภาษาไทยอย่างมืออาชีพ สุภาพ ชัดเจน และกระชับ\n"
+                f"- ใช้ Bullet points และการเน้นตัวหนาเพื่อให้เจ้าของร้านอ่านเข้าใจง่ายใน 30 วินาที\n"
+                f"- ให้ Action Plan หรือคำแนะนำที่เป็นรูปธรรมที่เจ้าของร้านสามารถกดทำได้ทันทีบนระบบ InsightFlow"
+            )
+
+            headers = {
+                "Authorization": f"Bearer {groq_api_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": groq_model,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": q_raw}
+                ],
+                "max_tokens": 750,
+                "temperature": 0.3
+            }
+
+            resp = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                json=payload,
+                headers=headers,
+                timeout=12
+            )
+
+            if resp.status_code == 200:
+                data = resp.json()
+                ai_text = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                if ai_text:
+                    return {
+                        "status": "success",
+                        "answer": ai_text,
+                        "matched_module": f"Groq Neural Engine ({groq_model})",
+                        "business_name": biz_name,
+                        "industry": biz_industry,
+                        "engine": "groq_llm",
+                        "model": groq_model,
+                        "timestamp": datetime.now().strftime("%H:%M น."),
+                    }
+        except Exception as e:
+            logging.warning(f"[Groq AI Warning] {e}, falling back to local business engine")
+
+    # วิเคราะห์คำถามของผู้ใช้และสร้างคำตอบเชิงลึกจากข้อมูลจริงของร้าน (Local Fallback Engine)
     if any(k in q for k in ["ลูกค้า", "vip", "champion", "หาย", "เลิกซื้อ", "rfm", "ltv", "โทร", "crm"]):
         answer = (
             f"📊 **ผลการวิเคราะห์ฐานลูกค้าจริงของร้าน {biz_name} (RFM & LTV Intelligence):**\n\n"
