@@ -109,5 +109,16 @@
     "notify_enabled": true,
     "updated_at": "2026-10-12T13:19:31.349913",
     "linked_at": "2026-10-12T13:19:31.360526"
+  },
+  "0899998888": {
+    "email": "pongsatornnantakong88@gmail.com",
+    "name": "ผู้ดูแลระบบสูงสุด (Admin)",
+    "phone": "089-999-8888",
+    "normalized_phone": "0899998888",
+    "line_id": "@insightflow.vip",
+    "line_user_id": "",
+    "notify_time": "22:00",
+    "notify_enabled": true,
+    "updated_at": "2026-10-14T09:49:52.907014"
   }
 }

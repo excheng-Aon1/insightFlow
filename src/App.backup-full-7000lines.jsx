@@ -15,6 +15,9 @@ import {
 } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { Toaster, toast as hotToast } from 'react-hot-toast';
+import { ActionablePlaybooks } from './components/ActionablePlaybooks';
+import { CashFlowAndDemandForecast } from './components/CashFlowAndDemandForecast';
+import { IndustryBenchmarkAndGoalDecomposition } from './components/IndustryBenchmarkAndGoalDecomposition';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -3827,6 +3830,16 @@ export function OverviewTab({
           </div>
         </div>
 
+        {/* Industry Benchmarking & Daily Goal Decomposition Engine */}
+        <IndustryBenchmarkAndGoalDecomposition
+          lang={lang}
+          currentRevenueVal={currentRevenueVal}
+          targetRevenueVal={targetRevenueVal}
+          targetTimelineVal={targetTimelineVal}
+          theme={theme}
+          setActiveTab={setActiveTab}
+        />
+
         {/* 2. กล่องบันทึกยอดขายใหม่ประจำวัน (ทำให้หน้าแรกทำงานได้จริง ทดสอบบวกยอดขายได้ทันที) */}
         <div className={`p-5 sm:p-6 rounded-2xl border ${
           theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-50 border-emerald-300'
@@ -6570,6 +6583,7 @@ export function InsightsTab({
   targetRevenueVal = 10000000,
   customersList = [],
   inventoryList = [],
+  setInventoryList,
   auditLogs = [],
   vendorsList = [],
   centralPosList = [],
@@ -7173,6 +7187,32 @@ export function InsightsTab({
           </div>
         </div>
       )}
+
+      {/* Actionable Prescriptive AI Hub: Market Basket, Dead Stock, Pricing Simulator */}
+      <ActionablePlaybooks
+        lang={lang}
+        inventoryList={inventoryList}
+        setInventoryList={setInventoryList}
+        setActiveTab={setActiveTab}
+      />
+
+      {/* Cash Flow Management & Demand Forecasting Engine */}
+      <CashFlowAndDemandForecast
+        lang={lang}
+        inventoryList={inventoryList}
+        setInventoryList={setInventoryList}
+        currentRevenueVal={currentRevenueVal}
+        setActiveTab={setActiveTab}
+      />
+
+      {/* Industry Benchmarking & Daily Goal Decomposition Engine */}
+      <IndustryBenchmarkAndGoalDecomposition
+        lang={lang}
+        currentRevenueVal={currentRevenueVal}
+        targetRevenueVal={targetRevenueVal}
+        targetTimelineVal="30"
+        setActiveTab={setActiveTab}
+      />
 
       {/* 6 AI Strategic Playbook Cards (Deep Data Analytics Cards) */}
       <div>
@@ -15332,6 +15372,7 @@ function App() {
                   targetRevenueVal={targetRevenueVal}
                   customersList={customersList}
                   inventoryList={inventoryList}
+                  setInventoryList={setInventoryList}
                   auditLogs={auditLogs}
                   vendorsList={vendorsList}
                   centralPosList={centralPosList}

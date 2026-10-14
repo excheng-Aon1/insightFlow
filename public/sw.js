@@ -1,4 +1,4 @@
-const CACHE_NAME = 'insightflow-executive-v6';
+const CACHE_NAME = 'insightflow-executive-v7';
 const STATIC_ASSETS = [
   '/app-icon.svg',
   '/manifest.webmanifest'
