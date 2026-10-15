@@ -23,6 +23,7 @@ import ProofAndTrustSection from './components/ProofAndTrustSection';
 import CuteCatPricingNudge from './components/CuteCatPricingNudge';
 import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
+import ActionableAiCenter from './components/ActionableAiCenter';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -7218,6 +7219,9 @@ export function InsightsTab({
           </div>
         </div>
       )}
+
+      {/* Downstream: Actionable AI & Decision Intelligence Center */}
+      <ActionableAiCenter lang={lang} />
 
       {/* Midstream Advanced Analytics & Statistical Modeling Center */}
       <AdvancedAnalyticsSuite lang={lang} />

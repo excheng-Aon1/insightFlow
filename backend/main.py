@@ -71,6 +71,13 @@ from analytics_modeling import (
     calculate_market_basket_rules,
     calculate_ab_testing_significance,
 )
+from actionable_ai import (
+    scan_business_anomalies,
+    send_line_anomaly_alert,
+    generate_executive_summary,
+    query_ai_business_copilot,
+    calculate_what_if_simulation,
+)
 from redis_cache import (
     redis_client,
     limiter,
@@ -270,6 +277,24 @@ class ABTestRequest(BaseModel):
     conversions_b: int = 102
     campaign_a_name: Optional[str] = "แคมเปญเดิม A (Control)"
     campaign_b_name: Optional[str] = "แคมเปญใหม่ B (Variation)"
+
+
+class LineAlertRequest(BaseModel):
+    alert_id: str
+    recipient_line_id: Optional[str] = None
+
+
+class CopilotQueryRequest(BaseModel):
+    question: str
+
+
+class WhatIfSimulationRequest(BaseModel):
+    base_price: float = 120.0
+    base_cost: float = 45.0
+    base_monthly_qty: int = 500
+    discount_pct: float = 10.0
+    cost_inflation_pct: float = 5.0
+    expected_volume_lift_pct: float = 20.0
 
 
 # ------------------------------------------------------------------------------
@@ -493,6 +518,49 @@ def run_ab_test_significance(req: ABTestRequest):
         conversions_b=req.conversions_b,
         campaign_a_name=req.campaign_a_name or "Campaign A",
         campaign_b_name=req.campaign_b_name or "Campaign B",
+    )
+
+
+# ------------------------------------------------------------------------------
+# ACTIONABLE INSIGHTS, ANOMALY DETECTION & WHAT-IF AI (DOWNSTREAM)
+# ------------------------------------------------------------------------------
+@app.get("/api/actionable/anomalies", status_code=status.HTTP_200_OK)
+def get_business_anomalies():
+    """ตรวจจับความผิดปกติของธุรกิจ (Anomaly Detection) เช่น ยอดขายดิ่ง หรือของใกล้หมดสต็อก"""
+    return scan_business_anomalies()
+
+
+@app.post("/api/actionable/send-alert", status_code=status.HTTP_200_OK)
+def trigger_line_alert(req: LineAlertRequest):
+    """ส่งการแจ้งเตือนความผิดปกติเข้า LINE Messaging API / Flex Message"""
+    return send_line_anomaly_alert(
+        alert_id=req.alert_id,
+        recipient_line_id=req.recipient_line_id,
+    )
+
+
+@app.get("/api/actionable/executive-summary", status_code=status.HTTP_200_OK)
+def get_executive_summary():
+    """สร้างบทสรุปผู้บริหาร 3 บรรทัด (McKinsey-Style Executive Summary)"""
+    return generate_executive_summary()
+
+
+@app.post("/api/actionable/ask-copilot", status_code=status.HTTP_200_OK)
+def ask_business_copilot(req: CopilotQueryRequest):
+    """ผู้ช่วย AI อัจฉริยะตอบคำถามธุรกิจตรงๆ จากฐานข้อมูล (Text-to-Insights Copilot)"""
+    return query_ai_business_copilot(question=req.question)
+
+
+@app.post("/api/actionable/what-if-simulate", status_code=status.HTTP_200_OK)
+def simulate_what_if_scenario(req: WhatIfSimulationRequest):
+    """จำลองสถานการณ์ธุรกิจ (What-If Simulation): คำนวณจุดคุ้มทุนและผลกระทบของส่วนลดกับต้นทุน"""
+    return calculate_what_if_simulation(
+        base_price=req.base_price,
+        base_cost=req.base_cost,
+        base_monthly_qty=req.base_monthly_qty,
+        discount_pct=req.discount_pct,
+        cost_inflation_pct=req.cost_inflation_pct,
+        expected_volume_lift_pct=req.expected_volume_lift_pct,
     )
 
 
