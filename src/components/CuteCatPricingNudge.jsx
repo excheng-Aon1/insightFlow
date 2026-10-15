@@ -23,12 +23,12 @@ export default function CuteCatPricingNudge({
   const [catAction, setCatAction] = useState('standing'); // 'walking' | 'standing' | 'waving'
   const timerRef = useRef(null);
 
-  // Interval randomizer: between 5 to 8 minutes (in milliseconds)
+  // Interval randomizer: between 1 to 3 minutes (in milliseconds)
   const getRandomIntervalMs = () => {
-    const minMinutes = 5;
-    const maxMinutes = 8;
-    const randomMinutes = Math.floor(Math.random() * (maxMinutes - minMinutes + 1)) + minMinutes;
-    return randomMinutes * 60 * 1000;
+    const minSeconds = 60; // 1 minute
+    const maxSeconds = 180; // 3 minutes
+    const randomSeconds = Math.floor(Math.random() * (maxSeconds - minSeconds + 1)) + minSeconds;
+    return randomSeconds * 1000;
   };
 
   // Function to trigger the cute cat walking sequence
@@ -51,38 +51,24 @@ export default function CuteCatPricingNudge({
     }, 2200);
   };
 
-  // Initial load check + 5-10 min recurring schedule
+  // 1. Walk out immediately upon entering the website (400ms for smooth DOM mount)
   useEffect(() => {
-    // Check localStorage for last nudge time
-    const lastNudge = parseInt(localStorage.getItem('insightflow_cat_last_nudge') || '0', 10);
-    const now = Date.now();
-    const fiveMinutesMs = 5 * 60 * 1000;
+    const initialTimer = setTimeout(() => {
+      startCatWalkIn();
+    }, 400);
 
-    if (!lastNudge || now - lastNudge > fiveMinutesMs) {
-      // First walk-in after 3 seconds on page
-      const initialTimer = setTimeout(() => {
-        startCatWalkIn();
-        localStorage.setItem('insightflow_cat_last_nudge', Date.now().toString());
-      }, 3000);
-      return () => clearTimeout(initialTimer);
-    } else {
-      // Schedule next walk-in after remaining time
-      const remainingTime = Math.max(3000, fiveMinutesMs - (now - lastNudge));
-      const scheduledTimer = setTimeout(() => {
-        startCatWalkIn();
-        localStorage.setItem('insightflow_cat_last_nudge', Date.now().toString());
-      }, remainingTime);
-      return () => clearTimeout(scheduledTimer);
-    }
+    return () => {
+      clearTimeout(initialTimer);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
 
-  // Recurring 5-10 minute timer when closed or dismissed
+  // 2. Recurring 1-3 minute timer when closed or dismissed
   const scheduleNextAppearance = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     const delay = getRandomIntervalMs();
     timerRef.current = setTimeout(() => {
       startCatWalkIn();
-      localStorage.setItem('insightflow_cat_last_nudge', Date.now().toString());
     }, delay);
   };
 
@@ -394,3 +380,4 @@ export default function CuteCatPricingNudge({
     </aside>
   );
 }
+
