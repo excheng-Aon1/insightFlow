@@ -245,3 +245,4 @@ export default function CuteBearPricingNudge({ isEn = false, onOpenPricing, onOp
     </aside>
   );
 }
+

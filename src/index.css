@@ -1533,4 +1533,120 @@ button:hover .luxury-dashboard-icon {
   animation: cutePawWave 2.2s ease-in-out infinite;
 }
 
+/* === CUTE GINGER CAT (WALKING CYCLE & TAIL SWISH) === */
+@keyframes cuteCatWalkInKeyframe {
+  0% {
+    transform: translateX(180px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes cuteCatWalkOutKeyframe {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(200px);
+  }
+}
+
+@keyframes cuteCatWaddle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(1.5deg);
+  }
+  50% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(-1.5deg);
+  }
+}
+
+@keyframes cuteCatTailSwish {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(18deg);
+  }
+  70% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes cuteCatLegSwing1 {
+  0%, 100% {
+    transform: rotate(-16deg);
+  }
+  50% {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes cuteCatLegSwing2 {
+  0%, 100% {
+    transform: rotate(18deg);
+  }
+  50% {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes cuteCatBeckonPaw {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-3px) rotate(12deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-3px) rotate(12deg);
+  }
+}
+
+.cute-cat-walk-in {
+  animation: cuteCatWalkInKeyframe 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards, cuteCatWaddle 0.45s ease-in-out infinite;
+}
+
+.cute-cat-walk-out {
+  animation: cuteCatWalkOutKeyframe 1.8s ease-in forwards, cuteCatWaddle 0.45s ease-in-out infinite;
+}
+
+.cute-cat-idle {
+  animation: cuteBearFloat 4s ease-in-out infinite;
+}
+
+.cute-cat-tail {
+  animation: cuteCatTailSwish 2.6s ease-in-out infinite;
+}
+
+.cute-cat-leg-front-left {
+  animation: cuteCatLegSwing1 0.45s ease-in-out infinite;
+}
+
+.cute-cat-leg-front-right {
+  animation: cuteCatLegSwing2 0.45s ease-in-out infinite;
+}
+
+.cute-cat-leg-back-left {
+  animation: cuteCatLegSwing2 0.45s ease-in-out infinite;
+}
+
+.cute-cat-leg-back-right {
+  animation: cuteCatLegSwing1 0.45s ease-in-out infinite;
+}
+
+.cute-cat-waving-paw {
+  animation: cuteCatBeckonPaw 1.4s ease-in-out infinite;
+}
+
+
 

@@ -20,7 +20,7 @@ import { CashFlowAndDemandForecast } from './components/CashFlowAndDemandForecas
 import { IndustryBenchmarkAndGoalDecomposition } from './components/IndustryBenchmarkAndGoalDecomposition';
 import { GoogleSheetCuteButton, GoogleSheetSyncModal } from './components/GoogleSheetSyncModal';
 import ProofAndTrustSection from './components/ProofAndTrustSection';
-import CuteBearPricingNudge from './components/CuteBearPricingNudge';
+import CuteCatPricingNudge from './components/CuteCatPricingNudge';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -15828,9 +15828,10 @@ function App() {
           </div>
         </nav>
 
-        {/* Cute Bear Mascot (LINE Style Popup: "คุณยังไม่สมัครแพ็กเกจ ดูว่ามีแพ็คอะไรบ้าง กดดูเลย") */}
-        <CuteBearPricingNudge
+        {/* Cute Ginger Cat Mascot (LINE Style: Walks out from bottom-right every 5-10 mins for non-subscribers) */}
+        <CuteCatPricingNudge
           isEn={isEn}
+          hasSubscribed={Boolean(user && (user.plan === 'starter' || user.plan === 'professional' || user.plan === 'enterprise') && !isExemptAdminMode)}
           onOpenPricing={() => {
             const pricingEl = document.getElementById('pricing');
             if (pricingEl) {
