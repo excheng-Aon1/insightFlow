@@ -1,70 +1,162 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
+    <!-- Background Obsidian Core -->
     <radialGradient id="obsidianCore" cx="30%" cy="22%" r="80%">
-      <stop offset="0%" stop-color="#172554" />
+      <stop offset="0%" stop-color="#1E293B" />
       <stop offset="55%" stop-color="#070C1E" />
       <stop offset="100%" stop-color="#02040A" />
     </radialGradient>
+
+    <!-- Bevel Metallic Rim -->
     <linearGradient id="rimMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FEF08A" />
       <stop offset="28%" stop-color="#F59E0B" />
       <stop offset="65%" stop-color="#38BDF8" />
       <stop offset="100%" stop-color="#FBBF24" />
     </linearGradient>
+
+    <!-- 24K Gold -->
     <linearGradient id="gold24k" x1="0%" y1="100%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#B45309" />
       <stop offset="45%" stop-color="#F59E0B" />
       <stop offset="80%" stop-color="#FDE047" />
       <stop offset="100%" stop-color="#FFFBEB" />
     </linearGradient>
+
+    <!-- Cyan Crystal -->
     <linearGradient id="cyanCrystal" x1="0%" y1="100%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#0369A1" />
       <stop offset="55%" stop-color="#38BDF8" />
       <stop offset="100%" stop-color="#E0F2FE" />
     </linearGradient>
-    <linearGradient id="emeraldCrystal" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#047857" />
-      <stop offset="60%" stop-color="#34D399" />
-      <stop offset="100%" stop-color="#D1FAE5" />
+
+    <!-- Orange Cat Fur Gradients -->
+    <linearGradient id="catFurLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FED7AA" />
+      <stop offset="35%" stop-color="#FB923C" />
+      <stop offset="75%" stop-color="#F97316" />
+      <stop offset="100%" stop-color="#EA580C" />
     </linearGradient>
+
+    <linearGradient id="catFurDeep" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EA580C" />
+      <stop offset="50%" stop-color="#C2410C" />
+      <stop offset="100%" stop-color="#7C2D12" />
+    </linearGradient>
+
+    <linearGradient id="catStripes" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C2410C" />
+      <stop offset="100%" stop-color="#7C2D12" />
+    </linearGradient>
+
+    <linearGradient id="catCream" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEB" />
+      <stop offset="100%" stop-color="#FEF3C7" />
+    </linearGradient>
+
+    <linearGradient id="catPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDA4AF" />
+      <stop offset="100%" stop-color="#F43F5E" />
+    </linearGradient>
+
+    <radialGradient id="catEmeraldEye" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#A7F3D0" />
+      <stop offset="35%" stop-color="#34D399" />
+      <stop offset="70%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#064E3B" />
+    </radialGradient>
+
     <filter id="luxGlow" x="-25%" y="-25%" width="150%" height="150%">
-      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feGaussianBlur stdDeviation="8" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- Outer Metallic Jewel Bevel -->
+  <!-- 1. Outer Beveled Metallic Jewel Squircle -->
   <rect width="512" height="512" rx="128" fill="url(#rimMetallic)" />
-  <rect x="12" y="12" width="488" height="488" rx="118" fill="url(#obsidianCore)" />
+  <rect x="14" y="14" width="484" height="484" rx="116" fill="url(#obsidianCore)" />
 
-  <!-- Ambient Royal Glow -->
-  <circle cx="256" cy="240" r="190" fill="#F59E0B" fill-opacity="0.12" />
-  <circle cx="340" cy="160" r="130" fill="#38BDF8" fill-opacity="0.12" />
+  <!-- Ambient Light Orbs -->
+  <circle cx="256" cy="240" r="190" fill="#F59E0B" fill-opacity="0.14" />
+  <circle cx="340" cy="160" r="130" fill="#38BDF8" fill-opacity="0.14" />
 
-  <!-- Outer Precision Octagon Frame -->
-  <polygon points="256,42 408,105 470,256 408,407 256,470 104,407 42,256 104,105" fill="none" stroke="url(#gold24k)" stroke-width="8" stroke-opacity="0.55" />
+  <!-- Outer Precision Luxury Octagon Frame -->
+  <polygon points="256,42 408,105 470,256 408,407 256,470 104,407 42,256 104,105" fill="none" stroke="url(#gold24k)" stroke-width="7" stroke-opacity="0.5" />
 
-  <!-- Inner Dashed Halo -->
-  <circle cx="256" cy="256" r="176" fill="none" stroke="url(#cyanCrystal)" stroke-width="5" stroke-dasharray="18 14" stroke-opacity="0.45" />
+  <!-- Inner Dashed Hologram Halo -->
+  <circle cx="256" cy="256" r="182" fill="none" stroke="url(#cyanCrystal)" stroke-width="4.5" stroke-dasharray="16 12" stroke-opacity="0.4" />
 
-  <!-- 3D Faceted Diamond Crest -->
-  <polygon points="256,68 316,126 256,180 196,126" fill="url(#gold24k)" filter="url(#luxGlow)" />
-  <polygon points="256,68 316,126 256,126" fill="#FFFBEB" fill-opacity="0.7" />
-  <polygon points="196,126 256,126 256,180" fill="#92400E" fill-opacity="0.55" />
+  <!-- ==================================================================== -->
+  <!-- 2. OFFICIAL BRAND AMBASSADOR: 3D LUXURY ORANGE CAT (INSIGHTMEOW) -->
+  <!-- ==================================================================== -->
+  <g transform="translate(256, 260) scale(1.68)">
+    <!-- Cat Ears -->
+    <polygon points="-58,-40 -34,-95 -4,-48" fill="url(#catFurDeep)" stroke="#7C2D12" stroke-width="4" stroke-linejoin="round" />
+    <polygon points="-48,-44 -34,-78 -16,-52" fill="url(#catPink)" opacity="0.9" />
+    <path d="-40,-48 L-32,-65 L-24,-48" stroke="#FFFBEB" stroke-width="2.5" stroke-linecap="round" />
 
-  <!-- 3 Ascending Crystal Data Pillars -->
-  <rect x="124" y="274" width="58" height="118" rx="16" fill="url(#cyanCrystal)" />
-  <rect x="220" y="214" width="58" height="178" rx="16" fill="url(#emeraldCrystal)" />
-  <rect x="316" y="146" width="62" height="246" rx="18" fill="url(#gold24k)" filter="url(#luxGlow)" />
+    <polygon points="58,-40 34,-95 4,-48" fill="url(#catFurDeep)" stroke="#7C2D12" stroke-width="4" stroke-linejoin="round" />
+    <polygon points="48,-44 34,-78 16,-52" fill="url(#catPink)" opacity="0.9" />
+    <path d="40,-48 L32,-65 L24,-48" stroke="#FFFBEB" stroke-width="2.5" stroke-linecap="round" />
 
-  <!-- Sweeping Golden Trajectory -->
-  <path d="M92 348 C 180 330, 265 238, 398 106" fill="none" stroke="#FFFBEB" stroke-width="22" stroke-linecap="round" filter="url(#luxGlow)" />
-  <path d="M92 348 C 180 330, 265 238, 398 106" fill="none" stroke="url(#gold24k)" stroke-width="14" stroke-linecap="round" />
+    <!-- Cat Chubby Head Contour -->
+    <ellipse cx="0" cy="-12" rx="72" ry="62" fill="url(#catFurLight)" stroke="#7C2D12" stroke-width="5" />
 
-  <!-- Apex Star Spark -->
-  <polygon points="424,80 356,94 404,148" fill="#FEF08A" />
-  <path d="M418 54 L425 78 L449 85 L425 92 L418 116 L411 92 L387 85 L411 78 Z" fill="#FFFFFF" />
+    <!-- Tabby Forehead "M" Crest Markings -->
+    <path d="-22,-52 L0,-34 L22,-52" stroke="url(#catStripes)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="0" y1="-56" x2="0" y2="-40" stroke="url(#catStripes)" stroke-width="4.5" stroke-linecap="round" />
+    <path d="-38,-40 L-26,-28" stroke="url(#catStripes)" stroke-width="4" stroke-linecap="round" />
+    <path d="38,-40 L26,-28" stroke="url(#catStripes)" stroke-width="4" stroke-linecap="round" />
 
-  <!-- Base Pedestal Line -->
-  <line x1="96" y1="408" x2="416" y2="408" stroke="url(#gold24k)" stroke-width="12" stroke-linecap="round" />
+    <!-- Rosy Blushing Cheeks -->
+    <ellipse cx="-44" cy="2" rx="12" ry="8" fill="#FB7185" opacity="0.85" />
+    <ellipse cx="44" cy="2" rx="12" ry="8" fill="#FB7185" opacity="0.85" />
+
+    <!-- Sparkling Emerald Cat Eyes -->
+    <!-- Left Eye -->
+    <ellipse cx="-26" cy="-18" rx="13.5" ry="16" fill="url(#catEmeraldEye)" stroke="#064E3B" stroke-width="3" />
+    <ellipse cx="-26" cy="-18" rx="5.2" ry="14.2" fill="#020617" />
+    <circle cx="-30" cy="-24" r="5" fill="#FFFFFF" />
+    <circle cx="-22" cy="-12" r="2.5" fill="#FFFFFF" />
+
+    <!-- Right Eye -->
+    <ellipse cx="26" cy="-18" rx="13.5" ry="16" fill="url(#catEmeraldEye)" stroke="#064E3B" stroke-width="3" />
+    <ellipse cx="26" cy="-18" rx="5.2" ry="14.2" fill="#020617" />
+    <circle cx="22" cy="-24" r="5" fill="#FFFFFF" />
+    <circle cx="30" cy="-12" r="2.5" fill="#FFFFFF" />
+
+    <!-- Fluffy Muzzle & Pink Nose -->
+    <ellipse cx="0" cy="8" rx="26" ry="18" fill="url(#catCream)" stroke="#7C2D12" stroke-width="2.8" />
+    <polygon points="0,4 -9,-4 9,-4" fill="url(#catPink)" stroke="#7C2D12" stroke-width="1.8" />
+    <circle cx="-4" cy="0" r="1.5" fill="#7C2D12" />
+    <circle cx="4" cy="0" r="1.5" fill="#7C2D12" />
+
+    <!-- Sweet Smiling Blep Mouth -->
+    <path d="-12,8 Q0,15 0,7 Q0,15 12,8" stroke="#7C2D12" stroke-width="4" stroke-linecap="round" fill="none" />
+    <ellipse cx="0" cy="14" rx="4.5" ry="5.5" fill="#F43F5E" stroke="#9F1239" stroke-width="1.5" />
+
+    <!-- Whiskers -->
+    <path d="-28,4 C-50,0 -70,2 -85,10" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" />
+    <path d="-28,10 C-48,12 -68,18 -82,28" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" />
+    <path d="28,4 C50,0 70,2 85,10" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" />
+    <path d="28,10 C48,12 68,18 82,28" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" />
+
+    <!-- 3. Emerald Collar with 24K Gold Bell -->
+    <path d="-36,36 Q0,48 36,36" stroke="#059669" stroke-width="8" stroke-linecap="round" fill="none" />
+    <circle cx="0" cy="46" r="11" fill="url(#gold24k)" stroke="#78350F" stroke-width="3.2" filter="url(#luxGlow)" />
+    <circle cx="0" cy="49" r="3.5" fill="#78350F" />
+    <line x1="-5" y1="46" x2="5" y2="46" stroke="#78350F" stroke-width="2" />
+
+    <!-- 4. Paws Peeking Holding Golden Crystal -->
+    <ellipse cx="-42" cy="50" rx="16" ry="12" fill="url(#catCream)" stroke="#7C2D12" stroke-width="3.5" />
+    <circle cx="-42" cy="50" r="4.5" fill="url(#catPink)" />
+    <ellipse cx="42" cy="50" rx="16" ry="12" fill="url(#catCream)" stroke="#7C2D12" stroke-width="3.5" />
+    <circle cx="42" cy="50" r="4.5" fill="url(#catPink)" />
+  </g>
+
+  <!-- 4-Point Golden Star Sparkles around Mascot -->
+  <polygon points="120,95 125,75 130,95 150,100 130,105 125,125 120,105 100,100" fill="#FEF08A" filter="url(#luxGlow)" />
+  <polygon points="380,105 384,90 388,105 403,109 388,113 384,128 380,113 365,109" fill="#FEF08A" filter="url(#luxGlow)" />
+  <polygon points="420,380 423,370 426,380 436,383 426,386 423,396 420,386 410,383" fill="#38BDF8" />
+  <polygon points="85,390 88,380 91,390 101,393 91,396 88,406 85,396 75,393" fill="#34D399" />
 </svg>

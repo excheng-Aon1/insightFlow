@@ -11534,8 +11534,148 @@ ChartJS.register(
   Legend
 );
 
+// ============================================================================
+// BRAND AMBASSADOR LOGO (โลโก้และตราแอมบาสเดอร์น้องแมวส้ม InsightMeow)
+// ตัวแทนความฉลาด คล่องแคล่ว และเป็นมิตรของแพลตฟอร์ม InsightFlow
+// ============================================================================
+export function BrandAmbassadorCatLogo({ size = 46, className = '' }) {
+  const rawId = React.useId();
+  const uid = rawId.replace(/:/g, '');
+
+  return (
+    <div
+      className={`relative inline-flex items-center justify-center select-none ${className}`}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: Math.round(size * 0.28),
+        padding: 2,
+        background:
+          'linear-gradient(135deg, #FEF08A 0%, #F59E0B 30%, #38BDF8 68%, #FBBF24 100%)',
+        boxShadow:
+          '0 10px 28px -6px rgba(245, 158, 11, 0.55), 0 0 18px rgba(56, 189, 248, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.75)'
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: Math.max(6, Math.round(size * 0.28) - 2),
+          background:
+            'radial-gradient(circle at 28% 22%, #1E293B 0%, #070C1E 58%, #02040A 100%)',
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        {/* Top Specular Reflection */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '8%',
+            right: '8%',
+            height: '42%',
+            borderRadius: '0 0 999px 999px',
+            background:
+              'linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%)',
+            pointerEvents: 'none'
+          }}
+        />
+
+        <svg
+          viewBox="0 0 100 100"
+          width="92%"
+          height="92%"
+          style={{
+            overflow: 'visible',
+            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.65))'
+          }}
+        >
+          <defs>
+            <linearGradient id={`catFurL_${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FED7AA" />
+              <stop offset="35%" stopColor="#FB923C" />
+              <stop offset="75%" stopColor="#F97316" />
+              <stop offset="100%" stopColor="#EA580C" />
+            </linearGradient>
+            <linearGradient id={`catFurD_${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#EA580C" />
+              <stop offset="60%" stopColor="#C2410C" />
+              <stop offset="100%" stopColor="#7C2D12" />
+            </linearGradient>
+            <linearGradient id={`catGold_${uid}`} x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#B45309" />
+              <stop offset="50%" stopColor="#F59E0B" />
+              <stop offset="100%" stopColor="#FEF08A" />
+            </linearGradient>
+            <radialGradient id={`catEye_${uid}`} cx="35%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#A7F3D0" />
+              <stop offset="40%" stopColor="#34D399" />
+              <stop offset="80%" stopColor="#059669" />
+              <stop offset="100%" stopColor="#064E3B" />
+            </radialGradient>
+          </defs>
+
+          {/* Ears with pink inner */}
+          <polygon points="18,36 32,8 48,28" fill={`url(#catFurD_${uid})`} stroke="#7C2D12" strokeWidth="2.8" strokeLinejoin="round" />
+          <polygon points="24,34 32,16 42,28" fill="#FDA4AF" opacity="0.9" />
+          <polygon points="52,28 68,8 82,36" fill={`url(#catFurD_${uid})`} stroke="#7C2D12" strokeWidth="2.8" strokeLinejoin="round" />
+          <polygon points="58,28 68,16 76,34" fill="#FDA4AF" opacity="0.9" />
+
+          {/* Cat Chubby Head */}
+          <ellipse cx="50" cy="52" rx="36" ry="31" fill={`url(#catFurL_${uid})`} stroke="#7C2D12" strokeWidth="3" />
+
+          {/* Tabby Forehead "M" Crest */}
+          <path d="M40 26 L50 36 L60 26" stroke="#9A3412" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <line x1="50" y1="24" x2="50" y2="33" stroke="#9A3412" strokeWidth="2.2" strokeLinecap="round" />
+
+          {/* Rosy Cheeks */}
+          <ellipse cx="27" cy="58" rx="6" ry="4" fill="#FB7185" opacity="0.85" />
+          <ellipse cx="73" cy="58" rx="6" ry="4" fill="#FB7185" opacity="0.85" />
+
+          {/* Emerald Eyes */}
+          <ellipse cx="37" cy="48" rx="7" ry="8.2" fill={`url(#catEye_${uid})`} stroke="#064E3B" strokeWidth="1.8" />
+          <ellipse cx="37" cy="48" rx="2.8" ry="7.2" fill="#020617" />
+          <circle cx="35" cy="45" r="2.6" fill="#FFFFFF" />
+          <circle cx="39" cy="51" r="1.3" fill="#FFFFFF" />
+
+          <ellipse cx="63" cy="48" rx="7" ry="8.2" fill={`url(#catEye_${uid})`} stroke="#064E3B" strokeWidth="1.8" />
+          <ellipse cx="63" cy="48" rx="2.8" ry="7.2" fill="#020617" />
+          <circle cx="61" cy="45" r="2.6" fill="#FFFFFF" />
+          <circle cx="65" cy="51" r="1.3" fill="#FFFFFF" />
+
+          {/* Muzzle & Nose */}
+          <ellipse cx="50" cy="62" rx="13" ry="9" fill="#FFFBEB" stroke="#7C2D12" strokeWidth="1.4" />
+          <polygon points="50,60 45,56 55,56" fill="#F43F5E" stroke="#7C2D12" strokeWidth="1" />
+          <path d="M44 62 Q50 66 50 62 Q50 66 56 62" stroke="#7C2D12" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+          {/* White Whiskers */}
+          <line x1="33" y1="58" x2="14" y2="56" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="33" y1="62" x2="12" y2="64" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="67" y1="58" x2="86" y2="56" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="67" y1="62" x2="88" y2="64" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+
+          {/* Emerald Collar with 24K Gold Bell */}
+          <path d="M32 78 Q50 86 68 78" stroke="#059669" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+          <circle cx="50" cy="84" r="6" fill={`url(#catGold_${uid})`} stroke="#78350F" strokeWidth="1.8" />
+          <circle cx="50" cy="85.5" r="2" fill="#78350F" />
+
+          {/* Cute Paws Peeking */}
+          <ellipse cx="28" cy="86" rx="9" ry="7" fill="#FFFBEB" stroke="#7C2D12" strokeWidth="2" />
+          <circle cx="28" cy="86" r="2.5" fill="#FDA4AF" />
+          <ellipse cx="72" cy="86" rx="9" ry="7" fill="#FFFBEB" stroke="#7C2D12" strokeWidth="2" />
+          <circle cx="72" cy="86" r="2.5" fill="#FDA4AF" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 function AppLogo({ size = 46, className = '' }) {
-  return <LuxuryBrandLogo size={size} className={className} />;
+  return <BrandAmbassadorCatLogo size={size} className={className} />;
 }
 
 function App() {
@@ -13750,6 +13890,9 @@ function App() {
                 >
                   InsightFlow
                 </span>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10.5px] font-black px-1.5 py-0.2 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/35">
+                  🐱 {tx('แบรนด์แอมบาสเดอร์: น้อนส้ม', 'Brand Ambassador: InsightMeow')}
+                </span>
               </div>
             </div>
 
@@ -15087,6 +15230,10 @@ function App() {
                   >
                     InsightFlow
                   </span>
+                  <div className="text-[10px] font-black text-amber-400 flex items-center gap-1">
+                    <span>🐱</span>
+                    <span>{tx('แบรนด์แอมบาสเดอร์: น้อนส้ม', 'Brand Ambassador: InsightMeow')}</span>
+                  </div>
                 </div>
               )}
             </div>
