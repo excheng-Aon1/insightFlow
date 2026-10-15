@@ -14673,6 +14673,21 @@ function App() {
             </button>
           </div>
         </div>
+
+        {/* Cute Ginger Cat Mascot on Main Landing Page: Walks out immediately on visit and recurs every 1-3 mins */}
+        <CuteCatPricingNudge
+          isEn={isEn}
+          hasSubscribed={false}
+          onOpenPricing={() => {
+            const pricingEl = document.getElementById('pricing');
+            if (pricingEl) {
+              pricingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+              setIsLoginOpen(true);
+            }
+          }}
+          onOpenRegister={() => setIsLoginOpen(true)}
+        />
       </div>
     );
   }
@@ -15827,21 +15842,6 @@ function App() {
             </button>
           </div>
         </nav>
-
-        {/* Cute Ginger Cat Mascot (LINE Style: Walks out from bottom-right every 5-10 mins for non-subscribers) */}
-        <CuteCatPricingNudge
-          isEn={isEn}
-          hasSubscribed={Boolean(user && (user.plan === 'starter' || user.plan === 'professional' || user.plan === 'enterprise') && !isExemptAdminMode)}
-          onOpenPricing={() => {
-            const pricingEl = document.getElementById('pricing');
-            if (pricingEl) {
-              pricingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-              setIsLoginOpen(true);
-            }
-          }}
-          onOpenRegister={() => setIsLoginOpen(true)}
-        />
       </div>
     </div>
   );
