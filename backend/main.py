@@ -64,6 +64,13 @@ from database import (
     EtlJobLog,
 )
 from etl_pipeline import run_etl_pipeline
+from analytics_modeling import (
+    forecast_sales_time_series,
+    calculate_dynamic_reorder_points,
+    calculate_rfm_segmentation,
+    calculate_market_basket_rules,
+    calculate_ab_testing_significance,
+)
 from redis_cache import (
     redis_client,
     limiter,
@@ -256,6 +263,15 @@ class EtlTriggerRequest(BaseModel):
     user_id: Optional[str] = "GUEST-EXEC-001"
 
 
+class ABTestRequest(BaseModel):
+    visitors_a: int = 1200
+    conversions_a: int = 68
+    visitors_b: int = 1250
+    conversions_b: int = 102
+    campaign_a_name: Optional[str] = "แคมเปญเดิม A (Control)"
+    campaign_b_name: Optional[str] = "แคมเปญใหม่ B (Variation)"
+
+
 # ------------------------------------------------------------------------------
 # 3. HEALTH, WORKER ALLOCATION, POOL TELEMETRY, REDIS STATUS & SQL SANDBOX
 # ------------------------------------------------------------------------------
@@ -438,6 +454,46 @@ def trigger_etl_pipeline(
         "message": "⚡ สั่งประมวลผล Automated Data Pipeline & ETL สำเร็จเรียบร้อย",
         "result": execution_result,
     }
+
+
+# ------------------------------------------------------------------------------
+# ADVANCED ANALYTICS & STATISTICAL MODELING SUITE (MIDSTREAM)
+# ------------------------------------------------------------------------------
+@app.get("/api/analytics/forecasting", status_code=status.HTTP_200_OK)
+def get_sales_forecast(days: int = Query(30, ge=7, le=90)):
+    """พยากรณ์ยอดขายล่วงหน้า (Time Series Forecasting) ด้วย Holt-Winters Seasonality"""
+    return forecast_sales_time_series(days_ahead=days)
+
+
+@app.get("/api/analytics/reorder-points", status_code=status.HTTP_200_OK)
+def get_dynamic_reorder_points():
+    """คำนวณจุดสั่งซื้อสินค้าล่วงหน้าตามฤดูกาล (Dynamic Reorder Point - ROP)"""
+    return calculate_dynamic_reorder_points()
+
+
+@app.get("/api/analytics/rfm-segmentation", status_code=status.HTTP_200_OK)
+def get_rfm_segmentation():
+    """วิเคราะห์การแบ่งกลุ่มลูกค้าตามหลัก RFM (Recency, Frequency, Monetary)"""
+    return calculate_rfm_segmentation()
+
+
+@app.get("/api/analytics/market-basket", status_code=status.HTTP_200_OK)
+def get_market_basket():
+    """วิเคราะห์ตะกร้าสินค้า (Market Basket Analysis / Association Rules)"""
+    return calculate_market_basket_rules()
+
+
+@app.post("/api/analytics/ab-test", status_code=status.HTTP_200_OK)
+def run_ab_test_significance(req: ABTestRequest):
+    """ทดสอบสมมติฐานเปรียบเทียบแคมเปญการตลาดด้วย Two-Proportion Z-Test"""
+    return calculate_ab_testing_significance(
+        visitors_a=req.visitors_a,
+        conversions_a=req.conversions_a,
+        visitors_b=req.visitors_b,
+        conversions_b=req.conversions_b,
+        campaign_a_name=req.campaign_a_name or "Campaign A",
+        campaign_b_name=req.campaign_b_name or "Campaign B",
+    )
 
 
 @app.post("/api/database/query", status_code=status.HTTP_200_OK)

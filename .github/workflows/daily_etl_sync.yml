@@ -68,3 +68,4 @@ jobs:
         if: success()
         run: |
           echo "✅ Automated ETL Pipeline executed successfully and synced clean data to database."
+

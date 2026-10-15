@@ -581,3 +581,4 @@ if __name__ == "__main__":
     res = run_etl_pipeline(sources=target_sources, user_id=args.user_id)
     print("\n--- Pipeline Summary JSON ---")
     print(json.dumps(res, indent=2, ensure_ascii=False))
+

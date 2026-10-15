@@ -22,6 +22,7 @@ import { GoogleSheetCuteButton, GoogleSheetSyncModal } from './components/Google
 import ProofAndTrustSection from './components/ProofAndTrustSection';
 import CuteCatPricingNudge from './components/CuteCatPricingNudge';
 import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
+import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -7217,6 +7218,9 @@ export function InsightsTab({
           </div>
         </div>
       )}
+
+      {/* Midstream Advanced Analytics & Statistical Modeling Center */}
+      <AdvancedAnalyticsSuite lang={lang} />
 
       {/* Actionable Prescriptive AI Hub: Market Basket, Dead Stock, Pricing Simulator */}
       <ActionablePlaybooks

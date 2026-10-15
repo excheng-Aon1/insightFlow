@@ -485,3 +485,4 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
     </div>
   );
 }
+
