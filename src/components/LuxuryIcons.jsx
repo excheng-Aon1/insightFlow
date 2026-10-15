@@ -637,6 +637,18 @@ export function LuxuryModuleIcon({ type = 'overview', size = 26 }) {
         </svg>
       );
 
+    case 'pipeline':
+    case 'etl':
+      return <EtlPipelineIcon size={size} />;
+
+    case 'records':
+    case 'master_records':
+      return <MasterRecordsIcon size={size} />;
+
+    case 'governance':
+    case 'data_governance':
+      return <DataGovernanceIcon size={size} />;
+
     default:
       return null;
   }
@@ -834,6 +846,370 @@ export function LuxuryBrandLogo({ size = 48, className = '' }) {
         </svg>
       </div>
     </div>
+  );
+}
+
+// ==============================================================================
+// STANDALONE 3D LUXURY VECTOR ICONS FOR GOVERNANCE & ETL
+// ==============================================================================
+
+/**
+ * 1. ETL Pipeline Icon (3D Gold & Cyan Automated Data Stream)
+ */
+export function EtlPipelineIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`etlGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="45%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`etlCyan_${id}`} x1="6" y1="10" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+      </defs>
+      <circle cx="16" cy="16" r="13" stroke={`url(#etlCyan_${id})`} strokeWidth="1.8" strokeDasharray="5 3" opacity="0.65" />
+      <path
+        d="M17.5 3.5L7.5 16.5H15.2L13.8 28.5L24.5 14.5H16.8L17.5 3.5Z"
+        fill={`url(#etlGold_${id})`}
+        stroke="#FFFBEB"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <circle cx="25.5" cy="8.5" r="2.2" fill="#38BDF8" stroke="#FFF" strokeWidth="0.8" />
+      <circle cx="6.5" cy="22.5" r="1.8" fill="#34D399" />
+    </svg>
+  );
+}
+
+/**
+ * 2. Master Records Icon (3D Sapphire & Gold Transaction Ledger)
+ */
+export function MasterRecordsIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`recGold_${id}`} x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="45%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`recBlue_${id}`} x1="4" y1="6" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#1E40AF" />
+        </linearGradient>
+      </defs>
+      <rect x="5.5" y="6.5" width="21" height="22" rx="4" fill="rgba(30, 64, 175, 0.22)" stroke={`url(#recBlue_${id})`} strokeWidth="2" />
+      <rect x="11.5" y="3.5" width="9" height="5" rx="1.8" fill={`url(#recGold_${id})`} stroke="#FFFBEB" strokeWidth="1" />
+      <line x1="9.5" y1="13.5" x2="22.5" y2="13.5" stroke="#BAE6FD" strokeWidth="2" strokeLinecap="round" />
+      <line x1="9.5" y1="18" x2="18.5" y2="18" stroke="#BAE6FD" strokeWidth="2" strokeLinecap="round" />
+      <line x1="9.5" y1="22.5" x2="20.5" y2="22.5" stroke="#BAE6FD" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="22" cy="22.5" r="3.2" fill="#10B981" stroke="#FEF08A" strokeWidth="1" />
+    </svg>
+  );
+}
+
+/**
+ * 3. Data Governance & RBAC Shield Icon (3D Royal Emerald & Gold Aegis Shield)
+ */
+export function DataGovernanceIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`govGold_${id}`} x1="5" y1="3" x2="27" y2="29" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="45%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`govEmerald_${id}`} x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#D1FAE5" />
+          <stop offset="45%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#065F46" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M16 2.8L26.8 6.8V15.4C26.8 22.3 22.1 27.4 16 29.5C9.9 27.4 5.2 22.3 5.2 15.4V6.8L16 2.8Z"
+        fill="rgba(16, 185, 129, 0.24)"
+        stroke={`url(#govGold_${id})`}
+        strokeWidth="2.1"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M16 5.8L23.8 8.8V15.1C23.8 20.4 20.3 24.3 16 26.2C11.7 24.3 8.2 20.4 8.2 15.1V8.8L16 5.8Z"
+        fill={`url(#govEmerald_${id})`}
+        fillOpacity="0.32"
+        stroke="#6EE7B7"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <circle cx="16" cy="13.5" r="3.2" fill={`url(#govGold_${id})`} stroke="#FFFBEB" strokeWidth="1" />
+      <path d="M16 16.5V22M16 19.5H18.8" stroke="#FFFBEB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 4. RBAC Owner Icon (3D Emperor Crown with 24K Gold & Ruby)
+ */
+export function RbacOwnerIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`crownGold_${id}`} x1="4" y1="5" x2="28" y2="27" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="45%" stopColor="#FDE047" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`rubyRed_${id}`} x1="14" y1="16" x2="18" y2="20" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FECDD3" />
+          <stop offset="100%" stopColor="#E11D48" />
+        </linearGradient>
+      </defs>
+      <circle cx="16" cy="16" r="12" stroke="rgba(251, 191, 36, 0.35)" strokeWidth="1.2" strokeDasharray="3 3" />
+      <path
+        d="M5 22L7.2 9.5L12.8 15L16 6.8L19.2 15L24.8 9.5L27 22H5Z"
+        fill={`url(#crownGold_${id})`}
+        stroke="#FFFBEB"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <rect x="6" y="23.5" width="20" height="3.2" rx="1.6" fill={`url(#crownGold_${id})`} stroke="#FEF08A" strokeWidth="1" />
+      <circle cx="16" cy="4.8" r="1.9" fill="#FEF08A" stroke="#FFF" strokeWidth="0.8" />
+      <circle cx="7" cy="7.5" r="1.6" fill="#38BDF8" />
+      <circle cx="25" cy="7.5" r="1.6" fill="#38BDF8" />
+      <polygon points="16,14.5 18.5,17.5 16,20.5 13.5,17.5" fill={`url(#rubyRed_${id})`} stroke="#FFFBEB" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/**
+ * 5. RBAC Manager Icon (3D Sapphire Executive Manager Crest)
+ */
+export function RbacManagerIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`mgrSapphire_${id}`} x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#1E40AF" />
+        </linearGradient>
+        <linearGradient id={`mgrGold_${id}`} x1="10" y1="8" x2="22" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="100%" stopColor="#F59E0B" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M16 3.5L25.5 7.5V14.8C25.5 21 21.2 25.8 16 27.8C10.8 25.8 6.5 21 6.5 14.8V7.5L16 3.5Z"
+        fill="rgba(56, 189, 248, 0.22)"
+        stroke={`url(#mgrSapphire_${id})`}
+        strokeWidth="2.1"
+        strokeLinejoin="round"
+      />
+      <path d="M10.5 10L16 16.5L21.5 10" stroke="#BAE6FD" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <polygon points="15,14 17,14 17.8,21 16,23 14.2,21" fill={`url(#mgrGold_${id})`} stroke="#FFFBEB" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/**
+ * 6. RBAC Cashier Icon (3D Emerald POS Terminal Register)
+ */
+export function RbacCashierIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`cshEmerald_${id}`} x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#D1FAE5" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+        <linearGradient id={`cshGold_${id}`} x1="8" y1="18" x2="24" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="100%" stopColor="#FBBF24" />
+        </linearGradient>
+      </defs>
+      <rect x="7" y="6" width="18" height="12" rx="2.5" fill="#0B132B" stroke={`url(#cshEmerald_${id})`} strokeWidth="1.8" />
+      <line x1="10.5" y1="10" x2="16.5" y2="10" stroke="#34D399" strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="10.5" y1="13.5" x2="21.5" y2="13.5" stroke="#A7F3D0" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M14 18V21.5H18V18" stroke="#64748B" strokeWidth="2" strokeLinecap="round" />
+      <rect x="5.5" y="21.5" width="21" height="6" rx="2" fill="rgba(16, 185, 129, 0.25)" stroke={`url(#cshGold_${id})`} strokeWidth="1.6" />
+      <circle cx="16" cy="24.5" r="1.3" fill="#FFFBEB" />
+      <line x1="19" y1="24.5" x2="23" y2="24.5" stroke="#FEF08A" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 7. Vault Lock Icon (3D Golden Security Lock & Vault)
+ */
+export function VaultLockIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`vltGold_${id}`} x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="50%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M10.5 13.5V9.5C10.5 6.5 12.9 4 16 4C19.1 4 21.5 6.5 21.5 9.5V13.5"
+        stroke={`url(#vltGold_${id})`}
+        strokeWidth="2.8"
+        strokeLinecap="round"
+      />
+      <rect x="7" y="13.5" width="18" height="14" rx="4" fill="rgba(251, 191, 36, 0.22)" stroke={`url(#vltGold_${id})`} strokeWidth="2" />
+      <circle cx="16" cy="19.5" r="2.2" fill="#FEF08A" />
+      <path d="M16 21.5V24" stroke="#FEF08A" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 8. Net Profit Icon (3D Gold Bullion Bar & Growth Diamond)
+ */
+export function NetProfitIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`npGold_${id}`} x1="4" y1="5" x2="28" y2="27" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="45%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`npEmerald_${id}`} x1="12" y1="4" x2="28" y2="20" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="12" cy="22" rx="7" ry="3.5" fill={`url(#npGold_${id})`} stroke="#FFFBEB" strokeWidth="1" />
+      <ellipse cx="12" cy="18" rx="7" ry="3.5" fill={`url(#npGold_${id})`} stroke="#FFFBEB" strokeWidth="1" />
+      <ellipse cx="12" cy="14" rx="7" ry="3.5" fill={`url(#npGold_${id})`} stroke="#FFFBEB" strokeWidth="1" />
+      <polygon points="23,4 28,10 23,20 18,10" fill={`url(#npEmerald_${id})`} stroke="#FEF08A" strokeWidth="1.2" />
+      <line x1="23" y1="4" x2="23" y2="20" stroke="#FFFBEB" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/**
+ * 9. Unit Cost Icon (3D Isometric Crate with Gold Lock)
+ */
+export function UnitCostIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`ucAmber_${id}`} x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M16 3.5L27 9.5V21.5L16 27.5L5 21.5V9.5L16 3.5Z"
+        fill="rgba(245, 158, 11, 0.18)"
+        stroke={`url(#ucAmber_${id})`}
+        strokeWidth="2.1"
+        strokeLinejoin="round"
+      />
+      <path d="M5 9.5L16 15.5L27 9.5M16 15.5V27.5" stroke="#FEF08A" strokeWidth="1.8" />
+      <circle cx="16" cy="15.5" r="3.2" fill="#0F172A" stroke="#FEF08A" strokeWidth="1.2" />
+      <path d="M14.5 15.5H17.5" stroke="#38BDF8" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 10. Branch Scope Icon (3D Flagship Architecture & Multi-Branch Hub)
+ */
+export function BranchScopeIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`brnCyan_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#1E3A8A" />
+        </linearGradient>
+      </defs>
+      <rect x="10.5" y="8" width="11" height="19" rx="2" fill="rgba(56, 189, 248, 0.22)" stroke={`url(#brnCyan_${id})`} strokeWidth="1.8" />
+      <line x1="13.5" y1="12" x2="18.5" y2="12" stroke="#BAE6FD" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="13.5" y1="16" x2="18.5" y2="16" stroke="#BAE6FD" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="13.5" y1="20" x2="18.5" y2="20" stroke="#BAE6FD" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="4" y="14" width="6.5" height="13" rx="1.5" fill="rgba(56, 189, 248, 0.15)" stroke="#7DD3FC" strokeWidth="1.3" />
+      <rect x="21.5" y="14" width="6.5" height="13" rx="1.5" fill="rgba(56, 189, 248, 0.15)" stroke="#7DD3FC" strokeWidth="1.3" />
+      <circle cx="16" cy="4" r="2" fill="#34D399" stroke="#FFF" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/**
+ * 11. Privacy Mask Icon (3D Biometric ID Shield with Keyhole)
+ */
+export function PrivacyMaskIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`prvPurple_${id}`} x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FAF5FF" />
+          <stop offset="50%" stopColor="#C084FC" />
+          <stop offset="100%" stopColor="#6B21A8" />
+        </linearGradient>
+      </defs>
+      <circle cx="16" cy="11" r="5" fill="rgba(192, 132, 252, 0.25)" stroke={`url(#prvPurple_${id})`} strokeWidth="1.8" />
+      <path
+        d="M7 26.5C7 21.5 11 18.5 16 18.5C21 18.5 25 21.5 25 26.5"
+        stroke={`url(#prvPurple_${id})`}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      <circle cx="23" cy="22" r="4.5" fill="#0B132B" stroke="#FEF08A" strokeWidth="1.5" />
+      <path d="M23 20V24M21 22H25" stroke="#FEF08A" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 12. Quarantine Laser Dome Icon (3D Ruby & Amber Containment Firewall)
+ */
+export function QuarantineDomeIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`qrnRuby_${id}`} x1="5" y1="3" x2="27" y2="29" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFE4E6" />
+          <stop offset="50%" stopColor="#FB7185" />
+          <stop offset="100%" stopColor="#BE123C" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M5 26C5 15.5 10 7 16 7C22 7 27 15.5 27 26H5Z"
+        fill="rgba(244, 63, 94, 0.18)"
+        stroke={`url(#qrnRuby_${id})`}
+        strokeWidth="2.1"
+      />
+      <line x1="5" y1="26" x2="27" y2="26" stroke="#FEF08A" strokeWidth="2.4" strokeLinecap="round" />
+      <line x1="8" y1="18" x2="24" y2="18" stroke="#FDA4AF" strokeWidth="1.5" strokeDasharray="3 2" />
+      <circle cx="16" cy="17" r="3.5" fill="#BE123C" stroke="#FFF" strokeWidth="1" />
+      <path d="M16 15V17.5" stroke="#FFF" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="16" cy="19" r="0.6" fill="#FFF" />
+    </svg>
   );
 }
 

@@ -7,6 +7,7 @@
 
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { LuxuryModuleIcon } from './LuxuryIcons';
 
 export default function ActionableAiCenter({ lang = 'th' }) {
   const isEn = lang === 'en';
@@ -235,10 +236,14 @@ export default function ActionableAiCenter({ lang = 'th' }) {
               <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
               <span>{tx('ปลายน้ำ: การเปลี่ยนข้อมูลเป็นการตัดสินใจ (Actionable Insights & AI)', 'Downstream: Actionable Insights & AI Decision Engine')}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-              <span>🎯</span>
-              <span>{tx('ศูนย์สั่งการ & จำลองผลกำไรทางธุรกิจ (Decision Hub)', 'Executive Decision Hub & Profit Simulator')}</span>
-            </h3>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-2xl bg-rose-500/15 border border-rose-500/35 shadow-lg shadow-rose-500/20 flex-shrink-0">
+                <LuxuryModuleIcon type="target" size={28} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                {tx('ศูนย์สั่งการ & จำลองผลกำไรทางธุรกิจ (Decision Hub)', 'Executive Decision Hub & Profit Simulator')}
+              </h3>
+            </div>
             <p className="text-sm text-slate-300 leading-relaxed">
               {tx(
                 'ส่งต่อคำแนะนำที่นำไปใช้ได้ทันที: แจ้งเตือนความผิดปกติผ่าน LINE Messaging API อัตโนมัติ, ผู้ช่วย AI สรุปผู้บริหารเป็นภาษาคน, และแถบเลื่อนจำลองจุดคุ้มทุน (What-If Simulator) ก่อนตัดสินใจจัดโปรโมชันจริง',
@@ -263,26 +268,26 @@ export default function ActionableAiCenter({ lang = 'th' }) {
           <button
             type="button"
             onClick={() => setActiveTab('what_if')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               activeTab === 'what_if'
                 ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5 border border-white/5'
             }`}
           >
-            <span>🧮</span>
+            <LuxuryModuleIcon type="settings" size={18} />
             <span>{tx('1. จำลองสถานการณ์ธุรกิจ (What-If Simulator)', '1. What-If Scenario Simulator')}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('alerts')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               activeTab === 'alerts'
                 ? 'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-lg shadow-rose-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5 border border-white/5'
             }`}
           >
-            <span>🚨</span>
+            <LuxuryModuleIcon type="alert" size={18} />
             <span>{tx('2. ระบบแจ้งเตือน LINE อัตโนมัติ (Anomaly Alerts)', '2. Automated LINE Anomaly Alerts')}</span>
             <span className="px-1.5 py-0.2 rounded-full bg-rose-500/40 text-[10px] text-white font-bold">
               3
@@ -292,13 +297,13 @@ export default function ActionableAiCenter({ lang = 'th' }) {
           <button
             type="button"
             onClick={() => setActiveTab('copilot')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               activeTab === 'copilot'
                 ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5 border border-white/5'
             }`}
           >
-            <span>🤖</span>
+            <LuxuryModuleIcon type="live" size={18} />
             <span>{tx('3. ผู้ช่วย AI สรุปข้อมูล & ช่องแชต (AI Copilot)', '3. AI Executive Summary & Copilot')}</span>
           </button>
         </div>

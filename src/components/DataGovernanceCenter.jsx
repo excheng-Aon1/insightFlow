@@ -3,10 +3,23 @@
 // System: InsightFlow Enterprise Data Governance, RBAC & Data Quality Firewall
 // Description: Role-Based Access Control Simulator (Owner vs Manager vs Cashier),
 //              Data Masking, and 5-Point Data Quality Gatekeeper Quarantine Room
+//              featuring Ultra-Luxury 3D Jewel & Metallic Vector Icons
 // ==============================================================================
 
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import {
+  DataGovernanceIcon,
+  RbacOwnerIcon,
+  RbacManagerIcon,
+  RbacCashierIcon,
+  VaultLockIcon,
+  NetProfitIcon,
+  UnitCostIcon,
+  BranchScopeIcon,
+  PrivacyMaskIcon,
+  QuarantineDomeIcon,
+} from './LuxuryIcons';
 
 export default function DataGovernanceCenter({ lang = 'th' }) {
   const isEn = lang === 'en';
@@ -19,7 +32,7 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
 
   const roleProfiles = {
     owner: {
-      title: tx('👑 เจ้าของกิจการ (Owner / Super Admin)', 'Owner / Super Admin'),
+      title: tx('เจ้าของกิจการ (Owner / Super Admin)', 'Owner / Super Admin'),
       badge: tx('สิทธิ์สูงสุด (Full Access)', 'Full Executive Access'),
       badgeColor: 'bg-amber-400/20 text-amber-300 border-amber-400/40',
       netProfit: '฿1,845,000.00',
@@ -27,35 +40,35 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
       secretUnitCost: '฿45.00 / ชิ้น',
       branchScope: tx('ทุกสาขา (รวมศูนย์บริษัท)', 'All Branches (Company-Wide)'),
       customerPhone: '081-924-8899',
-      exportPermission: tx('✅ อนุญาตส่งออกไฟล์ CSV ได้', 'Full CSV Export Permitted'),
-      etlPermission: tx('✅ ควบคุมท่อส่งข้อมูล ETL & Cloud Warehouse ได้', 'Full Pipeline & Warehouse Access'),
-      quarantinePermission: tx('✅ อนุมัติข้อมูลที่ถูกกักกันได้', 'Can Override Quarantined Records'),
+      exportPermission: tx('อนุญาตส่งออกไฟล์ CSV ได้', 'Full CSV Export Permitted'),
+      etlPermission: tx('ควบคุมท่อส่งข้อมูล ETL & Cloud Warehouse ได้', 'Full Pipeline & Warehouse Access'),
+      quarantinePermission: tx('อนุมัติข้อมูลที่ถูกกักกันได้', 'Can Override Quarantined Records'),
     },
     manager: {
-      title: tx('👔 ผู้จัดการสาขา (Store Manager)', 'Store Manager'),
+      title: tx('ผู้จัดการสาขา (Store Manager)', 'Store Manager'),
       badge: tx('จำกัดระดับสาขา (Branch Restricted)', 'Branch Level Only'),
       badgeColor: 'bg-sky-400/20 text-sky-300 border-sky-400/40',
-      netProfit: tx('🔒 [ซ่อนตามสิทธิ์ RBAC: เฉพาะเจ้าของร้าน]', '🔒 [Hidden by RBAC: Owner Only]'),
-      grossMargin: tx('🔒 [สิทธิ์ไม่เพียงพอ]', '🔒 [Restricted]'),
-      secretUnitCost: tx('🔒 [ต้นทุนลับเฉพาะฝ่ายจัดซื้อ]', '🔒 [Secret Unit Cost Hidden]'),
+      netProfit: tx('[ซ่อนตามสิทธิ์ RBAC: เฉพาะเจ้าของร้าน]', '[Hidden by RBAC: Owner Only]'),
+      grossMargin: tx('[สิทธิ์ไม่เพียงพอ]', '[Restricted]'),
+      secretUnitCost: tx('[ต้นทุนลับเฉพาะฝ่ายจัดซื้อ]', '[Secret Unit Cost Hidden]'),
       branchScope: tx('เฉพาะสาขาที่ดูแล (สาขาสุขุมวิท 21)', 'Assigned Branch Only (Sukhumvit 21)'),
       customerPhone: '081-xxx-8899 (Masked)',
-      exportPermission: tx('❌ ไม่อนุญาตให้ดาวน์โหลดฐานข้อมูลลูกค้า', 'Export Blocked to Prevent Leakage'),
-      etlPermission: tx('❌ ไม่มีสิทธิ์เข้าถึงโครงสร้างท่อข้อมูล', 'No Access to Ingestion Pipelines'),
-      quarantinePermission: tx('❌ ไม่มีสิทธิ์ปลดกักกันข้อมูลขยะ', 'Cannot Override Quarantine'),
+      exportPermission: tx('ไม่อนุญาตให้ดาวน์โหลดฐานข้อมูลลูกค้า', 'Export Blocked to Prevent Leakage'),
+      etlPermission: tx('ไม่มีสิทธิ์เข้าถึงโครงสร้างท่อข้อมูล', 'No Access to Ingestion Pipelines'),
+      quarantinePermission: tx('ไม่มีสิทธิ์ปลดกักกันข้อมูลขยะ', 'Cannot Override Quarantine'),
     },
     cashier: {
-      title: tx('🛒 พนักงานขาย / แคชเชียร์ (Cashier & Staff)', 'Cashier & POS Staff'),
+      title: tx('พนักงานขาย / แคชเชียร์ (Cashier & Staff)', 'Cashier & POS Staff'),
       badge: tx('สิทธิ์เฉพาะจุดขาย (POS Only)', 'POS Ring-Up Only'),
       badgeColor: 'bg-slate-400/20 text-slate-300 border-slate-400/40',
-      netProfit: tx('🔒 [ซ่อนตามสิทธิ์ RBAC]', '🔒 [Hidden by RBAC]'),
-      grossMargin: tx('🔒 [สิทธิ์ไม่เพียงพอ]', '🔒 [Restricted]'),
-      secretUnitCost: tx('🔒 [ต้นทุนลับ]', '🔒 [Hidden]'),
+      netProfit: tx('[ซ่อนตามสิทธิ์ RBAC]', '[Hidden by RBAC]'),
+      grossMargin: tx('[สิทธิ์ไม่เพียงพอ]', '[Restricted]'),
+      secretUnitCost: tx('[ต้นทุนลับ]', '[Hidden]'),
       branchScope: tx('เฉพาะหน้าเครื่องคิดเงิน POS', 'POS Terminal Only'),
       customerPhone: '081-xxx-8899 (Masked)',
-      exportPermission: tx('❌ บล็อกการส่งออกข้อมูล 100%', 'Export Blocked 100%'),
-      etlPermission: tx('❌ ไม่มีสิทธิ์เข้าถึงระบบหลังบ้าน', 'No Backend Access'),
-      quarantinePermission: tx('❌ ไม่มีสิทธิ์', 'No Permission'),
+      exportPermission: tx('บล็อกการส่งออกข้อมูล 100%', 'Export Blocked 100%'),
+      etlPermission: tx('ไม่มีสิทธิ์เข้าถึงระบบหลังบ้าน', 'No Backend Access'),
+      quarantinePermission: tx('ไม่มีสิทธิ์ดำเนินการ', 'No Permission'),
     },
   };
 
@@ -102,9 +115,9 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
       prev.map(r => (r.id === id ? { ...r, status: action === 'APPROVE' ? 'APPROVED' : 'DISCARDED' } : r))
     );
     if (action === 'APPROVE') {
-      toast.success(tx(`✅ อนุมัติและนำเข้าข้อมูล ${id} เรียบร้อยแล้ว`, `✅ Approved & released ${id} into database`));
+      toast.success(tx(`อนุมัติและนำเข้าข้อมูล ${id} เรียบร้อยแล้ว`, `Approved & released ${id} into database`));
     } else {
-      toast.error(tx(`🗑️ กำจัดข้อมูลขยะ ${id} ออกจากระบบถาวร`, `🗑️ Discarded corrupted record ${id}`));
+      toast.error(tx(`กำจัดข้อมูลขยะ ${id} ออกจากระบบถาวร`, `Discarded corrupted record ${id}`));
     }
   };
 
@@ -116,15 +129,21 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
         <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
+          <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>{tx('มาตรฐานระดับองค์กร (Enterprise Data Governance & Security)', 'Enterprise Data Governance & Security Standard')}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-              <span>🛡️</span>
-              <span>{tx('ระบบจัดการสิทธิ์ RBAC & ด่านตรวจจับข้อมูลขยะ (Data Quality)', 'Role-Based Access Control (RBAC) & Data Quality Firewall')}</span>
-            </h3>
+            
+            <div className="flex items-center gap-3.5">
+              <div className="p-2.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/35 shadow-lg shadow-emerald-500/20 flex-shrink-0">
+                <DataGovernanceIcon size={32} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                {tx('ระบบจัดการสิทธิ์ RBAC & ด่านตรวจจับข้อมูลขยะ (Data Quality)', 'Role-Based Access Control (RBAC) & Data Quality Firewall')}
+              </h3>
+            </div>
+
             <p className="text-sm text-slate-300 leading-relaxed">
               {tx(
                 'ปกป้องความลับทางธุรกิจด้วยการแยกสิทธิ์การมองเห็นข้อมูล (เจ้าของร้านเห็นกำไรสุทธิ ผู้จัดการเห็นเฉพาะสาขาตนเอง) พร้อมด่านตรวจจับข้อมูลขยะ (ราคาสินค้าติดลบ วันที่ผิดเพี้ยน ยอดเงินกระโดด) กักกันก่อนเข้าสู่ระบบแสดงผล ไม่ให้กราฟและ AI เพี้ยน',
@@ -143,23 +162,24 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
 
         {/* 2. Interactive Role Switcher Bar */}
         <div className="mt-6 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-slate-400 font-bold mr-1">
-              {tx('🎮 จำลองการสลับสิทธิ์ผู้ใช้ (Role Switcher):', 'Simulate User Role:')}
+              {tx('จำลองการสลับสิทธิ์ผู้ใช้ (Role Switcher):', 'Simulate User Role:')}
             </span>
+
             <button
               type="button"
               onClick={() => {
                 setActiveRole('owner');
-                toast.success(tx('👑 สลับเป็นมุมมอง: เจ้าของกิจการ (สิทธิ์เต็ม)', 'Switched to: Owner / Full Access'));
+                toast.success(tx('สลับเป็นมุมมอง: เจ้าของกิจการ (สิทธิ์เต็ม)', 'Switched to: Owner / Full Access'));
               }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
                 activeRole === 'owner'
                   ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
                   : 'bg-white/5 text-slate-300 hover:text-white border border-white/10'
               }`}
             >
-              <span>👑</span>
+              <RbacOwnerIcon size={18} />
               <span>{tx('Owner (เจ้าของ)', 'Owner')}</span>
             </button>
 
@@ -167,15 +187,15 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
               type="button"
               onClick={() => {
                 setActiveRole('manager');
-                toast(tx('👔 สลับเป็นมุมมอง: ผู้จัดการสาขา (ซ่อนกำไรสุทธิ)', 'Switched to: Store Manager (Net profit hidden)'), { icon: '🔒' });
+                toast(tx('สลับเป็นมุมมอง: ผู้จัดการสาขา (ซ่อนกำไรสุทธิ)', 'Switched to: Store Manager (Net profit hidden)'));
               }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
                 activeRole === 'manager'
                   ? 'bg-gradient-to-r from-sky-400 to-blue-500 text-slate-950 shadow-lg shadow-blue-500/25'
                   : 'bg-white/5 text-slate-300 hover:text-white border border-white/10'
               }`}
             >
-              <span>👔</span>
+              <RbacManagerIcon size={18} />
               <span>{tx('Manager (ผู้จัดการ)', 'Store Manager')}</span>
             </button>
 
@@ -183,15 +203,15 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
               type="button"
               onClick={() => {
                 setActiveRole('cashier');
-                toast(tx('🛒 สลับเป็นมุมมอง: แคชเชียร์ (จำกัดเฉพาะ POS)', 'Switched to: Cashier (POS only)'), { icon: '🔒' });
+                toast(tx('สลับเป็นมุมมอง: แคชเชียร์ (จำกัดเฉพาะ POS)', 'Switched to: Cashier (POS only)'));
               }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
                 activeRole === 'cashier'
                   ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/25'
                   : 'bg-white/5 text-slate-300 hover:text-white border border-white/10'
               }`}
             >
-              <span>🛒</span>
+              <RbacCashierIcon size={18} />
               <span>{tx('Cashier (แคชเชียร์)', 'Cashier')}</span>
             </button>
           </div>
@@ -208,8 +228,8 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
       <div className="glass-card rounded-2xl p-6 border border-white/10 bg-slate-900/80 shadow-xl space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h4 className="text-base font-black text-white flex items-center gap-2">
-              <span>🔐</span>
+            <h4 className="text-base font-black text-white flex items-center gap-2.5">
+              <VaultLockIcon size={22} />
               <span>{tx('การมองเห็นข้อมูลตามสิทธิ์ (Real-time RBAC Data Masking Matrix)', 'Live RBAC Data Masking Matrix')}</span>
             </h4>
             <p className="text-xs text-slate-400">
@@ -222,8 +242,8 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Net Profit */}
           <div className="bg-slate-950/70 border border-white/10 rounded-xl p-4 flex flex-col justify-between gap-2 shadow-lg">
-            <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
-              <span>💰</span>
+            <span className="text-xs text-slate-400 font-bold flex items-center gap-2">
+              <NetProfitIcon size={18} />
               <span>{tx('กำไรสุทธิรวม (Net Profit)', 'Net Profit (Company)')}</span>
             </span>
             <div className="mt-1">
@@ -235,14 +255,14 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
               </span>
             </div>
             <div className="pt-2 border-t border-white/10 text-[10px] text-slate-500">
-              {activeRole === 'owner' ? tx('✔ สิทธิ์เข้าถึงสมบูรณ์', 'Full access granted') : tx('❌ ซ่อนเพื่อความลับทางธุรกิจ', 'Masked for security')}
+              {activeRole === 'owner' ? tx('สิทธิ์เข้าถึงสมบูรณ์', 'Full access granted') : tx('ซ่อนเพื่อความลับทางธุรกิจ', 'Masked for security')}
             </div>
           </div>
 
           {/* Card 2: Secret Unit Cost */}
           <div className="bg-slate-950/70 border border-white/10 rounded-xl p-4 flex flex-col justify-between gap-2 shadow-lg">
-            <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
-              <span>📦</span>
+            <span className="text-xs text-slate-400 font-bold flex items-center gap-2">
+              <UnitCostIcon size={18} />
               <span>{tx('ต้นทุนวัตถุดิบลับ (Unit Cost)', 'Secret Unit Cost')}</span>
             </span>
             <div className="mt-1">
@@ -254,14 +274,14 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
               </span>
             </div>
             <div className="pt-2 border-t border-white/10 text-[10px] text-slate-500">
-              {activeRole === 'owner' ? tx('✔ เปิดเผยเฉพาะฝ่ายบริหาร', 'Executive only') : tx('❌ พนักงานเห็นเฉพาะราคาขาย', 'Staff sees retail only')}
+              {activeRole === 'owner' ? tx('เปิดเผยเฉพาะฝ่ายบริหาร', 'Executive only') : tx('พนักงานเห็นเฉพาะราคาขาย', 'Staff sees retail only')}
             </div>
           </div>
 
           {/* Card 3: Branch Scope */}
           <div className="bg-slate-950/70 border border-white/10 rounded-xl p-4 flex flex-col justify-between gap-2 shadow-lg">
-            <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
-              <span>🏬</span>
+            <span className="text-xs text-slate-400 font-bold flex items-center gap-2">
+              <BranchScopeIcon size={18} />
               <span>{tx('ขอบเขตข้อมูลสาขา (Branch Scope)', 'Branch Data Scope')}</span>
             </span>
             <div className="mt-1">
@@ -273,14 +293,14 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
               </span>
             </div>
             <div className="pt-2 border-t border-white/10 text-[10px] text-slate-500">
-              {activeRole === 'owner' ? tx('✔ รวมศูนย์ระดับบริษัท', 'Global multi-branch') : tx('🔒 ล็อกตามสาขาที่สังกัด', 'Restricted to branch')}
+              {activeRole === 'owner' ? tx('รวมศูนย์ระดับบริษัท', 'Global multi-branch') : tx('ล็อกตามสาขาที่สังกัด', 'Restricted to branch')}
             </div>
           </div>
 
           {/* Card 4: Customer Privacy Data Masking */}
           <div className="bg-slate-950/70 border border-white/10 rounded-xl p-4 flex flex-col justify-between gap-2 shadow-lg">
-            <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
-              <span>👤</span>
+            <span className="text-xs text-slate-400 font-bold flex items-center gap-2">
+              <PrivacyMaskIcon size={18} />
               <span>{tx('เบอร์โทรลูกค้า (Privacy Masking)', 'Customer Privacy Masking')}</span>
             </span>
             <div className="mt-1">
@@ -292,7 +312,7 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
               </span>
             </div>
             <div className="pt-2 border-t border-white/10 text-[10px] text-slate-500">
-              {activeRole === 'owner' ? tx('✔ ส่งออกได้เต็มรูปแบบ', 'Full export unlocked') : tx('🛡️ ป้องกันลูกค้ารั่วไหล', 'Leakage prevention active')}
+              {activeRole === 'owner' ? tx('ส่งออกได้เต็มรูปแบบ', 'Full export unlocked') : tx('ป้องกันลูกค้ารั่วไหล', 'Leakage prevention active')}
             </div>
           </div>
         </div>
@@ -304,39 +324,40 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
       <div className="glass-card rounded-2xl p-6 border border-white/10 bg-slate-900/80 shadow-xl space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h4 className="text-base font-black text-white flex items-center gap-2">
-              <span>🛑</span>
+            <h4 className="text-base font-black text-white flex items-center gap-2.5">
+              <QuarantineDomeIcon size={24} />
               <span>{tx('ห้องกักกันข้อมูลขยะ (Data Quality Firewall & Quarantine Room)', 'Data Quality Firewall & Quarantine Room')}</span>
             </h4>
             <p className="text-xs text-slate-400">
               {tx('ดักจับราคาสินค้าติดลบ วันที่เพี้ยน หรือยอดกระโดดผิดปกติ กักกันไว้ก่อนเข้าสู่ตารางแสดงผล กราฟจึงสะอาดและไม่เพี้ยน 100%', 'Intercepts corrupted rows (negative amounts, corrupt dates, outlier spikes) preventing chart breakdowns.')}
             </p>
           </div>
-          <span className="text-xs text-rose-400 font-mono font-bold bg-rose-500/15 px-3 py-1 rounded-full border border-rose-500/30">
-            {quarantineRecords.filter(r => r.status === 'QUARANTINED').length} {tx('รายการถูกกักกันอยู่', 'Records Quarantined')}
+          <span className="text-xs text-rose-400 font-mono font-bold bg-rose-500/15 px-3 py-1 rounded-full border border-rose-500/30 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+            <span>{quarantineRecords.filter(r => r.status === 'QUARANTINED').length} {tx('รายการถูกกักกันอยู่', 'Records Quarantined')}</span>
           </span>
         </div>
 
         {/* 5-Point Validation Rules Pills */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
           <div className="bg-slate-950/70 p-2.5 rounded-xl border border-emerald-500/30">
-            <span className="text-emerald-400 font-black text-xs block">✔ ผ่าน 100%</span>
+            <span className="text-emerald-400 font-black text-xs block">ผ่าน 100%</span>
             <span className="text-[10px] text-slate-300 mt-0.5 block">{tx('1. ราคาไม่ติดลบ', 'Numeric Sanity')}</span>
           </div>
           <div className="bg-slate-950/70 p-2.5 rounded-xl border border-emerald-500/30">
-            <span className="text-emerald-400 font-black text-xs block">✔ ผ่าน 99.8%</span>
+            <span className="text-emerald-400 font-black text-xs block">ผ่าน 99.8%</span>
             <span className="text-[10px] text-slate-300 mt-0.5 block">{tx('2. วันที่สมเหตุสมผล', 'Date Sanity')}</span>
           </div>
           <div className="bg-slate-950/70 p-2.5 rounded-xl border border-emerald-500/30">
-            <span className="text-emerald-400 font-black text-xs block">✔ ผ่าน 99.9%</span>
+            <span className="text-emerald-400 font-black text-xs block">ผ่าน 99.9%</span>
             <span className="text-[10px] text-slate-300 mt-0.5 block">{tx('3. สกัด Outlier สุดโต่ง', 'Outlier Shield')}</span>
           </div>
           <div className="bg-slate-950/70 p-2.5 rounded-xl border border-emerald-500/30">
-            <span className="text-emerald-400 font-black text-xs block">✔ ผ่าน 100%</span>
+            <span className="text-emerald-400 font-black text-xs block">ผ่าน 100%</span>
             <span className="text-[10px] text-slate-300 mt-0.5 block">{tx('4. บังคับมีรหัสบิล', 'Schema Required')}</span>
           </div>
           <div className="bg-slate-950/70 p-2.5 rounded-xl border border-emerald-500/30">
-            <span className="text-emerald-400 font-black text-xs block">✔ ผ่าน 99.5%</span>
+            <span className="text-emerald-400 font-black text-xs block">ผ่าน 99.5%</span>
             <span className="text-[10px] text-slate-300 mt-0.5 block">{tx('5. รูปแบบเบอร์ 10 หลัก', 'Phone Sanity')}</span>
           </div>
         </div>
@@ -373,16 +394,19 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
                   </td>
                   <td className="py-3 px-3 whitespace-nowrap">
                     {rec.status === 'QUARANTINED' ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse">
-                        ⚠️ กักกันอยู่
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse flex items-center gap-1 w-fit">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                        <span>{tx('กักกันอยู่', 'Quarantined')}</span>
                       </span>
                     ) : rec.status === 'APPROVED' ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                        ✔ อนุมัติแล้ว
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 w-fit">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        <span>{tx('อนุมัติแล้ว', 'Approved')}</span>
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-500/20 text-slate-400 border border-slate-500/40">
-                        🗑️ ทิ้งข้อมูลแล้ว
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-slate-500/20 text-slate-400 border border-slate-500/40 flex items-center gap-1 w-fit">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                        <span>{tx('ทิ้งข้อมูลแล้ว', 'Discarded')}</span>
                       </span>
                     )}
                   </td>
@@ -394,7 +418,7 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
                           onClick={() => handleResolveQuarantine(rec.id, 'APPROVE')}
                           disabled={activeRole !== 'owner'}
                           title={activeRole !== 'owner' ? tx('เฉพาะสิทธิ์ Owner เท่านั้น', 'Owner only') : ''}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] font-black disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] font-black disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
                           {tx('ปล่อยผ่าน', 'Approve')}
                         </button>
@@ -403,7 +427,7 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
                           onClick={() => handleResolveQuarantine(rec.id, 'DISCARD')}
                           disabled={activeRole !== 'owner'}
                           title={activeRole !== 'owner' ? tx('เฉพาะสิทธิ์ Owner เท่านั้น', 'Owner only') : ''}
-                          className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[10px] font-black disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[10px] font-black disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
                           {tx('ลบทิ้ง', 'Discard')}
                         </button>

@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Line } from 'react-chartjs-2';
+import { LuxuryModuleIcon } from './LuxuryIcons';
 
 export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
   const isEn = lang === 'en';
@@ -372,10 +373,14 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
               <span>{tx('กลางน้ำ: การวิเคราะห์เชิงลึกและสถิติ (Advanced Analytics & Modeling)', 'Midstream: Advanced Analytics & Statistical Modeling')}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-              <span>🧠</span>
-              <span>{tx('ระบบวิเคราะห์ทำนายอนาคต & ชี้นำกลยุทธ์ธุรกิจ', 'Predictive Intelligence & Prescriptive Business Modeling')}</span>
-            </h3>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-2xl bg-cyan-500/15 border border-cyan-500/35 shadow-lg shadow-cyan-500/20 flex-shrink-0">
+                <LuxuryModuleIcon type="insights" size={28} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                {tx('ระบบวิเคราะห์ทำนายอนาคต & ชี้นำกลยุทธ์ธุรกิจ', 'Predictive Intelligence & Prescriptive Business Modeling')}
+              </h3>
+            </div>
             <p className="text-sm text-slate-300 leading-relaxed">
               {tx(
                 'ก้าวข้ามแดชบอร์ดที่บอกแค่ "อดีต" สู่โมเดลสถิติที่ตอบว่า "อนาคตจะเป็นอย่างไร" พยากรณ์ยอดขาย 30 วัน, คำนวณจุดสั่งซื้อสินค้าตามฤดูกาล, จัดกลุ่มลูกค้า RFM, วิเคราะห์ของที่ลูกค้ามักซื้อคู่กัน, และทดสอบสมมติฐาน A/B Test อย่างแม่นยำ',
@@ -397,39 +402,39 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
           <button
             type="button"
             onClick={() => setActiveModule('forecasting')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               activeModule === 'forecasting'
                 ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5 border border-white/5'
             }`}
           >
-            <span>📈</span>
+            <LuxuryModuleIcon type="overview" size={18} />
             <span>{tx('1. พยากรณ์ยอดขาย & จุดสั่งซื้อ ROP', '1. Sales Forecast & Seasonal ROP')}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveModule('rfm_basket')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               activeModule === 'rfm_basket'
                 ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5 border border-white/5'
             }`}
           >
-            <span>👥</span>
+            <LuxuryModuleIcon type="customers" size={18} />
             <span>{tx('2. วิเคราะห์ RFM & จับคู่ตะกร้าสินค้า A+B', '2. RFM Clusters & Market Basket')}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveModule('ab_testing')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               activeModule === 'ab_testing'
                 ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5 border border-white/5'
             }`}
           >
-            <span>🧪</span>
+            <LuxuryModuleIcon type="precision_target" size={18} />
             <span>{tx('3. ทดสอบสมมติฐาน A/B Testing (Z-Test)', '3. A/B Testing & Z-Test Statistics')}</span>
           </button>
         </div>

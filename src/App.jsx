@@ -25,6 +25,7 @@ import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
+import { EtlPipelineIcon, MasterRecordsIcon, DataGovernanceIcon } from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -2435,6 +2436,18 @@ export function LuxuryModuleIcon({ type = 'overview', size = 26 }) {
           />
         </svg>
       );
+
+    case 'pipeline':
+    case 'etl':
+      return <EtlPipelineIcon size={size} />;
+
+    case 'records':
+    case 'master_records':
+      return <MasterRecordsIcon size={size} />;
+
+    case 'governance':
+    case 'data_governance':
+      return <DataGovernanceIcon size={size} />;
 
     default:
       return null;
@@ -7929,13 +7942,13 @@ export function DatabaseTab({
           <button
             type="button"
             onClick={() => setDbSubTab('pipeline')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               dbSubTab === 'pipeline'
                 ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
-            <span>⚡</span>
+            <EtlPipelineIcon size={20} />
             <span>{tx('ระบบจัดการและเตรียมข้อมูลอัตโนมัติ (ETL Pipeline)', 'Automated Data Pipeline & ETL')}</span>
             <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20 font-bold uppercase">
               Auto
@@ -7945,13 +7958,13 @@ export function DatabaseTab({
           <button
             type="button"
             onClick={() => setDbSubTab('records')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               dbSubTab === 'records'
                 ? 'bg-gradient-to-r from-sky-400 to-blue-500 text-slate-950 shadow-lg shadow-blue-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
-            <span>📋</span>
+            <MasterRecordsIcon size={20} />
             <span>{tx('คลังไฟล์และตารางธุรกรรมร้าน (Master Records)', 'Master Transaction Records & Files')}</span>
             <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20 font-bold uppercase">
               {filteredRecords.length}
@@ -7961,13 +7974,13 @@ export function DatabaseTab({
           <button
             type="button"
             onClick={() => setDbSubTab('governance')}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all ${
               dbSubTab === 'governance'
                 ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/25'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
-            <span>🛡️</span>
+            <DataGovernanceIcon size={20} />
             <span>{tx('ธรรมาภิบาลข้อมูล & สิทธิ์ RBAC (Data Governance)', 'Data Governance & RBAC Security')}</span>
             <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-bold uppercase border border-emerald-500/30">
               {tx('องค์กร', 'Enterprise')}
