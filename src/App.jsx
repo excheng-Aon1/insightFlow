@@ -48,6 +48,142 @@ const canUseBackendApi = () =>
 // ป้ายแจ้งเตือนดีไซน์ล้ำสมัย พร้อมแอนิเมชัน Spring Physics, วงแหวนเรดาร์,
 // เครื่องหมายถูกวาดตัวเองอัตโนมัติ, แสงเลเซอร์วิ่งผ่าน และแถบเวลานับถอยหลัง
 // ============================================================================
+// CUTE GINGER CAT TOAST AVATAR (น้องแมวส้มดุ๊กดิ๊กประจำป้ายแจ้งเตือน)
+// มาพร้อมแอนิเมชันกระดิกหู ตาหยีเคลิ้ม หรือตาโตตกใจตามประเภทการแจ้งเตือน
+// ============================================================================
+const CuteCatToastAvatar = ({ variant = 'success' }) => {
+  const id = React.useId().replace(/:/g, '');
+
+  return (
+    <div className="relative w-12 h-12 flex items-center justify-center">
+      <svg
+        viewBox="0 0 100 100"
+        className="w-12 h-12 filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
+      >
+        <defs>
+          <linearGradient id={`cToastFurLight_${id}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#FED7AA" />
+            <stop offset="40%" stopColor="#FB923C" />
+            <stop offset="100%" stopColor="#EA580C" />
+          </linearGradient>
+          <linearGradient id={`cToastFurDeep_${id}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#EA580C" />
+            <stop offset="100%" stopColor="#9A3412" />
+          </linearGradient>
+          <linearGradient id={`cToastPink_${id}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#FDA4AF" />
+            <stop offset="100%" stopColor="#F43F5E" />
+          </linearGradient>
+          <linearGradient id={`cToastCream_${id}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#FFFBEB" />
+            <stop offset="100%" stopColor="#FEF3C7" />
+          </linearGradient>
+          <radialGradient id={`cToastEye_${id}`} cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stopColor="#6EE7B7" />
+            <stop offset="50%" stopColor="#10B981" />
+            <stop offset="100%" stopColor="#047857" />
+          </radialGradient>
+        </defs>
+
+        {/* 1. Ears with Twitch Animation */}
+        <polygon points="20,38 32,10 48,30" fill={`url(#cToastFurDeep_${id})`} stroke="#7C2D12" strokeWidth="2.5" strokeLinejoin="round" />
+        <polygon points="26,36 34,18 44,30" fill={`url(#cToastPink_${id})`} opacity="0.9" />
+        <polygon points="52,30 68,10 80,38" fill={`url(#cToastFurDeep_${id})`} stroke="#7C2D12" strokeWidth="2.5" strokeLinejoin="round" />
+        <polygon points="56,30 66,18 74,36" fill={`url(#cToastPink_${id})`} opacity="0.9" />
+
+        {/* 2. Chubby Head Base */}
+        <ellipse cx="50" cy="54" rx="35" ry="30" fill={`url(#cToastFurLight_${id})`} stroke="#7C2D12" strokeWidth="3" />
+
+        {/* Tabby Forehead Marking */}
+        <path d="M42 28 L50 38 L58 28" stroke="#9A3412" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <line x1="50" y1="26" x2="50" y2="35" stroke="#9A3412" strokeWidth="2.2" strokeLinecap="round" />
+
+        {/* Rosy Cheeks */}
+        <ellipse cx="28" cy="60" rx="5.5" ry="3.5" fill="#FB7185" opacity="0.8" />
+        <ellipse cx="72" cy="60" rx="5.5" ry="3.5" fill="#FB7185" opacity="0.8" />
+
+        {/* 3. Dynamic Eyes Based on Variant */}
+        {variant === 'success' && (
+          /* Happy Squint Smiling Eyes (^ ^) */
+          <g>
+            <path d="M32 50 Q40 44 46 50" stroke="#7C2D12" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M54 50 Q60 44 68 50" stroke="#7C2D12" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <circle cx="24" cy="46" r="1.5" fill="#FEF08A" />
+            <circle cx="76" cy="46" r="1.5" fill="#FEF08A" />
+          </g>
+        )}
+
+        {variant === 'error' && (
+          /* Surprised Alert Eyes (O O) */
+          <g>
+            <circle cx="38" cy="50" r="7" fill="#FFFFFF" stroke="#BE123C" strokeWidth="1.5" />
+            <circle cx="38" cy="50" r="3.2" fill="#0F172A" />
+            <circle cx="36" cy="48" r="1.5" fill="#FFFFFF" />
+
+            <circle cx="62" cy="50" r="7" fill="#FFFFFF" stroke="#BE123C" strokeWidth="1.5" />
+            <circle cx="62" cy="50" r="3.2" fill="#0F172A" />
+            <circle cx="60" cy="48" r="1.5" fill="#FFFFFF" />
+
+            <path d="M78 36 C76 34 74 38 74 41 C74 43 76 45 78 45 C80 45 82 43 82 41 C82 38 80 34 78 36 Z" fill="#38BDF8" opacity="0.9" />
+          </g>
+        )}
+
+        {variant === 'info' && (
+          /* Emerald Inquisitive Eyes */
+          <g>
+            <ellipse cx="38" cy="50" rx="6.5" ry="7.5" fill={`url(#cToastEye_${id})`} stroke="#064E3B" strokeWidth="1.5" />
+            <ellipse cx="38" cy="50" rx="2.5" ry="6.8" fill="#020617" />
+            <circle cx="36" cy="47" r="2.2" fill="#FFFFFF" />
+            <circle cx="40" cy="53" r="1.1" fill="#FFFFFF" />
+
+            <ellipse cx="62" cy="50" rx="6.5" ry="7.5" fill={`url(#cToastEye_${id})`} stroke="#064E3B" strokeWidth="1.5" />
+            <ellipse cx="62" cy="50" rx="2.5" ry="6.8" fill="#020617" />
+            <circle cx="60" cy="47" r="2.2" fill="#FFFFFF" />
+            <circle cx="64" cy="53" r="1.1" fill="#FFFFFF" />
+          </g>
+        )}
+
+        {/* 4. Muzzle, Nose, Mouth & Whiskers */}
+        <ellipse cx="50" cy="62" rx="12" ry="8" fill={`url(#cToastCream_${id})`} stroke="#7C2D12" strokeWidth="1.4" />
+        <polygon points="50,60 46,56 54,56" fill={`url(#cToastPink_${id})`} stroke="#7C2D12" strokeWidth="0.8" />
+        <path d="M44 62 Q50 66 50 62 Q50 66 56 62" stroke="#7C2D12" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+
+        <line x1="34" y1="58" x2="16" y2="56" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="34" y1="62" x2="14" y2="64" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="66" y1="58" x2="84" y2="56" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="66" y1="62" x2="86" y2="64" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+
+        {/* 5. Golden Bell Collar */}
+        <g transform="translate(50, 78)">
+          <path d="M-15,-2 Q0,6 15,-2" stroke="#059669" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+          <circle cx="0" cy="4" r="4.5" fill="#FBBF24" stroke="#78350F" strokeWidth="1.4" />
+          <circle cx="0" cy="5" r="1.5" fill="#78350F" />
+        </g>
+
+        {/* 6. Little Waving Paw with Status Jewel */}
+        <g className="cute-cat-waving-paw origin-[74px_74px]" transform="translate(68, 62)">
+          <ellipse cx="8" cy="8" rx="8" ry="6" fill={`url(#cToastCream_${id})`} stroke="#7C2D12" strokeWidth="1.8" />
+          <circle cx="8" cy="8" r="2.5" fill={`url(#cToastPink_${id})`} />
+          {variant === 'success' && (
+            <circle cx="14" cy="3" r="4.5" fill="#10B981" stroke="#FEF08A" strokeWidth="1.2" />
+          )}
+          {variant === 'error' && (
+            <circle cx="14" cy="3" r="4.5" fill="#F43F5E" stroke="#FECDD3" strokeWidth="1.2" />
+          )}
+          {variant === 'info' && (
+            <circle cx="14" cy="3" r="4.5" fill="#FBBF24" stroke="#FEF08A" strokeWidth="1.2" />
+          )}
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+// ============================================================================
+// CYBER-LUXURY CUTE CAT NOTIFICATION BADGE ENGINE (3D ANIMATED HUD TOAST)
+// ป้ายแจ้งเตือนดีไซน์น่ารักและหรูหรา พร้อมน้องแมวส้มดุ๊กดิ๊ก, อุ้งเท้าเกาะขอบป้าย,
+// แอนิเมชัน Spring Physics, วงแหวนเรดาร์ และแสงเลเซอร์วิ่งผ่าน
+// ============================================================================
 const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
   const isThaiText = /[\u0E00-\u0E7F]/.test(String(message || ''));
   const nowTime = new Date().toLocaleTimeString(isThaiText ? 'th-TH' : 'en-GB', {
@@ -64,7 +200,7 @@ const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
       sonarColor: 'border-emerald-400/70',
       orbitColor: 'border-amber-300/60',
       tagBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40',
-      tagLabel: isThaiText ? '⚡ ดำเนินการสำเร็จเรียบร้อย' : '⚡ SYSTEM ACTION VERIFIED',
+      tagLabel: isThaiText ? '🐾 น้องแมวส้ม: สำเร็จเรียบร้อย เหมียว~' : '🐾 CUTE CAT: VERIFIED MEOW~',
       progressGradient: 'from-emerald-400 via-amber-300 to-cyan-400',
       ambientOrb: 'bg-emerald-500/25'
     },
@@ -75,7 +211,7 @@ const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
       sonarColor: 'border-rose-400/75',
       orbitColor: 'border-orange-300/60',
       tagBg: 'bg-rose-500/20 text-rose-300 border-rose-400/45',
-      tagLabel: isThaiText ? '⚠️ แจ้งเตือนตรวจสอบระบบ' : '⚠️ SECURITY & SYSTEM ALERT',
+      tagLabel: isThaiText ? '🐾 น้องแมวส้ม: ตรวจสอบระบบ เหมียว!' : '🐾 CUTE CAT: SYSTEM ALERT MEOW!',
       progressGradient: 'from-rose-500 via-orange-400 to-amber-400',
       ambientOrb: 'bg-rose-500/25'
     },
@@ -86,7 +222,7 @@ const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
       sonarColor: 'border-amber-400/75',
       orbitColor: 'border-sky-300/60',
       tagBg: 'bg-amber-400/20 text-amber-300 border-amber-400/45',
-      tagLabel: isThaiText ? '✨ อัปเดตสถานะอัจฉริยะ' : '✨ INSIGHTFLOW LIVE UPDATE',
+      tagLabel: isThaiText ? '🐾 น้องแมวส้ม: อัปเดตสถานะ เหมียว~' : '🐾 CUTE CAT: LIVE UPDATE MEOW~',
       progressGradient: 'from-amber-400 via-sky-400 to-emerald-400',
       ambientOrb: 'bg-amber-400/25'
     }
@@ -102,6 +238,16 @@ const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
         cfg.borderGlow
       } text-white select-none`}
     >
+      {/* Cute Orange Cat Peeking Paws over Top Edge */}
+      <div className="absolute -top-1 left-7 flex items-center gap-4 pointer-events-none z-20">
+        <span className="w-5 h-2.5 rounded-t-full bg-gradient-to-b from-[#FED7AA] to-[#FB923C] border-t border-l border-r border-[#7C2D12] shadow-sm flex items-center justify-center">
+          <span className="w-1.5 h-1 rounded-full bg-[#FDA4AF]" />
+        </span>
+        <span className="w-5 h-2.5 rounded-t-full bg-gradient-to-b from-[#FED7AA] to-[#FB923C] border-t border-l border-r border-[#7C2D12] shadow-sm flex items-center justify-center">
+          <span className="w-1.5 h-1 rounded-full bg-[#FDA4AF]" />
+        </span>
+      </div>
+
       {/* Top Neon Accent Line */}
       <div className={`h-1 w-full bg-gradient-to-r ${cfg.topAccent}`} />
 
@@ -116,8 +262,8 @@ const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
       />
 
       <div className="relative p-3.5 sm:px-5 sm:py-4 flex items-start gap-3 sm:gap-4">
-        {/* 3D Animated Emblem with Sonar Pulse & Rotating Orbit Ring */}
-        <div className="relative flex-shrink-0 w-12 h-12 flex items-center justify-center mt-0.5">
+        {/* 3D Animated Emblem with Cute Cat Avatar */}
+        <div className="relative flex-shrink-0 w-13 h-13 flex items-center justify-center mt-0.5">
           {/* Expanding Sonar Ring */}
           <span
             className={`toast-sonar-ring absolute inset-0 rounded-2xl border-2 ${cfg.sonarColor}`}
@@ -133,47 +279,11 @@ const CyberLuxuryToastCard = ({ t, message, variant = 'success' }) => {
             style={{ animationDelay: '0.6s' }}
           />
 
-          {/* Core 3D Glass Icon Badge */}
+          {/* Core 3D Glass Icon Badge with Cute Cat Avatar */}
           <div
-            className={`relative z-10 w-12 h-12 rounded-2xl bg-gradient-to-br ${cfg.badgeBg} border flex items-center justify-center shadow-inner`}
+            className={`relative z-10 w-12 h-12 rounded-2xl bg-gradient-to-br ${cfg.badgeBg} border flex items-center justify-center shadow-inner overflow-visible`}
           >
-            {variant === 'success' && (
-              <svg className="w-7 h-7 text-emerald-300 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.35" />
-                <path
-                  className="toast-check-path"
-                  d="M7.5 12.5L10.5 15.5L16.8 8.8"
-                  stroke="#fde047"
-                  strokeWidth="2.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            )}
-            {variant === 'error' && (
-              <svg className="w-7 h-7 text-rose-300 drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]" viewBox="0 0 24 24" fill="none">
-                <path
-                  className="toast-check-path"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  stroke="#fda4af"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            )}
-            {variant === 'info' && (
-              <svg className="w-7 h-7 text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.85)]" viewBox="0 0 24 24" fill="none">
-                <path
-                  className="toast-check-path"
-                  d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"
-                  stroke="#fde047"
-                  strokeWidth="2.3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            )}
+            <CuteCatToastAvatar variant={variant} />
           </div>
         </div>
 
@@ -15201,22 +15311,22 @@ function App() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {/* 1-Click Test Animated Cyber-Luxury Notification Button */}
+            {/* 1-Click Test Animated Cute Cat Notification Button */}
             <button
               type="button"
               onClick={() =>
                 toast.success(
                   tx(
-                    '🎉 ทดสอบป้ายแจ้งเตือน 3D Holographic ใหม่สำเร็จ! ระบบซิงค์ข้อมูลและแอนิเมชันพร้อมใช้งานเต็มรูปแบบ',
-                    '🎉 3D Holographic Notification Badge Active! Real-time animations & data sync verified.'
+                    '🎉 น้อนแมวส้มแจ้งเตือน: ดำเนินการสำเร็จเรียบร้อยแล้วค้าบ! ระบบซิงค์ข้อมูลและวิเคราะห์กำไรพร้อมใช้งาน เหมียว~ 🐱✨',
+                    '🎉 Cute Cat Alert: System Action Verified Successfully! 100% Data Sync & Profit Engine Active, Meow~ 🐱✨'
                   )
                 )
               }
-              className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-500/25 via-amber-400/20 to-teal-500/25 hover:from-emerald-500/35 hover:to-amber-400/35 border border-emerald-400/50 text-emerald-300 text-xs font-black cursor-pointer transition shadow-md"
-              title={tx('กดเพื่อดูตัวอย่างป้ายแจ้งเตือนแอนิเมชันใหม่', 'Click to preview the new 3D animated notification badge')}
+              className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500/25 via-orange-400/20 to-emerald-500/25 hover:from-amber-500/35 hover:to-orange-400/35 border border-amber-400/50 text-amber-300 text-xs font-black cursor-pointer transition shadow-md flex items-center gap-1.5"
+              title={tx('กดเพื่อดูตัวอย่างป้ายแจ้งเตือนน้องแมวส้มดุ๊กดิ๊ก', 'Click to preview Cute Cat notification toast')}
             >
-              <span className="md:hidden">✨</span>
-              <span className="hidden md:inline">✨ {tx('ทดสอบป้ายแจ้งเตือน', 'Test Alert Badge')}</span>
+              <span className="text-sm">🐱</span>
+              <span className="hidden md:inline">{tx('ทดสอบป้ายเตือนน้องแมว', 'Test Cat Alert')}</span>
             </button>
 
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
