@@ -442,3 +442,4 @@ def calculate_what_if_simulation(
             "warning_message": warning_msg,
         },
     }
+

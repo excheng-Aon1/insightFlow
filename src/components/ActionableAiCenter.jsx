@@ -753,3 +753,4 @@ export default function ActionableAiCenter({ lang = 'th' }) {
     </div>
   );
 }
+

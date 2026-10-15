@@ -78,6 +78,14 @@ from actionable_ai import (
     query_ai_business_copilot,
     calculate_what_if_simulation,
 )
+from data_governance import (
+    DataQualityGatekeeper,
+    get_quarantine_records,
+    resolve_quarantine_record,
+    get_data_quality_metrics,
+    RolePermissions,
+    apply_rbac_data_masking,
+)
 from redis_cache import (
     redis_client,
     limiter,
@@ -295,6 +303,11 @@ class WhatIfSimulationRequest(BaseModel):
     discount_pct: float = 10.0
     cost_inflation_pct: float = 5.0
     expected_volume_lift_pct: float = 20.0
+
+
+class QuarantineActionRequest(BaseModel):
+    quarantine_id: str
+    action: str = "APPROVE"
 
 
 # ------------------------------------------------------------------------------
@@ -562,6 +575,39 @@ def simulate_what_if_scenario(req: WhatIfSimulationRequest):
         cost_inflation_pct=req.cost_inflation_pct,
         expected_volume_lift_pct=req.expected_volume_lift_pct,
     )
+
+
+# ------------------------------------------------------------------------------
+# ENTERPRISE DATA GOVERNANCE, RBAC & DATA QUALITY FIREWALL
+# ------------------------------------------------------------------------------
+@app.get("/api/governance/quality-score", status_code=status.HTTP_200_OK)
+def get_governance_quality_score():
+    """ดึงคะแนนสุขภาพความสะอาดของข้อมูล (Data Quality Health Score)"""
+    return get_data_quality_metrics()
+
+
+@app.get("/api/governance/quarantine-logs", status_code=status.HTTP_200_OK)
+def get_governance_quarantine_logs():
+    """ดึงรายการข้อมูลขยะที่ถูกดักจับและกักกันไว้ในห้อง Quarantine"""
+    return {
+        "status": "success",
+        "records": get_quarantine_records(),
+    }
+
+
+@app.post("/api/governance/quarantine/resolve", status_code=status.HTTP_200_OK)
+def resolve_governance_quarantine_record(req: QuarantineActionRequest):
+    """จัดการข้อมูลที่ถูกกักกัน (อนุมัติ APPROVE หรือกำจัดทิ้ง DISCARD)"""
+    return resolve_quarantine_record(quarantine_id=req.quarantine_id, action=req.action)
+
+
+@app.get("/api/governance/rbac-policies", status_code=status.HTTP_200_OK)
+def get_rbac_policies():
+    """ดึงตารางสิทธิ์การเข้าถึงข้อมูลตามบทบาท (RBAC Matrix Policy)"""
+    return {
+        "status": "success",
+        "policies": RolePermissions.POLICIES,
+    }
 
 
 @app.post("/api/database/query", status_code=status.HTTP_200_OK)

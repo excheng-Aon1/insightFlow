@@ -24,6 +24,7 @@ import CuteCatPricingNudge from './components/CuteCatPricingNudge';
 import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
+import DataGovernanceCenter from './components/DataGovernanceCenter';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -7956,6 +7957,22 @@ export function DatabaseTab({
               {filteredRecords.length}
             </span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setDbSubTab('governance')}
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+              dbSubTab === 'governance'
+                ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/25'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>🛡️</span>
+            <span>{tx('ธรรมาภิบาลข้อมูล & สิทธิ์ RBAC (Data Governance)', 'Data Governance & RBAC Security')}</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-bold uppercase border border-emerald-500/30">
+              {tx('องค์กร', 'Enterprise')}
+            </span>
+          </button>
         </div>
 
         <div className="hidden md:flex items-center gap-2 text-xs text-amber-300/90 font-bold px-3">
@@ -8237,6 +8254,11 @@ export function DatabaseTab({
         </table>
       </div>
         </>
+      )}
+
+      {/* 3. Enterprise Data Governance & RBAC Access Control View */}
+      {dbSubTab === 'governance' && (
+        <DataGovernanceCenter lang={lang} />
       )}
     </div>
   );
@@ -15856,6 +15878,7 @@ function App() {
             theme === 'dark'
               ? 'bg-[#050917]/95 border-white/15'
               : 'bg-white/95 border-slate-200'
+              
           }`}
           style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
         >
