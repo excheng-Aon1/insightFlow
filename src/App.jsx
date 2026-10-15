@@ -26,6 +26,7 @@ import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
+import { InsightFlowMnemonicLogo, InsightFlowSuiteGrid } from './components/AdobeStyleInsightFlowLogo';
 import {
   EtlPipelineIcon,
   MasterRecordsIcon,
@@ -11534,11 +11535,33 @@ ChartJS.register(
   Legend
 );
 
-function AppLogo({ size = 46, className = '' }) {
-  return <LuxuryBrandLogo size={size} className={className} />;
+function AppLogo({ size = 46, className = '', style }) {
+  const currentStyle =
+    style ||
+    (typeof window !== 'undefined'
+      ? localStorage.getItem('insightflow_logo_style') || 'adobe'
+      : 'adobe');
+  if (currentStyle === 'original') {
+    return <LuxuryBrandLogo size={size} className={className} />;
+  }
+  return (
+    <InsightFlowMnemonicLogo
+      size={size}
+      letters="If"
+      variant="gold"
+      className={className}
+    />
+  );
 }
 
 function App() {
+  const [logoStyle, setLogoStyle] = useState(() => {
+    try {
+      return localStorage.getItem('insightflow_logo_style') || 'adobe';
+    } catch {
+      return 'adobe';
+    }
+  });
   const [user, setUser] = useState(() => {
     try {
       const savedUserRaw = localStorage.getItem('insightflow_saved_user');
@@ -15327,6 +15350,32 @@ function App() {
             >
               <span className="text-sm">🐱</span>
               <span className="hidden md:inline">{tx('ทดสอบป้ายเตือนน้องแมว', 'Test Cat Alert')}</span>
+            </button>
+
+            {/* Adobe "If" Style vs Original Logo Switcher Button */}
+            <button
+              type="button"
+              onClick={() => {
+                const nextStyle = logoStyle === 'adobe' ? 'original' : 'adobe';
+                setLogoStyle(nextStyle);
+                try {
+                  localStorage.setItem('insightflow_logo_style', nextStyle);
+                } catch (e) {}
+                toast.success(
+                  nextStyle === 'adobe'
+                    ? tx('✨ เปิดใช้งานโลโก้สไตล์ Adobe "If" (InsightFlow Mnemonic Badge)', '✨ Activated Adobe-Style "If" Luxury Mnemonic Badge')
+                    : tx('👑 สลับกลับสู่โลโก้ดั้งเดิม 3D Pillars & Trajectory แล้วครับ', '👑 Restored Original 3D Pillars Logo')
+                );
+              }}
+              className="px-2.5 py-1.5 sm:py-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-xs font-black cursor-pointer transition flex items-center gap-1.5 shadow-sm"
+              title={tx('คลิกสลับสไตล์โลโก้ (สไตล์ Adobe "If" vs โลโก้ดั้งเดิม)', 'Toggle Logo Style: Adobe "If" vs Original')}
+            >
+              <span className="font-mono text-amber-400 font-black">
+                {logoStyle === 'adobe' ? '[If]' : '👑'}
+              </span>
+              <span className="hidden sm:inline text-slate-300">
+                {logoStyle === 'adobe' ? tx('สไตล์ Adobe If', 'Adobe Style') : tx('โลโก้เดิม', 'Original Logo')}
+              </span>
             </button>
 
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
