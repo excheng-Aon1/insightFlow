@@ -7,6 +7,33 @@
 
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import {
+  EtlPipelineIcon,
+  RbacCashierIcon,
+  SocialAdsIcon,
+  VideoAdsIcon,
+  UnitCostIcon,
+  SpreadsheetIcon,
+  SyncSpinIcon,
+  DataGovernanceIcon,
+} from './LuxuryIcons';
+
+const renderSourceIcon = (sourceId) => {
+  switch (sourceId) {
+    case 'POS_SYSTEM':
+      return <RbacCashierIcon size={24} />;
+    case 'FACEBOOK_ADS':
+      return <SocialAdsIcon size={24} />;
+    case 'TIKTOK_ADS':
+      return <VideoAdsIcon size={24} />;
+    case 'WAREHOUSE_ERP':
+      return <UnitCostIcon size={24} />;
+    case 'GOOGLE_SHEETS':
+      return <SpreadsheetIcon size={24} />;
+    default:
+      return <EtlPipelineIcon size={24} />;
+  }
+};
 
 export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
   const isEn = lang === 'en';
@@ -269,10 +296,14 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>{tx('ระบบจัดการและเตรียมข้อมูลต้นน้ำ (Data Engineering Lite & ETL)', 'Data Engineering Lite & Automated ETL')}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-              <span>⚡</span>
-              <span>{tx('ระบบดึงและทำความสะอาดข้อมูลอัตโนมัติ (Automated Pipeline)', 'Automated Multi-Source Extraction & Cleansing Pipeline')}</span>
-            </h3>
+            <div className="flex items-center gap-3.5">
+              <div className="p-2.5 rounded-2xl bg-amber-500/15 border border-amber-500/35 shadow-lg shadow-amber-500/20 flex-shrink-0">
+                <EtlPipelineIcon size={32} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                {tx('ระบบดึงและทำความสะอาดข้อมูลอัตโนมัติ (Automated Pipeline)', 'Automated Multi-Source Extraction & Cleansing Pipeline')}
+              </h3>
+            </div>
             <p className="text-sm text-slate-300 leading-relaxed">
               {tx(
                 'ดึงข้อมูลจากจุดขาย POS, ค่าโฆษณา Facebook/TikTok และระบบคลังสินค้า เข้ามาคัดกรองแถวซ้ำซ้อน, จัดฟอร์แมตตัวเลข, แปลง พ.ศ. เป็น ค.ศ. และอัปเดตเข้าฐานข้อมูล SQL อัตโนมัติทุกวัน ผู้ใช้ไม่ต้องอัปโหลดไฟล์เอง',
@@ -287,15 +318,13 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
               type="button"
               onClick={handleTriggerEtl}
               disabled={isLoading}
-              className={`px-5 py-3.5 rounded-xl font-black text-sm text-slate-950 flex items-center justify-center gap-2 shadow-lg transition-all duration-200 ${
+              className={`px-5 py-3.5 rounded-xl font-black text-sm text-slate-950 flex items-center justify-center gap-2.5 shadow-lg transition-all duration-200 ${
                 isLoading
                   ? 'bg-amber-300/60 cursor-not-allowed opacity-80'
                   : 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-110 hover:shadow-amber-500/25 active:scale-95'
               }`}
             >
-              <span className={`text-base ${isLoading ? 'animate-spin' : ''}`}>
-                {isLoading ? '⏳' : '🔄'}
-              </span>
+              <SyncSpinIcon size={20} className={isLoading ? 'animate-spin' : ''} />
               <span>
                 {isLoading
                   ? tx('กำลังดึงและคลีนข้อมูล...', 'Extracting & Cleansing...')
@@ -338,8 +367,8 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
           </div>
 
           <div className="bg-slate-950/60 border border-white/10 rounded-xl p-3.5 flex flex-col justify-between">
-            <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
-              <span>🛡️</span>
+            <span className="text-xs text-slate-400 font-bold flex items-center gap-2">
+              <DataGovernanceIcon size={16} />
               <span>{tx('ข้อมูลซ้ำที่ตัดทิ้ง (Deduplication)', 'Duplicates Discarded')}</span>
             </span>
             <div className="mt-2">
@@ -353,8 +382,8 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
           </div>
 
           <div className="bg-slate-950/60 border border-white/10 rounded-xl p-3.5 flex flex-col justify-between">
-            <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
-              <span>⏱️</span>
+            <span className="text-xs text-slate-400 font-bold flex items-center gap-2">
+              <SyncSpinIcon size={16} />
               <span>{tx('รอบทำงานอัตโนมัติ (Schedule)', 'Automation Cycle')}</span>
             </span>
             <div className="mt-2">
@@ -372,8 +401,8 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
       {/* 3. Data Sources Connectors Grid */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-base font-black text-white flex items-center gap-2">
-            <span>🔗</span>
+          <h4 className="text-base font-black text-white flex items-center gap-2.5">
+            <EtlPipelineIcon size={20} />
             <span>{tx('แหล่งข้อมูลที่เชื่อมต่อในระบบ (Data Source Connectors)', 'Connected Data Source Connectors')}</span>
           </h4>
           <span className="text-xs text-slate-400">
@@ -389,8 +418,10 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
             >
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-2xl">{src.icon}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 shadow-inner">
+                      {renderSourceIcon(src.id)}
+                    </div>
                     <div>
                       <h5 className="text-sm font-black text-white leading-tight">{src.name}</h5>
                       <span className="text-[11px] text-slate-400 font-medium">{src.category}</span>

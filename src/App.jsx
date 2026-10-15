@@ -25,7 +25,16 @@ import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
-import { EtlPipelineIcon, MasterRecordsIcon, DataGovernanceIcon } from './components/LuxuryIcons';
+import {
+  EtlPipelineIcon,
+  MasterRecordsIcon,
+  DataGovernanceIcon,
+  FileRegistryIcon,
+  SearchInspectorIcon,
+  FileDocumentIcon,
+  DatabaseAddIcon,
+  TrashCanIcon,
+} from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -8020,33 +8029,41 @@ export function DatabaseTab({
         }}
       >
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <div>
-            <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fbbf24' }}>
-              📂 {tx('คลังไฟล์ที่คุณอัปโหลดเข้าสู่ระบบทั้งหมด (กดดูเนื้อหาในไฟล์ได้ทันที)', 'All Uploaded Files Registry (Click to Inspect File Data)')}
-            </h4>
-            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: '#cbd5e1' }}>
-              {tx(
-                'ทุกครั้งที่คุณอัปโหลดไฟล์ใหม่ ข้อความ ตัวเลข และตารางในหน้านั้นจะเปลี่ยนตามข้อมูลในไฟล์จริงทันที และสามารถกดดูข้อมูลในไฟล์ย้อนหลังได้ที่นี่ครับ',
-                'Whenever you upload a file, page text, metrics, and tables update dynamically from your file content. Click any file below to inspect its rows.'
-              )}
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <FileRegistryIcon size={26} />
+            <div>
+              <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fbbf24' }}>
+                {tx('คลังไฟล์ที่คุณอัปโหลดเข้าสู่ระบบทั้งหมด (กดดูเนื้อหาในไฟล์ได้ทันที)', 'All Uploaded Files Registry (Click to Inspect File Data)')}
+              </h4>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: '#cbd5e1' }}>
+                {tx(
+                  'ทุกครั้งที่คุณอัปโหลดไฟล์ใหม่ ข้อความ ตัวเลข และตารางในหน้านั้นจะเปลี่ยนตามข้อมูลในไฟล์จริงทันที และสามารถกดดูข้อมูลในไฟล์ย้อนหลังได้ที่นี่ครับ',
+                  'Whenever you upload a file, page text, metrics, and tables update dynamically from your file content. Click any file below to inspect its rows.'
+                )}
+              </p>
+            </div>
           </div>
           {onInspectUploadedFile && (
             <button
               type="button"
               onClick={() => onInspectUploadedFile('database')}
               style={{
-                padding: '0.6rem 1.1rem',
+                padding: '0.6rem 1.15rem',
                 borderRadius: '12px',
                 border: '1px solid rgba(251, 191, 36, 0.5)',
                 background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
                 color: '#0f172a',
                 fontWeight: 900,
                 fontSize: '0.84rem',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                boxShadow: '0 4px 14px -2px rgba(245, 158, 11, 0.4)'
               }}
             >
-              🔍 {tx('เปิดหน้าต่างดูเนื้อหาไฟล์ทั้งหมด', 'Open Full Uploaded File Inspector')}
+              <SearchInspectorIcon size={18} />
+              <span>{tx('เปิดหน้าต่างดูเนื้อหาไฟล์ทั้งหมด', 'Open Full Uploaded File Inspector')}</span>
             </button>
           )}
         </div>
@@ -8088,8 +8105,9 @@ export function DatabaseTab({
                       </span>
                     )}
                   </div>
-                  <div style={{ fontWeight: 900, color: '#f8fafc', fontSize: '0.92rem', marginTop: '0.25rem', wordBreak: 'break-all' }}>
-                    📄 {fMeta.filename}
+                  <div style={{ fontWeight: 900, color: '#f8fafc', fontSize: '0.92rem', marginTop: '0.25rem', wordBreak: 'break-all', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                    <FileDocumentIcon size={18} />
+                    <span>{fMeta.filename}</span>
                   </div>
                   <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.2rem' }}>
                     {fMeta.rows.toLocaleString()} {tx('รายการ', 'rows')} • {isEn ? fMeta.updatedAtEn : fMeta.updatedAtTh}
@@ -8112,10 +8130,15 @@ export function DatabaseTab({
                       color: '#38bdf8',
                       fontWeight: 800,
                       fontSize: '0.78rem',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem'
                     }}
                   >
-                    🔍 {tx('ดูข้อมูลในไฟล์นี้', 'View File Content')}
+                    <SearchInspectorIcon size={15} />
+                    <span>{tx('ดูข้อมูลในไฟล์นี้', 'View File Content')}</span>
                   </button>
                 )}
               </div>
@@ -8176,16 +8199,22 @@ export function DatabaseTab({
         <button
           type="submit"
           style={{
-            padding: '0.68rem 1.1rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.55rem',
+            padding: '0.68rem 1.25rem',
             borderRadius: '10px',
-            border: 'none',
+            border: '1px solid rgba(16,185,129,0.4)',
             background: 'linear-gradient(135deg, #10b981, #059669)',
             color: '#fff',
             fontWeight: 800,
-            cursor: 'pointer'
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(16,185,129,0.35)'
           }}
         >
-          {tx('➕ บันทึกลงฐานข้อมูล', '➕ Add to Database')}
+          <DatabaseAddIcon size={18} />
+          <span>{tx('บันทึกลงฐานข้อมูล', 'Add to Database')}</span>
         </button>
       </form>
 
@@ -8200,20 +8229,25 @@ export function DatabaseTab({
               {tx('ตารางรายการซื้อขายในฐานข้อมูลกลาง', 'Master Transaction Records')} ({filteredRecords.length})
             </h4>
           </div>
-          <input
-            type="text"
-            value={dbSearch}
-            onChange={e => setDbSearch(e.target.value)}
-            placeholder={tx('ค้นหาชื่อลูกค้า สินค้า หรือรหัสบิล...', 'Search customer, product, or bill ID...')}
-            style={{
-              padding: '0.6rem 0.95rem',
-              borderRadius: '10px',
-              border: '1px solid rgba(148,163,184,0.3)',
-              background: '#0f172a',
-              color: '#f8fafc',
-              minWidth: '250px'
-            }}
-          />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <span style={{ position: 'absolute', left: '0.85rem', pointerEvents: 'none', opacity: 0.8, display: 'inline-flex' }}>
+              <SearchInspectorIcon size={16} />
+            </span>
+            <input
+              type="text"
+              value={dbSearch}
+              onChange={e => setDbSearch(e.target.value)}
+              placeholder={tx('ค้นหาชื่อลูกค้า สินค้า หรือรหัสบิล...', 'Search customer, product, or bill ID...')}
+              style={{
+                padding: '0.6rem 0.95rem 0.6rem 2.4rem',
+                borderRadius: '10px',
+                border: '1px solid rgba(148,163,184,0.3)',
+                background: '#0f172a',
+                color: '#f8fafc',
+                minWidth: '260px'
+              }}
+            />
+          </div>
         </div>
 
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '740px' }}>
@@ -8247,7 +8281,10 @@ export function DatabaseTab({
                       type="button"
                       onClick={() => handleDeleteRecord(rec.id)}
                       style={{
-                        padding: '0.4rem 0.75rem',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.45rem 0.8rem',
                         borderRadius: '8px',
                         border: '1px solid rgba(244,63,94,0.4)',
                         background: 'rgba(244,63,94,0.14)',
@@ -8257,7 +8294,8 @@ export function DatabaseTab({
                         cursor: 'pointer'
                       }}
                     >
-                      {tx('ลบรายการ', 'Delete')}
+                      <TrashCanIcon size={14} />
+                      <span>{tx('ลบรายการ', 'Delete')}</span>
                     </button>
                   </td>
                 </tr>
@@ -12725,10 +12763,10 @@ function App() {
             <button
               type="button"
               onClick={() => setInspectingUploadTab(tabKey)}
-              className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-sky-300 border border-sky-400/40 hover:border-sky-300 font-black text-xs sm:text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 hover:shadow-sky-500/20"
+              className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-sky-300 border border-sky-400/40 hover:border-sky-300 font-black text-xs sm:text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 active:scale-95 hover:shadow-sky-500/20"
               title={tx('เปิดดูเนื้อหาในไฟล์ที่อัปโหลดทั้งหมด', 'Inspect all uploaded files')}
             >
-              <span className="text-sm">📂</span>
+              <FileRegistryIcon size={18} />
               <span className="truncate">
                 {tx(`คลังไฟล์ (${totalUploadedCount})`, `Files (${totalUploadedCount})`)}
               </span>

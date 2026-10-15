@@ -1213,3 +1213,255 @@ export function QuarantineDomeIcon({ size = 24, className = '' }) {
   );
 }
 
+/**
+ * 13. File Registry Folder Icon (3D Gold & Amber Folder Archive)
+ */
+export function FileRegistryIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`regGold_${id}`} x1="4" y1="6" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="45%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`regTab_${id}`} x1="4" y1="4" x2="16" y2="12" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      {/* แถบแฟ้มหลัง */}
+      <path d="M4.5 9C4.5 7.6 5.6 6.5 7 6.5H12.5L15 9.5H25C26.4 9.5 27.5 10.6 27.5 12V24C27.5 25.4 26.4 26.5 25 26.5H7C5.6 26.5 4.5 25.4 4.5 24V9Z" fill="rgba(245, 158, 11, 0.22)" stroke={`url(#regGold_${id})`} strokeWidth="1.8" />
+      {/* เอกสารคริสตัลภายใน */}
+      <rect x="7.5" y="11.5" width="17" height="12" rx="2" fill="#0B132B" stroke="#7DD3FC" strokeWidth="1.2" />
+      <line x1="10.5" y1="15" x2="19.5" y2="15" stroke="#BAE6FD" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="10.5" y1="18.5" x2="16.5" y2="18.5" stroke="#BAE6FD" strokeWidth="1.5" strokeLinecap="round" />
+      {/* ตราเพชรทองคำหน้าแฟ้ม */}
+      <circle cx="21" cy="18.5" r="2.2" fill="#FEF08A" stroke="#F59E0B" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/**
+ * 14. Search Inspector Icon (3D Cyan & Platinum Magnifying Glass)
+ */
+export function SearchInspectorIcon({ size = 20, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`schCyan_${id}`} x1="4" y1="4" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+        <linearGradient id={`schGold_${id}`} x1="18" y1="18" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      {/* เลนส์ขยายกระจกคริสตัล */}
+      <circle cx="13.5" cy="13.5" r="8.5" fill="rgba(56, 189, 248, 0.22)" stroke={`url(#schCyan_${id})`} strokeWidth="2.4" />
+      {/* วงแหวนสะท้อนแสงด้านใน */}
+      <path d="M8 13.5C8 10.5 10.5 8 13.5 8" stroke="#FFFBEB" strokeWidth="1.6" strokeLinecap="round" />
+      {/* ด้ามจับทองคำ 24K */}
+      <line x1="19.5" y1="19.5" x2="27.5" y2="27.5" stroke={`url(#schGold_${id})`} strokeWidth="3.2" strokeLinecap="round" />
+      <circle cx="13.5" cy="13.5" r="2.5" fill="#38BDF8" opacity="0.6" />
+    </svg>
+  );
+}
+
+/**
+ * 15. File Document Icon (3D Sapphire & Cyan CSV Spreadsheet Document)
+ */
+export function FileDocumentIcon({ size = 20, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`docSapphire_${id}`} x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#1D4ED8" />
+        </linearGradient>
+      </defs>
+      {/* ตัวแผ่นกระดาษพับมุม */}
+      <path
+        d="M7.5 4.5H19.5L25.5 10.5V26.5C25.5 27.6 24.6 28.5 23.5 28.5H7.5C6.4 28.5 5.5 27.6 5.5 26.5V6.5C5.5 5.4 6.4 4.5 7.5 4.5Z"
+        fill="rgba(56, 189, 248, 0.18)"
+        stroke={`url(#docSapphire_${id})`}
+        strokeWidth="1.8"
+      />
+      {/* รอยพับมุมบนขวา */}
+      <path d="M19.5 4.5V10.5H25.5" stroke={`url(#docSapphire_${id})`} strokeWidth="1.6" />
+      {/* แถวข้อมูลในไฟล์ */}
+      <line x1="9.5" y1="15" x2="17.5" y2="15" stroke="#BAE6FD" strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="9.5" y1="19" x2="21.5" y2="19" stroke="#BAE6FD" strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="9.5" y1="23" x2="19.5" y2="23" stroke="#BAE6FD" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="19.5" cy="15" r="1.2" fill="#34D399" />
+    </svg>
+  );
+}
+
+/**
+ * 16. Database Add Icon (3D Emerald & Gold Database Record Adder)
+ */
+export function DatabaseAddIcon({ size = 20, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`dbAddEmerald_${id}`} x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#D1FAE5" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+        <linearGradient id={`dbAddGold_${id}`} x1="16" y1="14" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="100%" stopColor="#F59E0B" />
+        </linearGradient>
+      </defs>
+      {/* ทรงกระบอกฐานข้อมูล */}
+      <ellipse cx="14" cy="8" rx="8.5" ry="3.5" fill="rgba(16, 185, 129, 0.28)" stroke={`url(#dbAddEmerald_${id})`} strokeWidth="1.6" />
+      <path d="M5.5 8V18C5.5 20.2 9.3 22 14 22C18.7 22 22.5 20.2 22.5 18V8" stroke={`url(#dbAddEmerald_${id})`} strokeWidth="1.6" />
+      <path d="M5.5 13C5.5 15.2 9.3 17 14 17C18.7 17 22.5 15.2 22.5 13" stroke="#A7F3D0" strokeWidth="1.4" />
+      {/* ตราเครื่องหมายบวกทองคำ */}
+      <circle cx="22" cy="22" r="6" fill="#0F172A" stroke={`url(#dbAddGold_${id})`} strokeWidth="2" />
+      <path d="M22 18.5V25.5M18.5 22H25.5" stroke="#FFFBEB" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 17. Trash Can Delete Icon (Sleek Ruby & Rose Deletion Icon)
+ */
+export function TrashCanIcon({ size = 16, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`tshRuby_${id}`} x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FECDD3" />
+          <stop offset="50%" stopColor="#F43F5E" />
+          <stop offset="100%" stopColor="#BE123C" />
+        </linearGradient>
+      </defs>
+      {/* ฝาถัง */}
+      <path d="M4 6H20M9 6V4C9 3.4 9.4 3 10 3H14C14.6 3 15 3.4 15 4V6" stroke={`url(#tshRuby_${id})`} strokeWidth="2" strokeLinecap="round" />
+      {/* ตัวถัง */}
+      <path d="M6 6L7.2 19.1C7.3 20.2 8.2 21 9.3 21H14.7C15.8 21 16.7 20.2 16.8 19.1L18 6" stroke={`url(#tshRuby_${id})`} strokeWidth="2" strokeLinecap="round" />
+      <line x1="10" y1="10" x2="10" y2="17" stroke="#FDA4AF" strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="14" y1="10" x2="14" y2="17" stroke="#FDA4AF" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 18. Social Ads Marketing Icon (3D Sapphire & Cyan Social Ad Beacon)
+ */
+export function SocialAdsIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`socBlue_${id}`} x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#1E40AF" />
+        </linearGradient>
+      </defs>
+      {/* สมาร์ตโฟน/แท็บเล็ตโฆษณา */}
+      <rect x="7" y="4" width="18" height="24" rx="4" fill="rgba(56, 189, 248, 0.2)" stroke={`url(#socBlue_${id})`} strokeWidth="2" />
+      {/* สัญลักษณ์แคมเปญโฆษณาพุ่งขึ้น */}
+      <circle cx="16" cy="12" r="4" fill="#0B132B" stroke="#38BDF8" strokeWidth="1.5" />
+      <path d="M14 12L15.5 13.5L18 10.5" stroke="#FEF08A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      {/* กราฟแท่งผลลัพธ์โฆษณา */}
+      <rect x="10" y="20" width="2.5" height="4" rx="0.8" fill="#38BDF8" />
+      <rect x="14.5" y="18" width="2.5" height="6" rx="0.8" fill="#34D399" />
+      <rect x="19" y="16" width="2.5" height="8" rx="0.8" fill="#FEF08A" />
+    </svg>
+  );
+}
+
+/**
+ * 19. Video Ads Stream Icon (3D Rose Video Media / TikTok Reel)
+ */
+export function VideoAdsIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`vidRose_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFE4E6" />
+          <stop offset="50%" stopColor="#FB7185" />
+          <stop offset="100%" stopColor="#E11D48" />
+        </linearGradient>
+      </defs>
+      {/* ฟิล์มม้วนวิดีโอ 3 มิติ */}
+      <rect x="5" y="6" width="22" height="20" rx="4" fill="rgba(244, 63, 94, 0.22)" stroke={`url(#vidRose_${id})`} strokeWidth="2" />
+      {/* แถบรูฟิล์มบน-ล่าง */}
+      <circle cx="9" cy="9.5" r="1.3" fill="#FFE4E6" />
+      <circle cx="16" cy="9.5" r="1.3" fill="#FFE4E6" />
+      <circle cx="23" cy="9.5" r="1.3" fill="#FFE4E6" />
+      <circle cx="9" cy="22.5" r="1.3" fill="#FFE4E6" />
+      <circle cx="16" cy="22.5" r="1.3" fill="#FFE4E6" />
+      <circle cx="23" cy="22.5" r="1.3" fill="#FFE4E6" />
+      {/* ปุ่ม Play เล่นวิดีโอตรงกลาง */}
+      <polygon points="14,13 20,16 14,19" fill="#FEF08A" stroke="#FFFBEB" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/**
+ * 20. Spreadsheet Icon (3D Emerald Google Sheets Grid)
+ */
+export function SpreadsheetIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`sheetEmerald_${id}`} x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#D1FAE5" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+      </defs>
+      <rect x="5.5" y="5.5" width="21" height="21" rx="3.5" fill="rgba(16, 185, 129, 0.22)" stroke={`url(#sheetEmerald_${id})`} strokeWidth="2" />
+      {/* เส้นตารางสเปรดชีต */}
+      <line x1="5.5" y1="12" x2="26.5" y2="12" stroke="#6EE7B7" strokeWidth="1.5" />
+      <line x1="5.5" y1="19" x2="26.5" y2="19" stroke="#6EE7B7" strokeWidth="1.5" />
+      <line x1="13" y1="5.5" x2="13" y2="26.5" stroke="#6EE7B7" strokeWidth="1.5" />
+      <line x1="20" y1="5.5" x2="20" y2="26.5" stroke="#6EE7B7" strokeWidth="1.5" />
+      {/* ไฮไลต์เซลล์ทองคำ */}
+      <rect x="13.5" y="12.5" width="6" height="6" fill="#FEF08A" opacity="0.65" />
+    </svg>
+  );
+}
+
+/**
+ * 21. Sync Spin Icon (3D Quantum Sync Dual-Orbit)
+ */
+export function SyncSpinIcon({ size = 18, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <defs>
+        <linearGradient id={`syncGold_${id}`} x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="50%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M20 12C20 16.4 16.4 20 12 20C8.5 20 5.6 17.8 4.5 14.5M4 12C4 7.6 7.6 4 12 4C15.5 4 18.4 6.2 19.5 9.5"
+        stroke={`url(#syncGold_${id})`}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <polygon points="19.5,4 20,10 14,9" fill="#FEF08A" />
+      <polygon points="4.5,20 4,14 10,15" fill="#FEF08A" />
+    </svg>
+  );
+}
+
