@@ -21,6 +21,7 @@ import { IndustryBenchmarkAndGoalDecomposition } from './components/IndustryBenc
 import { GoogleSheetCuteButton, GoogleSheetSyncModal } from './components/GoogleSheetSyncModal';
 import ProofAndTrustSection from './components/ProofAndTrustSection';
 import CuteCatPricingNudge from './components/CuteCatPricingNudge';
+import CuteCatAnnouncementBoard from './components/CuteCatAnnouncementBoard';
 import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
@@ -15266,6 +15267,19 @@ function App() {
         </header>
 
         <main className="p-3 sm:p-6 lg:p-8 pb-28 lg:pb-8 space-y-3.5 sm:space-y-6 flex-1 max-w-full overflow-x-hidden">
+          {/* CUTE GINGER CAT ANNOUNCEMENT BILLBOARD WITH LIVELY 3D ANIMATION */}
+          <CuteCatAnnouncementBoard
+            isEn={isEn}
+            onNavigateTab={(tab) => {
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenPricing={() => {
+              setActiveTab('admin');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+
           {/* MISS UNIVERSE EXECUTIVE STAGE — COMPACT & SLEEK CROWN PODIUM */}
           <div
             className={`mu-stage-card py-2.5 px-3.5 sm:px-5 rounded-2xl border shadow-xl relative ${
