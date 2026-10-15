@@ -20,6 +20,7 @@ import { CashFlowAndDemandForecast } from './components/CashFlowAndDemandForecas
 import { IndustryBenchmarkAndGoalDecomposition } from './components/IndustryBenchmarkAndGoalDecomposition';
 import { GoogleSheetCuteButton, GoogleSheetSyncModal } from './components/GoogleSheetSyncModal';
 import ProofAndTrustSection from './components/ProofAndTrustSection';
+import CuteBearPricingNudge from './components/CuteBearPricingNudge';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -15826,6 +15827,20 @@ function App() {
             </button>
           </div>
         </nav>
+
+        {/* Cute Bear Mascot (LINE Style Popup: "คุณยังไม่สมัครแพ็กเกจ ดูว่ามีแพ็คอะไรบ้าง กดดูเลย") */}
+        <CuteBearPricingNudge
+          isEn={isEn}
+          onOpenPricing={() => {
+            const pricingEl = document.getElementById('pricing');
+            if (pricingEl) {
+              pricingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+              setIsLoginOpen(true);
+            }
+          }}
+          onOpenRegister={() => setIsLoginOpen(true)}
+        />
       </div>
     </div>
   );
