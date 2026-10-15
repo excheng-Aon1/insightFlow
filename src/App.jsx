@@ -21,6 +21,7 @@ import { IndustryBenchmarkAndGoalDecomposition } from './components/IndustryBenc
 import { GoogleSheetCuteButton, GoogleSheetSyncModal } from './components/GoogleSheetSyncModal';
 import ProofAndTrustSection from './components/ProofAndTrustSection';
 import CuteCatPricingNudge from './components/CuteCatPricingNudge';
+import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 const canUseBackendApi = () =>
@@ -7845,6 +7846,7 @@ export function DatabaseTab({
   const tx = (th, en) => (isEn ? en : th);
 
   const [dbSearch, setDbSearch] = useState('');
+  const [dbSubTab, setDbSubTab] = useState('pipeline');
   const [newCustomer, setNewCustomer] = useState('');
   const [newProduct, setNewProduct] = useState('');
   const [newAmount, setNewAmount] = useState('');
@@ -7912,7 +7914,62 @@ export function DatabaseTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {renderUploadZone('database', tx('คลังฐานข้อมูลการขายของร้าน', 'Central Store Transaction Database'))}
+      {/* Sub-tab Navigation Switcher */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-2 rounded-2xl bg-slate-900/90 border border-white/10 backdrop-blur-xl shadow-xl">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setDbSubTab('pipeline')}
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+              dbSubTab === 'pipeline'
+                ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>⚡</span>
+            <span>{tx('ระบบจัดการและเตรียมข้อมูลอัตโนมัติ (ETL Pipeline)', 'Automated Data Pipeline & ETL')}</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20 font-bold uppercase">
+              Auto
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setDbSubTab('records')}
+            className={`px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all ${
+              dbSubTab === 'records'
+                ? 'bg-gradient-to-r from-sky-400 to-blue-500 text-slate-950 shadow-lg shadow-blue-500/25'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>📋</span>
+            <span>{tx('คลังไฟล์และตารางธุรกรรมร้าน (Master Records)', 'Master Transaction Records & Files')}</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/20 font-bold uppercase">
+              {filteredRecords.length}
+            </span>
+          </button>
+        </div>
+
+        <div className="hidden md:flex items-center gap-2 text-xs text-amber-300/90 font-bold px-3">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>{tx('PostgreSQL Connection Pool: พร้อมรองรับ 100K - 1M+ แถว', 'PostgreSQL QueuePool: Ready for 1M+ Rows')}</span>
+        </div>
+      </div>
+
+      {/* 1. Automated ETL & Data Pipeline View */}
+      {dbSubTab === 'pipeline' && (
+        <DataPipelineEtlCenter
+          lang={lang}
+          onSyncSuccess={() => {
+            // Callback when ETL finishes
+          }}
+        />
+      )}
+
+      {/* 2. Manual Transaction Records & Uploads View */}
+      {dbSubTab === 'records' && (
+        <>
+          {renderUploadZone('database', tx('คลังฐานข้อมูลการขายของร้าน', 'Central Store Transaction Database'))}
 
       {/* Uploaded Files Registry across all modules */}
       <div
@@ -8171,6 +8228,8 @@ export function DatabaseTab({
           </tbody>
         </table>
       </div>
+        </>
+      )}
     </div>
   );
 }

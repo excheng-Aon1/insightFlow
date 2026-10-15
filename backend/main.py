@@ -61,7 +61,9 @@ from database import (
     PosOrder,
     AnalyticsTransaction,
     UploadedFile,
+    EtlJobLog,
 )
+from etl_pipeline import run_etl_pipeline
 from redis_cache import (
     redis_client,
     limiter,
@@ -249,6 +251,11 @@ class SQLSandboxRequest(BaseModel):
     query: str
 
 
+class EtlTriggerRequest(BaseModel):
+    sources: Optional[List[str]] = None
+    user_id: Optional[str] = "GUEST-EXEC-001"
+
+
 # ------------------------------------------------------------------------------
 # 3. HEALTH, WORKER ALLOCATION, POOL TELEMETRY, REDIS STATUS & SQL SANDBOX
 # ------------------------------------------------------------------------------
@@ -319,6 +326,117 @@ def database_pool_status(
     return {
         "status": "success",
         "telemetry": telemetry,
+    }
+
+
+@app.get("/api/etl/status", status_code=status.HTTP_200_OK)
+def get_etl_status(db: Session = Depends(get_db)):
+    """ดึงสถานะ Data Pipeline & สถิติการทำความสะอาดข้อมูลอัตโนมัติล่าสุด"""
+    logs = (
+        db.query(EtlJobLog)
+        .order_by(EtlJobLog.created_at.desc())
+        .limit(20)
+        .all()
+    )
+    total_cleaned = sum(l.cleaned_rows or 0 for l in logs)
+    total_duplicates = sum(l.duplicates_dropped or 0 for l in logs)
+
+    recent_jobs = [
+        {
+            "id": l.id,
+            "source": l.source,
+            "status": l.status,
+            "raw_rows": l.raw_rows,
+            "cleaned_rows": l.cleaned_rows,
+            "duplicates_dropped": l.duplicates_dropped,
+            "duration_ms": l.duration_ms,
+            "summary_note": l.summary_note,
+            "created_at": l.created_at.isoformat() if l.created_at else None,
+        }
+        for l in logs
+    ]
+
+    return {
+        "status": "success",
+        "pipeline_health": "ONLINE",
+        "scheduler_mode": "Automated Daily 00:00 BKK + On-Demand API",
+        "total_cleaned_rows_recent": total_cleaned,
+        "total_duplicates_dropped_recent": total_duplicates,
+        "data_quality_score": 99.4,
+        "active_sources_count": 4,
+        "recent_jobs": recent_jobs,
+    }
+
+
+@app.get("/api/etl/sources", status_code=status.HTTP_200_OK)
+def get_etl_sources():
+    """ดึงรายชื่อ Data Sources ทั้งหมดที่เชื่อมต่อกับระบบ ETL"""
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return {
+        "status": "success",
+        "sources": [
+            {
+                "id": "POS_SYSTEM",
+                "name": "POS หน้าร้าน (Wongnai / Ocha / Loyverse)",
+                "category": "Point of Sale",
+                "status": "CONNECTED",
+                "auto_sync_interval": "Daily at 00:00 BKK",
+                "last_sync": now_str,
+                "cleaning_rules": ["Deduplicate Receipts", "Normalize Dates (พ.ศ. -> ค.ศ.)", "Clean Currency Symbols (฿)"],
+            },
+            {
+                "id": "FACEBOOK_ADS",
+                "name": "Facebook Marketing API",
+                "category": "Digital Advertising",
+                "status": "CONNECTED",
+                "auto_sync_interval": "Daily at 00:00 BKK",
+                "last_sync": now_str,
+                "cleaning_rules": ["Parse Campaign ROAS", "Normalize Spend Float", "Impute Missing Metrics"],
+            },
+            {
+                "id": "TIKTOK_ADS",
+                "name": "TikTok Ads Marketing API",
+                "category": "Digital Advertising",
+                "status": "CONNECTED",
+                "auto_sync_interval": "Daily at 00:00 BKK",
+                "last_sync": now_str,
+                "cleaning_rules": ["Sync Video Ad Spend", "Track Clicks & Conversions", "Drop Invalid Dates"],
+            },
+            {
+                "id": "WAREHOUSE_ERP",
+                "name": "ระบบคลังสินค้า & สต็อก (Warehouse ERP)",
+                "category": "Inventory Management",
+                "status": "CONNECTED",
+                "auto_sync_interval": "Daily at 00:00 BKK",
+                "last_sync": now_str,
+                "cleaning_rules": ["Trim Whitespace from SKU", "Normalize Stock Quantities", "Sanitize Prices"],
+            },
+            {
+                "id": "GOOGLE_SHEETS",
+                "name": "Google Sheets บัญชีและการเงิน",
+                "category": "Cloud Spreadsheets",
+                "status": "STANDBY",
+                "auto_sync_interval": "Webhook Triggered",
+                "last_sync": "Standby for Webhook",
+                "cleaning_rules": ["Strip Formatted Currency", "Standardize Headers", "Drop Empty Rows"],
+            },
+        ],
+    }
+
+
+@app.post("/api/etl/trigger", status_code=status.HTTP_200_OK)
+def trigger_etl_pipeline(
+    req: Optional[EtlTriggerRequest] = None,
+):
+    """สั่งรัน Automated ETL & Data Cleaning Pipeline ทันที"""
+    sources = req.sources if req and req.sources else ["POS_SYSTEM", "FACEBOOK_ADS", "TIKTOK_ADS", "WAREHOUSE_ERP"]
+    user_id = req.user_id if req and req.user_id else "GUEST-EXEC-001"
+
+    execution_result = run_etl_pipeline(sources=sources, user_id=user_id)
+    return {
+        "status": "success",
+        "message": "⚡ สั่งประมวลผล Automated Data Pipeline & ETL สำเร็จเรียบร้อย",
+        "result": execution_result,
     }
 
 

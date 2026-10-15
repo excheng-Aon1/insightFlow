@@ -1,0 +1,70 @@
+# ==============================================================================
+# Workflow: InsightFlow Automated Daily ETL & Data Cleaning Pipeline
+# Schedule: Runs daily at 17:00 UTC (00:00 Bangkok Time GMT+7)
+# Description: Automated extraction, cleaning, and ingestion from POS, Ads,
+#              and ERP APIs directly into production SQL / Data Warehouse.
+# ==============================================================================
+
+name: Automated Daily Data Pipeline & ETL
+
+on:
+  schedule:
+    # 17:00 UTC = 00:00 (Midnight) Bangkok Time (GMT+7)
+    - cron: '0 17 * * *'
+  workflow_dispatch:
+    inputs:
+      data_source:
+        description: 'Target Data Source to Sync'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - pos
+          - ads
+          - inventory
+      user_id:
+        description: 'Tenant User Context'
+        required: false
+        default: 'GUEST-EXEC-001'
+
+jobs:
+  run-etl-pipeline:
+    name: Extract, Clean & Ingest Enterprise Data
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 Install Backend & ETL Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: 🚀 Run Automated ETL Engine
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FALLBACK_DATABASE_URL: "sqlite:///./insightflow_pooled.db"
+          POS_API_URL: ${{ secrets.POS_API_URL }}
+          POS_API_KEY: ${{ secrets.POS_API_KEY }}
+          FB_MARKETING_TOKEN: ${{ secrets.FB_MARKETING_TOKEN }}
+          TIKTOK_ADS_TOKEN: ${{ secrets.TIKTOK_ADS_TOKEN }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          SOURCE_PARAM="${{ github.event.inputs.data_source || 'all' }}"
+          USER_PARAM="${{ github.event.inputs.user_id || 'GUEST-EXEC-001' }}"
+          echo "Running ETL Pipeline for source: $SOURCE_PARAM..."
+          python backend/etl_pipeline.py --source "$SOURCE_PARAM" --user-id "$USER_PARAM"
+
+      - name: 📊 Pipeline Run Health Check
+        if: success()
+        run: |
+          echo "✅ Automated ETL Pipeline executed successfully and synced clean data to database."

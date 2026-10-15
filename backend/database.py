@@ -262,10 +262,25 @@ class UploadedFile(Base):
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
 
+class EtlJobLog(Base):
+    __tablename__ = "etl_job_logs"
+
+    id = Column(String(128), primary_key=True, index=True)
+    source = Column(String(64), nullable=False, index=True)  # POS_SYSTEM, FACEBOOK_ADS, TIKTOK_ADS, WAREHOUSE_ERP, GOOGLE_SHEETS
+    status = Column(String(32), default="SUCCESS", index=True)  # SUCCESS, RUNNING, FAILED
+    raw_rows = Column(Integer, default=0)
+    cleaned_rows = Column(Integer, default=0)
+    duplicates_dropped = Column(Integer, default=0)
+    duration_ms = Column(Float, default=0.0)
+    summary_note = Column(Text, default="")
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
 # Composite Indexes สำหรับเพิ่มความเร็วในการคิวรี่และเขียนพร้อมกันระดับพันคำขอ
 Index("ix_cashflow_user_type_date", CashFlowTransaction.user_id, CashFlowTransaction.type, CashFlowTransaction.date)
 Index("ix_products_user_stock", Product.user_id, Product.stock_qty)
 Index("ix_uploaded_files_user_created", UploadedFile.user_id, UploadedFile.created_at)
+Index("ix_etl_job_source_created", EtlJobLog.source, EtlJobLog.created_at)
 
 
 # ------------------------------------------------------------------------------
@@ -306,6 +321,7 @@ def get_pool_telemetry(db: Session) -> Dict[str, Any]:
         "cash_flow_transactions": db.query(CashFlowTransaction).count(),
         "transactions": db.query(AnalyticsTransaction).count(),
         "uploaded_files": db.query(UploadedFile).count(),
+        "etl_job_logs": db.query(EtlJobLog).count(),
     }
     return {
         "engine": ACTIVE_DB_METADATA["configured_dialect"].upper(),
