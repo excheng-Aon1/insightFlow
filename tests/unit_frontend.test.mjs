@@ -165,4 +165,57 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(spaRewrite, 'vercel.json must route SPA requests to /index.html');
   });
 
+  // ----------------------------------------------------------------------------
+  // 6. EYE-COMFORT WHITE-BLUE LIGHT MODE & GREEN/RED TREND INDICATOR SYSTEM
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-09: index.css defines eye-comfortable White-Blue Light Mode design system', () => {
+    const cssPath = path.join(projectRoot, 'src', 'index.css');
+    assert.ok(fs.existsSync(cssPath), 'src/index.css must exist');
+
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+
+    // 1. Soothing off-white & soft sapphire background
+    assert.ok(
+      cssContent.includes('#f8fafc') || cssContent.includes('#f0f5fa'),
+      'Light mode must use eye-comfortable background (#f8fafc / #f0f5fa)'
+    );
+
+    // 2. White cards with soft blue borders
+    assert.ok(
+      cssContent.includes('#dbeafe'),
+      'Light mode cards must feature soft blue borders (#dbeafe)'
+    );
+
+    // 3. Royal Blue / Navy primary buttons, tabs and accents
+    assert.ok(
+      cssContent.includes('#2563eb') || cssContent.includes('#1d4ed8') || cssContent.includes('#1e40af'),
+      'Light mode must use Royal Blue accents (#2563eb / #1d4ed8 / #1e40af)'
+    );
+  });
+
+  test('UNIT-FE-10: Strict Green (ขาขึ้น) / Red (ขาลง) Trend Indicator System is established', () => {
+    const cssPath = path.join(projectRoot, 'src', 'index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+
+    // Upward trend indicators (Green)
+    assert.ok(
+      cssContent.includes('.trend-up') && cssContent.includes('#047857'),
+      'Upward trends (.trend-up) must be styled in bold readable green (#047857)'
+    );
+    assert.ok(
+      cssContent.includes('.badge-trend-up'),
+      'Upward trend badges (.badge-trend-up) must be defined'
+    );
+
+    // Downward trend indicators (Red)
+    assert.ok(
+      cssContent.includes('.trend-down') && cssContent.includes('#b91c1c'),
+      'Downward trends (.trend-down) must be styled in bold readable red (#b91c1c)'
+    );
+    assert.ok(
+      cssContent.includes('.badge-trend-down'),
+      'Downward trend badges (.badge-trend-down) must be defined'
+    );
+  });
+
 });

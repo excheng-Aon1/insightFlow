@@ -462,29 +462,32 @@ body {
 
 /* ==========================================================================
    INSIGHTFLOW LIGHT MODE HIGH-CONTRAST READABILITY & SURFACE ENGINE
-   - ทำให้โหมดสว่าง (Light Mode) ตัวหนังสือคมชัดระดับหมึกพิมพ์ (Ultra-Crisp Ink #0F172A)
-   - แปลงการ์ด พื้นหลังตาราง ช่องกรอกข้อมูล และป้ายสถานะทุกหน้าให้สว่างสะอาดตา
-   - ปรับเฉดสีทอง เขียว ฟ้า แดง ม่วง ให้เข้มขึ้นในโหมดสว่าง ताकिอ่านชัดเจน 100% ไม่จาง
+/* ==========================================================================
+   INSIGHTFLOW MODERN EXECUTIVE WHITE & BLUE LIGHT MODE THEME
+   - ออกแบบให้สบายตา ไม่แสบตา (Soothing Eye-Comfort Palette)
+   - โทนสีหลัก: ขาวคลีน (#ffffff) + พื้นหลังนุ่มนวล (#f8fafc) + น้ำเงินหรูหรา (#1e40af, #2563eb, #3b82f6)
+   - ขาขึ้น (Upward Trends, Growth, Gains, +%): สีเขียวมรกต (#047857 / #10b981)
+   - ขาลง (Downward Trends, Drops, Losses, -%): สีแดงทับทิม (#b91c1c / #ef4444)
    ========================================================================== */
 
 html[data-theme="light"],
 html[data-theme="light"] body,
 body.theme-light {
-  background-color: #f1f5f9 !important;
+  background-color: #f8fafc !important;
   color: #0f172a !important;
 }
 
-/* 1. การ์ดหลักและกล่องข้อมูล (.glass-card และพื้นหลังมืดทั้งหมด ยกเว้นป้ายแจ้งเตือน HUD) */
+/* 1. การ์ดหลักและกล่องข้อมูล (.glass-card โทนขาว-น้ำเงิน สบายตา) */
 html[data-theme="light"] .glass-card:not(.cyber-toast-hud) {
   background: #ffffff !important;
-  border-color: #cbd5e1 !important;
+  border-color: #dbeafe !important;
   color: #0f172a !important;
-  box-shadow: 0 10px 28px -6px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+  box-shadow: 0 4px 20px -2px rgba(30, 58, 138, 0.05), 0 2px 6px -1px rgba(30, 58, 138, 0.03) !important;
 }
 
-/* แปลงพื้นหลัง Tailwind โทนมืดให้เป็นพื้นขาว/เทาอ่อนสะอาดตาในโหมดสว่าง */
-html[data-theme="light"] [class*="bg-[#0"]:not(.cyber-toast-hud),
-html[data-theme="light"] [class*="bg-[#1"]:not(.cyber-toast-hud),
+/* แปลงพื้นหลัง Tailwind โทนมืดให้เป็นพื้นขาวคลีนตัดขอบน้ำเงินละมุนในโหมดสว่าง */
+html[data-theme="light"] [class*="bg-[#0"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [class*="bg-[#1"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
 html[data-theme="light"] .bg-slate-950:not(.cyber-toast-hud),
 html[data-theme="light"] .bg-slate-900:not(.cyber-toast-hud),
 html[data-theme="light"] .bg-slate-900\/95:not(.cyber-toast-hud),
@@ -513,33 +516,33 @@ html[data-theme="light"] .bg-black\/50:not(.cyber-toast-hud),
 html[data-theme="light"] .bg-black\/60:not(.cyber-toast-hud) {
   background-color: #ffffff !important;
   color: #0f172a !important;
-  border-color: #cbd5e1 !important;
+  border-color: #dbeafe !important;
 }
 
-/* แปลง Gradient พื้นหลังมืดของ Tailwind ให้เป็นพื้นขาวมุกไล่เฉดสะอาดตา */
+/* แปลง Gradient พื้นหลังมืดให้เป็นขาว-ฟ้าอ่อนละมุนตา */
 html[data-theme="light"] [class*="from-[#0"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="from-[#1"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="from-slate-9"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="from-slate-8"]:not(.cyber-toast-hud) {
   --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
-  --tw-gradient-to: #f8fafc var(--tw-gradient-to-position) !important;
+  --tw-gradient-to: #f0f7ff var(--tw-gradient-to-position) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
 html[data-theme="light"] [class*="via-[#0"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="via-[#1"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="via-slate-9"]:not(.cyber-toast-hud) {
-  --tw-gradient-via: #f8fafc var(--tw-gradient-via-position) !important;
-  --tw-gradient-stops: var(--tw-gradient-from), #f8fafc, var(--tw-gradient-to) !important;
+  --tw-gradient-via: #f8fbff var(--tw-gradient-via-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #f8fbff, var(--tw-gradient-to) !important;
 }
 
 html[data-theme="light"] [class*="to-[#0"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="to-[#1"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="to-slate-9"]:not(.cyber-toast-hud) {
-  --tw-gradient-to: #f1f5f9 var(--tw-gradient-to-position) !important;
+  --tw-gradient-to: #eff6ff var(--tw-gradient-to-position) !important;
 }
 
-/* แปลง Inline Dark Backgrounds ในทุกแท็บ (เช่น rgba(15, 23, 42, ...), rgba(2, 6, 23, ...), #0f172a) */
+/* แปลง Inline Dark Backgrounds ให้เป็นขาวตัดฟ้านุ่มนวล */
 html[data-theme="light"] [style*="rgba(15, 23, 42"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
 html[data-theme="light"] [style*="rgba(2, 6, 23"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
 html[data-theme="light"] [style*="rgba(5, 8, 20"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
@@ -552,18 +555,18 @@ html[data-theme="light"] [style*="rgb(30, 41, 59)"]:not(.cyber-toast-hud):not(.l
 html[data-theme="light"] [style*="#0f172a"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
 html[data-theme="light"] [style*="#020617"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
 html[data-theme="light"] [style*="#1e293b"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *) {
-  background: #f8fafc !important;
-  border-color: #cbd5e1 !important;
+  background: #ffffff !important;
+  border-color: #dbeafe !important;
   color: #0f172a !important;
 }
 
-/* 2. ตัวหนังสือหลักและตัวหนังสือรองในโหมดสว่าง: เข้ม คมชัด 100% อ่านง่ายไม่ต้องเพ่ง */
+/* 2. ตัวหนังสือหลักและตัวหนังสือรอง: โทนสีน้ำเงินครามเข้มและ Slate คมชัดระดับ Premium */
 html[data-theme="light"] h1:not(.cyber-toast-hud *),
 html[data-theme="light"] h2:not(.cyber-toast-hud *),
 html[data-theme="light"] h3:not(.cyber-toast-hud *),
 html[data-theme="light"] h4:not(.cyber-toast-hud *),
 html[data-theme="light"] th:not(.cyber-toast-hud *),
-html[data-theme="light"] strong:not(.cyber-toast-hud *) {
+html[data-theme="light"] strong:not(.cyber-toast-hud *):not(.trend-indicator *) {
   color: #0f172a !important;
 }
 
@@ -574,8 +577,8 @@ html[data-theme="light"] label:not(.cyber-toast-hud *) {
   color: #1e293b;
 }
 
-/* แปลงคลาสสีขาว/สีเทาอ่อนให้เป็นสีหมึกเข้มคมชัดในโหมดสว่าง (ยกเว้นปุ่มที่มีพื้นหลังสีเข้ม) */
-html[data-theme="light"] .text-white:not(.bg-rose-500):not(.bg-rose-600):not(.bg-emerald-500):not(.bg-emerald-600):not(.bg-sky-500):not(.bg-sky-600):not(.bg-blue-600):not(.bg-indigo-600):not(.bg-purple-600):not(.bg-amber-600):not(.bg-\[\#06C755\]):not(.cyber-toast-hud):not(.cyber-toast-hud *),
+/* แปลงคลาสสีขาว/สีเทาอ่อนให้เป็นสีหมึกน้ำเงินครามเข้มในโหมดสว่าง */
+html[data-theme="light"] .text-white:not(.bg-rose-500):not(.bg-rose-600):not(.bg-emerald-500):not(.bg-emerald-600):not(.bg-sky-500):not(.bg-sky-600):not(.bg-blue-600):not(.bg-blue-700):not(.bg-indigo-600):not(.bg-\[\#06C755\]):not(.cyber-toast-hud):not(.cyber-toast-hud *):not(.btn-primary),
 html[data-theme="light"] .text-slate-50:not(.cyber-toast-hud *),
 html[data-theme="light"] .text-slate-100:not(.cyber-toast-hud *),
 html[data-theme="light"] .text-slate-200:not(.cyber-toast-hud *) {
@@ -586,104 +589,129 @@ html[data-theme="light"] .text-slate-300:not(.cyber-toast-hud *),
 html[data-theme="light"] .text-slate-400:not(.cyber-toast-hud *),
 html[data-theme="light"] .text-slate-500:not(.cyber-toast-hud *),
 html[data-theme="light"] .text-slate-600:not(.cyber-toast-hud *) {
-  color: #1e293b !important;
+  color: #334155 !important;
 }
 
-/* คงตัวหนังสือสีขาวไว้เฉพาะบนปุ่มกดที่มีพื้นหลังสีทึบ (Solid Action Buttons) */
-html[data-theme="light"] button.bg-rose-500,
-html[data-theme="light"] button.bg-rose-600,
-html[data-theme="light"] button.bg-emerald-500,
-html[data-theme="light"] button.bg-emerald-600,
-html[data-theme="light"] button.bg-sky-500,
-html[data-theme="light"] button.bg-sky-600,
-html[data-theme="light"] button.bg-blue-600,
-html[data-theme="light"] button.bg-indigo-600,
-html[data-theme="light"] button.bg-purple-600,
-html[data-theme="light"] a.bg-\[\#06C755\],
-html[data-theme="light"] button.bg-\[\#06C755\] {
+/* 3. ปุ่มกดหลักและไฮไลท์เน้นโทน น้ำเงินหรูหรา (Executive Royal Blue #2563eb / #1d4ed8) */
+html[data-theme="light"] button.bg-amber-400,
+html[data-theme="light"] .bg-gradient-to-r.from-amber-400.to-amber-300 {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  color: #ffffff !important;
+  border-color: #1e40af !important;
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.25) !important;
+}
+
+html[data-theme="light"] button.bg-amber-400:hover,
+html[data-theme="light"] .bg-gradient-to-r.from-amber-400.to-amber-300:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
   color: #ffffff !important;
 }
 
-/* แปลง Inline Text Colors ที่เป็นสีขาว/สีอ่อนให้กลายเป็นสีหมึกเข้มคมชัดในโหมดสว่าง */
-html[data-theme="light"] [style*="color: rgb(248, 250, 252)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(255, 255, 255)"]:not(button):not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(241, 245, 249)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(226, 232, 240)"]:not(.cyber-toast-hud *) {
-  color: #0f172a !important;
+/* ป้ายสถานะ/ป้ายกำกับทั่วไปในโหมดสว่างให้เป็นโทนฟ้า-น้ำเงินสบายตา */
+html[data-theme="light"] .bg-amber-400\/10,
+html[data-theme="light"] .bg-amber-400\/15,
+html[data-theme="light"] .bg-amber-400\/20,
+html[data-theme="light"] .bg-amber-500\/10,
+html[data-theme="light"] .bg-amber-500\/15,
+html[data-theme="light"] .bg-amber-500\/20 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
 }
 
-html[data-theme="light"] [style*="color: rgb(203, 213, 225)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(148, 163, 184)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(100, 116, 139)"]:not(.cyber-toast-hud *) {
-  color: #1e293b !important;
+html[data-theme="light"] .text-amber-400,
+html[data-theme="light"] .text-amber-300 {
+  color: #1d4ed8 !important;
 }
 
-/* 3. ปรับเฉดสีไฮไลท์ (ทอง / เขียว / ฟ้า / แดง / ม่วง) ให้เข้มคมชัดบนพื้นขาว ไม่แสบตาและไม่จาง */
-/* สีทอง/เหลืองอำพัน -> ทองเข้มระดับผู้บริหาร (#b45309 / #92400e) */
-html[data-theme="light"] .text-amber-100:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-amber-200:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-amber-300:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-amber-400:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-amber-500:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-yellow-300:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-yellow-400:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(251, 191, 36)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(253, 230, 138)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(254, 243, 199)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(245, 158, 11)"]:not(.cyber-toast-hud *) {
-  color: #b45309 !important;
-}
+/* ==========================================================================
+   TREND INDICATOR SYSTEM (ส่วนที่เป็นขาขึ้น/ลง ให้ใช้สีเขียว/แดง ชัดเจน 100%)
+   ========================================================================== */
 
-/* สีเขียวมรกต -> เขียวเข้มคมชัด (#047857) */
-html[data-theme="light"] .text-emerald-100:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-emerald-200:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-emerald-300:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-emerald-400:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-emerald-500:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(52, 211, 153)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(16, 185, 129)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(110, 231, 183)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(167, 243, 208)"]:not(.cyber-toast-hud *) {
+/* 🟢 ขาขึ้น (Upward Trends / Growth / Gains / Profit / +% / Above Benchmark) */
+.trend-up,
+[data-trend="up"],
+.trend-positive,
+.text-trend-up {
   color: #047857 !important;
+  font-weight: 700 !important;
 }
 
-/* สีฟ้าไซอัน -> น้ำเงินเข้มคมชัด (#0369a1) */
-html[data-theme="light"] .text-sky-100:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-sky-200:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-sky-300:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-sky-400:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-cyan-200:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-cyan-300:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-cyan-400:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(56, 189, 248)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(125, 211, 252)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(186, 230, 253)"]:not(.cyber-toast-hud *) {
-  color: #0369a1 !important;
+html:not([data-theme="light"]) .trend-up,
+html:not([data-theme="light"]) [data-trend="up"],
+html:not([data-theme="light"]) .text-trend-up {
+  color: #34d399 !important;
 }
 
-/* สีแดงโรส -> แดงทับทิมเข้มคมชัด (#be123c) */
-html[data-theme="light"] .text-rose-200:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-rose-300:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-rose-400:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(244, 63, 94)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(251, 113, 133)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(253, 164, 175)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(254, 205, 211)"]:not(.cyber-toast-hud *) {
-  color: #be123c !important;
+/* ป้าย Badge ขาขึ้น */
+.badge-trend-up,
+[data-trend-badge="up"],
+html[data-theme="light"] .bg-emerald-500\/15,
+html[data-theme="light"] .bg-emerald-500\/20 {
+  background-color: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+  color: #047857 !important;
+  font-weight: 700 !important;
 }
 
-/* สีม่วงไวโอเล็ต -> ม่วงเข้มคมชัด (#6d28d9) */
-html[data-theme="light"] .text-purple-200:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-purple-300:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-purple-400:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-indigo-200:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-indigo-300:not(.cyber-toast-hud *),
-html[data-theme="light"] .text-indigo-400:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(168, 85, 247)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(192, 132, 252)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(233, 213, 255)"]:not(.cyber-toast-hud *),
-html[data-theme="light"] [style*="color: rgb(129, 140, 248)"]:not(.cyber-toast-hud *) {
-  color: #6d28d9 !important;
+html:not([data-theme="light"]) .badge-trend-up,
+html:not([data-theme="light"]) [data-trend-badge="up"] {
+  background-color: rgba(16, 185, 129, 0.16) !important;
+  border: 1px solid rgba(52, 211, 153, 0.38) !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="light"] .text-emerald-300,
+html[data-theme="light"] .text-emerald-400,
+html[data-theme="light"] .text-emerald-500,
+html[data-theme="light"] .text-green-500,
+html[data-theme="light"] .text-green-600 {
+  color: #047857 !important;
+  font-weight: 700 !important;
+}
+
+/* 🔴 ขาลง (Downward Trends / Drops / Loss / Risk / -% / Below Benchmark) */
+.trend-down,
+[data-trend="down"],
+.trend-negative,
+.text-trend-down {
+  color: #b91c1c !important;
+  font-weight: 700 !important;
+}
+
+html:not([data-theme="light"]) .trend-down,
+html:not([data-theme="light"]) [data-trend="down"],
+html:not([data-theme="light"]) .text-trend-down {
+  color: #f87171 !important;
+}
+
+/* ป้าย Badge ขาลง */
+.badge-trend-down,
+[data-trend-badge="down"],
+html[data-theme="light"] .bg-rose-500\/15,
+html[data-theme="light"] .bg-rose-500\/20,
+html[data-theme="light"] .bg-red-500\/15,
+html[data-theme="light"] .bg-red-500\/20 {
+  background-color: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  color: #b91c1c !important;
+  font-weight: 700 !important;
+}
+
+html:not([data-theme="light"]) .badge-trend-down,
+html:not([data-theme="light"]) [data-trend-badge="down"] {
+  background-color: rgba(239, 68, 68, 0.16) !important;
+  border: 1px solid rgba(248, 113, 113, 0.38) !important;
+  color: #f87171 !important;
+}
+
+html[data-theme="light"] .text-rose-300,
+html[data-theme="light"] .text-rose-400,
+html[data-theme="light"] .text-rose-500,
+html[data-theme="light"] .text-red-500,
+html[data-theme="light"] .text-red-600 {
+  color: #b91c1c !important;
+  font-weight: 700 !important;
 }
 
 /* 4. ช่องกรอกข้อมูล (Input / Select / Textarea) และตารางข้อมูลในโหมดสว่าง */
@@ -692,20 +720,21 @@ html[data-theme="light"] select,
 html[data-theme="light"] textarea {
   background-color: #ffffff !important;
   color: #0f172a !important;
-  border: 1.5px solid #94a3b8 !important;
+  border: 1.5px solid #bfdbfe !important;
   font-weight: 600 !important;
 }
 
-html[data-theme="light"] input::placeholder,
-html[data-theme="light"] textarea::placeholder {
-  color: #64748b !important;
-  opacity: 1 !important;
+html[data-theme="light"] input:focus,
+html[data-theme="light"] select:focus,
+html[data-theme="light"] textarea:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
 }
 
 html[data-theme="light"] table th {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-bottom: 2px solid #cbd5e1 !important;
+  background-color: #f0f7ff !important;
+  color: #1e3a8a !important;
+  border-bottom: 2px solid #bfdbfe !important;
   font-weight: 700 !important;
 }
 
@@ -716,10 +745,10 @@ html[data-theme="light"] table td {
 }
 
 html[data-theme="light"] table tr:hover td {
-  background-color: #f8fafc !important;
+  background-color: #f8fbff !important;
 }
 
-/* 5. เส้นขอบในโหมดสว่างให้เห็นกรอบชัดเจน ไม่กลืนไปกับพื้นขาว */
+/* 5. เส้นขอบในโหมดสว่างให้เป็นโทนฟ้า-เทานุ่มนวล สบายสายตา */
 html[data-theme="light"] .border-white\/5,
 html[data-theme="light"] .border-white\/10,
 html[data-theme="light"] .border-white\/15,
@@ -728,7 +757,7 @@ html[data-theme="light"] .border-slate-800,
 html[data-theme="light"] .border-slate-800\/80,
 html[data-theme="light"] .border-slate-700,
 html[data-theme="light"] .border-slate-700\/50 {
-  border-color: #cbd5e1 !important;
+  border-color: #dbeafe !important;
 }
 
 /* ==========================================================================

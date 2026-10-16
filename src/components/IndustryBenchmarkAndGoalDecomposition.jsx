@@ -504,7 +504,7 @@ export function IndustryBenchmarkAndGoalDecomposition({
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: '0.76rem', color: '#cbd5e1', marginBottom: '0.35rem' }}>
                       <div>
                         {tx('ร้านคุณ:', 'Your Store:')}{' '}
-                        <strong style={{ fontSize: '1rem', color: pillar.diff < 0 ? '#fbbf24' : '#34d399' }}>
+                        <strong style={{ fontSize: '1rem', color: pillar.diff < 0 ? '#ef4444' : '#10b981' }}>
                           {pillar.yourValue.toLocaleString()}{pillar.unit}
                         </strong>
                       </div>

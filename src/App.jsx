@@ -12578,6 +12578,7 @@ function App() {
     htmlEl.setAttribute('data-theme', theme);
     htmlEl.classList.toggle('theme-light', theme === 'light');
     htmlEl.classList.toggle('theme-dark', theme === 'dark');
+    htmlEl.classList.toggle('dark', theme === 'dark');
     document.body.classList.toggle('theme-light', theme === 'light');
     document.body.classList.toggle('theme-dark', theme === 'dark');
   }, [theme]);
@@ -13464,10 +13465,14 @@ function App() {
         {/* Login Modal (Scrollable & Mobile-Optimized with 1-Tap Instant Access at Top) */}
         {isLoginOpen && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-start sm:items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
-            <div className="bg-[#0c1222] border border-white/15 rounded-3xl w-full max-w-md max-h-[92dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative my-auto">
+            <div className={`border rounded-3xl w-full max-w-md max-h-[92dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative my-auto ${
+              theme === 'light' ? 'bg-white border-blue-100 text-slate-900 shadow-blue-900/10' : 'bg-[#0c1222] border-white/15 text-white'
+            }`}>
               <button
                 onClick={() => setIsLoginOpen(false)}
-                className="sticky top-0 float-right w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200 hover:text-white transition text-base font-black z-10 cursor-pointer"
+                className={`sticky top-0 float-right w-9 h-9 rounded-full flex items-center justify-center transition text-base font-black z-10 cursor-pointer ${
+                  theme === 'light' ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white'
+                }`}
                 aria-label="Close"
               >
                 ✕
@@ -13476,14 +13481,14 @@ function App() {
                 <AppLogo size={54} />
                 {renderLanguageSwitcher()}
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-center mb-1.5 text-white">
+              <h2 className={`text-xl sm:text-2xl font-black text-center mb-1.5 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                 {authMode === 'otp'
                   ? tx('🔐 เข้าสู่ระบบด้วยรหัส OTP 2FA', 'Sign In with 2FA OTP Code')
                   : authMode === 'login'
                   ? tx('เข้าสู่ระบบจัดการร้านค้า', 'Sign In to Your Store Console')
                   : tx('ลงทะเบียนเจ้าของร้านใหม่', 'Create New Store Account')}
               </h2>
-              <p className="text-slate-300 text-center text-xs sm:text-sm mb-3">
+              <p className={`text-center text-xs sm:text-sm mb-3 ${theme === 'light' ? 'text-slate-600' : 'text-slate-300'}`}>
                 {authMode === 'otp'
                   ? tx('ระบบจะส่งรหัสยืนยัน 6 หลักไปยังอีเมลของคุณเพื่อความปลอดภัยสูงสุด', 'A 6-digit OTP code will be sent to your email address')
                   : tx('เลือกวิธีเข้าสู่ระบบที่คุณสะดวก หรือกดทางลัด 1 คลิกด้านล่างครับ', 'Choose your preferred sign-in method or use 1-Tap access below.')}
@@ -14124,10 +14129,10 @@ function App() {
                     activeSection === item.id
                       ? theme === 'dark'
                         ? 'text-amber-400 border-amber-400'
-                        : 'text-amber-700 border-amber-600'
+                        : 'text-blue-700 border-blue-600'
                       : theme === 'dark'
                       ? 'text-slate-300 border-transparent hover:text-white'
-                      : 'text-slate-800 border-transparent hover:text-slate-950'
+                      : 'text-slate-700 border-transparent hover:text-blue-700'
                   }`}
                 >
                   {item.label}
@@ -14143,7 +14148,7 @@ function App() {
                 className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border text-xs font-black cursor-pointer transition ${
                   theme === 'dark'
                     ? 'border-white/15 bg-white/5 text-amber-300 hover:bg-white/10'
-                    : 'border-slate-300 bg-slate-100 text-slate-900 hover:bg-slate-200'
+                    : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 shadow-sm'
                 }`}
                 title={tx('สลับโหมดมืด / โหมดสว่าง', 'Switch Dark / Light Mode')}
               >
@@ -14152,7 +14157,11 @@ function App() {
               </button>
               <button
                 onClick={() => setIsLoginOpen(true)}
-                className="bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition shadow-lg cursor-pointer whitespace-nowrap"
+                className={`font-black px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition shadow-lg cursor-pointer whitespace-nowrap ${
+                  theme === 'light'
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-blue-500/25'
+                    : 'bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950'
+                }`}
               >
                 <span className="sm:hidden">{tx('เข้าใช้งาน', 'Sign In')}</span>
                 <span className="hidden sm:inline">{t.freeTrial}</span>
@@ -14194,8 +14203,12 @@ function App() {
         <main className="flex-1 px-4 sm:px-8 lg:px-16 py-6 sm:py-14 max-w-[1600px] mx-auto w-full">
           <div id="home" className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center mb-12 sm:mb-24">
             <div className="lg:col-span-6">
-              <div className="inline-flex items-center gap-2 bg-amber-400/10 text-amber-400 text-xs font-black px-3.5 py-1.5 rounded-full mb-4 sm:mb-6 border border-amber-400/20">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <div className={`inline-flex items-center gap-2 text-xs font-black px-3.5 py-1.5 rounded-full mb-4 sm:mb-6 border ${
+                theme === 'light'
+                  ? 'bg-blue-50 text-blue-700 border-blue-200'
+                  : 'bg-amber-400/10 text-amber-400 border-amber-400/20'
+              }`}>
+                <span className={`w-2 h-2 rounded-full animate-pulse ${theme === 'light' ? 'bg-blue-600' : 'bg-amber-400'}`}></span>
                 <span>{t.badgeHero}</span>
               </div>
 
@@ -14205,14 +14218,14 @@ function App() {
                   className={`block mt-1.5 sm:mt-2 bg-clip-text text-transparent ${
                     theme === 'dark'
                       ? 'bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500'
-                      : 'bg-gradient-to-r from-amber-700 via-orange-600 to-amber-800'
+                      : 'bg-gradient-to-r from-blue-700 via-blue-600 to-sky-600'
                   }`}
                 >
                   {t.tagline2}
                 </span>
               </h1>
 
-              <p className="text-slate-300 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed">{t.description}</p>
+              <p className={`text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>{t.description}</p>
 
               <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 sm:gap-4 items-center mb-4 sm:mb-6">
                 <button
@@ -14221,15 +14234,23 @@ function App() {
                     handleSelectSubscriptionPlan('starter', null, true);
                     setIsLoginOpen(true);
                   }}
-                  className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl shadow-xl text-base sm:text-lg cursor-pointer text-center transition-all duration-200 transform hover:scale-[1.02]"
+                  className={`w-full sm:w-auto font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl shadow-xl text-base sm:text-lg cursor-pointer text-center transition-all duration-200 transform hover:scale-[1.02] ${
+                    theme === 'light'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-blue-500/25'
+                      : 'bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-400 text-slate-950'
+                  }`}
                 >
                   {t.heroCtaPrimary || t.freeTrial}
                 </button>
                 <button
                   onClick={() => setIsAppleFilmOpen(true)}
-                  className="w-full sm:w-auto bg-[#0b1120] hover:bg-slate-800 text-white font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl border border-amber-400/40 shadow-[0_0_25px_rgba(251,191,36,0.2)] text-base sm:text-lg cursor-pointer text-center flex items-center justify-center gap-2 transition-all duration-200"
+                  className={`w-full sm:w-auto font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl border text-base sm:text-lg cursor-pointer text-center flex items-center justify-center gap-2 transition-all duration-200 ${
+                    theme === 'light'
+                      ? 'bg-white hover:bg-blue-50 text-slate-800 border-blue-200 shadow-sm'
+                      : 'bg-[#0b1120] hover:bg-slate-800 text-white border-amber-400/40 shadow-[0_0_25px_rgba(251,191,36,0.2)]'
+                  }`}
                 >
-                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+                  <span className={`inline-block w-2.5 h-2.5 rounded-full animate-ping ${theme === 'light' ? 'bg-blue-600' : 'bg-amber-400'}`} />
                   <span>▶ {t.watchDemo}</span>
                 </button>
               </div>
@@ -15467,7 +15488,7 @@ function App() {
           <nav className="p-3.5 space-y-2 mt-1">
             {(isSidebarOpen || isMobileMenuOpen) && (
               <div className="px-3 pb-1 flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                <p className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-blue-700' : 'text-amber-400'}`}>
                   {isExemptAdminMode
                     ? tx('เมนู Super Admin (เว้นแพ็กเกจ)', 'Super Admin Menu (Exempt)')
                     : tx('เมนูหลักตามแพ็กเกจ', 'Package Navigation')}
@@ -15497,11 +15518,11 @@ function App() {
                   className={`w-full flex items-center justify-between p-2.5 rounded-2xl text-left transition-all cursor-pointer ${
                     activeTab === item.id
                       ? (theme === 'light'
-                          ? 'bg-amber-500/10 text-amber-950 border-2 border-amber-500 shadow-sm'
+                          ? 'bg-blue-50/90 text-blue-900 border-2 border-blue-600 shadow-sm'
                           : 'bg-gradient-to-r from-amber-400/25 via-amber-400/10 to-transparent text-white border-2 border-amber-400 shadow-lg')
                       : unlocked
                       ? (theme === 'light'
-                          ? 'text-slate-700 hover:text-slate-950 hover:bg-slate-100 border-2 border-transparent'
+                          ? 'text-slate-700 hover:text-blue-700 hover:bg-blue-50/60 border-2 border-transparent'
                           : 'text-slate-200 hover:text-white hover:bg-white/10 border-2 border-transparent')
                       : (theme === 'light'
                           ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 border-2 border-dashed border-slate-200 opacity-85'
@@ -15516,7 +15537,7 @@ function App() {
                       <div className="min-w-0 flex-1">
                         <p className={`text-sm font-black truncate leading-tight ${
                           activeTab === item.id
-                            ? (theme === 'light' ? 'text-amber-800' : 'text-amber-300')
+                            ? (theme === 'light' ? 'text-blue-700' : 'text-amber-300')
                             : (theme === 'light' ? 'text-slate-900' : 'text-slate-100')
                         }`}>
                           {item.label}
@@ -15524,7 +15545,7 @@ function App() {
                         {item.subLabel && (
                           <p className={`text-[11px] truncate mt-0.5 leading-snug ${
                             activeTab === item.id
-                              ? (theme === 'light' ? 'text-amber-900/80 font-bold' : 'text-amber-200/80 font-bold')
+                              ? (theme === 'light' ? 'text-blue-600 font-bold' : 'text-amber-200/80 font-bold')
                               : (theme === 'light' ? 'text-slate-500 font-medium' : 'text-slate-400 font-medium')
                           }`}>
                             {item.subLabel}
@@ -15536,7 +15557,9 @@ function App() {
                   {showLabels && (
                     unlocked ? (
                       item.badge && (
-                        <span className="text-[11px] font-black px-2 py-0.5 rounded-lg bg-amber-400 text-slate-950 flex-shrink-0">
+                        <span className={`text-[11px] font-black px-2 py-0.5 rounded-lg flex-shrink-0 ${
+                          theme === 'light' ? 'bg-blue-600 text-white shadow-sm' : 'bg-amber-400 text-slate-950'
+                        }`}>
                           {item.badge}
                         </span>
                       )
@@ -15719,10 +15742,10 @@ function App() {
                   onClick={() => setFontScale(sz.id)}
                   className={`px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                     fontScale === sz.id
-                      ? 'bg-amber-400 text-slate-950 shadow'
+                      ? (theme === 'light' ? 'bg-blue-600 text-white shadow' : 'bg-amber-400 text-slate-950 shadow')
                       : theme === 'dark'
                       ? 'text-slate-300 hover:text-white'
-                      : 'text-slate-800 hover:text-slate-950'
+                      : 'text-slate-700 hover:text-blue-700 hover:bg-blue-50'
                   }`}
                 >
                   {isEn ? sz.en : sz.th}
@@ -15737,7 +15760,7 @@ function App() {
               className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border text-xs font-black cursor-pointer transition ${
                 theme === 'dark'
                   ? 'border-white/15 bg-white/5 text-amber-300 hover:bg-white/10'
-                  : 'border-slate-300 bg-slate-100 text-slate-900 hover:bg-slate-200'
+                  : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 shadow-sm'
               }`}
             >
               <span className="sm:hidden">{theme === 'dark' ? '☀️' : '🌙'}</span>
@@ -16497,3 +16520,5 @@ function App() {
 }
 
 export default App;
+
+

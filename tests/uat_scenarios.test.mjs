@@ -165,4 +165,36 @@ describe('InsightFlow User Acceptance Testing (UAT) Scenarios', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // UAT-SCENARIO-07: Eye-Comfort White-Blue Light Mode & Green/Red Trend Indicators
+  // ----------------------------------------------------------------------------
+  test('UAT-07: Light mode applies soothing White-Blue aesthetic and Green (ขาขึ้น) / Red (ขาลง) indicators', () => {
+    // 1. Check App.jsx navigation and header use Blue tones in light mode
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    assert.ok(
+      appContent.includes('text-blue-') || appContent.includes('border-blue-') || appContent.includes('bg-blue-'),
+      'Acceptance Criteria: App.jsx must use Blue accents in Light Mode controls'
+    );
+
+    // 2. Check Industry Benchmark uses Red for downward/negative metrics
+    const industryPath = path.join(projectRoot, 'src', 'components', 'IndustryBenchmarkAndGoalDecomposition.jsx');
+    const industryContent = fs.readFileSync(industryPath, 'utf8');
+
+    assert.ok(
+      industryContent.includes('#ef4444') || industryContent.includes('text-rose-') || industryContent.includes('text-red-'),
+      'Acceptance Criteria: Downward benchmark metrics (diff < 0) must use Red tone'
+    );
+
+    // 3. Check CashFlow demand forecasts standardize positive surges to Green
+    const cashflowPath = path.join(projectRoot, 'src', 'components', 'CashFlowAndDemandForecast.jsx');
+    const cashflowContent = fs.readFileSync(cashflowPath, 'utf8');
+
+    assert.ok(
+      cashflowContent.includes('#10b981'),
+      'Acceptance Criteria: Positive demand surges must use Green tone (#10b981)'
+    );
+  });
+
 });

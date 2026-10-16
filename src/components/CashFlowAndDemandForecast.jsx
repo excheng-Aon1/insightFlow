@@ -166,9 +166,9 @@ export function CashFlowAndDemandForecast({
       periodEn: '1st & 16th of month (After 4:00 PM)',
       upliftTh: '+28% ยอดขายช้อปปิ้ง & สินค้าฉลอง',
       upliftEn: '+28% Post-Lottery Celebration Surge',
-      badgeColor: '#fbbf24',
-      bgColor: 'rgba(251, 191, 36, 0.15)',
-      borderColor: 'rgba(251, 191, 36, 0.45)',
+      badgeColor: '#10b981',
+      bgColor: 'rgba(16, 185, 129, 0.15)',
+      borderColor: 'rgba(16, 185, 129, 0.45)',
       descriptionTh:
         'ช่วงบ่ายหลัง 16:00 น. ของวันหวยออก คนไทยมีพฤติกรรมจับจ่ายเพื่อเป็นรางวัลให้ตนเอง หรือฉลองความสุข ยอดขายกลุ่มเครื่องดื่ม คาเฟ่ อาหาร และของชิ้นเล็กจะพุ่งขึ้นทันที',
       descriptionEn:
@@ -186,9 +186,9 @@ export function CashFlowAndDemandForecast({
       periodEn: '14th - 16th of every month',
       upliftTh: '+34% ยอดขายช่องทาง E-Commerce',
       upliftEn: '+34% Marketplace Campaign Spike',
-      badgeColor: '#38bdf8',
-      bgColor: 'rgba(56, 189, 248, 0.15)',
-      borderColor: 'rgba(56, 189, 248, 0.45)',
+      badgeColor: '#10b981',
+      bgColor: 'rgba(16, 185, 129, 0.15)',
+      borderColor: 'rgba(16, 185, 129, 0.45)',
       descriptionTh:
         'ผู้บริโภครอใช้โค้ดส่วนลดของ Shopee, Lazada, TikTok Shop และบัตรเครดิตกลางเดือน มีการเปรียบเทียบราคาข้ามช่องทางสูง',
       descriptionEn:
@@ -206,9 +206,9 @@ export function CashFlowAndDemandForecast({
       periodEn: 'Friday Evening, Saturday & Sunday',
       upliftTh: '+30% ยอดขายจุดชำระเงินหน้าร้าน (POS)',
       upliftEn: '+30% Physical Store Footfall',
-      badgeColor: '#c084fc',
-      bgColor: 'rgba(192, 132, 252, 0.15)',
-      borderColor: 'rgba(192, 132, 252, 0.45)',
+      badgeColor: '#10b981',
+      bgColor: 'rgba(16, 185, 129, 0.15)',
+      borderColor: 'rgba(16, 185, 129, 0.45)',
       descriptionTh:
         'ทราฟฟิกหน้าร้านและสาขาเพิ่มขึ้น 2.2 เท่าเมื่อเทียบกับวันธรรมดา ลูกค้าชอบทดลองสัมผัสสินค้าจริงและจ่ายเงินสดหรือสแกนจ่ายทันที',
       descriptionEn:
