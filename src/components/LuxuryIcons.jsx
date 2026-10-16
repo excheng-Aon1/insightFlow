@@ -69,7 +69,9 @@ export function LuxuryIconBadge({
 
   return (
     <div
-      className={`relative flex items-center justify-center flex-shrink-0 transition-transform duration-300 ${
+      data-variant={variant}
+      data-active={active ? 'true' : 'false'}
+      className={`luxury-icon-badge luxury-icon-badge-${variant} ${active ? 'is-active' : ''} relative flex items-center justify-center flex-shrink-0 transition-transform duration-300 ${
         active ? 'scale-105' : 'hover:scale-105'
       } ${className}`}
       style={{
@@ -84,6 +86,7 @@ export function LuxuryIconBadge({
     >
       {/* แสงสะท้อนคริสตัลด้านบน */}
       <div
+        className="luxury-badge-orb"
         style={{
           position: 'absolute',
           inset: 0,
@@ -93,6 +96,7 @@ export function LuxuryIconBadge({
       />
       {/* เส้นขอบเพชรด้านบน */}
       <div
+        className="luxury-badge-rim"
         style={{
           position: 'absolute',
           top: 0,

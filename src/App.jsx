@@ -15164,10 +15164,16 @@ function App() {
                   }}
                   className={`w-full flex items-center justify-between p-2.5 rounded-2xl text-left transition-all cursor-pointer ${
                     activeTab === item.id
-                      ? 'bg-gradient-to-r from-amber-400/25 via-amber-400/10 to-transparent text-white border-2 border-amber-400 shadow-lg'
+                      ? (theme === 'light'
+                          ? 'bg-amber-500/10 text-amber-950 border-2 border-amber-500 shadow-sm'
+                          : 'bg-gradient-to-r from-amber-400/25 via-amber-400/10 to-transparent text-white border-2 border-amber-400 shadow-lg')
                       : unlocked
-                      ? 'text-slate-200 hover:text-white hover:bg-white/10 border-2 border-transparent'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5 border-2 border-dashed border-white/10 opacity-85'
+                      ? (theme === 'light'
+                          ? 'text-slate-700 hover:text-slate-950 hover:bg-slate-100 border-2 border-transparent'
+                          : 'text-slate-200 hover:text-white hover:bg-white/10 border-2 border-transparent')
+                      : (theme === 'light'
+                          ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 border-2 border-dashed border-slate-200 opacity-85'
+                          : 'text-slate-400 hover:text-white hover:bg-white/5 border-2 border-dashed border-white/10 opacity-85')
                   }`}
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
@@ -15176,12 +15182,18 @@ function App() {
                     </LuxuryIconBadge>
                     {showLabels && (
                       <div className="min-w-0 flex-1">
-                        <p className={`text-sm font-black truncate leading-tight ${activeTab === item.id ? 'text-amber-300' : ''}`}>
+                        <p className={`text-sm font-black truncate leading-tight ${
+                          activeTab === item.id
+                            ? (theme === 'light' ? 'text-amber-800' : 'text-amber-300')
+                            : (theme === 'light' ? 'text-slate-900' : 'text-slate-100')
+                        }`}>
                           {item.label}
                         </p>
                         {item.subLabel && (
                           <p className={`text-[11px] truncate mt-0.5 leading-snug ${
-                            activeTab === item.id ? 'text-amber-200/80 font-bold' : 'text-slate-400 font-medium'
+                            activeTab === item.id
+                              ? (theme === 'light' ? 'text-amber-900/80 font-bold' : 'text-amber-200/80 font-bold')
+                              : (theme === 'light' ? 'text-slate-500 font-medium' : 'text-slate-400 font-medium')
                           }`}>
                             {item.subLabel}
                           </p>
@@ -15629,20 +15641,34 @@ function App() {
                     onClick={() => setActiveTab(nav.id)}
                     className={`${hideOnDesktop} flex-shrink-0 px-3 py-2 sm:p-3 rounded-xl sm:rounded-2xl border-2 text-left transition-all flex items-center gap-2 sm:gap-3 cursor-pointer relative ${
                       activeTab === nav.id
-                        ? 'bg-amber-400/20 border-amber-400 shadow-lg'
+                        ? (theme === 'light'
+                            ? 'bg-amber-500/15 border-amber-500 shadow-sm text-slate-950'
+                            : 'bg-amber-400/20 border-amber-400 shadow-lg text-white')
                         : unlocked
-                        ? 'bg-black/20 border-white/10 hover:border-amber-400/40'
-                        : 'bg-black/10 border-dashed border-white/10 opacity-80 hover:opacity-100'
+                        ? (theme === 'light'
+                            ? 'bg-slate-50 border-slate-200 hover:border-amber-400/70 hover:bg-white text-slate-800'
+                            : 'bg-black/20 border-white/10 hover:border-amber-400/40 text-slate-200')
+                        : (theme === 'light'
+                            ? 'bg-slate-100/60 border-dashed border-slate-300 opacity-80 hover:opacity-100 text-slate-500'
+                            : 'bg-black/10 border-dashed border-white/10 opacity-80 hover:opacity-100 text-slate-400')
                     }`}
                   >
                     <LuxuryIconBadge variant={nav.variant} size="sm" active={activeTab === nav.id}>
                       <LuxuryModuleIcon type={nav.id} size={18} />
                     </LuxuryIconBadge>
                     <div className="min-w-0">
-                      <p className="text-xs font-black whitespace-nowrap lg:truncate">
+                      <p className={`text-xs font-black whitespace-nowrap lg:truncate ${
+                        activeTab === nav.id
+                          ? (theme === 'light' ? 'text-amber-800' : 'text-amber-300')
+                          : (theme === 'light' ? 'text-slate-900' : 'text-slate-100')
+                      }`}>
                         {!unlocked ? `🔒 ${nav.label}` : nav.label}
                       </p>
-                      <p className="hidden sm:block text-[11px] text-slate-400 truncate">
+                      <p className={`hidden sm:block text-[11px] truncate ${
+                        activeTab === nav.id
+                          ? (theme === 'light' ? 'text-amber-900/80' : 'text-amber-200/80')
+                          : (theme === 'light' ? 'text-slate-500' : 'text-slate-400')
+                      }`}>
                         {!unlocked ? `${reqPlan.code} (${reqPlan.price})` : nav.subLabel}
                       </p>
                     </div>

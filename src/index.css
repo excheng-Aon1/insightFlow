@@ -540,18 +540,18 @@ html[data-theme="light"] [class*="to-slate-9"]:not(.cyber-toast-hud) {
 }
 
 /* แปลง Inline Dark Backgrounds ในทุกแท็บ (เช่น rgba(15, 23, 42, ...), rgba(2, 6, 23, ...), #0f172a) */
-html[data-theme="light"] [style*="rgba(15, 23, 42"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="rgba(2, 6, 23"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="rgba(5, 8, 20"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="rgba(7, 13, 25"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="rgba(10, 15, 30"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="rgba(30, 41, 59"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="rgb(15, 23, 42)"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="rgb(2, 6, 23)"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="rgb(30, 41, 59)"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="#0f172a"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="#020617"]:not(.cyber-toast-hud),
-html[data-theme="light"] [style*="#1e293b"]:not(.cyber-toast-hud) {
+html[data-theme="light"] [style*="rgba(15, 23, 42"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="rgba(2, 6, 23"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="rgba(5, 8, 20"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="rgba(7, 13, 25"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="rgba(10, 15, 30"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="rgba(30, 41, 59"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="rgb(15, 23, 42)"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="rgb(2, 6, 23)"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="rgb(30, 41, 59)"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="#0f172a"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="#020617"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
+html[data-theme="light"] [style*="#1e293b"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *) {
   background: #f8fafc !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
@@ -1711,3 +1711,121 @@ button:hover .luxury-dashboard-icon {
 .cute-cat-petting {
   animation: cuteCatPetNuzzle 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
+/* ==========================================================================
+   MINIMAL LUXURY ICON BADGES & MODERN THEME ADAPTABILITY (LIGHT & DARK)
+   ========================================================================== */
+
+/* Base badge transitions & layout */
+.luxury-icon-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, background 0.25s ease;
+  overflow: hidden;
+}
+
+/* --- LIGHT MODE: Soft Pastel Glass Jewel Badges with Crisp Saturated Borders --- */
+html[data-theme="light"] .luxury-icon-badge {
+  box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.1), 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+}
+
+html[data-theme="light"] .luxury-icon-badge.is-active {
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.5), 0 8px 20px -4px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Gold / Amber */
+html[data-theme="light"] .luxury-icon-badge-gold {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%) !important;
+  border: 1.5px solid #d97706 !important;
+}
+html[data-theme="light"] .luxury-icon-badge-gold .luxury-badge-orb {
+  background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.8), transparent 70%) !important;
+}
+
+/* Ruby / Rose */
+html[data-theme="light"] .luxury-icon-badge-ruby {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #fecdd3 100%) !important;
+  border: 1.5px solid #e11d48 !important;
+}
+html[data-theme="light"] .luxury-icon-badge-ruby .luxury-badge-orb {
+  background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.8), transparent 70%) !important;
+}
+
+/* Sapphire / Sky */
+html[data-theme="light"] .luxury-icon-badge-sapphire {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%) !important;
+  border: 1.5px solid #2563eb !important;
+}
+html[data-theme="light"] .luxury-icon-badge-sapphire .luxury-badge-orb {
+  background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.8), transparent 70%) !important;
+}
+
+/* Emerald / Green */
+html[data-theme="light"] .luxury-icon-badge-emerald {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #a7f3d0 100%) !important;
+  border: 1.5px solid #059669 !important;
+}
+html[data-theme="light"] .luxury-icon-badge-emerald .luxury-badge-orb {
+  background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.8), transparent 70%) !important;
+}
+
+/* Amethyst / Purple */
+html[data-theme="light"] .luxury-icon-badge-amethyst {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%) !important;
+  border: 1.5px solid #7c3aed !important;
+}
+html[data-theme="light"] .luxury-icon-badge-amethyst .luxury-badge-orb {
+  background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.8), transparent 70%) !important;
+}
+
+/* Cyan */
+html[data-theme="light"] .luxury-icon-badge-cyan {
+  background: linear-gradient(135deg, #ecfeff 0%, #cffafe 50%, #a5f3fc 100%) !important;
+  border: 1.5px solid #0891b2 !important;
+}
+html[data-theme="light"] .luxury-icon-badge-cyan .luxury-badge-orb {
+  background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.8), transparent 70%) !important;
+}
+
+/* Platinum */
+html[data-theme="light"] .luxury-icon-badge-platinum {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%) !important;
+  border: 1.5px solid #64748b !important;
+}
+html[data-theme="light"] .luxury-icon-badge-platinum .luxury-badge-orb {
+  background: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.9), transparent 70%) !important;
+}
+
+/* Light mode diamond rim highlight */
+html[data-theme="light"] .luxury-badge-rim {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent) !important;
+}
+
+/* --- MINIMAL LIGHT MODE POLISH: Crisp, clutter-free surfaces --- */
+html[data-theme="light"] body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Clean minimal card surfaces in light mode */
+html[data-theme="light"] .minimal-card-surface {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Clean minimal card surfaces in dark mode */
+html[data-theme="dark"] .minimal-card-surface {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Minimalist navigation pill transitions */
+.nav-pill-transition {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
