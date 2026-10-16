@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { LuxuryIconBadge, LuxuryModuleIcon } from './LuxuryIcons';
+import { LuxuryIconBadge, LuxuryModuleIcon, ReorderPointControlIcon } from './LuxuryIcons';
 
 export function CashFlowAndDemandForecast({
   lang = 'th',
@@ -301,8 +301,8 @@ export function CashFlowAndDemandForecast({
       {/* Header Banner */}
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <LuxuryIconBadge variant="sapphire" size="lg" active>
-            <LuxuryModuleIcon type="overview" size={26} />
+          <LuxuryIconBadge variant="cyan" size="lg" active>
+            <ReorderPointControlIcon size={28} />
           </LuxuryIconBadge>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
@@ -325,8 +325,8 @@ export function CashFlowAndDemandForecast({
             </div>
             <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 900, color: '#f8fafc' }}>
               {tx(
-                '📊 ควบคุมจุดสั่งซื้อสินค้า • ปฏิทินวันหวยออกสิ้นเดือน • วิเคราะห์กำไรจริงหลังหักต้นทุนแฝง',
-                '📊 Precision Restock Alert • Thai Consumer Calendar • True Net Profit & Runway Tracker'
+                'ควบคุมจุดสั่งซื้อสินค้า • ปฏิทินวันหวยออกสิ้นเดือน • วิเคราะห์กำไรจริงหลังหักต้นทุนแฝง',
+                'Precision Restock Alert • Thai Consumer Calendar • True Net Profit & Runway Tracker'
               )}
             </h3>
           </div>

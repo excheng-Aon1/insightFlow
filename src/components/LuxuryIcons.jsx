@@ -1494,3 +1494,276 @@ export function GoogleIcon({ size = 20, className = '' }) {
     </svg>
   );
 }
+
+/**
+ * 1. MarketPositionRadarIcon: ร้านคุณอยู่จุดไหนของตลาด (Market Positioning & Benchmark)
+ * ดีไซน์: เรดาร์วงแหวนโฮโลกราฟิก 3 มิติ, ดาวเพชรประกายทองระบุตำแหน่งผู้นำตลาด, วงแหวนเปรียบเทียบคู่แข่ง
+ */
+export function MarketPositionRadarIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`mktGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="45%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`mktCyan_${id}`} x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#BAE6FD" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+        <radialGradient id={`mktGlow_${id}`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#0284C7" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* วงแหวนเรดาร์ตลาดชั้นนอกและชั้นใน */}
+      <circle cx="16" cy="16" r="13" stroke={`url(#mktCyan_${id})`} strokeWidth="1.2" strokeDasharray="3 2" opacity="0.6" />
+      <circle cx="16" cy="16" r="8.5" stroke="#38BDF8" strokeWidth="1.4" opacity="0.8" />
+      <circle cx="16" cy="16" r="10" fill={`url(#mktGlow_${id})`} />
+      {/* แกนพิกัดตลาด 4 ทิศ */}
+      <line x1="16" y1="2" x2="16" y2="30" stroke={`url(#mktCyan_${id})`} strokeWidth="1.2" opacity="0.5" />
+      <line x1="2" y1="16" x2="30" y2="16" stroke={`url(#mktCyan_${id})`} strokeWidth="1.2" opacity="0.5" />
+      {/* พิกัดคู่แข่งในตลาด (จุดประกายสีเงิน) */}
+      <circle cx="9" cy="11" r="1.8" fill="#94A3B8" opacity="0.75" />
+      <circle cx="11" cy="22" r="1.6" fill="#94A3B8" opacity="0.6" />
+      <circle cx="23" cy="21" r="1.8" fill="#94A3B8" opacity="0.75" />
+      {/* พิกัดร้านของคุณ (ดาวประกายเพชรทองคำ 24K โดดเด่นเป็นผู้นำตลาดที่มุมบนขวา) */}
+      <path
+        d="M22 6L23.2 9.8L27 11L23.2 12.2L22 16L20.8 12.2L17 11L20.8 9.8Z"
+        fill={`url(#mktGold_${id})`}
+      />
+      <circle cx="22" cy="11" r="1.6" fill="#FFF" />
+      {/* วงแหวนเรดาร์ตรวจจับร้านคุณ */}
+      <circle cx="22" cy="11" r="4.5" stroke="#FDE047" strokeWidth="1.2" strokeDasharray="2 1.5" />
+    </svg>
+  );
+}
+
+/**
+ * 2. PurchaseConversionRateIcon: อัตราการตัดสินใจซื้อสำเร็จ (Purchase Conversion Rate)
+ * ดีไซน์: กรวยการตลาด 3 มิติ (Funnel), ลูกศรพุ่งทะยาน 45 องศา, เหรียญทองความสำเร็จและเช็คมาร์กสีมรกต
+ */
+export function PurchaseConversionRateIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`crEmerald_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+        <linearGradient id={`crGold_${id}`} x1="12" y1="12" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="60%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
+      {/* ฐานกรวย Conversion (ท่อกระจก 3 ชั้น) */}
+      <path
+        d="M5 6H27L20 16V24L12 28V16L5 6Z"
+        fill={`url(#crEmerald_${id})`}
+        opacity="0.88"
+        stroke="#6EE7B7"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      {/* ปากกรวยด้านบน */}
+      <ellipse cx="16" cy="6" rx="11" ry="2.6" fill="#D1FAE5" stroke="#34D399" strokeWidth="1.2" />
+      {/* กระแสลูกค้าไหลเข้า (3 ลำแสงสีขาว) */}
+      <path d="M12 2V5M16 1.5V5M20 2V5" stroke="#FFF" strokeWidth="1.6" strokeLinecap="round" />
+      {/* เหรียญทองปิดการขายสำเร็จด้านล่าง */}
+      <circle cx="21" cy="22" r="5.5" fill={`url(#crGold_${id})`} stroke="#FEF08A" strokeWidth="1.3" />
+      {/* เครื่องหมายเช็คความสำเร็จบนเหรียญทอง */}
+      <path d="M19 22L20.5 23.5L23.5 20" stroke="#FFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      {/* ลูกศรพุ่งทะยาน Conversion Surge */}
+      <path d="M22 13L27 8M27 8H23M27 8V12" stroke="#FEF08A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 3. BasketSizePerBillIcon: เปรียบเทียบยอดซื้อต่อบิล (Basket Size & Upselling per Bill)
+ * ดีไซน์: ตะกร้าช้อปปิ้งหรูหรา 3 มิติ, ใบเสร็จริบบิ้นทองคำ, อัญมณีสินค้าพ่วงคู่ (+) และเหรียญทับทิม
+ */
+export function BasketSizePerBillIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`bsRuby_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FECDD3" />
+          <stop offset="50%" stopColor="#F43F5E" />
+          <stop offset="100%" stopColor="#BE123C" />
+        </linearGradient>
+        <linearGradient id={`bsGold_${id}`} x1="8" y1="4" x2="24" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="50%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      {/* ตะกร้าช้อปปิ้งพรีเมียม */}
+      <path
+        d="M7 13H25L23 26C23 27.1 22.1 28 21 28H11C9.9 28 9 27.1 9 26L7 13Z"
+        fill={`url(#bsRuby_${id})`}
+        stroke="#FDA4AF"
+        strokeWidth="1.5"
+      />
+      {/* หูหิ้วตะกร้าโค้งมน */}
+      <path
+        d="M11 13V9C11 6.2 13.2 4 16 4C18.8 4 21 6.2 21 9V13"
+        stroke={`url(#bsGold_${id})`}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      {/* เส้นลายสานตะกร้า */}
+      <line x1="12" y1="16" x2="13.5" y2="25" stroke="#FFE4E6" strokeWidth="1.2" opacity="0.6" />
+      <line x1="16" y1="16" x2="16" y2="25" stroke="#FFE4E6" strokeWidth="1.2" opacity="0.6" />
+      <line x1="20" y1="16" x2="18.5" y2="25" stroke="#FFE4E6" strokeWidth="1.2" opacity="0.6" />
+      <line x1="8.5" y1="20" x2="23.5" y2="20" stroke="#FFE4E6" strokeWidth="1.2" opacity="0.6" />
+      {/* ใบเสร็จทองคำลอยเด่น (Upselling Bill) */}
+      <rect x="18" y="7" width="10" height="13" rx="2" fill={`url(#bsGold_${id})`} stroke="#FEF08A" strokeWidth="1.2" />
+      <line x1="20.5" y1="10.5" x2="25.5" y2="10.5" stroke="#78350F" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="20.5" y1="13.5" x2="24" y2="13.5" stroke="#78350F" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="20.5" y1="16.5" x2="26" y2="16.5" stroke="#78350F" strokeWidth="1.4" strokeLinecap="round" />
+      {/* สัญลักษณ์บวกสินค้าพ่วง Upsell (+) */}
+      <circle cx="8" cy="8" r="4" fill="#10B981" stroke="#D1FAE5" strokeWidth="1" />
+      <path d="M8 6V10M6 8H10" stroke="#FFF" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 4. DailyStoreClosingIcon: สรุปปิดยอดร้านประจำวัน (Daily Store Closing / EOD Sales Summary)
+ * ดีไซน์: หน้าร้านค้าพร้อมนาฬิกาปิดรอบ 22:00 น., กองเหรียญทองคำยอดขายรวม, โบว์ประทับตราอนุมัติยอด และคลื่นส่ง LINE
+ */
+export function DailyStoreClosingIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`eodGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`eodLineGreen_${id}`} x1="16" y1="2" x2="30" y2="16" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#86EFAC" />
+          <stop offset="60%" stopColor="#22C55E" />
+          <stop offset="100%" stopColor="#15803D" />
+        </linearGradient>
+      </defs>
+      {/* หลังคาหน้าร้านค้าสไตล์บูทีค */}
+      <path d="M4 12L7 6H25L28 12H4Z" fill={`url(#eodGold_${id})`} stroke="#FEF08A" strokeWidth="1.2" />
+      {/* เสาและตัวอาคารร้าน */}
+      <rect x="6" y="12" width="20" height="15" rx="2" fill="rgba(15, 23, 42, 0.9)" stroke={`url(#eodGold_${id})`} strokeWidth="1.2" />
+      {/* ประตูปิดร้านแบบมีไฟอุ่น */}
+      <rect x="13" y="16" width="6" height="11" rx="1.5" fill={`url(#eodGold_${id})`} opacity="0.85" />
+      {/* ป้าย CLOSED / ยอดสรุปปิดร้าน */}
+      <rect x="9" y="14" width="14" height="2" rx="1" fill="#FEF08A" />
+      {/* นาฬิกาบอกเวลา 22:00 น. ปิดร้านด้านบน */}
+      <circle cx="24" cy="7" r="5" fill="#0F172A" stroke="#FEF08A" strokeWidth="1.3" />
+      {/* เข็มนาฬิกาชี้ 22:00 น. */}
+      <path d="M24 4.5V7L22 5.5" stroke="#FEF08A" strokeWidth="1.3" strokeLinecap="round" />
+      {/* สัญลักษณ์แจ้งเตือน Flex Message LINE ส่งสำเร็จ */}
+      <circle cx="8" cy="23" r="4.5" fill={`url(#eodLineGreen_${id})`} stroke="#DCFCE7" strokeWidth="1" />
+      <path d="M6.2 23L7.6 24.4L10 21.8" stroke="#FFF" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 5. SalesVsFeesComparisonIcon: เปรียบเทียบยอดขาย ค่าธรรมเนียม และกำไรสุทธิ (Sales vs Platform Fees & Net Profit)
+ * ดีไซน์: ตราชั่ง 3 มิติเปรียบเทียบ ยอดขายรวมหน้าร้าน vs ค่าธรรมเนียมแอป พร้อมเพชรกำไรสุทธิเข้ากระเป๋า
+ */
+export function SalesVsFeesComparisonIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`svfGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="50%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`svfPurple_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E9D5FF" />
+          <stop offset="50%" stopColor="#A855F7" />
+          <stop offset="100%" stopColor="#7E22CE" />
+        </linearGradient>
+        <linearGradient id={`svfEmerald_${id}`} x1="10" y1="2" x2="22" y2="14" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+      </defs>
+      {/* เสาแกนตราชั่ง 3 มิติ */}
+      <rect x="15" y="6" width="2" height="21" rx="1" fill={`url(#svfGold_${id})`} />
+      <rect x="11" y="27" width="10" height="3" rx="1.5" fill={`url(#svfGold_${id})`} />
+      {/* คานตราชั่ง (เอียงเล็กน้อยแสดงให้เห็นว่ากำไรสุทธิชนะค่าธรรมเนียม) */}
+      <path d="M5 11L16 9L27 11" stroke={`url(#svfGold_${id})`} strokeWidth="2.2" strokeLinecap="round" />
+      {/* ยอดขาย/กำไรสุทธิ (จานซ้าย - สูงกว่า หนักแน่นกว่า) */}
+      <path d="M5 11L3 17H9L7 11" stroke="#34D399" strokeWidth="1.2" fill="none" />
+      <ellipse cx="6" cy="17" rx="4.5" ry="1.6" fill={`url(#svfEmerald_${id})`} stroke="#A7F3D0" strokeWidth="1" />
+      {/* ก้อนเหรียญกำไรสุทธิ 100% */}
+      <circle cx="6" cy="15" r="2.2" fill="#FEF08A" stroke="#B45309" strokeWidth="0.8" />
+      {/* ค่าธรรมเนียมแอป (จานขวา - ถูกหักออก 21-23%) */}
+      <path d="M27 11L25 19H31L29 11" stroke="#F43F5E" strokeWidth="1.2" fill="none" />
+      <ellipse cx="28" cy="19" rx="4.5" ry="1.6" fill="#F43F5E" opacity="0.8" stroke="#FECDD3" strokeWidth="1" />
+      {/* ป้าย % ค่าธรรมเนียมที่ถูกตัดออก */}
+      <path d="M26.5 17.5L29.5 15.5" stroke="#FFF" strokeWidth="1.2" strokeLinecap="round" />
+      <circle cx="26.8" cy="16" r="0.6" fill="#FFF" />
+      <circle cx="29.2" cy="17" r="0.6" fill="#FFF" />
+      {/* ยอดเพชรบนคานตราชั่ง */}
+      <circle cx="16" cy="6" r="2.8" fill={`url(#svfPurple_${id})`} stroke="#FEF08A" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+/**
+ * 6. ReorderPointControlIcon: ควบคุมจุดสั่งซื้อสินค้า (Reorder Point / Smart Restock Control)
+ * ดีไซน์: กล่องพัสดุสินค้าคลัง 3 มิติ, เกจวัดระดับสต็อกปลอดภัย (Safety Buffer), เรดาร์ตรวจจับของใกล้หมด และเครื่องหมายสั่งของอัตโนมัติ
+ */
+export function ReorderPointControlIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`ropCyan_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#BAE6FD" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0369A1" />
+        </linearGradient>
+        <linearGradient id={`ropGold_${id}`} x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#F59E0B" />
+        </linearGradient>
+      </defs>
+      {/* กล่องสต็อกสินค้าไอโซเมตริก 3 มิติ */}
+      {/* ผิวด้านบน */}
+      <polygon points="16,4 25,8.5 16,13 7,8.5" fill="#E0F2FE" stroke="#38BDF8" strokeWidth="1.3" strokeLinejoin="round" />
+      {/* ผิวด้านซ้าย */}
+      <polygon points="7,8.5 16,13 16,23 7,18.5" fill={`url(#ropCyan_${id})`} stroke="#0284C7" strokeWidth="1.3" strokeLinejoin="round" />
+      {/* ผิวด้านขวา */}
+      <polygon points="16,13 25,8.5 25,18.5 16,23" fill="#0284C7" stroke="#0369A1" strokeWidth="1.3" strokeLinejoin="round" opacity="0.85" />
+      {/* เทปคาดกล่องสินค้า */}
+      <polygon points="16,4 18,5 13,7.5 11,6.5" fill={`url(#ropGold_${id})`} />
+      <line x1="16" y1="13" x2="16" y2="23" stroke={`url(#ropGold_${id})`} strokeWidth="1.5" />
+      {/* เกจเรดาร์แจ้งเตือนจุดสั่งซื้อ (ROP Alert Ring ด้านล่าง) */}
+      <ellipse cx="16" cy="26" rx="11" ry="3.8" stroke="#38BDF8" strokeWidth="1.4" strokeDasharray="3 2" opacity="0.75" />
+      {/* ตราประทับ Restock Triggered สีเขียวมรกตที่มุมขวาล่าง */}
+      <circle cx="23" cy="22" r="5" fill="#10B981" stroke="#D1FAE5" strokeWidth="1.3" />
+      {/* ลูกศรหมุนเวียน Restock */}
+      <path
+        d="M21 21C21.5 20.2 22.8 20 23.8 20.5C24.4 20.8 24.8 21.4 24.9 22M25 23C24.5 23.8 23.2 24 22.2 23.5C21.6 23.2 21.2 22.6 21.1 22"
+        stroke="#FFF"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <polygon points="21.5,19.5 21,21.5 23,21.5" fill="#FFF" />
+      <polygon points="24.5,24.5 25,22.5 23,22.5" fill="#FFF" />
+    </svg>
+  );
+}
+

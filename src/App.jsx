@@ -38,6 +38,12 @@ import {
   DatabaseAddIcon,
   TrashCanIcon,
   GoogleIcon,
+  MarketPositionRadarIcon,
+  PurchaseConversionRateIcon,
+  BasketSizePerBillIcon,
+  DailyStoreClosingIcon,
+  SalesVsFeesComparisonIcon,
+  ReorderPointControlIcon,
 } from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
@@ -4180,14 +4186,19 @@ export function OverviewTab({
         <div className={`lg:col-span-12 p-7 rounded-3xl border shadow-xl ${
           theme === 'dark' ? 'bg-[#0b1020]/85 border-white/10' : 'bg-white border-slate-200'
         }`}>
-          <div className="flex flex-wrap justify-between items-center mb-5 gap-2">
-            <div>
-              <h3 className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                📊 {tx('อัตราการตัดสินใจซื้อสำเร็จแยกตามช่องทางขาย', 'Purchase Conversion Rate by Channel')}
-              </h3>
-              <p className="text-xs text-slate-300 mt-0.5">
-                {tx('แสดงว่าลูกค้าที่ทักหรือเข้ามาในแต่ละช่องทาง ตัดสินใจซื้อจริงคิดเป็นกี่เปอร์เซ็นต์', 'Percentage of visitors in each channel who complete a purchase')}
-              </p>
+          <div className="flex flex-wrap justify-between items-center mb-5 gap-3">
+            <div className="flex items-center gap-3.5">
+              <LuxuryIconBadge variant="emerald" size="md">
+                <PurchaseConversionRateIcon size={22} />
+              </LuxuryIconBadge>
+              <div>
+                <h3 className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                  {tx('อัตราการตัดสินใจซื้อสำเร็จแยกตามช่องทางขาย', 'Purchase Conversion Rate by Channel')}
+                </h3>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  {tx('แสดงว่าลูกค้าที่ทักหรือเข้ามาในแต่ละช่องทาง ตัดสินใจซื้อจริงคิดเป็นกี่เปอร์เซ็นต์', 'Percentage of visitors in each channel who complete a purchase')}
+                </p>
+              </div>
             </div>
             <span className="text-xs px-3.5 py-1.5 bg-emerald-500/15 text-emerald-300 rounded-xl border border-emerald-500/30 font-bold">
               {tx('🏆 ช่องทางที่ปิดการขายเก่งที่สุด: แชตร้านค้าโดยตรง (11.4%)', '🏆 Top Converting Channel: Direct Store Chat (11.4%)')}
@@ -5135,13 +5146,18 @@ export function StaffPosTab({
       {/* Filter by Branch + Chart */}
       <div className="glass-card" style={{ padding: '1.35rem', borderRadius: '18px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1.1rem' }}>
-          <div>
-            <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>
-              {tx('📊 เปรียบเทียบยอดซื้อต่อบิล & ผลงานการเชียร์สินค้าพ่วงรายพนักงาน', '📊 Basket Size & Upselling Performance by Staff')}
-            </h4>
-            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: '#94a3b8' }}>
-              {tx('กดเลือกสาขาเพื่อดูผลงานพนักงานแต่ละคนแยกตามจุดขาย', 'Filter by branch to inspect individual cashier performance')}
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <LuxuryIconBadge variant="ruby" size="md">
+              <BasketSizePerBillIcon size={22} />
+            </LuxuryIconBadge>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>
+                {tx('เปรียบเทียบยอดซื้อต่อบิล & ผลงานการเชียร์สินค้าพ่วงรายพนักงาน', 'Basket Size & Upselling Performance by Staff')}
+              </h4>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: '#94a3b8' }}>
+                {tx('กดเลือกสาขาเพื่อดูผลงานพนักงานแต่ละคนแยกตามจุดขาย', 'Filter by branch to inspect individual cashier performance')}
+              </p>
+            </div>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             {[
@@ -5669,18 +5685,35 @@ export function MultiChannelTab({
               </div>
               <div
                 style={{
-                  padding: '0.9rem',
-                  borderRadius: '12px',
-                  background: 'rgba(16, 185, 129, 0.1)',
+                  padding: '1rem',
+                  borderRadius: '14px',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
                   color: '#f8fafc',
                   fontSize: '0.88rem',
-                  lineHeight: 1.6
+                  lineHeight: 1.6,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.85rem'
                 }}
               >
-                {tx(
-                  `📊 สรุปปิดยอดร้านประจำวัน (${lineNotifyTime} น.) ส่งการ์ด Flex Message ถึง LINE: ${userLineId} และ SMS (${userPhone}) • ยอดขายรวมทุกช่องทาง: ฿${(offlineRev + onlineRev).toLocaleString()} • กำไรสุทธิเข้ากระเป๋า: ฿${(offlineProfit + onlineProfit).toLocaleString()} • สาขาอันดับ 1: สาขาสยามพารากอน`,
-                  `📊 Daily Closing Flex Message (${lineNotifyTime}) sent to LINE: ${userLineId} & SMS (${userPhone}) • Total Omnichannel Revenue: ฿${(offlineRev + onlineRev).toLocaleString()} • Net Profit: ฿${(offlineProfit + onlineProfit).toLocaleString()} • #1 Branch: Siam Paragon`
-                )}
+                <LuxuryIconBadge variant="gold" size="sm" className="mt-0.5 flex-shrink-0">
+                  <DailyStoreClosingIcon size={20} />
+                </LuxuryIconBadge>
+                <div>
+                  <div style={{ fontWeight: 800, color: '#fde047', marginBottom: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span>{tx(`สรุปปิดยอดร้านประจำวัน (${lineNotifyTime} น.)`, `Daily Store Closing Summary (${lineNotifyTime})`)}</span>
+                    <span style={{ fontSize: '0.72rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: '#10b981', color: '#022c22', fontWeight: 900 }}>
+                      Flex Card
+                    </span>
+                  </div>
+                  <div style={{ color: '#e2e8f0', fontSize: '0.86rem' }}>
+                    {tx(
+                      `ส่งการ์ด Flex Message ถึง LINE: ${userLineId} และ SMS (${userPhone}) • ยอดขายรวมทุกช่องทาง: ฿${(offlineRev + onlineRev).toLocaleString()} • กำไรสุทธิเข้ากระเป๋า: ฿${(offlineProfit + onlineProfit).toLocaleString()} • สาขาอันดับ 1: สาขาสยามพารากอน`,
+                      `Daily Closing Flex Message sent to LINE: ${userLineId} & SMS (${userPhone}) • Total Omnichannel Revenue: ฿${(offlineRev + onlineRev).toLocaleString()} • Net Profit: ฿${(offlineProfit + onlineProfit).toLocaleString()} • #1 Branch: Siam Paragon`
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -6135,9 +6168,19 @@ export function MultiChannelTab({
 
       {/* Channel Comparison Chart & Table */}
       <div className="glass-card" style={{ padding: '1.35rem', borderRadius: '18px' }}>
-        <h4 style={{ margin: '0 0 1rem 0', fontSize: '1.15rem', fontWeight: 800 }}>
-          {tx('📊 เปรียบเทียบยอดขาย ค่าธรรมเนียม และกำไรสุทธิระหว่างหน้าร้านกับออนไลน์', '📊 Channel Comparison: Gross Revenue, Fees & Net Profit')}
-        </h4>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.1rem' }}>
+          <LuxuryIconBadge variant="amethyst" size="md">
+            <SalesVsFeesComparisonIcon size={22} />
+          </LuxuryIconBadge>
+          <div>
+            <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>
+              {tx('เปรียบเทียบยอดขาย ค่าธรรมเนียม และกำไรสุทธิระหว่างหน้าร้านกับออนไลน์', 'Channel Comparison: Gross Revenue, Fees & Net Profit')}
+            </h4>
+            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
+              {tx('วิเคราะห์กำไรสุทธิตัวจริงหลังหักค่าธรรมเนียมและค่านายหน้าแอปในแต่ละช่องทาง', 'Analyze true net profits after platform fees and commissions across all channels')}
+            </p>
+          </div>
+        </div>
         <div style={{ height: '240px', marginBottom: '1.25rem' }}>
           <Bar data={channelChartData} options={barChartOptions} />
         </div>

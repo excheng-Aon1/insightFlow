@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { toast } from 'react-hot-toast';
-import { LuxuryIconBadge, LuxuryModuleIcon } from './LuxuryIcons';
+import { LuxuryIconBadge, LuxuryModuleIcon, PurchaseConversionRateIcon } from './LuxuryIcons';
 
 export function OverviewTab({
   lang,
@@ -499,14 +499,19 @@ export function OverviewTab({
         <div className={`lg:col-span-12 p-7 rounded-3xl border shadow-xl ${
           theme === 'dark' ? 'bg-[#0b1020]/85 border-white/10' : 'bg-white border-slate-200'
         }`}>
-          <div className="flex flex-wrap justify-between items-center mb-5 gap-2">
-            <div>
-              <h3 className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                📊 {tx('อัตราการตัดสินใจซื้อสำเร็จแยกตามช่องทางขาย', 'Purchase Conversion Rate by Channel')}
-              </h3>
-              <p className="text-xs text-slate-300 mt-0.5">
-                {tx('แสดงว่าลูกค้าที่ทักหรือเข้ามาในแต่ละช่องทาง ตัดสินใจซื้อจริงคิดเป็นกี่เปอร์เซ็นต์', 'Percentage of visitors in each channel who complete a purchase')}
-              </p>
+          <div className="flex flex-wrap justify-between items-center mb-5 gap-3">
+            <div className="flex items-center gap-3.5">
+              <LuxuryIconBadge variant="emerald" size="md">
+                <PurchaseConversionRateIcon size={22} />
+              </LuxuryIconBadge>
+              <div>
+                <h3 className={`text-lg font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                  {tx('อัตราการตัดสินใจซื้อสำเร็จแยกตามช่องทางขาย', 'Purchase Conversion Rate by Channel')}
+                </h3>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  {tx('แสดงว่าลูกค้าที่ทักหรือเข้ามาในแต่ละช่องทาง ตัดสินใจซื้อจริงคิดเป็นกี่เปอร์เซ็นต์', 'Percentage of visitors in each channel who complete a purchase')}
+                </p>
+              </div>
             </div>
             <span className="text-xs px-3.5 py-1.5 bg-emerald-500/15 text-emerald-300 rounded-xl border border-emerald-500/30 font-bold">
               {tx('🏆 ช่องทางที่ปิดการขายเก่งที่สุด: แชตร้านค้าโดยตรง (11.4%)', '🏆 Top Converting Channel: Direct Store Chat (11.4%)')}

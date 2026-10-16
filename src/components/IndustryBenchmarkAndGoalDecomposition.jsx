@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { LuxuryIconBadge, LuxuryModuleIcon } from './LuxuryIcons';
+import { LuxuryIconBadge, LuxuryModuleIcon, MarketPositionRadarIcon } from './LuxuryIcons';
 
 export function IndustryBenchmarkAndGoalDecomposition({
   lang = 'th',
@@ -350,7 +350,7 @@ export function IndustryBenchmarkAndGoalDecomposition({
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
           <LuxuryIconBadge variant="gold" size="lg" active>
-            <LuxuryModuleIcon type="overview" size={26} />
+            <MarketPositionRadarIcon size={28} />
           </LuxuryIconBadge>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
@@ -373,8 +373,8 @@ export function IndustryBenchmarkAndGoalDecomposition({
             </div>
             <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 900, color: '#f8fafc' }}>
               {tx(
-                '📊 ร้านคุณอยู่จุดไหนของตลาด? พร้อมซอยเป้าหมายใหญ่ให้ทีมหน้าร้านรู้ว่า "วันนี้ต้องขายกี่บิล"',
-                '📊 Where Do You Stand in the Market? Plus Daily Goal Breakdown for Store Crews'
+                'ร้านคุณอยู่จุดไหนของตลาด? พร้อมซอยเป้าหมายใหญ่ให้ทีมหน้าร้านรู้ว่า "วันนี้ต้องขายกี่บิล"',
+                'Where Do You Stand in the Market? Plus Daily Goal Breakdown for Store Crews'
               )}
             </h3>
           </div>
