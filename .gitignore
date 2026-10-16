@@ -29,4 +29,8 @@ dist-ssr
 backend/.env
 __pycache__/
 *.py[cod]
+*.db
+*.db-*
+*.lock
+
 

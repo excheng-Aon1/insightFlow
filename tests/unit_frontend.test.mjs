@@ -1,0 +1,168 @@
+// ==============================================================================
+// File: tests/unit_frontend.test.mjs
+// System: InsightFlow Frontend Unit Testing Suite
+// Stack: Node.js 24 Native Test Runner (node:test, node:assert/strict)
+// ==============================================================================
+
+import { test, describe } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '..');
+
+describe('InsightFlow Frontend Unit Test Suite', () => {
+
+  // ----------------------------------------------------------------------------
+  // 1. LUXURY 3D ICONS LIBRARY INTEGRITY
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-01: LuxuryIcons.jsx exports all 6 newly requested 3D Jewel icons', () => {
+    const iconsPath = path.join(projectRoot, 'src', 'components', 'LuxuryIcons.jsx');
+    assert.ok(fs.existsSync(iconsPath), 'src/components/LuxuryIcons.jsx must exist');
+
+    const content = fs.readFileSync(iconsPath, 'utf8');
+
+    const requiredIcons = [
+      'MarketPositionRadarIcon',      // ร้านคุณอยู่จุดไหนของตลาด?
+      'PurchaseConversionRateIcon',   // อัตราการตัดสินใจซื้อ
+      'BasketSizePerBillIcon',         // เปรียบเทียบยอดซื้อต่อบิล
+      'DailyStoreClosingIcon',        // สรุปปิดยอดร้านประจำวัน
+      'SalesVsFeesComparisonIcon',     // เปรียบเทียบยอดขาย ค่าธรรมเนียม
+      'ReorderPointControlIcon',      // ควบคุมจุดสั่งซื้อสินค้า
+      'GoogleIcon',                   // โลโก้ Google ทางการ
+    ];
+
+    for (const iconName of requiredIcons) {
+      assert.ok(
+        content.includes(`export function ${iconName}`) || content.includes(`export const ${iconName}`),
+        `LuxuryIcons.jsx must export ${iconName}`
+      );
+    }
+  });
+
+  test('UNIT-FE-02: GoogleIcon contains official 4 Google brand colors', () => {
+    const iconsPath = path.join(projectRoot, 'src', 'components', 'LuxuryIcons.jsx');
+    const content = fs.readFileSync(iconsPath, 'utf8');
+
+    // Official Google Brand Colors
+    const googleColors = ['#4285F4', '#34A853', '#FBBC05', '#EA4335'];
+    for (const color of googleColors) {
+      assert.ok(
+        content.includes(color),
+        `GoogleIcon must include official Google vector color ${color}`
+      );
+    }
+  });
+
+  // ----------------------------------------------------------------------------
+  // 2. BRANDING STANDARDIZATION & CLEANUP
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-03: Cat test alert button is completely removed from App.jsx', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    assert.ok(
+      !appContent.includes('ทดสอบป้ายเตือนน้องแมว'),
+      'Button "ทดสอบป้ายเตือนน้องแมว" must NOT exist in App.jsx'
+    );
+  });
+
+  test('UNIT-FE-04: Single official logo standardization (3D Glass Pill Bars)', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    assert.ok(
+      appContent.includes('InsightFlowGlassBarsLogo'),
+      'App.jsx must import and use InsightFlowGlassBarsLogo'
+    );
+
+    // Old logo switcher button and redundant logos should not be in the active header
+    assert.ok(
+      !appContent.includes('activeLogoStyle'),
+      'Legacy activeLogoStyle state should be removed for minimalist clean UI'
+    );
+  });
+
+  test('UNIT-FE-05: Favicon and App Icon sync with 3D Glass Pill Bars design', () => {
+    const faviconPath = path.join(projectRoot, 'public', 'app-icon.svg');
+    const barsPath = path.join(projectRoot, 'public', 'app-icon-glass-bars.svg');
+
+    assert.ok(fs.existsSync(faviconPath), 'public/app-icon.svg must exist');
+    assert.ok(fs.existsSync(barsPath), 'public/app-icon-glass-bars.svg must exist');
+
+    const faviconContent = fs.readFileSync(faviconPath, 'utf8');
+    const barsContent = fs.readFileSync(barsPath, 'utf8');
+
+    assert.equal(
+      faviconContent.trim(),
+      barsContent.trim(),
+      'public/app-icon.svg must match public/app-icon-glass-bars.svg'
+    );
+  });
+
+  // ----------------------------------------------------------------------------
+  // 3. I18N DATA INTEGRITY (THAI & ENGLISH)
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-06: i18nData dictionary has parity between Thai and English', async () => {
+    const i18nPath = path.join(projectRoot, 'src', 'i18nData.js');
+    assert.ok(fs.existsSync(i18nPath), 'src/i18nData.js must exist');
+
+    const i18nModule = await import(`file://${i18nPath}`);
+    const i18n = i18nModule.landingTranslations || i18nModule.i18nData || i18nModule.default;
+
+    assert.ok(i18n, 'landingTranslations must be exported');
+    assert.ok(i18n.th, 'landingTranslations must contain Thai ("th") locale');
+    assert.ok(i18n.en, 'landingTranslations must contain English ("en") locale');
+
+    // Check key landing and navigation labels exist in both languages
+    const sampleKeys = ['home', 'solutions', 'whyUs', 'pricing', 'tagline1', 'description'];
+    for (const key of sampleKeys) {
+      assert.ok(i18n.th[key], `Key "${key}" must exist in Thai locale`);
+      assert.ok(i18n.en[key], `Key "${key}" must exist in English locale as well`);
+    }
+  });
+
+  // ----------------------------------------------------------------------------
+  // 4. TAILWIND DESIGN SYSTEM & MINIMALIST THEME
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-07: tailwind.config.js enables class-based dark mode', () => {
+    const tailwindPath = path.join(projectRoot, 'tailwind.config.js');
+    assert.ok(fs.existsSync(tailwindPath), 'tailwind.config.js must exist');
+
+    const content = fs.readFileSync(tailwindPath, 'utf8');
+    assert.ok(
+      content.includes("darkMode: 'class'") || content.includes('darkMode: "class"'),
+      'tailwind.config.js must specify darkMode: "class" for instant theme switching'
+    );
+  });
+
+  // ----------------------------------------------------------------------------
+  // 5. PRODUCTION DEPLOYMENT & VERCEL CONFIGURATION
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-08: vercel.json enforces cache-busting for index.html & SPA rewrites', () => {
+    const vercelPath = path.join(projectRoot, 'vercel.json');
+    assert.ok(fs.existsSync(vercelPath), 'vercel.json must exist');
+
+    const vercelConfig = JSON.parse(fs.readFileSync(vercelPath, 'utf8'));
+
+    // Check headers rule for index.html
+    const indexHeaderRule = vercelConfig.headers?.find(h => h.source === '/index.html');
+    assert.ok(indexHeaderRule, 'vercel.json must have headers rule for /index.html');
+    
+    const cacheControl = indexHeaderRule.headers?.find(h => h.key === 'Cache-Control');
+    assert.ok(cacheControl, 'index.html must have Cache-Control header');
+    assert.ok(
+      cacheControl.value.includes('no-cache'),
+      'index.html Cache-Control must include no-cache'
+    );
+
+    // Check SPA rewrites
+    assert.ok(Array.isArray(vercelConfig.rewrites), 'vercel.json must specify rewrites');
+    const spaRewrite = vercelConfig.rewrites.find(r => r.destination === '/index.html');
+    assert.ok(spaRewrite, 'vercel.json must route SPA requests to /index.html');
+  });
+
+});
