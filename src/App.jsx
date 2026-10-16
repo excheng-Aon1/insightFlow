@@ -11579,8 +11579,8 @@ ChartJS.register(
   Legend
 );
 
-function AppLogo({ size = 46, className = '' }) {
-  return <InsightFlowGlassBarsLogo size={size} className={className} />;
+function AppLogo({ size = 46, className = '', theme }) {
+  return <InsightFlowGlassBarsLogo size={size} className={className} theme={theme} />;
 }
 
 function App() {
@@ -13477,18 +13477,21 @@ function App() {
               >
                 ✕
               </button>
-              <div className="flex flex-col items-center justify-center gap-2.5 mb-3 clear-both">
-                <AppLogo size={54} />
+              <div className="flex flex-col items-center justify-center gap-2 mb-3 clear-both">
+                <AppLogo size={58} theme={theme} />
+                <span className={`text-xl font-black tracking-tight ${theme === 'light' ? 'text-slate-950' : 'text-white'}`}>
+                  INSIGHTFLOW
+                </span>
                 {renderLanguageSwitcher()}
               </div>
-              <h2 className={`text-xl sm:text-2xl font-black text-center mb-1.5 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+              <h2 className={`text-xl sm:text-2xl font-black text-center mb-1.5 ${theme === 'light' ? 'text-slate-950' : 'text-white'}`}>
                 {authMode === 'otp'
                   ? tx('🔐 เข้าสู่ระบบด้วยรหัส OTP 2FA', 'Sign In with 2FA OTP Code')
                   : authMode === 'login'
                   ? tx('เข้าสู่ระบบจัดการร้านค้า', 'Sign In to Your Store Console')
                   : tx('ลงทะเบียนเจ้าของร้านใหม่', 'Create New Store Account')}
               </h2>
-              <p className={`text-center text-xs sm:text-sm mb-3 ${theme === 'light' ? 'text-slate-600' : 'text-slate-300'}`}>
+              <p className={`text-center text-xs sm:text-sm mb-3 ${theme === 'light' ? 'text-slate-800 font-semibold' : 'text-slate-300'}`}>
                 {authMode === 'otp'
                   ? tx('ระบบจะส่งรหัสยืนยัน 6 หลักไปยังอีเมลของคุณเพื่อความปลอดภัยสูงสุด', 'A 6-digit OTP code will be sent to your email address')
                   : tx('เลือกวิธีเข้าสู่ระบบที่คุณสะดวก หรือกดทางลัด 1 คลิกด้านล่างครับ', 'Choose your preferred sign-in method or use 1-Tap access below.')}
@@ -14099,17 +14102,24 @@ function App() {
           }`}
         >
           <div className="flex justify-between items-center gap-1.5 sm:gap-2">
-            <div className="flex items-center gap-2 sm:gap-3.5 cursor-pointer group min-w-0" onClick={() => scrollToSection('home')}>
-              <AppLogo size={38} className="transition-transform duration-300 group-hover:scale-105 flex-shrink-0" />
+            <div className="flex items-center gap-2.5 sm:gap-4 cursor-pointer group min-w-0" onClick={() => scrollToSection('home')}>
+              <AppLogo size={44} className="transition-transform duration-300 group-hover:scale-105 flex-shrink-0" theme={theme} />
               <div className="min-w-0">
                 <span
-                  className={`text-base sm:text-2xl font-black tracking-tight block truncate ${
+                  className={`text-lg sm:text-2xl font-black tracking-tight block truncate ${
                     theme === 'dark'
                       ? 'bg-gradient-to-r from-white via-amber-100 to-amber-300 bg-clip-text text-transparent'
-                      : 'text-slate-950'
+                      : 'text-slate-950 font-black'
                   }`}
                 >
-                  InsightFlow
+                  INSIGHTFLOW
+                </span>
+                <span
+                  className={`text-[9px] sm:text-[11px] block font-black tracking-widest uppercase -mt-0.5 truncate ${
+                    theme === 'dark' ? 'text-amber-400/90' : 'text-blue-700'
+                  }`}
+                >
+                  {isEn ? 'Executive Intelligence' : 'ระบบบริหารข้อมูลอัจฉริยะ'}
                 </span>
               </div>
             </div>
@@ -14225,7 +14235,7 @@ function App() {
                 </span>
               </h1>
 
-              <p className={`text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>{t.description}</p>
+              <p className={`text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800 font-medium'}`}>{t.description}</p>
 
               <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 sm:gap-4 items-center mb-4 sm:mb-6">
                 <button
@@ -15452,17 +15462,24 @@ function App() {
             }`}
           >
             <div className="flex items-center gap-3 overflow-hidden">
-              <AppLogo size={44} className="flex-shrink-0" />
+              <AppLogo size={46} className="flex-shrink-0" theme={theme} />
               {(isSidebarOpen || isMobileMenuOpen) && (
                 <div className="whitespace-nowrap">
                   <span
-                    className={`text-lg font-black ${
+                    className={`text-lg font-black tracking-tight ${
                       theme === 'dark'
                         ? 'bg-gradient-to-r from-white via-amber-100 to-amber-300 bg-clip-text text-transparent'
-                        : 'text-slate-950'
+                        : 'text-slate-950 font-black'
                     }`}
                   >
-                    InsightFlow
+                    INSIGHTFLOW
+                  </span>
+                  <span
+                    className={`text-[10px] block font-black tracking-wider -mt-0.5 ${
+                      theme === 'dark' ? 'text-amber-400/90' : 'text-blue-700'
+                    }`}
+                  >
+                    {isEn ? 'Executive Platform' : 'ระบบบริหารข้อมูลองค์กร'}
                   </span>
                 </div>
               )}

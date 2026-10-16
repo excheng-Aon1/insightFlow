@@ -218,4 +218,21 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  test('UNIT-FE-11: Logo clarity enhancement and ultra-high contrast dark typography are applied', () => {
+    const cssPath = path.join(projectRoot, 'src', 'index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+
+    // Logo clarity and contrast in light mode
+    assert.ok(
+      cssContent.includes('.insightflow-glass-bars-logo') && cssContent.includes('#2563eb'),
+      'index.css must enforce high-contrast emblem border and sapphire glow for logo in light mode'
+    );
+
+    // High contrast dark text typography
+    assert.ok(
+      cssContent.includes('#020617') && cssContent.includes('font-weight: 800'),
+      'index.css must enforce bold dark #020617 text for headings in light mode'
+    );
+  });
+
 });

@@ -19,15 +19,17 @@ export function InsightFlowGlassBarsLogo({
   className = '',
   showShadow = true,
   interactive = false,
-  onClick
+  onClick,
+  theme
 }) {
   const rawId = React.useId();
   const uid = rawId.replace(/:/g, '');
+  const isLight = theme === 'light';
 
   return (
     <div
       onClick={onClick}
-      className={`relative inline-flex items-center justify-center select-none transition-transform duration-300 ${
+      className={`insightflow-glass-bars-logo insightflow-logo-container relative inline-flex items-center justify-center select-none transition-transform duration-300 ${
         interactive ? 'cursor-pointer hover:scale-105 active:scale-95' : ''
       } ${className}`}
       style={{
@@ -36,8 +38,11 @@ export function InsightFlowGlassBarsLogo({
         borderRadius: Math.round(size * 0.28),
         padding: 0,
         boxShadow: showShadow
-          ? '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.12)'
-          : 'none'
+          ? isLight
+            ? '0 0 0 2.5px #2563eb, 0 8px 24px -2px rgba(37, 99, 235, 0.42), 0 0 16px rgba(56, 189, 248, 0.3)'
+            : '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.12)'
+          : 'none',
+        border: isLight ? '1.5px solid #60a5fa' : 'none'
       }}
       title="InsightFlow 3D Glass Bars Logo"
     >
@@ -50,24 +55,24 @@ export function InsightFlowGlassBarsLogo({
         <defs>
           {/* Base Dark Matte Squircle Gradient */}
           <linearGradient id={`bgTile_${uid}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#1E2330" />
-            <stop offset="35%" stopColor="#141824" />
-            <stop offset="70%" stopColor="#0D101A" />
-            <stop offset="100%" stopColor="#080A10" />
+            <stop offset="0%" stopColor={isLight ? "#1E293B" : "#1E2330"} />
+            <stop offset="35%" stopColor={isLight ? "#0F172A" : "#141824"} />
+            <stop offset="70%" stopColor={isLight ? "#09101F" : "#0D101A"} />
+            <stop offset="100%" stopColor={isLight ? "#020617" : "#080A10"} />
           </linearGradient>
 
           {/* Radial Ambient Center Soft Lighting */}
           <radialGradient id={`ambientLight_${uid}`} cx="50%" cy="30%" r="70%">
-            <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.08" />
-            <stop offset="50%" stopColor="#818CF8" stopOpacity="0.04" />
+            <stop offset="0%" stopColor="#38BDF8" stopOpacity={isLight ? "0.22" : "0.08"} />
+            <stop offset="50%" stopColor="#818CF8" stopOpacity={isLight ? "0.14" : "0.04"} />
             <stop offset="100%" stopColor="#000000" stopOpacity="0" />
           </radialGradient>
 
-          {/* Subtle Outer Bevel Rim */}
+          {/* Outer Bevel Rim (Electric Sapphire in Light Mode, Specular Glass in Dark Mode) */}
           <linearGradient id={`rimBevel_${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.18)" />
-            <stop offset="40%" stopColor="rgba(255, 255, 255, 0.05)" />
-            <stop offset="100%" stopColor="rgba(0, 0, 0, 0.8)" />
+            <stop offset="0%" stopColor={isLight ? "#93C5FD" : "rgba(255, 255, 255, 0.18)"} stopOpacity={isLight ? "0.95" : "1"} />
+            <stop offset="50%" stopColor={isLight ? "#3B82F6" : "rgba(255, 255, 255, 0.05)"} stopOpacity={isLight ? "0.85" : "1"} />
+            <stop offset="100%" stopColor={isLight ? "#1D4ED8" : "rgba(0, 0, 0, 0.8)"} stopOpacity={isLight ? "0.98" : "1"} />
           </linearGradient>
 
           {/* Deep Drop Shadow for Capsules */}
