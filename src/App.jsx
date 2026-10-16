@@ -27,6 +27,7 @@ import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
 import { InsightFlowMnemonicLogo, InsightFlowSuiteGrid } from './components/AdobeStyleInsightFlowLogo';
+import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
   EtlPipelineIcon,
   MasterRecordsIcon,
@@ -11539,27 +11540,30 @@ function AppLogo({ size = 46, className = '', style }) {
   const currentStyle =
     style ||
     (typeof window !== 'undefined'
-      ? localStorage.getItem('insightflow_logo_style') || 'adobe'
-      : 'adobe');
+      ? localStorage.getItem('insightflow_logo_style') || 'bars'
+      : 'bars');
   if (currentStyle === 'original') {
     return <LuxuryBrandLogo size={size} className={className} />;
   }
-  return (
-    <InsightFlowMnemonicLogo
-      size={size}
-      letters="If"
-      variant="gold"
-      className={className}
-    />
-  );
+  if (currentStyle === 'adobe') {
+    return (
+      <InsightFlowMnemonicLogo
+        size={size}
+        letters="If"
+        variant="gold"
+        className={className}
+      />
+    );
+  }
+  return <InsightFlowGlassBarsLogo size={size} className={className} />;
 }
 
 function App() {
   const [logoStyle, setLogoStyle] = useState(() => {
     try {
-      return localStorage.getItem('insightflow_logo_style') || 'adobe';
+      return localStorage.getItem('insightflow_logo_style') || 'bars';
     } catch {
-      return 'adobe';
+      return 'bars';
     }
   });
   const [user, setUser] = useState(() => {
@@ -15349,29 +15353,40 @@ function App() {
               <span className="hidden md:inline">{tx('ทดสอบป้ายเตือนน้องแมว', 'Test Cat Alert')}</span>
             </button>
 
-            {/* Adobe "If" Style vs Original Logo Switcher Button */}
+            {/* Logo Style Switcher: 3D Glass Bars vs Adobe If vs Original */}
             <button
               type="button"
               onClick={() => {
-                const nextStyle = logoStyle === 'adobe' ? 'original' : 'adobe';
+                const nextStyle =
+                  logoStyle === 'bars'
+                    ? 'adobe'
+                    : logoStyle === 'adobe'
+                    ? 'original'
+                    : 'bars';
                 setLogoStyle(nextStyle);
                 try {
                   localStorage.setItem('insightflow_logo_style', nextStyle);
                 } catch (e) {}
                 toast.success(
-                  nextStyle === 'adobe'
-                    ? tx('✨ เปิดใช้งานโลโก้สไตล์ Adobe "If" (InsightFlow Mnemonic Badge)', '✨ Activated Adobe-Style "If" Luxury Mnemonic Badge')
+                  nextStyle === 'bars'
+                    ? tx('✨ สลับเป็นโลโก้ 3D Glass Pill Bars (สไตล์ใหม่ล่าสุดตามภาพ)', '✨ Activated 3D Glass Pill Bars Logo')
+                    : nextStyle === 'adobe'
+                    ? tx('✨ สลับเป็นโลโก้สไตล์ Adobe "If" (InsightFlow Mnemonic Badge)', '✨ Activated Adobe-Style "If" Luxury Mnemonic Badge')
                     : tx('👑 สลับกลับสู่โลโก้ดั้งเดิม 3D Pillars & Trajectory แล้วครับ', '👑 Restored Original 3D Pillars Logo')
                 );
               }}
               className="px-2.5 py-1.5 sm:py-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-xs font-black cursor-pointer transition flex items-center gap-1.5 shadow-sm"
-              title={tx('คลิกสลับสไตล์โลโก้ (สไตล์ Adobe "If" vs โลโก้ดั้งเดิม)', 'Toggle Logo Style: Adobe "If" vs Original')}
+              title={tx('คลิกสลับสไตล์โลโก้ (แท่งแก้ว 3D Bars / Adobe If / โลโก้ดั้งเดิม)', 'Toggle Logo Style')}
             >
-              <span className="font-mono text-amber-400 font-black">
-                {logoStyle === 'adobe' ? '[If]' : '👑'}
+              <span className="text-sm">
+                {logoStyle === 'bars' ? '📊' : logoStyle === 'adobe' ? '[If]' : '👑'}
               </span>
               <span className="hidden sm:inline text-slate-300">
-                {logoStyle === 'adobe' ? tx('สไตล์ Adobe If', 'Adobe Style') : tx('โลโก้เดิม', 'Original Logo')}
+                {logoStyle === 'bars'
+                  ? tx('3D Glass Bars', '3D Glass Bars')
+                  : logoStyle === 'adobe'
+                  ? tx('สไตล์ Adobe If', 'Adobe Style')
+                  : tx('โลโก้เดิม', 'Original Logo')}
               </span>
             </button>
 
