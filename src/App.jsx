@@ -12925,10 +12925,7 @@ function App() {
                 <>
                   <span className="cyber-arrow-icon text-sm sm:text-base inline-block">🚀</span>
                   <span className="truncate tracking-tight font-extrabold">
-                    {tx('อัปโหลดไฟล์ใหม่', 'Upload File')}
-                  </span>
-                  <span className="hidden md:inline-block text-[10px] px-1.5 py-0.5 rounded-full bg-slate-950/15 font-black uppercase text-slate-900">
-                    CSV • XLS
+                    {tx('อัปโหลดไฟล์', 'Upload File')}
                   </span>
                   <span className="cyber-sparkle-spin text-xs inline-block">✨</span>
                 </>
