@@ -413,3 +413,4 @@ export function InsightFlowSuiteGrid({ activeTab, onSelectTab, lang = 'th' }) {
 }
 
 export default InsightFlowMnemonicLogo;
+

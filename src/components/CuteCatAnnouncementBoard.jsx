@@ -13,50 +13,200 @@ import React, { useState, useEffect, useRef } from 'react';
 const STORAGE_KEY = 'insightflow_cat_announcements_v2';
 const SOUND_KEY = 'insightflow_cat_sound_enabled';
 
-// Sound effect synthesizer using Web Audio API (Zero external assets needed)
+// ==============================================================================
+// REALISTIC SWEET FELINE VOCAL SYNTHESIZER (Web Audio API - 100% Zero External Files)
+// Simulates feline vocal tract: glottal folds (triangle/sawtooth wave), 
+// resonant formant filter (mouth opening 'M-Y-A-O-W'), and purring vibrato/tremolo (22-26Hz LFO).
+// ==============================================================================
+let sharedCatAudioCtx = null;
+
+const getSharedCatAudioCtx = () => {
+  try {
+    if (typeof window === 'undefined') return null;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    if (!sharedCatAudioCtx || sharedCatAudioCtx.state === 'closed') {
+      sharedCatAudioCtx = new AudioCtx();
+    }
+    if (sharedCatAudioCtx.state === 'suspended') {
+      sharedCatAudioCtx.resume().catch(() => {});
+    }
+    return sharedCatAudioCtx;
+  } catch {
+    return null;
+  }
+};
+
+// Subtle bell chime for announcement slide navigation
 const playMeowChime = () => {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
+    const ctx = getSharedCatAudioCtx();
+    if (!ctx) return;
+    const t0 = ctx.currentTime;
 
-    // First sweet harmonic tone (Me~)
     const osc1 = ctx.createOscillator();
     const gain1 = ctx.createGain();
     osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(620, ctx.currentTime);
-    osc1.frequency.exponentialRampToValueAtTime(780, ctx.currentTime + 0.12);
+    osc1.frequency.setValueAtTime(620, t0);
+    osc1.frequency.exponentialRampToValueAtTime(780, t0 + 0.12);
 
-    gain1.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    gain1.gain.setValueAtTime(0.08, t0);
+    gain1.gain.exponentialRampToValueAtTime(0.001, t0 + 0.32);
 
     osc1.connect(gain1);
     gain1.connect(ctx.destination);
-    osc1.start();
-    osc1.stop(ctx.currentTime + 0.35);
+    osc1.start(t0);
+    osc1.stop(t0 + 0.32);
 
-    // Second bell chime (Ow~✨)
-    setTimeout(() => {
-      try {
-        const osc2 = ctx.createOscillator();
-        const gain2 = ctx.createGain();
-        osc2.type = 'triangle';
-        osc2.frequency.setValueAtTime(980, ctx.currentTime);
-        osc2.frequency.exponentialRampToValueAtTime(1180, ctx.currentTime + 0.15);
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(980, t0 + 0.09);
+    osc2.frequency.exponentialRampToValueAtTime(1180, t0 + 0.22);
 
-        gain2.gain.setValueAtTime(0.06, ctx.currentTime);
-        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    gain2.gain.setValueAtTime(0.06, t0 + 0.09);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t0 + 0.35);
 
-        osc2.connect(gain2);
-        gain2.connect(ctx.destination);
-        osc2.start();
-        osc2.stop(ctx.currentTime + 0.3);
-      } catch (err) {
-        // Audio error silent fallback
-      }
-    }, 90);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(t0 + 0.09);
+    osc2.stop(t0 + 0.35);
   } catch (err) {
-    // Audio context not allowed or blocked
+    // Audio fallback
+  }
+};
+
+// Ultra-cute realistic affectionate feline vocalization ("เสียงแมวร้องอ้อนๆ น้วยๆ")
+const playAffectionateMeowSound = (variantIndex) => {
+  try {
+    const ctx = getSharedCatAudioCtx();
+    if (!ctx) return;
+    const t0 = ctx.currentTime;
+
+    // 3 distinct affectionate vocal styles
+    const variations = [
+      {
+        // 1. "มยาาา~วว" (Classic sweet affectionate meow with throat purr)
+        startF: 440,
+        peakF: 840,
+        endF: 470,
+        duration: 0.68,
+        purrRate: 24,
+        purrDepth: 18,
+        filterStart: 520,
+        filterPeak: 1600,
+        filterEnd: 620,
+        gain: 0.22
+      },
+      {
+        // 2. "มิ้วว~วว ✨" (Playful kitten chirrup-meow with rising inflection)
+        startF: 520,
+        peakF: 960,
+        endF: 540,
+        duration: 0.54,
+        purrRate: 26,
+        purrDepth: 14,
+        filterStart: 620,
+        filterPeak: 1850,
+        filterEnd: 720,
+        gain: 0.2
+      },
+      {
+        // 3. "ง่าวว~ น้วยๆ ครืดๆ" (Deep affectionate purr-meow with laryngeal vibration)
+        startF: 400,
+        peakF: 760,
+        endF: 430,
+        duration: 0.74,
+        purrRate: 22,
+        purrDepth: 24,
+        filterStart: 460,
+        filterPeak: 1420,
+        filterEnd: 560,
+        gain: 0.24
+      }
+    ];
+
+    const idx =
+      typeof variantIndex === 'number'
+        ? variantIndex % variations.length
+        : Math.floor(Math.random() * variations.length);
+    const p = variations[idx];
+
+    // Master volume envelope for natural feline vocal attack & release
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0.0001, t0);
+    masterGain.gain.exponentialRampToValueAtTime(p.gain, t0 + 0.05); // soft onset
+    masterGain.gain.setValueAtTime(p.gain * 0.95, t0 + p.duration * 0.45);
+    masterGain.gain.exponentialRampToValueAtTime(0.0001, t0 + p.duration); // smooth tail fade
+
+    // LFO (Low-Frequency Oscillator): Feline purring flutter / laryngeal vibration
+    const lfo = ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(p.purrRate, t0);
+
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.setValueAtTime(p.purrDepth, t0);
+    lfoGain.gain.linearRampToValueAtTime(p.purrDepth * 0.5, t0 + p.duration);
+    lfo.connect(lfoGain);
+
+    // Primary Voice Carrier: Warm glottal wave
+    const voiceOsc = ctx.createOscillator();
+    voiceOsc.type = 'triangle';
+    const peakTime = t0 + p.duration * 0.36;
+    voiceOsc.frequency.setValueAtTime(p.startF, t0);
+    voiceOsc.frequency.exponentialRampToValueAtTime(p.peakF, peakTime);
+    voiceOsc.frequency.exponentialRampToValueAtTime(p.endF, t0 + p.duration);
+    lfoGain.connect(voiceOsc.frequency);
+
+    // Secondary Harmonic: Subtle throat texture
+    const harmOsc = ctx.createOscillator();
+    harmOsc.type = 'sawtooth';
+    const harmGain = ctx.createGain();
+    harmGain.gain.setValueAtTime(0.022, t0);
+    harmGain.gain.exponentialRampToValueAtTime(0.0001, t0 + p.duration);
+    harmOsc.frequency.setValueAtTime(p.startF * 1.5, t0);
+    harmOsc.frequency.exponentialRampToValueAtTime(p.peakF * 1.5, peakTime);
+    harmOsc.frequency.exponentialRampToValueAtTime(p.endF * 1.5, t0 + p.duration);
+    lfoGain.connect(harmOsc.frequency);
+    harmOsc.connect(harmGain);
+
+    // Formant Acoustic Filter (Cat vocal tract & mouth shape dynamics)
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.Q.setValueAtTime(3.2, t0);
+    filter.frequency.setValueAtTime(p.filterStart, t0);
+    filter.frequency.exponentialRampToValueAtTime(p.filterPeak, peakTime);
+    filter.frequency.exponentialRampToValueAtTime(p.filterEnd, t0 + p.duration);
+
+    // Sub-purr vibration (Gentle rumbling purr in chest)
+    const purrOsc = ctx.createOscillator();
+    purrOsc.type = 'triangle';
+    purrOsc.frequency.setValueAtTime(88, t0);
+    const purrGain = ctx.createGain();
+    purrGain.gain.setValueAtTime(0.035, t0);
+    purrGain.gain.exponentialRampToValueAtTime(0.0001, t0 + p.duration * 0.85);
+    purrOsc.connect(purrGain);
+
+    // Audio Graph Wiring
+    voiceOsc.connect(filter);
+    harmGain.connect(filter);
+    filter.connect(masterGain);
+    purrGain.connect(masterGain);
+    masterGain.connect(ctx.destination);
+
+    // Trigger synthesis
+    lfo.start(t0);
+    voiceOsc.start(t0);
+    harmOsc.start(t0);
+    purrOsc.start(t0);
+
+    const stopTime = t0 + p.duration + 0.05;
+    lfo.stop(stopTime);
+    voiceOsc.stop(stopTime);
+    harmOsc.stop(stopTime);
+    purrOsc.stop(stopTime);
+  } catch (err) {
+    // Audio context error fallback silently
   }
 };
 
@@ -171,6 +321,8 @@ export default function CuteCatAnnouncementBoard({
   const [petHearts, setPetHearts] = useState([]);
   const [catSpeech, setCatSpeech] = useState(null);
   const [isWiggling, setIsWiggling] = useState(false);
+  const [isPetting, setIsPetting] = useState(false);
+  const [petCount, setPetCount] = useState(0);
 
   // ----------------------------------------------------------------------------
   // 2. MANAGEMENT MODAL STATE
@@ -225,34 +377,49 @@ export default function CuteCatAnnouncementBoard({
     setTimeout(() => setIsWiggling(false), 500);
   };
 
-  // Pet the cat interaction
+  // Pet the cat interaction: realistic sweet affectionate meowing sound & purr animation
   const handlePetCat = (e) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
+    setIsPetting(true);
     triggerCatBounce();
-    if (soundEnabled) playMeowChime();
+    setTimeout(() => setIsPetting(false), 700);
 
+    const nextCount = petCount + 1;
+    setPetCount(nextCount);
+
+    // Play ultra-cute realistic feline meow & purr sound effect
+    if (soundEnabled) {
+      playAffectionateMeowSound(nextCount % 3);
+    }
+
+    // Spawn floating cute particles (Hearts, Cat Paws, Sparkles, Flowers)
+    const particlePool = ['💖', '🐾', '✨', '🌸', '😻'];
+    const chosenParticle = particlePool[Math.floor(Math.random() * particlePool.length)];
     const newHeart = {
       id: Date.now() + Math.random(),
-      x: 30 + Math.random() * 40,
-      y: 10 + Math.random() * 20
+      symbol: chosenParticle,
+      x: 25 + Math.random() * 50,
+      y: 8 + Math.random() * 22
     };
-    setPetHearts((prev) => [...prev.slice(-4), newHeart]);
+    setPetHearts((prev) => [...prev.slice(-5), newHeart]);
     setTimeout(() => {
       setPetHearts((prev) => prev.filter((h) => h.id !== newHeart.id));
     }, 1200);
 
     const meowQuotes = [
-      tx('เหมียววว~ นุดลูบหัวเค้าแล้ว! ขอบคุณนะค้าบ 🐾✨', 'Purrrr~ Thanks for petting me, hooman! 🐾✨'),
-      tx('ป้ายประกาศนี้ใช้งานได้จริง เพิ่ม/แก้ข่าวสารของร้านได้เลยนะนุด! 🐱📢', 'This notice board is 100% real! You can edit any store announcement! 🐱📢'),
-      tx('InsightFlow ช่วยให้ร้านขายดี กำไรพุ่งพรวด เหมียว~', 'InsightFlow makes your store profit skyrocket! Meow~'),
-      tx('เค้าคอยเฝ้าประกาศให้ตลอด 24 ชม. เลยนะงับ! 💖', 'Guarding this notice board 24/7 for you! 💖')
+      tx('เหมียววว~ นุดลูบหัวเค้าแล้ว! อ้อนๆ น้วยๆ 🐾✨', 'Myaaaooow~ Thanks for petting me, hooman! So cuddly 🐾✨'),
+      tx('มยาาา~ว ชื่นใจจังเลยนุด เกาคางเค้าอีกทีน้าา 💖', 'Purrrrr~ That scratches the itch, hooman! More chin scritches please 💖'),
+      tx('มิ้วว~ นุดน่ารักที่สุด! ขอให้ร้านค้ายอดขายปังๆ กำไรทะลุเป้านะค้าบ 🐱💵', 'Mewww~ Wishing your store record-breaking sales & explosive revenue! 🐱💵'),
+      tx('ง่าววว~ (ทำเสียงเพอร์รี่ครืดๆ อ้อนอยู่ในลำคออย่างมีความสุข) 😻✨', 'Mrrrr-meow~ (Happy deep purring vibration in chest) 😻✨'),
+      tx('ป้ายประกาศนี้ใช้งานได้จริง เพิ่ม/แก้ข่าวสารของร้านได้เลยนะนุด! 📢🐾', 'This notice board is 100% real! You can edit any store announcement! 📢🐾'),
+      tx('เค้าคอยเฝ้าประกาศและยอดขายให้ตลอด 24 ชม. เลยนะงับ! 🛡️🧡', 'Guarding this announcement board & sales 24/7 for you! 🛡️🧡')
     ];
     const quote = meowQuotes[Math.floor(Math.random() * meowQuotes.length)];
     setCatSpeech(quote);
 
     setTimeout(() => {
       setCatSpeech(null);
-    }, 3500);
+    }, 3600);
   };
 
   const handleActionClick = () => {
@@ -333,7 +500,7 @@ export default function CuteCatAnnouncementBoard({
       setCurrentIndex(0);
     }
 
-    if (soundEnabled) playMeowChime();
+    if (soundEnabled) playAffectionateMeowSound(1);
     setIsManageModalOpen(false);
     triggerCatBounce();
   };
@@ -414,7 +581,7 @@ export default function CuteCatAnnouncementBoard({
           onClick={() => {
             setIsMinimized(false);
             triggerCatBounce();
-            if (soundEnabled) playMeowChime();
+            if (soundEnabled) playAffectionateMeowSound(0);
           }}
           className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-slate-900/95 to-amber-400/20 border-2 border-amber-400/60 shadow-[0_10px_30px_rgba(251,191,36,0.35)] backdrop-blur-xl hover:scale-105 active:scale-95 transition-transform duration-200 cursor-pointer"
           title={tx('คลิกเพื่อเปิดป้ายประกาศน้องแมวส้ม', 'Click to open Cute Cat Announcement Board')}
@@ -501,10 +668,10 @@ export default function CuteCatAnnouncementBoard({
             {petHearts.map((h) => (
               <div
                 key={h.id}
-                className="absolute text-rose-400 font-black text-xl cute-heart-float z-30"
+                className="absolute text-rose-400 font-black text-xl cute-heart-float z-30 select-none pointer-events-none"
                 style={{ left: `${h.x}%`, top: `${h.y}%` }}
               >
-                💖
+                {h.symbol || '💖'}
               </div>
             ))}
 
@@ -519,7 +686,11 @@ export default function CuteCatAnnouncementBoard({
             {/* Cat SVG Illustration Container */}
             <div
               className={`relative w-28 h-28 sm:w-32 sm:h-32 transition-transform duration-300 ${
-                isWiggling ? 'scale-110 rotate-3' : 'group-hover:scale-105'
+                isPetting
+                  ? 'cute-cat-petting'
+                  : isWiggling
+                  ? 'scale-110 rotate-3'
+                  : 'group-hover:scale-105'
               }`}
             >
               <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-500/30 to-yellow-300/20 blur-xl pointer-events-none" />
@@ -650,11 +821,11 @@ export default function CuteCatAnnouncementBoard({
                 <path d="M72 32 L80 42 L88 32" stroke="url(#boardStripes)" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                 <line x1="80" y1="30" x2="80" y2="40" stroke="url(#boardStripes)" strokeWidth="2.8" strokeLinecap="round" />
 
-                <ellipse cx="56" cy="65" rx="6" ry="4" fill="#FB7185" opacity="0.8" />
-                <ellipse cx="104" cy="65" rx="6" ry="4" fill="#FB7185" opacity="0.8" />
+                <ellipse cx="56" cy="65" rx={isPetting ? "7.5" : "6"} ry={isPetting ? "5" : "4"} fill="#FB7185" opacity={isPetting ? "0.95" : "0.8"} />
+                <ellipse cx="104" cy="65" rx={isPetting ? "7.5" : "6"} ry={isPetting ? "5" : "4"} fill="#FB7185" opacity={isPetting ? "0.95" : "0.8"} />
 
                 {/* Almond Emerald Eyes (or Happy Squint if pet) */}
-                {catSpeech || currentItem?.catMood === 'happy' ? (
+                {isPetting || catSpeech || currentItem?.catMood === 'happy' ? (
                   <g>
                     <path d="M60 54 Q66 48 72 54" stroke="#7C2D12" strokeWidth="3" strokeLinecap="round" fill="none" />
                     <path d="M88 54 Q94 48 100 54" stroke="#7C2D12" strokeWidth="3" strokeLinecap="round" fill="none" />
@@ -745,11 +916,20 @@ export default function CuteCatAnnouncementBoard({
                 <button
                   type="button"
                   onClick={() => {
-                    setSoundEnabled(!soundEnabled);
-                    if (!soundEnabled) playMeowChime();
+                    const next = !soundEnabled;
+                    setSoundEnabled(next);
+                    if (next) playAffectionateMeowSound(0);
                   }}
-                  className="w-7 h-7 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-slate-300 hover:text-amber-300 text-xs font-black flex items-center justify-center transition active:scale-95 cursor-pointer"
-                  title={soundEnabled ? tx('ปิดเสียงเหมียว', 'Mute Sound') : tx('เปิดเสียงเหมียว', 'Enable Sound')}
+                  className={`w-7 h-7 rounded-xl border text-xs font-black flex items-center justify-center transition active:scale-95 cursor-pointer ${
+                    soundEnabled
+                      ? 'bg-amber-500/25 text-amber-300 border-amber-400/50 shadow-[0_0_10px_rgba(251,191,36,0.35)]'
+                      : 'bg-white/5 hover:bg-white/15 border-white/15 text-slate-400'
+                  }`}
+                  title={
+                    soundEnabled
+                      ? tx('ปิดเสียงร้องแมว', 'Mute Cat Sounds')
+                      : tx('เปิดเสียงร้องแมวอ้อนๆ', 'Enable Affectionate Cat Sounds')
+                  }
                 >
                   {soundEnabled ? '🔔' : '🔕'}
                 </button>
