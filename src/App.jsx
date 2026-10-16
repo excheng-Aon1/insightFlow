@@ -26,7 +26,6 @@ import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
-import { InsightFlowMnemonicLogo, InsightFlowSuiteGrid } from './components/AdobeStyleInsightFlowLogo';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
   EtlPipelineIcon,
@@ -11580,36 +11579,11 @@ ChartJS.register(
   Legend
 );
 
-function AppLogo({ size = 46, className = '', style }) {
-  const currentStyle =
-    style ||
-    (typeof window !== 'undefined'
-      ? localStorage.getItem('insightflow_logo_style') || 'bars'
-      : 'bars');
-  if (currentStyle === 'original') {
-    return <LuxuryBrandLogo size={size} className={className} />;
-  }
-  if (currentStyle === 'adobe') {
-    return (
-      <InsightFlowMnemonicLogo
-        size={size}
-        letters="If"
-        variant="gold"
-        className={className}
-      />
-    );
-  }
+function AppLogo({ size = 46, className = '' }) {
   return <InsightFlowGlassBarsLogo size={size} className={className} />;
 }
 
 function App() {
-  const [logoStyle, setLogoStyle] = useState(() => {
-    try {
-      return localStorage.getItem('insightflow_logo_style') || 'bars';
-    } catch {
-      return 'bars';
-    }
-  });
   const [user, setUser] = useState(() => {
     try {
       const savedUserRaw = localStorage.getItem('insightflow_saved_user');
@@ -15725,61 +15699,6 @@ function App() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {/* 1-Click Test Animated Cute Cat Notification Button */}
-            <button
-              type="button"
-              onClick={() =>
-                toast.success(
-                  tx(
-                    '🎉 น้อนแมวส้มแจ้งเตือน: ดำเนินการสำเร็จเรียบร้อยแล้วค้าบ! ระบบซิงค์ข้อมูลและวิเคราะห์กำไรพร้อมใช้งาน เหมียว~ 🐱✨',
-                    '🎉 Cute Cat Alert: System Action Verified Successfully! 100% Data Sync & Profit Engine Active, Meow~ 🐱✨'
-                  )
-                )
-              }
-              className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500/25 via-orange-400/20 to-emerald-500/25 hover:from-amber-500/35 hover:to-orange-400/35 border border-amber-400/50 text-amber-300 text-xs font-black cursor-pointer transition shadow-md flex items-center gap-1.5"
-              title={tx('กดเพื่อดูตัวอย่างป้ายแจ้งเตือนน้องแมวส้มดุ๊กดิ๊ก', 'Click to preview Cute Cat notification toast')}
-            >
-              <span className="text-sm">🐱</span>
-              <span className="hidden md:inline">{tx('ทดสอบป้ายเตือนน้องแมว', 'Test Cat Alert')}</span>
-            </button>
-
-            {/* Logo Style Switcher: 3D Glass Bars vs Adobe If vs Original */}
-            <button
-              type="button"
-              onClick={() => {
-                const nextStyle =
-                  logoStyle === 'bars'
-                    ? 'adobe'
-                    : logoStyle === 'adobe'
-                    ? 'original'
-                    : 'bars';
-                setLogoStyle(nextStyle);
-                try {
-                  localStorage.setItem('insightflow_logo_style', nextStyle);
-                } catch (e) {}
-                toast.success(
-                  nextStyle === 'bars'
-                    ? tx('✨ สลับเป็นโลโก้ 3D Glass Pill Bars (สไตล์ใหม่ล่าสุดตามภาพ)', '✨ Activated 3D Glass Pill Bars Logo')
-                    : nextStyle === 'adobe'
-                    ? tx('✨ สลับเป็นโลโก้สไตล์ Adobe "If" (InsightFlow Mnemonic Badge)', '✨ Activated Adobe-Style "If" Luxury Mnemonic Badge')
-                    : tx('👑 สลับกลับสู่โลโก้ดั้งเดิม 3D Pillars & Trajectory แล้วครับ', '👑 Restored Original 3D Pillars Logo')
-                );
-              }}
-              className="px-2.5 py-1.5 sm:py-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-xs font-black cursor-pointer transition flex items-center gap-1.5 shadow-sm"
-              title={tx('คลิกสลับสไตล์โลโก้ (แท่งแก้ว 3D Bars / Adobe If / โลโก้ดั้งเดิม)', 'Toggle Logo Style')}
-            >
-              <span className="text-sm">
-                {logoStyle === 'bars' ? '📊' : logoStyle === 'adobe' ? '[If]' : '👑'}
-              </span>
-              <span className="hidden sm:inline text-slate-300">
-                {logoStyle === 'bars'
-                  ? tx('3D Glass Bars', '3D Glass Bars')
-                  : logoStyle === 'adobe'
-                  ? tx('สไตล์ Adobe If', 'Adobe Style')
-                  : tx('โลโก้เดิม', 'Original Logo')}
-              </span>
-            </button>
-
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
             {renderLanguageSwitcher()}
 
