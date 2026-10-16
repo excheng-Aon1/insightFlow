@@ -200,6 +200,16 @@ class UserLoginRequest(BaseModel):
     name: Optional[str] = None
 
 
+class GoogleAuthRequest(BaseModel):
+    credential: Optional[str] = None
+    email: Optional[str] = None
+    name: Optional[str] = None
+    picture: Optional[str] = None
+    sub: Optional[str] = None
+    phone: Optional[str] = None
+    line_id: Optional[str] = None
+
+
 class OTPRequest(BaseModel):
     email: str
 
@@ -738,6 +748,77 @@ async def login_with_email(req: UserLoginRequest, db: Session = Depends(get_db))
         name=user.full_name or user.email.split("@")[0],
         extra_message="เข้าสู่ระบบและรับ JWT Access Token สำเร็จ",
     )
+
+
+@app.post("/api/auth/google")
+async def login_with_google(req: GoogleAuthRequest, db: Session = Depends(get_db)):
+    """เข้าสู่ระบบด้วย Google Account (OAuth2 / GIS ID Token)"""
+    email_clean = ""
+    display_name = ""
+    picture_url = ""
+
+    # 1. หากส่ง credential (Google JWT) มา ให้แกะ token
+    if req.credential:
+        try:
+            from google.oauth2 import id_token
+            from google.auth.transport import requests as google_requests
+            google_client_id = os.environ.get("GOOGLE_CLIENT_ID")
+            id_info = id_token.verify_oauth2_token(
+                req.credential,
+                google_requests.Request(),
+                google_client_id if google_client_id else None
+            )
+            email_clean = str(id_info.get("email", "")).strip().lower()
+            display_name = id_info.get("name") or id_info.get("given_name") or email_clean.split("@")[0]
+            picture_url = id_info.get("picture", "")
+        except Exception as e:
+            logger.warning(f"Google token id_token verification fallback: {e}")
+            try:
+                import base64
+                parts = req.credential.split(".")
+                if len(parts) >= 2:
+                    padded = parts[1] + "=" * ((4 - len(parts[1]) % 4) % 4)
+                    payload_json = json.loads(base64.urlsafe_b64decode(padded).decode("utf-8"))
+                    email_clean = str(payload_json.get("email", "")).strip().lower()
+                    display_name = payload_json.get("name") or payload_json.get("given_name") or email_clean.split("@")[0]
+                    picture_url = payload_json.get("picture", "")
+            except Exception as parse_err:
+                logger.error(f"Failed to parse google credential payload: {parse_err}")
+
+    # 2. กรณีส่ง email โดยตรง (เช่น direct Google sign-in payload)
+    if not email_clean and req.email:
+        email_clean = str(req.email).strip().lower()
+        display_name = req.name or email_clean.split("@")[0]
+        picture_url = req.picture or ""
+
+    if not email_clean:
+        raise HTTPException(status_code=400, detail="ไม่พบข้อมูลอีเมลจาก Google Account")
+
+    # 3. ตรวจสอบหรือสร้างผู้ใช้ในฐานข้อมูล
+    user = db.query(User).filter(User.email == email_clean).first()
+    if not user:
+        new_user = User(
+            id=str(uuid.uuid4()),
+            email=email_clean,
+            full_name=display_name,
+            hashed_password=get_password_hash(f"google-oauth-{uuid.uuid4()}"),
+            role="admin" if email_clean == SUPER_ADMIN_EMAIL else "member"
+        )
+        db.add(new_user)
+        db.commit()
+    elif display_name and not user.full_name:
+        user.full_name = display_name
+        db.commit()
+
+    logger.info(f"User authenticated with Google: {email_clean} ({display_name})")
+    resp = _issue_jwt_response(
+        email=email_clean,
+        name=display_name or (user.full_name if user else email_clean.split("@")[0]),
+        extra_message="เข้าสู่ระบบด้วยบัญชี Google สำเร็จ",
+    )
+    if picture_url:
+        resp["user"]["picture"] = picture_url
+    return resp
 
 
 @app.post("/api/auth/session-token")

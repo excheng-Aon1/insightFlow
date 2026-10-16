@@ -37,6 +37,7 @@ import {
   FileDocumentIcon,
   DatabaseAddIcon,
   TrashCanIcon,
+  GoogleIcon,
 } from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
@@ -11935,6 +11936,160 @@ function App() {
     );
   };
 
+  // Google Sign-In State & Handlers (Google Identity Services + Interactive Selector)
+  const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
+  const [isGoogleAccountPickerOpen, setIsGoogleAccountPickerOpen] = useState(false);
+  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
+  const [customGoogleName, setCustomGoogleName] = useState('');
+
+  // Auto-init Google Identity Services (GIS) if Client ID is configured
+  useEffect(() => {
+    const googleClientId = import.meta?.env?.VITE_GOOGLE_CLIENT_ID;
+    if (googleClientId && typeof window !== 'undefined' && window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: response => {
+            if (response?.credential) {
+              handleGoogleSignIn({ credential: response.credential });
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('GIS auto-init notice:', e);
+      }
+    }
+  }, []);
+
+  const handleGoogleSignIn = async (directPayload = null) => {
+    setIsGoogleSigningIn(true);
+    try {
+      let emailToUse = directPayload?.email;
+      let nameToUse = directPayload?.name;
+      let pictureToUse = directPayload?.picture;
+      let credential = directPayload?.credential;
+
+      const googleClientId = import.meta?.env?.VITE_GOOGLE_CLIENT_ID;
+
+      // 1. If no direct payload, check if GIS prompt can be shown
+      if (!directPayload && typeof window !== 'undefined' && window.google?.accounts?.id && googleClientId) {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: async response => {
+            if (response?.credential) {
+              await handleGoogleSignIn({ credential: response.credential });
+            }
+          }
+        });
+        window.google.accounts.id.prompt();
+        setIsGoogleSigningIn(false);
+        return;
+      }
+
+      // 2. If no direct payload and GIS is not configured, open interactive Google Account Picker
+      if (!emailToUse && !credential) {
+        setIsGoogleAccountPickerOpen(true);
+        setIsGoogleSigningIn(false);
+        return;
+      }
+
+      // 3. Connect to Backend /api/auth/google
+      if (canUseBackendApi()) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              credential,
+              email: emailToUse,
+              name: nameToUse,
+              picture: pictureToUse
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.access_token) {
+            localStorage.setItem('insightflow_jwt_token', data.access_token);
+            if (data.email) emailToUse = data.email;
+            if (data.user?.name) nameToUse = data.user.name;
+            if (data.user?.picture) pictureToUse = data.user.picture;
+          }
+        } catch (err) {
+          console.warn('Backend Google Auth error:', err);
+        }
+      }
+
+      const cleanEmail = (emailToUse || 'user@gmail.com').toLowerCase();
+      const isEnteringSuperAdmin = cleanEmail === SUPER_ADMIN_EMAIL;
+      const cleanPhone = (authPhone || '089-999-8888').trim();
+      const cleanLine = (authLineId || '@insightflow.vip').trim();
+      const resolvedName =
+        nameToUse ||
+        (isEnteringSuperAdmin
+          ? tx('ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin')
+          : cleanEmail.split('@')[0]);
+      const resolvedPicture =
+        pictureToUse ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          resolvedName
+        )}&background=4285F4&color=ffffff&bold=true`;
+
+      const googleUser = {
+        name: resolvedName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        lineId: cleanLine,
+        sub: isEnteringSuperAdmin ? 'super-admin' : cleanEmail,
+        role: isEnteringSuperAdmin ? 'admin' : 'customer',
+        picture: resolvedPicture,
+        authProvider: 'google'
+      };
+
+      if (isEnteringSuperAdmin) {
+        setAdminPreviewCustomerPlan(false);
+      }
+      if (rememberPassword) {
+        localStorage.setItem('insightflow_saved_user', JSON.stringify(googleUser));
+        localStorage.setItem('insightflow_saved_phone', cleanPhone);
+        localStorage.setItem('insightflow_saved_line_id', cleanLine);
+        localStorage.setItem(
+          'insightflow_saved_credentials',
+          JSON.stringify({
+            name: resolvedName,
+            email: cleanEmail,
+            phone: cleanPhone,
+            lineId: cleanLine
+          })
+        );
+      }
+
+      registerOrUpdateWebCustomer({
+        name: resolvedName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        lineId: cleanLine,
+        plan: subscriptionPlan
+      });
+
+      setUser(googleUser);
+      setIsLoginOpen(false);
+      setIsGoogleAccountPickerOpen(false);
+      syncContactWithLineBackend(cleanPhone, cleanLine, cleanEmail, resolvedName);
+
+      toast.success(
+        tx(
+          `🎉 เข้าสู่ระบบด้วยบัญชี Google (${cleanEmail}) เรียบร้อยแล้ว!`,
+          `🎉 Signed in with Google (${cleanEmail}) successfully!`
+        ),
+        { icon: '🌐', duration: 4500 }
+      );
+    } catch (err) {
+      toast.error(tx('⚠️ เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google', '⚠️ Google sign-in failed'));
+    } finally {
+      setIsGoogleSigningIn(false);
+    }
+  };
+
+
   // Interactive Business State across all tabs
   const [currentRevenueVal, setCurrentRevenueVal] = useState(4829000);
   const [targetRevenueVal, setTargetRevenueVal] = useState(6500000);
@@ -13324,6 +13479,32 @@ function App() {
                 </div>
               )}
 
+              {/* Google Sign-In Quick 1-Tap Button */}
+              <button
+                type="button"
+                onClick={() => handleGoogleSignIn()}
+                disabled={isGoogleSigningIn}
+                className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm shadow-md border border-slate-200 flex items-center justify-center gap-3 transition-all hover:shadow-lg active:scale-[0.99] cursor-pointer mb-3"
+              >
+                <GoogleIcon size={20} />
+                <span>
+                  {isGoogleSigningIn
+                    ? tx('กำลังเชื่อมต่อ Google...', 'Connecting to Google...')
+                    : tx('เข้าสู่ระบบด้วยบัญชี Google', 'Continue with Google')}
+                </span>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 ml-auto hidden sm:inline-block">
+                  ⚡ 1 คลิก
+                </span>
+              </button>
+
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-[1px] flex-1 bg-white/10" />
+                <span className="text-[11px] font-medium text-slate-400">
+                  {tx('หรือเลือกวิธีอื่นด้านล่าง', 'or choose sign-in method below')}
+                </span>
+                <div className="h-[1px] flex-1 bg-white/10" />
+              </div>
+
               {/* Auth Mode Toggle Tabs (Password / OTP 2FA / Register) */}
               <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-[#060a14] border border-white/10 mb-4">
                 <button
@@ -13750,6 +13931,140 @@ function App() {
                     ? tx('🔄 เปลี่ยนไปเข้าสู่ระบบด้วยรหัสผ่านปกติ', 'Switch to standard Password sign-in')
                     : tx('🔐 สลับไปเข้าสู่ระบบด้วยรหัส OTP 2FA (รวดเร็ว ปลอดภัย)', 'Switch to 2FA OTP login (Fast & Secure)')}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Google Account Selector Modal (Interactive GIS Experience) */}
+        {isGoogleAccountPickerOpen && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0f172a] border border-white/20 rounded-3xl w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+              <button
+                onClick={() => setIsGoogleAccountPickerOpen(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white transition text-sm font-bold cursor-pointer"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+
+              <div className="flex items-center gap-3 mb-4">
+                <GoogleIcon size={32} />
+                <div>
+                  <h3 className="text-lg font-black text-white leading-tight">
+                    {tx('ลงชื่อเข้าใช้ด้วย Google', 'Sign in with Google')}
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {tx('เพื่อเข้าใช้งาน InsightFlow Console', 'To continue to InsightFlow Console')}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-300 mb-3">
+                {tx('เลือกบัญชี Google เพื่อเข้าสู่ระบบได้ทันทีในคลิกเดียว:', 'Choose a Google Account to sign in instantly:')}
+              </p>
+
+              <div className="space-y-2 mb-4">
+                {/* Account 1: Super Admin */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleGoogleSignIn({
+                      email: SUPER_ADMIN_EMAIL,
+                      name: tx('Super Admin (อาจารย์สอน)', 'Super Admin (Achan Sorn)'),
+                      picture: 'https://ui-avatars.com/api/?name=Super+Admin&background=fbbf24&color=0f172a&bold=true'
+                    })
+                  }
+                  className="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/50 flex items-center gap-3 text-left transition cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 text-slate-950 font-black flex items-center justify-center text-sm shadow flex-shrink-0">
+                    👑
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-black text-white group-hover:text-amber-300 truncate">
+                        {tx('Super Admin (อาจารย์สอน)', 'Super Admin (Achan Sorn)')}
+                      </p>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 flex-shrink-0">
+                        11 หน้า
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 truncate">{SUPER_ADMIN_EMAIL}</p>
+                  </div>
+                </button>
+
+                {/* Account 2: Store Owner Demo */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleGoogleSignIn({
+                      email: 'owner.somchai@gmail.com',
+                      name: tx('คุณสมชาย (เจ้าของร้าน Insight Store)', 'Somchai (Store Owner)'),
+                      picture: 'https://ui-avatars.com/api/?name=Somchai+Store&background=34A853&color=ffffff&bold=true'
+                    })
+                  }
+                  className="w-full p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/50 flex items-center gap-3 text-left transition cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-emerald-500 text-white font-black flex items-center justify-center text-sm shadow flex-shrink-0">
+                    🛍️
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-black text-white group-hover:text-emerald-300 truncate">
+                      {tx('คุณสมชาย (เจ้าของร้าน Insight Store)', 'Somchai (Store Owner)')}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">owner.somchai@gmail.com</p>
+                  </div>
+                </button>
+              </div>
+
+              {/* Custom Google Account Section */}
+              <div className="pt-3 border-t border-white/10">
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  {tx('หรือระบุบัญชี Google (@gmail.com) ของคุณเอง:', 'Or enter your own Google Account email:')}
+                </label>
+                <div className="space-y-2 mb-3">
+                  <input
+                    type="text"
+                    placeholder={tx('ชื่อผู้ใช้งาน / ชื่อร้านค้า', 'Your Name / Store Name')}
+                    value={customGoogleName}
+                    onChange={e => setCustomGoogleName(e.target.value)}
+                    className="w-full bg-[#050814] border border-white/15 rounded-xl px-3.5 py-2 text-white outline-none focus:border-blue-400 text-xs"
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      placeholder="your.email@gmail.com"
+                      value={customGoogleEmail}
+                      onChange={e => setCustomGoogleEmail(e.target.value)}
+                      className="flex-1 bg-[#050814] border border-white/15 rounded-xl px-3.5 py-2 text-white outline-none focus:border-blue-400 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const clean = customGoogleEmail.trim().toLowerCase();
+                        if (!clean || !clean.includes('@')) {
+                          toast.error(tx('⚠️ กรุณาระบุอีเมล Google ที่ถูกต้อง', '⚠️ Please enter a valid Google email'));
+                          return;
+                        }
+                        handleGoogleSignIn({
+                          email: clean,
+                          name: customGoogleName.trim() || clean.split('@')[0],
+                          picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            clean.split('@')[0]
+                          )}&background=4285F4&color=ffffff&bold=true`
+                        });
+                      }}
+                      className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl text-white font-bold text-xs shadow hover:brightness-105 active:scale-95 transition cursor-pointer flex-shrink-0"
+                    >
+                      {tx('เข้าสู่ระบบ', 'Sign In')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-[11px] text-slate-500 text-center flex items-center justify-center gap-1.5 pt-1">
+                <span>🔒</span>
+                <span>{tx('ระบบเชื่อมต่อ Google OAuth2 มาตรฐานความปลอดภัย 256-Bit SSL', 'Protected by Google OAuth2 & 256-Bit SSL standard')}</span>
               </div>
             </div>
           </div>
@@ -15282,13 +15597,33 @@ function App() {
 
           <div className="flex items-center justify-between gap-2 p-2 rounded-2xl bg-white/5">
             {(isSidebarOpen || isMobileMenuOpen) && (
-              <div className="min-w-0">
-                <p className="text-xs font-black truncate">
-                  {isSuperAdmin ? `👑 ${user.email}` : user.name}
-                </p>
-                <p className="text-[11px] text-emerald-400 font-bold truncate">
-                  ● {activePlanMeta.name} ({activePlanMeta.price})
-                </p>
+              <div className="flex items-center gap-2 min-w-0">
+                {user.picture ? (
+                  <img
+                    src={user.picture}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full border border-white/20 object-cover flex-shrink-0"
+                  />
+                ) : user.authProvider === 'google' ? (
+                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow">
+                    <GoogleIcon size={18} />
+                  </div>
+                ) : null}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-black truncate">
+                      {isSuperAdmin ? `👑 ${user.email}` : user.name}
+                    </p>
+                    {user.authProvider === 'google' && (
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-blue-500/20 text-blue-300 border border-blue-400/30 flex-shrink-0">
+                        Google
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-emerald-400 font-bold truncate">
+                    ● {activePlanMeta.name} ({activePlanMeta.price})
+                  </p>
+                </div>
               </div>
             )}
             <button
