@@ -218,7 +218,7 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
-  test('UNIT-FE-11: Logo clarity enhancement and ultra-high contrast dark typography are applied', () => {
+  test('UNIT-FE-11: Logo clarity enhancement and high-contrast sapphire emblem are enforced', () => {
     const cssPath = path.join(projectRoot, 'src', 'index.css');
     const cssContent = fs.readFileSync(cssPath, 'utf8');
 
@@ -227,11 +227,26 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
       cssContent.includes('.insightflow-glass-bars-logo') && cssContent.includes('#2563eb'),
       'index.css must enforce high-contrast emblem border and sapphire glow for logo in light mode'
     );
+  });
 
-    // High contrast dark text typography
+  test('UNIT-FE-12: All icons clarity engine and pure black (#000000) typography are applied in light mode', () => {
+    const cssPath = path.join(projectRoot, 'src', 'index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+
+    // All icons clarity engine
     assert.ok(
-      cssContent.includes('#020617') && cssContent.includes('font-weight: 800'),
-      'index.css must enforce bold dark #020617 text for headings in light mode'
+      cssContent.includes('html[data-theme="light"] svg') && cssContent.includes('contrast('),
+      'index.css must boost contrast and clarity on all SVGs in light mode'
+    );
+    assert.ok(
+      cssContent.includes('.luxury-icon-badge-gold') && cssContent.includes('border: 2px solid'),
+      'index.css must enforce 2px solid vivid borders for luxury icon badges in light mode'
+    );
+
+    // Pure black typography
+    assert.ok(
+      cssContent.includes('html[data-theme="light"]') && cssContent.includes('#000000 !important'),
+      'index.css must enforce pure black (#000000) typography for text in light mode'
     );
   });
 
