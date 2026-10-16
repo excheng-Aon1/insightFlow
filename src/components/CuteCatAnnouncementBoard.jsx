@@ -210,6 +210,78 @@ const playAffectionateMeowSound = (variantIndex) => {
   }
 };
 
+// ==============================================================================
+// AUTHENTIC REAL RECORDED CAT SOUNDS ("เสียงแมวจริงๆ ร้องอ้อน")
+// Recorded from real pleading domestic cats, clean-cut with smooth fade-in/out
+// ==============================================================================
+const REAL_CAT_SOUND_SOURCES = [
+  { wav: '/sounds/cat-real-meow-1.wav', m4a: '/sounds/cat-real-meow-1.m4a' },
+  { wav: '/sounds/cat-real-meow-2.wav', m4a: '/sounds/cat-real-meow-2.m4a' },
+  { wav: '/sounds/cat-real-meow-3.wav', m4a: '/sounds/cat-real-meow-3.m4a' }
+];
+
+// Preloaded Audio Objects cache for instant, zero-latency playback on click
+let preloadedCatAudios = null;
+
+const getPreloadedCatAudios = () => {
+  if (typeof window === 'undefined') return [];
+  if (!preloadedCatAudios) {
+    preloadedCatAudios = REAL_CAT_SOUND_SOURCES.map((src) => {
+      try {
+        const audio = new Audio();
+        // Support WAV or M4A based on browser capabilities
+        const canPlayM4A = audio.canPlayType('audio/x-m4a') || audio.canPlayType('audio/mp4');
+        audio.src = canPlayM4A ? src.m4a : src.wav;
+        audio.preload = 'auto';
+        audio.volume = 0.95;
+        return audio;
+      } catch {
+        return null;
+      }
+    });
+  }
+  return preloadedCatAudios;
+};
+
+// Play authentic real cat voice recording with synthesizer fallback
+const playRealCatMeow = (variantIndex) => {
+  try {
+    const audios = getPreloadedCatAudios();
+    const idx =
+      typeof variantIndex === 'number'
+        ? variantIndex % REAL_CAT_SOUND_SOURCES.length
+        : Math.floor(Math.random() * REAL_CAT_SOUND_SOURCES.length);
+
+    const audio = audios[idx];
+    if (audio) {
+      // Clone audio node or reset currentTime to allow rapid consecutive clicks
+      try {
+        const playInstance = audio.cloneNode();
+        playInstance.volume = 0.95;
+        const promise = playInstance.play();
+        if (promise !== undefined) {
+          promise.catch(() => {
+            // If cloning blocked, try original instance
+            audio.currentTime = 0;
+            audio.play().catch(() => {
+              playAffectionateMeowSound(idx);
+            });
+          });
+        }
+        return;
+      } catch {
+        audio.currentTime = 0;
+        audio.play().catch(() => playAffectionateMeowSound(idx));
+        return;
+      }
+    }
+    // Fallback to synthesizer
+    playAffectionateMeowSound(variantIndex);
+  } catch (err) {
+    playAffectionateMeowSound(variantIndex);
+  }
+};
+
 const DEFAULT_ANNOUNCEMENTS = [
   {
     id: 'ann-1',
@@ -313,6 +385,11 @@ export default function CuteCatAnnouncementBoard({
     }
   }, [soundEnabled]);
 
+  // Preload authentic cat audio clips on first render
+  useEffect(() => {
+    getPreloadedCatAudios();
+  }, []);
+
   // Active items currently published
   const activeAnnouncements = announcements.filter((a) => a.active);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -377,7 +454,7 @@ export default function CuteCatAnnouncementBoard({
     setTimeout(() => setIsWiggling(false), 500);
   };
 
-  // Pet the cat interaction: realistic sweet affectionate meowing sound & purr animation
+  // Pet the cat interaction: authentic real cat meow voice & purr animation
   const handlePetCat = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     setIsPetting(true);
@@ -387,9 +464,9 @@ export default function CuteCatAnnouncementBoard({
     const nextCount = petCount + 1;
     setPetCount(nextCount);
 
-    // Play ultra-cute realistic feline meow & purr sound effect
+    // Play authentic real recorded cat voice (with synthesized fallback)
     if (soundEnabled) {
-      playAffectionateMeowSound(nextCount % 3);
+      playRealCatMeow(nextCount % 3);
     }
 
     // Spawn floating cute particles (Hearts, Cat Paws, Sparkles, Flowers)
@@ -500,7 +577,7 @@ export default function CuteCatAnnouncementBoard({
       setCurrentIndex(0);
     }
 
-    if (soundEnabled) playAffectionateMeowSound(1);
+    if (soundEnabled) playRealCatMeow(1);
     setIsManageModalOpen(false);
     triggerCatBounce();
   };
@@ -581,7 +658,7 @@ export default function CuteCatAnnouncementBoard({
           onClick={() => {
             setIsMinimized(false);
             triggerCatBounce();
-            if (soundEnabled) playAffectionateMeowSound(0);
+            if (soundEnabled) playRealCatMeow(0);
           }}
           className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-slate-900/95 to-amber-400/20 border-2 border-amber-400/60 shadow-[0_10px_30px_rgba(251,191,36,0.35)] backdrop-blur-xl hover:scale-105 active:scale-95 transition-transform duration-200 cursor-pointer"
           title={tx('คลิกเพื่อเปิดป้ายประกาศน้องแมวส้ม', 'Click to open Cute Cat Announcement Board')}
@@ -918,7 +995,7 @@ export default function CuteCatAnnouncementBoard({
                   onClick={() => {
                     const next = !soundEnabled;
                     setSoundEnabled(next);
-                    if (next) playAffectionateMeowSound(0);
+                    if (next) playRealCatMeow(0);
                   }}
                   className={`w-7 h-7 rounded-xl border text-xs font-black flex items-center justify-center transition active:scale-95 cursor-pointer ${
                     soundEnabled
