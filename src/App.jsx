@@ -1710,6 +1710,133 @@ export const initialCentralPosBilingual = [
   }
 ];
 
+export const initialPageUploadedFiles = {
+  overview: {
+    filename: 'Sales_Overview_2026.csv',
+    rows: 1420,
+    fileSizeKb: 148,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'เชื่อมโยงยอดขายรวม ฿4,829,000 และเป้าหมายรายไตรมาส',
+    changeSummaryEn: 'Synced total revenue ฿4,829,000 and quarterly targets',
+    headers: ['วันที่ / เดือน', 'สาขา / ช่องทาง', 'หมวดสินค้าหลัก', 'ยอดขายสุทธิ (บาท)'],
+    previewRows: [
+      ['2026-10-01', 'สาขาสยามพารากอน', 'เซรั่มบำรุงผิวพรีเมียม', '985,000'],
+      ['2026-10-02', 'ช่องทางแชตร้านค้า & LINE OA', 'ชุดของขวัญดูแลผิว', '1,190,000'],
+      ['2026-10-03', 'สาขาเซ็นทรัลลาดพร้าว', 'ครีมกันแดดสูตรน้ำ', '840,000']
+    ]
+  },
+  customers: {
+    filename: 'Customer_RFM_Database.csv',
+    rows: 1435,
+    fileSizeKb: 215,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'ซิงก์รายชื่อลูกค้า VIP และลูกค้าที่ห่างหายเกิน 45 วันครบถ้วน',
+    changeSummaryEn: 'Synced VIP customer profiles and 45+ day inactive buyers',
+    headers: ['รหัสลูกค้า', 'ชื่อลูกค้า', 'เบอร์โทรศัพท์', 'ID LINE', 'ยอดซื้อสะสม (บาท)'],
+    previewRows: [
+      ['CUS-001', 'คุณพิมพ์ชนก วงศ์สุวรรณ', '081-234-5678', '@pimchanok.vip', '148,500'],
+      ['CUS-002', 'คุณกิตติพงศ์ เจริญทรัพย์', '089-876-5432', '@kittipong88', '92,400'],
+      ['CUS-003', 'คุณณัฐนิชา อัศวเดช', '086-555-4321', '@nattanicha.a', '72,500']
+    ]
+  },
+  staff_pos: {
+    filename: 'POS_Staff_Audit_Log.csv',
+    rows: 1232,
+    fileSizeKb: 132,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'ซิงก์ยอดขายพนักงานและบันทึกตรวจสอบบิลยกเลิกหน้าเครื่อง POS',
+    changeSummaryEn: 'Synced cashier KPI rankings and register void audit logs',
+    headers: ['รหัสพนักงาน', 'ชื่อแคชเชียร์ / สาขา', 'ยอดขายรวม (บาท)', 'บิลยกเลิก / สถานะ'],
+    previewRows: [
+      ['STF-01', 'คุณภัทรพล (สยามพารากอน)', '642,000', '0 บิลผิดปกติ (ปกติ)'],
+      ['STF-04', 'เครื่องคิดเงิน #4 (เซ็นทรัลลาดพร้าว)', '318,000', 'ยกเลิกบิลหลังรับเงินสด 14 ครั้ง (รอตรวจสอบ)']
+    ]
+  },
+  multi_channel: {
+    filename: 'MultiChannel_Branch_Data.csv',
+    rows: 1890,
+    fileSizeKb: 260,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'ซิงก์กำไรสุทธิรายช่องทางและตารางเปรียบเทียบสาขา',
+    changeSummaryEn: 'Synced net profit margins across branches and online channels',
+    headers: ['สาขา / แพลตฟอร์ม', 'ยอดขายรวม (บาท)', 'ค่าธรรมเนียม (บาท)', 'กำไรสุทธิ (บาท)'],
+    previewRows: [
+      ['หน้าร้านสยามพารากอน', '985,000', '0', '461,000'],
+      ['แชตร้านค้า & LINE Official', '1,190,000', '59,500', '623,560'],
+      ['แอปมาร์เก็ตเพลสออนไลน์', '1,420,000', '255,600', '397,600']
+    ]
+  },
+  procurement: {
+    filename: 'Central_Procurement_Vendors.csv',
+    rows: 960,
+    fileSizeKb: 98,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'ซิงก์คะแนนซัพพลายเออร์และรายการสั่งซื้อรวมศูนย์ (Economy of Scale)',
+    changeSummaryEn: 'Synced supplier scorecards and consolidated Central PO requisitions',
+    headers: ['รหัสคู่ค้า', 'ชื่อบริษัทซัพพลายเออร์', 'เวลาส่ง (วัน)', 'อัตราส่งของครบ (%)', 'ส่วนลดสั่งรวม (%)'],
+    previewRows: [
+      ['VND-01', 'บจก. สยาม ออร์แกนิค ซัพพลาย', '1.8 วัน', '99.4%', '15%'],
+      ['VND-02', 'บจก. แพ็กเกจจิ้ง พรีเมียม ไทย', '2.1 วัน', '98.8%', '18%']
+    ]
+  },
+  inventory: {
+    filename: 'Stock_SKU_Master.csv',
+    rows: 1248,
+    fileSizeKb: 175,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'ซิงก์จำนวนสต็อกคงเหลือและแจ้งเตือนสินค้าใกล้หมดคลัง',
+    changeSummaryEn: 'Synced live SKU quantities and low-stock reorder alerts',
+    headers: ['รหัสสินค้า (SKU)', 'ชื่อสินค้า', 'หมวดหมู่', 'ราคาต่อชิ้น (บาท)', 'คงเหลือ (ชิ้น)'],
+    previewRows: [
+      ['SKU-101', 'เซรั่มทองคำลดเลือนริ้วรอย', 'สกินแคร์หลัก', '1,290', '145'],
+      ['SKU-104', 'กล่องพัสดุกันกระแทกพรีเมียม', 'อุปกรณ์แพ็กสินค้า', '18', '12 (ใกล้หมด)'],
+      ['SKU-105', 'ชุดของขวัญเทศกาลปีใหม่', 'เซ็ตของขวัญ', '2,490', '0 (สินค้าหมด)']
+    ]
+  },
+  insights: {
+    filename: 'Business_Knowledge.csv',
+    rows: 1435,
+    fileSizeKb: 188,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'ซิงก์ฐานความรู้ธุรกิจสำหรับ AI พยากรณ์ยอดขายและตอบคำถาม',
+    changeSummaryEn: 'Synced business rules and historical data for AI Copilot',
+    headers: ['หัวข้อวิเคราะห์ AI', 'ข้อมูลอ้างอิงจากร้าน', 'คำแนะนำกลยุทธ์ AI'],
+    previewRows: [
+      ['พยากรณ์ยอดขาย 30 วัน', 'แนวโน้มเติบโต +18.4%', 'เตรียมสต็อกเซรั่มเพิ่ม 120 ชิ้นก่อนวันศุกร์'],
+      ['ดึงลูกค้า VIP ที่หายไป', 'ลูกค้าไม่ซื้อซ้ำเกิน 45 วัน', 'ส่งคูปองส่วนลด 20% ทาง LINE อัตโนมัติ']
+    ]
+  },
+  database: {
+    filename: 'Master_Transactions.csv',
+    rows: 3842,
+    fileSizeKb: 450,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'ซิงก์รายการซื้อขายหลักในคลังฐานข้อมูลกลางของร้าน',
+    changeSummaryEn: 'Synced master transaction records across all store channels',
+    headers: ['รหัสบิล', 'ชื่อลูกค้า', 'รายการสินค้า', 'ช่องทางขาย', 'ยอดเงินสุทธิ (บาท)'],
+    previewRows: [
+      ['TXN-2026-881', 'คุณพิมพ์ชนก วงศ์สุวรรณ', 'เซรั่มทองคำ x2', 'สาขาสยามพารากอน', '2,580'],
+      ['TXN-2026-882', 'คุณธนดล รัตนโชติ', 'ชุดดูแลผิวพรีเมียม x1', 'LINE Official', '3,490']
+    ]
+  }
+};
+
 
 // --- MODULE 2: 3D LUXURY ICONS & BRAND LOGO ---
 
@@ -8035,7 +8162,13 @@ export function DatabaseTab({
   setDbRecords,
   pageUploadedFiles = {},
   onInspectUploadedFile,
-  renderUploadZone
+  renderUploadZone,
+  onUploadFileForTab,
+  onAddCustomFile,
+  onDeleteUploadedFile,
+  onResetAllFiles,
+  isUploading = false,
+  theme = 'dark'
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
@@ -8197,44 +8330,130 @@ export function DatabaseTab({
             <FileRegistryIcon size={26} />
             <div>
               <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fbbf24' }}>
-                {tx('คลังไฟล์ที่คุณอัปโหลดเข้าสู่ระบบทั้งหมด (กดดูเนื้อหาในไฟล์ได้ทันที)', 'All Uploaded Files Registry (Click to Inspect File Data)')}
+                {tx('คลังไฟล์ที่คุณอัปโหลดเข้าสู่ระบบทั้งหมด (จัดการ ลบออก และเพิ่มไฟล์ใหม่ได้อิสระ)', 'All Uploaded Files Registry (Manage, Delete & Add Files Freely)')}
               </h4>
               <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: '#cbd5e1' }}>
                 {tx(
-                  'ทุกครั้งที่คุณอัปโหลดไฟล์ใหม่ ข้อความ ตัวเลข และตารางในหน้านั้นจะเปลี่ยนตามข้อมูลในไฟล์จริงทันที และสามารถกดดูข้อมูลในไฟล์ย้อนหลังได้ที่นี่ครับ',
-                  'Whenever you upload a file, page text, metrics, and tables update dynamically from your file content. Click any file below to inspect its rows.'
+                  'คุณและทีมงานสามารถนำเข้าไฟล์ใหม่ เปลี่ยนไฟล์ทับ หรือลบไฟล์ออกได้ตลอดเวลา โดยระบบจะซิงก์ข้อมูลไปคำนวณและแสดงผลในทุกหน้าทันทีครับ',
+                  'You and your team can add, replace, or delete files anytime. The system instantly syncs rows & metrics across all dashboard pages.'
                 )}
               </p>
             </div>
           </div>
-          {onInspectUploadedFile && (
-            <button
-              type="button"
-              onClick={() => onInspectUploadedFile('database')}
-              style={{
-                padding: '0.6rem 1.15rem',
-                borderRadius: '12px',
-                border: '1px solid rgba(251, 191, 36, 0.5)',
-                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                color: '#0f172a',
-                fontWeight: 900,
-                fontSize: '0.84rem',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                boxShadow: '0 4px 14px -2px rgba(245, 158, 11, 0.4)'
-              }}
-            >
-              <SearchInspectorIcon size={18} />
-              <span>{tx('เปิดหน้าต่างดูเนื้อหาไฟล์ทั้งหมด', 'Open Full Uploaded File Inspector')}</span>
-            </button>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            {onResetAllFiles && (
+              <button
+                type="button"
+                onClick={onResetAllFiles}
+                style={{
+                  padding: '0.6rem 0.95rem',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(244, 63, 94, 0.4)',
+                  background: 'rgba(244, 63, 94, 0.15)',
+                  color: '#fb7185',
+                  fontWeight: 900,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  transition: 'all 0.2s'
+                }}
+                title={tx('ล้างและรีเซ็ตไฟล์ทั้งหมดในคลังไฟล์เป็นค่าเริ่มต้น', 'Reset all files in registry to system defaults')}
+              >
+                <span>🗑️</span>
+                <span>{tx('ล้าง/รีเซ็ตไฟล์ทั้งหมด', 'Reset All Files')}</span>
+              </button>
+            )}
+            {onInspectUploadedFile && (
+              <button
+                type="button"
+                onClick={() => onInspectUploadedFile('database')}
+                style={{
+                  padding: '0.6rem 1.15rem',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(251, 191, 36, 0.5)',
+                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                  color: '#0f172a',
+                  fontWeight: 900,
+                  fontSize: '0.84rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  boxShadow: '0 4px 14px -2px rgba(245, 158, 11, 0.4)'
+                }}
+              >
+                <SearchInspectorIcon size={18} />
+                <span>{tx('เปิดหน้าต่างดูเนื้อหาไฟล์ทั้งหมด', 'Open Full Uploaded File Inspector')}</span>
+              </button>
+            )}
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.85rem' }}>
+        {/* Quick Add Custom File Bar to Vault */}
+        <div
+          style={{
+            padding: '0.9rem 1.1rem',
+            borderRadius: '14px',
+            background: 'rgba(15, 23, 42, 0.9)',
+            border: '1.5px dashed rgba(251, 191, 36, 0.45)',
+            marginBottom: '1rem',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.75rem'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <span style={{ fontSize: '1.4rem' }}>📥</span>
+            <div>
+              <div style={{ fontWeight: 900, color: '#f8fafc', fontSize: '0.92rem' }}>
+                {tx('นำเข้าไฟล์ใหม่เข้าสู่คลังไฟล์ (เพิ่มไฟล์เข้าคลังได้ไม่จำกัด)', 'Import New Custom File to Vault (Unlimited Files Supported)')}
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                {tx('รองรับไฟล์ .csv, .xlsx, .xls, .json, .txt • คุณและคนอื่นสามารถเปิดดู ตรวจสอบ และลบออกได้ตลอดเวลา', 'Supports .csv, .xlsx, .xls, .json, .txt • Accessible, inspectable and deletable by you & your team anytime.')}
+              </div>
+            </div>
+          </div>
+          <label
+            style={{
+              padding: '0.55rem 1.15rem',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: '#fff',
+              fontWeight: 900,
+              fontSize: '0.84rem',
+              cursor: isUploading ? 'not-allowed' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              boxShadow: '0 4px 12px -2px rgba(16, 185, 129, 0.4)',
+              opacity: isUploading ? 0.7 : 1
+            }}
+          >
+            <span>➕</span>
+            <span>{isUploading ? tx('กำลังนำเข้าไฟล์...', 'Importing File...') : tx('เลือกไฟล์เพื่อเพิ่มเข้าคลัง', 'Add File to Vault')}</span>
+            <input
+              type="file"
+              accept=".csv,.xlsx,.xls,.json,.txt"
+              disabled={isUploading}
+              style={{ display: 'none' }}
+              onChange={e => {
+                const f = e.target.files?.[0];
+                if (f && onAddCustomFile) {
+                  onAddCustomFile(f);
+                  e.target.value = '';
+                }
+              }}
+            />
+          </label>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem' }}>
           {Object.entries(pageUploadedFiles).map(([tabId, fMeta]) => {
-            const modTitle = moduleLabelsMap[tabId]?.[isEn ? 'en' : 'th'] || tabId;
+            const modTitle = moduleLabelsMap[tabId]?.[isEn ? 'en' : 'th'] || fMeta.customTitle || fMeta.filename || tabId;
             return (
               <div
                 key={tabId}
@@ -8242,19 +8461,35 @@ export function DatabaseTab({
                   padding: '1rem',
                   borderRadius: '14px',
                   background: 'rgba(15, 23, 42, 0.85)',
-                  border: fMeta.isCustomUpload
+                  border: fMeta.isUserAdded
+                    ? '1.5px solid rgba(168, 85, 247, 0.55)'
+                    : fMeta.isCustomUpload
                     ? '1.5px solid rgba(16, 185, 129, 0.55)'
                     : '1px solid rgba(148, 163, 184, 0.22)',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  gap: '0.65rem'
+                  gap: '0.75rem'
                 }}
               >
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.4rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '0.74rem', fontWeight: 900, color: '#fbbf24' }}>{modTitle}</span>
-                    {fMeta.isCustomUpload && (
+                    {fMeta.isUserAdded ? (
+                      <span
+                        style={{
+                          fontSize: '0.68rem',
+                          fontWeight: 900,
+                          padding: '0.12rem 0.5rem',
+                          borderRadius: '999px',
+                          background: 'rgba(168, 85, 247, 0.2)',
+                          color: '#c084fc',
+                          border: '1px solid rgba(168, 85, 247, 0.4)'
+                        }}
+                      >
+                        {tx('ไฟล์เพิ่มเติมในคลัง', 'Vault Custom File')}
+                      </span>
+                    ) : fMeta.isCustomUpload ? (
                       <span
                         style={{
                           fontSize: '0.68rem',
@@ -8262,49 +8497,134 @@ export function DatabaseTab({
                           padding: '0.12rem 0.5rem',
                           borderRadius: '999px',
                           background: 'rgba(16, 185, 129, 0.2)',
-                          color: '#34d399'
+                          color: '#34d399',
+                          border: '1px solid rgba(16, 185, 129, 0.4)'
                         }}
                       >
                         {tx('อัปโหลดใหม่แล้ว', 'Custom File')}
                       </span>
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          padding: '0.12rem 0.45rem',
+                          borderRadius: '999px',
+                          background: 'rgba(56, 189, 248, 0.12)',
+                          color: '#38bdf8'
+                        }}
+                      >
+                        {tx('ไฟล์ระบบมาตรฐาน', 'System Baseline')}
+                      </span>
                     )}
                   </div>
-                  <div style={{ fontWeight: 900, color: '#f8fafc', fontSize: '0.92rem', marginTop: '0.25rem', wordBreak: 'break-all', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                  <div style={{ fontWeight: 900, color: '#f8fafc', fontSize: '0.92rem', marginTop: '0.35rem', wordBreak: 'break-all', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                     <FileDocumentIcon size={18} />
                     <span>{fMeta.filename}</span>
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.2rem' }}>
-                    {fMeta.rows.toLocaleString()} {tx('รายการ', 'rows')} • {isEn ? fMeta.updatedAtEn : fMeta.updatedAtTh}
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.25rem' }}>
+                    {(fMeta.rows || 0).toLocaleString()} {tx('รายการ', 'rows')} • {fMeta.fileSizeKb ? `${fMeta.fileSizeKb} KB • ` : ''}{isEn ? (fMeta.updatedAtEn || fMeta.updatedAt) : (fMeta.updatedAtTh || fMeta.updatedAt)}
                   </div>
                   {(fMeta.changeSummaryTh || fMeta.changeSummaryEn) && (
-                    <div style={{ fontSize: '0.76rem', color: '#34d399', marginTop: '0.3rem', fontWeight: 700 }}>
-                      ✓ {isEn ? fMeta.changeSummaryEn : fMeta.changeSummaryTh}
+                    <div style={{ fontSize: '0.76rem', color: '#34d399', marginTop: '0.35rem', fontWeight: 700, lineHeight: 1.4 }}>
+                      ✓ {isEn ? (fMeta.changeSummaryEn || fMeta.changeSummaryTh) : (fMeta.changeSummaryTh || fMeta.changeSummaryEn)}
                     </div>
                   )}
                 </div>
-                {onInspectUploadedFile && (
-                  <button
-                    type="button"
-                    onClick={() => onInspectUploadedFile(tabId)}
+
+                {/* File Action Controls (Inspect, Replace, Delete) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                  {onInspectUploadedFile && (
+                    <button
+                      type="button"
+                      onClick={() => onInspectUploadedFile(tabId)}
+                      style={{
+                        flex: 1,
+                        padding: '0.45rem 0.65rem',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(56, 189, 248, 0.4)',
+                        background: 'rgba(56, 189, 248, 0.14)',
+                        color: '#38bdf8',
+                        fontWeight: 800,
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.35rem'
+                      }}
+                      title={tx('เปิดดูข้อมูลจริงและตารางในไฟล์นี้', 'View rows & table data inside this file')}
+                    >
+                      <SearchInspectorIcon size={15} />
+                      <span>{tx('ดูข้อมูล', 'Inspect')}</span>
+                    </button>
+                  )}
+
+                  {/* Replace / Upload New File on this slot */}
+                  <label
                     style={{
-                      padding: '0.45rem 0.75rem',
+                      padding: '0.45rem 0.65rem',
                       borderRadius: '8px',
-                      border: '1px solid rgba(56, 189, 248, 0.4)',
-                      background: 'rgba(56, 189, 248, 0.14)',
-                      color: '#38bdf8',
+                      border: '1px solid rgba(251, 191, 36, 0.4)',
+                      background: 'rgba(251, 191, 36, 0.12)',
+                      color: '#fbbf24',
                       fontWeight: 800,
                       fontSize: '0.78rem',
-                      cursor: 'pointer',
+                      cursor: isUploading ? 'not-allowed' : 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '0.4rem'
+                      gap: '0.35rem'
                     }}
+                    title={tx('อัปโหลดไฟล์ใหม่มาแทนที่ไฟล์นี้', 'Upload new file to replace this file')}
                   >
-                    <SearchInspectorIcon size={15} />
-                    <span>{tx('ดูข้อมูลในไฟล์นี้', 'View File Content')}</span>
-                  </button>
-                )}
+                    <span>📤</span>
+                    <span>{tx('ใส่ไฟล์ใหม่', 'Replace')}</span>
+                    <input
+                      type="file"
+                      accept=".csv,.xlsx,.xls,.json,.txt"
+                      disabled={isUploading}
+                      style={{ display: 'none' }}
+                      onChange={e => {
+                        const f = e.target.files?.[0];
+                        if (f && onUploadFileForTab) {
+                          onUploadFileForTab(tabId, modTitle, f);
+                          e.target.value = '';
+                        }
+                      }}
+                    />
+                  </label>
+
+                  {/* Delete / Reset File Button */}
+                  {onDeleteUploadedFile && (
+                    <button
+                      type="button"
+                      onClick={() => onDeleteUploadedFile(tabId, fMeta.filename)}
+                      style={{
+                        padding: '0.45rem 0.65rem',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(244, 63, 94, 0.4)',
+                        background: 'rgba(244, 63, 94, 0.14)',
+                        color: '#fb7185',
+                        fontWeight: 800,
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.35rem'
+                      }}
+                      title={
+                        fMeta.isUserAdded
+                          ? tx('ลบไฟล์นี้ออกจากคลังถาวร', 'Permanently delete this file from vault')
+                          : tx('ลบไฟล์ที่อัปโหลดและรีเซ็ตข้อมูลคืนค่าเดิม', 'Delete custom file and reset back to baseline')
+                      }
+                    >
+                      <span>🗑️</span>
+                      <span>{fMeta.isUserAdded ? tx('ลบไฟล์', 'Delete') : tx('ลบ/คืนค่า', 'Reset')}</span>
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -12141,124 +12461,88 @@ function App() {
   const [isUploading, setIsUploading] = useState(false);
   const [dragOverTabKey, setDragOverTabKey] = useState(null);
 
-  const [pageUploadedFiles, setPageUploadedFiles] = useState({
-    overview: {
-      filename: 'Sales_Overview_2026.csv',
-      rows: 1420,
-      updatedAtTh: 'พร้อมใช้งาน',
-      updatedAtEn: 'Ready',
-      isCustomUpload: false,
-      changeSummaryTh: 'เชื่อมโยงยอดขายรวม ฿4,829,000 และเป้าหมายรายไตรมาส',
-      changeSummaryEn: 'Synced total revenue ฿4,829,000 and quarterly targets',
-      headers: ['วันที่ / เดือน', 'สาขา / ช่องทาง', 'หมวดสินค้าหลัก', 'ยอดขายสุทธิ (บาท)'],
-      previewRows: [
-        ['2026-10-01', 'สาขาสยามพารากอน', 'เซรั่มบำรุงผิวพรีเมียม', '985,000'],
-        ['2026-10-02', 'ช่องทางแชตร้านค้า & LINE OA', 'ชุดของขวัญดูแลผิว', '1,190,000'],
-        ['2026-10-03', 'สาขาเซ็นทรัลลาดพร้าว', 'ครีมกันแดดสูตรน้ำ', '840,000']
-      ]
-    },
-    customers: {
-      filename: 'Customer_RFM_Database.csv',
-      rows: 1435,
-      updatedAtTh: 'พร้อมใช้งาน',
-      updatedAtEn: 'Ready',
-      isCustomUpload: false,
-      changeSummaryTh: 'ซิงก์รายชื่อลูกค้า VIP และลูกค้าที่ห่างหายเกิน 45 วันครบถ้วน',
-      changeSummaryEn: 'Synced VIP customer profiles and 45+ day inactive buyers',
-      headers: ['รหัสลูกค้า', 'ชื่อลูกค้า', 'เบอร์โทรศัพท์', 'ID LINE', 'ยอดซื้อสะสม (บาท)'],
-      previewRows: [
-        ['CUS-001', 'คุณพิมพ์ชนก วงศ์สุวรรณ', '081-234-5678', '@pimchanok.vip', '148,500'],
-        ['CUS-002', 'คุณกิตติพงศ์ เจริญทรัพย์', '089-876-5432', '@kittipong88', '92,400'],
-        ['CUS-003', 'คุณณัฐนิชา อัศวเดช', '086-555-4321', '@nattanicha.a', '72,500']
-      ]
-    },
-    staff_pos: {
-      filename: 'POS_Staff_Audit_Log.csv',
-      rows: 1232,
-      updatedAtTh: 'พร้อมใช้งาน',
-      updatedAtEn: 'Ready',
-      isCustomUpload: false,
-      changeSummaryTh: 'ซิงก์ยอดขายพนักงานและบันทึกตรวจสอบบิลยกเลิกหน้าเครื่อง POS',
-      changeSummaryEn: 'Synced cashier KPI rankings and register void audit logs',
-      headers: ['รหัสพนักงาน', 'ชื่อแคชเชียร์ / สาขา', 'ยอดขายรวม (บาท)', 'บิลยกเลิก / สถานะ'],
-      previewRows: [
-        ['STF-01', 'คุณภัทรพล (สยามพารากอน)', '642,000', '0 บิลผิดปกติ (ปกติ)'],
-        ['STF-04', 'เครื่องคิดเงิน #4 (เซ็นทรัลลาดพร้าว)', '318,000', 'ยกเลิกบิลหลังรับเงินสด 14 ครั้ง (รอตรวจสอบ)']
-      ]
-    },
-    multi_channel: {
-      filename: 'MultiChannel_Branch_Data.csv',
-      rows: 1890,
-      updatedAtTh: 'พร้อมใช้งาน',
-      updatedAtEn: 'Ready',
-      isCustomUpload: false,
-      changeSummaryTh: 'ซิงก์กำไรสุทธิรายช่องทางและตารางเปรียบเทียบสาขา',
-      changeSummaryEn: 'Synced net profit margins across branches and online channels',
-      headers: ['สาขา / แพลตฟอร์ม', 'ยอดขายรวม (บาท)', 'ค่าธรรมเนียม (บาท)', 'กำไรสุทธิ (บาท)'],
-      previewRows: [
-        ['หน้าร้านสยามพารากอน', '985,000', '0', '461,000'],
-        ['แชตร้านค้า & LINE Official', '1,190,000', '59,500', '623,560'],
-        ['แอปมาร์เก็ตเพลสออนไลน์', '1,420,000', '255,600', '397,600']
-      ]
-    },
-    procurement: {
-      filename: 'Central_Procurement_Vendors.csv',
-      rows: 960,
-      updatedAtTh: 'พร้อมใช้งาน',
-      updatedAtEn: 'Ready',
-      isCustomUpload: false,
-      changeSummaryTh: 'ซิงก์คะแนนซัพพลายเออร์และรายการสั่งซื้อรวมศูนย์ (Economy of Scale)',
-      changeSummaryEn: 'Synced supplier scorecards and consolidated Central PO requisitions',
-      headers: ['รหัสคู่ค้า', 'ชื่อบริษัทซัพพลายเออร์', 'เวลาส่ง (วัน)', 'อัตราส่งของครบ (%)', 'ส่วนลดสั่งรวม (%)'],
-      previewRows: [
-        ['VND-01', 'บจก. สยาม ออร์แกนิค ซัพพลาย', '1.8 วัน', '99.4%', '15%'],
-        ['VND-02', 'บจก. แพ็กเกจจิ้ง พรีเมียม ไทย', '2.1 วัน', '98.8%', '18%']
-      ]
-    },
-    inventory: {
-      filename: 'Stock_SKU_Master.csv',
-      rows: 1248,
-      updatedAtTh: 'พร้อมใช้งาน',
-      updatedAtEn: 'Ready',
-      isCustomUpload: false,
-      changeSummaryTh: 'ซิงก์จำนวนสต็อกคงเหลือและแจ้งเตือนสินค้าใกล้หมดคลัง',
-      changeSummaryEn: 'Synced live SKU quantities and low-stock reorder alerts',
-      headers: ['รหัสสินค้า (SKU)', 'ชื่อสินค้า', 'หมวดหมู่', 'ราคาต่อชิ้น (บาท)', 'คงเหลือ (ชิ้น)'],
-      previewRows: [
-        ['SKU-101', 'เซรั่มทองคำลดเลือนริ้วรอย', 'สกินแคร์หลัก', '1,290', '145'],
-        ['SKU-104', 'กล่องพัสดุกันกระแทกพรีเมียม', 'อุปกรณ์แพ็กสินค้า', '18', '12 (ใกล้หมด)'],
-        ['SKU-105', 'ชุดของขวัญเทศกาลปีใหม่', 'เซ็ตของขวัญ', '2,490', '0 (สินค้าหมด)']
-      ]
-    },
-    insights: {
-      filename: 'Business_Knowledge.csv',
-      rows: 1435,
-      updatedAtTh: 'พร้อมใช้งาน',
-      updatedAtEn: 'Ready',
-      isCustomUpload: false,
-      changeSummaryTh: 'ซิงก์ฐานความรู้ธุรกิจสำหรับ AI พยากรณ์ยอดขายและตอบคำถาม',
-      changeSummaryEn: 'Synced business rules and historical data for AI Copilot',
-      headers: ['หัวข้อวิเคราะห์ AI', 'ข้อมูลอ้างอิงจากร้าน', 'คำแนะนำกลยุทธ์ AI'],
-      previewRows: [
-        ['พยากรณ์ยอดขาย 30 วัน', 'แนวโน้มเติบโต +18.4%', 'เตรียมสต็อกเซรั่มเพิ่ม 120 ชิ้นก่อนวันศุกร์'],
-        ['ดึงลูกค้า VIP ที่หายไป', 'ลูกค้าไม่ซื้อซ้ำเกิน 45 วัน', 'ส่งคูปองส่วนลด 20% ทาง LINE อัตโนมัติ']
-      ]
-    },
-    database: {
-      filename: 'Master_Transactions.csv',
-      rows: 3842,
-      updatedAtTh: 'พร้อมใช้งาน',
-      updatedAtEn: 'Ready',
-      isCustomUpload: false,
-      changeSummaryTh: 'ซิงก์รายการซื้อขายหลักในคลังฐานข้อมูลกลางของร้าน',
-      changeSummaryEn: 'Synced master transaction records across all store channels',
-      headers: ['รหัสบิล', 'ชื่อลูกค้า', 'รายการสินค้า', 'ช่องทางขาย', 'ยอดเงินสุทธิ (บาท)'],
-      previewRows: [
-        ['TXN-2026-881', 'คุณพิมพ์ชนก วงศ์สุวรรณ', 'เซรั่มทองคำ x2', 'สาขาสยามพารากอน', '2,580'],
-        ['TXN-2026-882', 'คุณธนดล รัตนโชติ', 'ชุดดูแลผิวพรีเมียม x1', 'LINE Official', '3,490']
-      ]
+  const [pageUploadedFiles, setPageUploadedFiles] = useState(() => {
+    try {
+      const saved = localStorage.getItem('insightflow_page_uploaded_files_v2');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return { ...initialPageUploadedFiles, ...parsed };
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read cached uploaded files', e);
     }
+    return initialPageUploadedFiles;
   });
+
+  // Sync to localStorage whenever pageUploadedFiles changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('insightflow_page_uploaded_files_v2', JSON.stringify(pageUploadedFiles));
+    } catch (e) {
+      console.warn('Could not persist uploaded files to localStorage', e);
+    }
+  }, [pageUploadedFiles]);
+
+  // Delete / Reset a file from the repository
+  const handleDeleteUploadedFile = (tabKey, filename) => {
+    const fileDisplayName = filename || pageUploadedFiles[tabKey]?.filename || tabKey;
+    const confirmMsg = isEn
+      ? `Are you sure you want to delete and reset file "${fileDisplayName}"?`
+      : `คุณต้องการลบและรีเซ็ตไฟล์ "${fileDisplayName}" หรือไม่?`;
+
+    if (window.confirm && !window.confirm(confirmMsg)) {
+      return;
+    }
+
+    setPageUploadedFiles(prev => {
+      const next = { ...prev };
+      if (next[tabKey]?.isUserAdded) {
+        delete next[tabKey];
+      } else if (initialPageUploadedFiles[tabKey]) {
+        next[tabKey] = { ...initialPageUploadedFiles[tabKey] };
+      } else {
+        delete next[tabKey];
+      }
+      return next;
+    });
+
+    if (inspectingUploadTab === tabKey) {
+      setInspectingUploadTab(null);
+    }
+
+    toast.success(
+      tx(
+        `🗑️ ลบไฟล์ "${fileDisplayName}" ออกจากคลังไฟล์เรียบร้อยแล้ว`,
+        `🗑️ Deleted file "${fileDisplayName}" from registry`
+      )
+    );
+  };
+
+  // Reset all files in the repository to initial system defaults
+  const handleResetAllFiles = () => {
+    const confirmMsg = isEn
+      ? 'Are you sure you want to reset all files in registry to system defaults?'
+      : 'คุณต้องการล้างและรีเซ็ตไฟล์ทั้งหมดในคลังไฟล์เป็นค่าเริ่มต้นหรือไม่?';
+    if (window.confirm && !window.confirm(confirmMsg)) {
+      return;
+    }
+
+    setPageUploadedFiles(initialPageUploadedFiles);
+    try {
+      localStorage.removeItem('insightflow_page_uploaded_files_v2');
+    } catch (e) {}
+    if (inspectingUploadTab) {
+      setInspectingUploadTab(null);
+    }
+    toast.success(
+      tx(
+        '🗑️ รีเซ็ตไฟล์ทั้งหมดในคลังไฟล์กลับเป็นค่าเริ่มต้นเรียบร้อยแล้ว',
+        '🗑️ Reset all files in repository to initial system defaults'
+      )
+    );
+  };
 
   // Business AI Assistant State
   const [bizProfile, setBizProfile] = useState({
@@ -12978,6 +13262,8 @@ function App() {
         ...prev,
         [tabKey]: {
           filename: file.name,
+          customTitle: pageTitle || file.name,
+          isUserAdded: !initialPageUploadedFiles[tabKey],
           rows: parsedRowsCount,
           fileSizeKb: Math.max(1, Math.round((file.size || 2048) / 1024)),
           updatedAtTh: `อัปโหลดเมื่อ ${nowTime} น.`,
@@ -12993,10 +13279,14 @@ function App() {
       setIsUploading(false);
       toast.success(
         tx(
-          `📂 อัปโหลดไฟล์ "${file.name}" สำเร็จ! ข้อความและตารางในหน้า "${pageTitle}" เปลี่ยนตามข้อมูลในไฟล์เรียบร้อยแล้ว (กดปุ่ม "ดูข้อมูลในไฟล์" เพื่อตรวจสอบได้เลย)`,
-          `📂 Uploaded "${file.name}"! Page text & tables in "${pageTitle}" have been updated from your file.`
+          `📂 อัปโหลดไฟล์ "${file.name}" สำเร็จ! ข้อความและตารางในระบบเปลี่ยนตามข้อมูลในไฟล์เรียบร้อยแล้ว (กดปุ่ม "ดูข้อมูลในไฟล์" เพื่อตรวจสอบได้เลย)`,
+          `📂 Uploaded "${file.name}"! System text & metrics updated from your file.`
         )
       );
+    };
+    reader.onerror = () => {
+      setIsUploading(false);
+      toast.error(tx('เกิดข้อผิดพลาดในการอ่านไฟล์ กรุณาลองใหม่อีกครั้ง', 'Error reading file. Please try again.'));
     };
     reader.readAsText(file);
   };
@@ -13090,6 +13380,19 @@ function App() {
                 {tx(`คลังไฟล์ (${totalUploadedCount})`, `Files (${totalUploadedCount})`)}
               </span>
             </button>
+
+            {/* Quick Reset Capsule Button if Custom File was uploaded */}
+            {fileMeta.isCustomUpload && (
+              <button
+                type="button"
+                onClick={() => handleDeleteUploadedFile(tabKey, fileMeta.filename)}
+                className="px-3 sm:px-3.5 py-2.5 sm:py-3 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-black text-xs sm:text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                title={tx('ลบไฟล์ที่อัปโหลดและคืนค่าเริ่มต้นของหน้านี้', 'Delete custom file and reset to default')}
+              >
+                <span>🗑️</span>
+                <span className="hidden sm:inline">{tx('คืนค่าเดิม', 'Reset')}</span>
+              </button>
+            )}
 
             {/* Cyber-Cute Animated Upload Capsule Button */}
             <label className="cyber-cute-upload-btn group relative overflow-hidden rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-slate-950 font-black px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 cursor-pointer select-none">
@@ -16237,11 +16540,20 @@ function App() {
               {activeTab === 'database' && (
                 <DatabaseTab
                   lang={lang}
+                  theme={theme}
                   dbRecords={dbRecords}
                   setDbRecords={setDbRecords}
                   renderUploadZone={renderUploadZone}
                   pageUploadedFiles={pageUploadedFiles}
                   onInspectUploadedFile={setInspectingUploadTab}
+                  onUploadFileForTab={handlePageFileUpload}
+                  onAddCustomFile={file => {
+                    const newKey = `custom_${Date.now()}`;
+                    handlePageFileUpload(newKey, file.name, file);
+                  }}
+                  onDeleteUploadedFile={handleDeleteUploadedFile}
+                  onResetAllFiles={handleResetAllFiles}
+                  isUploading={isUploading}
                 />
               )}
 
@@ -16299,6 +16611,19 @@ function App() {
                     <button
                       type="button"
                       onClick={() => {
+                        const targetKey = inspectingUploadTab;
+                        const activeF = pageUploadedFiles[targetKey];
+                        handleDeleteUploadedFile(targetKey, activeF?.filename || targetKey);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-black cursor-pointer transition flex items-center gap-1.5"
+                      title={tx('ลบไฟล์นี้ออกจากคลังหรือคืนค่าเริ่มต้น', 'Delete file from vault or reset to default')}
+                    >
+                      <span>🗑️</span>
+                      <span>{pageUploadedFiles[inspectingUploadTab]?.isUserAdded ? tx('ลบไฟล์นี้', 'Delete File') : tx('ลบ/คืนค่าเริ่มต้น', 'Reset File')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
                         const targetTab = inspectingUploadTab;
                         setInspectingUploadTab(null);
                         setActiveTab('database');
@@ -16326,7 +16651,7 @@ function App() {
                 {/* Module Selector Tabs inside Modal */}
                 <div className="px-6 py-3 bg-[#060a14] border-b border-white/10 overflow-x-auto">
                   <div className="text-[11px] font-bold text-slate-400 mb-2">
-                    {tx('คลิกเลือกดูไฟล์ของแต่ละหมวดหมู่ (8 หมวดหมู่):', 'Select Module to Inspect Uploaded File (8 Modules):')}
+                    {tx('คลิกเลือกดูไฟล์ของแต่ละหมวดหมู่ หรือไฟล์ที่เพิ่มเข้าคลัง:', 'Select Module or Custom File to Inspect:')}
                   </div>
                   <div className="flex items-center gap-2 min-w-max">
                     {[
@@ -16337,7 +16662,13 @@ function App() {
                       { id: 'procurement', label: tx('5. ใบสั่งซื้อ (PO)', '5. Procurement') },
                       { id: 'inventory', label: tx('6. สต็อกสินค้า', '6. Inventory') },
                       { id: 'insights', label: tx('7. วิเคราะห์ AI', '7. AI Insights') },
-                      { id: 'database', label: tx('8. คลังข้อมูลรวม', '8. Database') }
+                      { id: 'database', label: tx('8. คลังข้อมูลรวม', '8. Database') },
+                      ...Object.entries(pageUploadedFiles)
+                        .filter(([k]) => !['overview', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'database'].includes(k))
+                        .map(([k, meta]) => ({
+                          id: k,
+                          label: `📁 ${meta.filename || meta.customTitle || k}`
+                        }))
                     ].map(tabItem => {
                       const fInfo = pageUploadedFiles[tabItem.id];
                       const activeInspect = inspectingUploadTab === tabItem.id;
@@ -16353,7 +16684,15 @@ function App() {
                           }`}
                         >
                           <span>{tabItem.label}</span>
-                          {fInfo?.isCustomUpload && (
+                          {fInfo?.isUserAdded ? (
+                            <span
+                              className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                                activeInspect ? 'bg-purple-900 text-purple-200' : 'bg-purple-500/20 text-purple-300'
+                              }`}
+                            >
+                              VAULT
+                            </span>
+                          ) : fInfo?.isCustomUpload ? (
                             <span
                               className={`text-[10px] px-1.5 py-0.2 rounded-full ${
                                 activeInspect ? 'bg-slate-950 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
@@ -16361,7 +16700,7 @@ function App() {
                             >
                               NEW
                             </span>
-                          )}
+                          ) : null}
                         </button>
                       );
                     })}
@@ -16382,7 +16721,7 @@ function App() {
                             {tx('ชื่อไฟล์ที่กำลังใช้งานอยู่ในหมวดนี้', 'Active Uploaded Filename')}
                           </div>
                           <div className="text-lg font-black text-amber-300 mt-1 break-all">
-                            📄 {activeFile?.name}
+                            📄 {activeFile?.filename || activeFile?.name || tx('ไม่ระบุชื่อไฟล์', 'Unnamed File')}
                           </div>
                           <div className="text-xs text-emerald-400 font-bold mt-1">
                             ✓ {tx('สถานะ: ซิงค์ข้อความและตัวเลขเข้ากับหน้าเว็บเรียบร้อยแล้ว', 'Status: Text & Metrics Synced Live to Page')}
@@ -16397,7 +16736,7 @@ function App() {
                             {(activeFile?.rows || rows.length).toLocaleString()} {tx('รายการ', 'rows')}
                           </div>
                           <div className="text-xs text-slate-400 mt-1">
-                            {headers.length} {tx('คอลัมน์', 'columns')}
+                            {headers.length} {tx('คอลัมน์', 'columns')}{activeFile?.fileSizeKb ? ` • ${activeFile.fileSizeKb} KB` : ''}
                           </div>
                         </div>
 
@@ -16406,17 +16745,33 @@ function App() {
                             {tx('เวลาที่อัปเดตไฟล์ล่าสุด', 'Last Updated Time')}
                           </div>
                           <div className="text-lg font-black text-sky-300 mt-1">
-                            🕒 {activeFile?.updatedAt}
+                            🕒 {isEn ? (activeFile?.updatedAtEn || activeFile?.updatedAt) : (activeFile?.updatedAtTh || activeFile?.updatedAt) || tx('พร้อมใช้งาน', 'Ready')}
                           </div>
-                          <label className="inline-block mt-2 px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer transition">
-                            + {tx('อัปโหลดไฟล์ใหม่ทับทันที', 'Upload New File Here')}
-                            <input
-                              type="file"
-                              accept=".csv,.xlsx,.xls,.json,.txt"
-                              onChange={e => handlePageFileUpload(inspectingUploadTab, inspectingUploadTab, e)}
-                              className="hidden"
-                            />
-                          </label>
+                          <div className="flex items-center gap-2 mt-2">
+                            <label className="inline-block px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer transition">
+                              + {tx('อัปโหลดทับ', 'Replace')}
+                              <input
+                                type="file"
+                                accept=".csv,.xlsx,.xls,.json,.txt"
+                                onChange={e => {
+                                  const f = e.target.files?.[0];
+                                  if (f) {
+                                    handlePageFileUpload(inspectingUploadTab, inspectingUploadTab, f);
+                                    e.target.value = '';
+                                  }
+                                }}
+                                className="hidden"
+                              />
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteUploadedFile(inspectingUploadTab, activeFile?.filename || inspectingUploadTab)}
+                              className="px-3 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-black text-xs cursor-pointer transition"
+                              title={tx('ลบไฟล์นี้', 'Delete File')}
+                            >
+                              🗑️ {activeFile?.isUserAdded ? tx('ลบไฟล์', 'Delete') : tx('ลบ/คืนค่า', 'Reset')}
+                            </button>
+                          </div>
                         </div>
                       </div>
 

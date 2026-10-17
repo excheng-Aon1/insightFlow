@@ -254,4 +254,29 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  test('UNIT-FE-13: File vault management (Add, Replace, and Delete handlers) integrity', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // initialPageUploadedFiles export
+    assert.ok(
+      appContent.includes('export const initialPageUploadedFiles'),
+      'App.jsx must export initialPageUploadedFiles'
+    );
+
+    // Deletion and Reset handlers
+    assert.ok(
+      appContent.includes('const handleDeleteUploadedFile =') &&
+      appContent.includes('const handleResetAllFiles ='),
+      'App.jsx must define handleDeleteUploadedFile and handleResetAllFiles'
+    );
+
+    // DatabaseTab component handles file replacement and deletion
+    assert.ok(
+      appContent.includes('onDeleteUploadedFile') &&
+      appContent.includes('onUploadFileForTab'),
+      'App.jsx must wire onDeleteUploadedFile and onUploadFileForTab to DatabaseTab'
+    );
+  });
+
 });

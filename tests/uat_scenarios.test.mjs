@@ -219,4 +219,39 @@ describe('InsightFlow User Acceptance Testing (UAT) Scenarios', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // UAT-SCENARIO-08: File Vault Management (Delete, Add, and Replace Files)
+  // ----------------------------------------------------------------------------
+  test('UAT-08: File Registry allows deleting files and uploading/adding new files freely', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // 1. Initial baseline and localStorage persistence
+    assert.ok(
+      appContent.includes('export const initialPageUploadedFiles =') &&
+      appContent.includes('localStorage.getItem(\'insightflow_page_uploaded_files_v2\')'),
+      'Acceptance Criteria: App.jsx must export initialPageUploadedFiles and persist to localStorage'
+    );
+
+    // 2. Deletion & Reset Handlers
+    assert.ok(
+      appContent.includes('handleDeleteUploadedFile') &&
+      appContent.includes('handleResetAllFiles'),
+      'Acceptance Criteria: App.jsx must implement handleDeleteUploadedFile and handleResetAllFiles'
+    );
+
+    // 3. Adding New Files to Vault
+    assert.ok(
+      appContent.includes('onAddCustomFile') || appContent.includes('Add File to Vault'),
+      'Acceptance Criteria: File Registry must support uploading and adding arbitrary new files to the vault'
+    );
+
+    // 4. Per-file Delete / Reset and Replace controls
+    assert.ok(
+      appContent.includes('onDeleteUploadedFile') &&
+      appContent.includes('onUploadFileForTab'),
+      'Acceptance Criteria: Every file in registry must feature delete/reset and replace actions'
+    );
+  });
+
 });
