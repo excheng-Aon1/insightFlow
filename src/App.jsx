@@ -43,6 +43,9 @@ import {
   DailyStoreClosingIcon,
   SalesVsFeesComparisonIcon,
   ReorderPointControlIcon,
+  ActualParsedDataTableIcon,
+  BaselineTrajectoryIcon,
+  EnterpriseStandardIcon,
 } from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
@@ -7362,8 +7365,9 @@ export function InsightsTab({
                 },
                 {
                   id: 'baseline',
-                  th: '📊 แนวโน้มปกติเดิม',
-                  en: '📊 Baseline Trajectory'
+                  th: 'แนวโน้มปกติเดิม',
+                  en: 'Baseline Trajectory',
+                  isBaseline: true
                 }
               ].map(sc => (
                 <button
@@ -7384,10 +7388,14 @@ export function InsightsTab({
                     color: aiScenario === sc.id ? '#fbbf24' : '#cbd5e1',
                     fontWeight: 800,
                     fontSize: '0.8rem',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
                   }}
                 >
-                  {isEn ? sc.en : sc.th}
+                  {sc.isBaseline ? <BaselineTrajectoryIcon size={16} /> : null}
+                  <span>{isEn ? sc.en : sc.th}</span>
                 </button>
               ))}
             </div>
@@ -16427,8 +16435,9 @@ function App() {
                       {/* Data Table Preview inside the Uploaded File */}
                       <div className="rounded-2xl border border-white/15 overflow-hidden bg-[#050814]">
                         <div className="px-4 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
-                          <span className="text-xs font-black text-amber-300">
-                            📊 {tx('ตารางแสดงข้อความและข้อมูลจริงที่อ่านได้จากในไฟล์นี้', 'Actual Parsed Text & Rows Inside This Uploaded File')}
+                          <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
+                            <ActualParsedDataTableIcon size={18} className="inline-block" />
+                            <span>{tx('ตารางแสดงข้อความและข้อมูลจริงที่อ่านได้จากในไฟล์นี้', 'Actual Parsed Text & Rows Inside This Uploaded File')}</span>
                           </span>
                           <span className="text-xs text-slate-400 font-bold">
                             {tx(`แสดงตัวอย่าง ${rows.length} แถวแรก`, `Showing top ${rows.length} parsed rows`)}

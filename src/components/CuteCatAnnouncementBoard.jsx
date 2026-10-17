@@ -9,6 +9,7 @@
 // ==============================================================================
 
 import React, { useState, useEffect, useRef } from 'react';
+import { EnterpriseStandardIcon } from './LuxuryIcons';
 
 const STORAGE_KEY = 'insightflow_cat_announcements_v2';
 const SOUND_KEY = 'insightflow_cat_sound_enabled';
@@ -1222,9 +1223,16 @@ export default function CuteCatAnnouncementBoard({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-1">
                               <span
-                                className={`text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r ${item.tagColor}`}
+                                className={`text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r ${item.tagColor} inline-flex items-center gap-1`}
                               >
-                                {item.tag}
+                                {item.tag?.includes('มาตรฐานองค์กร') ? (
+                                  <>
+                                    <EnterpriseStandardIcon size={12} className="inline-block" />
+                                    <span>{item.tag.replace(/^🛡️\s*/, '')}</span>
+                                  </>
+                                ) : (
+                                  item.tag
+                                )}
                               </span>
 
                               {item.pinned && (

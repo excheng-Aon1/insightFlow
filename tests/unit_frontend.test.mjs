@@ -33,6 +33,10 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
       'SalesVsFeesComparisonIcon',     // เปรียบเทียบยอดขาย ค่าธรรมเนียม
       'ReorderPointControlIcon',      // ควบคุมจุดสั่งซื้อสินค้า
       'GoogleIcon',                   // โลโก้ Google ทางการ
+      'ActualParsedDataTableIcon',    // ตารางแสดงข้อความและข้อมูลจริง
+      'BaselineTrajectoryIcon',       // แนวโน้มปกติเดิม
+      'DailyAverageDemandIcon',       // ยอดขายเฉลี่ยรายวัน
+      'EnterpriseStandardIcon',       // มาตรฐานองค์กร
     ];
 
     for (const iconName of requiredIcons) {

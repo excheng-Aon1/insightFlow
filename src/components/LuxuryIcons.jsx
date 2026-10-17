@@ -1767,3 +1767,210 @@ export function ReorderPointControlIcon({ size = 24, className = '' }) {
   );
 }
 
+/**
+ * 7. ActualParsedDataTableIcon: ตารางแสดงข้อความและข้อมูลจริง
+ * ดีไซน์: ตาราง Matrix ข้อมูลจริงแบบ 3D Isometric กระจกหรูหรา (Holographic Spreadsheet Matrix)
+ * แถวและคอลัมน์สีทอง-แซฟไฟร์, เม็ดข้อมูลเรืองแสง และตราประทับตรวจสอบความถูกต้องสีเขียวมรกต
+ */
+export function ActualParsedDataTableIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`tblSapphire_${id}`} x1="3" y1="5" x2="29" y2="27" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#60A5FA" />
+          <stop offset="50%" stopColor="#2563EB" />
+          <stop offset="100%" stopColor="#1E3A8A" />
+        </linearGradient>
+        <linearGradient id={`tblGold_${id}`} x1="6" y1="4" x2="26" y2="14" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      {/* ฐานตารางข้อมูล 3 มิติ Card Surface */}
+      <rect x="4" y="5" width="24" height="22" rx="4" fill={`url(#tblSapphire_${id})`} fillOpacity="0.18" stroke="url(#tblSapphire_${id})" strokeWidth="1.6" />
+      {/* แถบหัวตาราง Header Ribbon (Gold Accent) */}
+      <rect x="5.5" y="6.5" width="21" height="6" rx="2.5" fill={`url(#tblGold_${id})`} />
+      <circle cx="9" cy="9.5" r="1.3" fill="#FFF" />
+      <rect x="12" y="8.5" width="5" height="2" rx="1" fill="#78350F" />
+      <rect x="19" y="8.5" width="5.5" height="2" rx="1" fill="#78350F" />
+      {/* เส้นตาราง Grid Rows & Columns */}
+      <line x1="5.5" y1="17.5" x2="26.5" y2="17.5" stroke="#93C5FD" strokeWidth="1.2" strokeDasharray="2 1.5" />
+      <line x1="5.5" y1="22.5" x2="26.5" y2="22.5" stroke="#93C5FD" strokeWidth="1.2" strokeDasharray="2 1.5" />
+      <line x1="12.5" y1="13" x2="12.5" y2="25.5" stroke="#93C5FD" strokeWidth="1.2" strokeDasharray="2 1.5" />
+      <line x1="19.5" y1="13" x2="19.5" y2="25.5" stroke="#93C5FD" strokeWidth="1.2" strokeDasharray="2 1.5" />
+      {/* เม็ดข้อมูลจริง (Parsed Data Tokens) */}
+      <rect x="7" y="15" width="4" height="1.6" rx="0.8" fill="#38BDF8" />
+      <rect x="14" y="15" width="4" height="1.6" rx="0.8" fill="#FBBF24" />
+      <rect x="21" y="15" width="4" height="1.6" rx="0.8" fill="#34D399" />
+      <rect x="7" y="20" width="4" height="1.6" rx="0.8" fill="#A78BFA" />
+      <rect x="14" y="20" width="4" height="1.6" rx="0.8" fill="#38BDF8" />
+      <rect x="21" y="20" width="4" height="1.6" rx="0.8" fill="#F472B6" />
+      {/* ตราประทับตรวจสอบข้อมูลจริง 100% (Verified Emerald Badge) */}
+      <circle cx="24" cy="24" r="4.8" fill="#10B981" stroke="#D1FAE5" strokeWidth="1.3" />
+      <path d="M22 24L23.5 25.5L26.5 22.5" stroke="#FFF" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 8. BaselineTrajectoryIcon: แนวโน้มปกติเดิม (Baseline Trajectory)
+ * ดีไซน์: เส้นคลื่นวิถีแนวโน้มอ้างอิง 3 มิติ (Holographic Reference Trajectory Wave)
+ * หมุดเพชรเปรียบเทียบค่ามาตรฐานเดิม (Historical Anchor Pin), เส้นคลื่นเสถียรภาพ และสเกลวัดความแม่นยำ
+ */
+export function BaselineTrajectoryIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`baseWave_${id}`} x1="3" y1="26" x2="29" y2="6" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#0284C7" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#818CF8" />
+        </linearGradient>
+        <linearGradient id={`baseGold_${id}`} x1="12" y1="8" x2="22" y2="18" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`baseFloor_${id}`} x1="4" y1="26" x2="28" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#818CF8" stopOpacity="0.2" />
+        </linearGradient>
+      </defs>
+      {/* ระนาบแกนอ้างอิงประวัติ Baseline Floor */}
+      <line x1="4" y1="26" x2="28" y2="26" stroke={`url(#baseFloor_${id})`} strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="4" y1="8" x2="4" y2="26" stroke="#64748B" strokeWidth="1.3" strokeDasharray="2 1.5" opacity="0.6" />
+      {/* เงาพื้นที่ใต้คลื่นแนวโน้มปกติ (Area Under Baseline) */}
+      <path
+        d="M5 24C9 22 13 18 16 17C20 15.5 23 11 27 9V26H5V24Z"
+        fill={`url(#baseWave_${id})`}
+        fillOpacity="0.18"
+      />
+      {/* เส้นวิถีแนวโน้มปกติเดิม (Baseline Trajectory Smooth Curve) */}
+      <path
+        d="M4 24C8 22 12.5 18 16 17C19.5 16 23 11 27.5 9"
+        stroke={`url(#baseWave_${id})`}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      {/* เส้นพยากรณ์ขยายแนวโน้มเดิมไปข้างหน้า (Projected Baseline Extension) */}
+      <path
+        d="M27.5 9L30 7.5"
+        stroke="#A5B4FC"
+        strokeWidth="2"
+        strokeDasharray="2 2"
+        strokeLinecap="round"
+      />
+      {/* หมุดเพชรศูนย์กลางการวัด (Calibration Anchor Node) */}
+      <circle cx="16" cy="17" r="4.2" fill={`url(#baseGold_${id})`} stroke="#FFF" strokeWidth="1.4" />
+      <circle cx="16" cy="17" r="1.5" fill="#78350F" />
+      {/* จุดพิกัดประวัติเดิม */}
+      <circle cx="8" cy="22" r="2.2" fill="#38BDF8" stroke="#E0F2FE" strokeWidth="1" />
+      <circle cx="24" cy="12" r="2.4" fill="#818CF8" stroke="#EEF2FF" strokeWidth="1" />
+      {/* รังสีวัดระยะห่าง (Baseline Calibration Caliper) */}
+      <line x1="16" y1="17" x2="16" y2="26" stroke="#FDE047" strokeWidth="1.2" strokeDasharray="1.5 1.5" />
+    </svg>
+  );
+}
+
+/**
+ * 9. DailyAverageDemandIcon: ยอดขายเฉลี่ยรายวัน (Daily Average Demand / Mean Sales)
+ * ดีไซน์: หน้าปัดปฏิทินวัฏจักรยอดขาย 24 ชั่วโมง 3 มิติ (Executive Daily Demand Dial)
+ * แท่งสถิติเฉลี่ย 3 มิติสีทอง-ไซอัน, สัญลักษณ์ค่าเฉลี่ย x̄ (Mean Metric Node) และเหรียญทองคำยอดขาย
+ */
+export function DailyAverageDemandIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`dadGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="45%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`dadCyan_${id}`} x1="6" y1="12" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+      </defs>
+      {/* วงแหวนปฏิทินรายวัน 3 มิติ Calendar Bezel */}
+      <rect x="4" y="6" width="24" height="22" rx="4.5" fill="#0B132B" stroke={`url(#dadGold_${id})`} strokeWidth="1.6" />
+      {/* แถบหัวปฏิทินวันใหม่ */}
+      <rect x="5.5" y="7.5" width="21" height="5" rx="2" fill={`url(#dadGold_${id})`} />
+      <circle cx="9" cy="5" r="1.2" fill="#FEF08A" />
+      <circle cx="23" cy="5" r="1.2" fill="#FEF08A" />
+      <line x1="9" y1="4" x2="9" y2="7.5" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="23" y1="4" x2="23" y2="7.5" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" />
+      {/* แท่งสถิติยอดขายเฉลี่ยรายวัน (Daily Bars Triad) */}
+      <rect x="7.5" y="18" width="3.5" height="7.5" rx="1.5" fill={`url(#dadCyan_${id})`} />
+      <rect x="13" y="14.5" width="3.5" height="11" rx="1.5" fill={`url(#dadGold_${id})`} />
+      <rect x="18.5" y="16.5" width="3.5" height="9" rx="1.5" fill={`url(#dadCyan_${id})`} />
+      {/* เส้นค่าเฉลี่ยสถิติแนวนอน (Mean Horizontal Benchmark Bar) */}
+      <line x1="6" y1="15" x2="24" y2="15" stroke="#FDE047" strokeWidth="1.4" strokeDasharray="2 1.5" />
+      {/* ตราสัญลักษณ์ค่าเฉลี่ยและสกุลเงิน (Gold Mean Token ฿ / x̄) */}
+      <circle cx="24.5" cy="18" r="4.5" fill={`url(#dadGold_${id})`} stroke="#FFFBEB" strokeWidth="1.2" />
+      <text x="24.5" y="20.5" textAnchor="middle" fill="#78350F" fontSize="6.5" fontWeight="900" fontFamily="sans-serif">฿</text>
+    </svg>
+  );
+}
+
+/**
+ * 10. EnterpriseStandardIcon: มาตรฐานองค์กร (Enterprise Standard & Corporate Governance)
+ * ดีไซน์: ตราโล่เกียรติยศระดับสถาบัน 3 มิติ (Royal Titanium & Emerald Security Crest)
+ * ขอบทองคำ 24K, โล่เขียวมรกตนิรภัย, กุญแจเข้ารหัสความลับธุรกิจ และดาวเกียรติยศ 3 ดวง
+ */
+export function EnterpriseStandardIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`entEmerald_${id}`} x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="40%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+        <linearGradient id={`entGold_${id}`} x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBEB" />
+          <stop offset="45%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <radialGradient id={`entGlow_${id}`} cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stopColor="#34D399" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#047857" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* รัศมีแสงความปลอดภัยเบื้องหลัง */}
+      <circle cx="16" cy="15" r="13" fill={`url(#entGlow_${id})`} />
+      {/* โล่ขอบทองคำแท้ 24K ชั้นนอก (Outer Gold Bevel Shield) */}
+      <path
+        d="M16 2.5L26.5 6.5C26.5 14.5 22 22 16 29C10 22 5.5 14.5 5.5 6.5L16 2.5Z"
+        fill={`url(#entGold_${id})`}
+        stroke="#FEF08A"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      {/* โล่ชั้นในสีเขียวมรกตมงคลเกรดองค์กร (Inner Emerald Security Plate) */}
+      <path
+        d="M16 4.8L24.5 8C24.5 14.5 20.8 20.5 16 26.5C11.2 20.5 7.5 14.5 7.5 8L16 4.8Z"
+        fill={`url(#entEmerald_${id})`}
+        stroke="#6EE7B7"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      {/* มงกุฎเกียรติยศ / ดาว 3 ดวงด้านบน */}
+      <polygon points="16,8 17,10.5 19.5,10.8 17.5,12.5 18.2,15 16,13.6 13.8,15 14.5,12.5 12.5,10.8 15,10.5" fill="#FFFBEB" stroke="#F59E0B" strokeWidth="0.8" />
+      <circle cx="11.5" cy="11.5" r="1.2" fill="#FEF08A" />
+      <circle cx="20.5" cy="11.5" r="1.2" fill="#FEF08A" />
+      {/* แม่กุญแจทองคำนิรภัยองค์กร (Enterprise Security Vault Lock) */}
+      <rect x="12.5" y="18" width="7" height="5.5" rx="1.5" fill={`url(#entGold_${id})`} stroke="#FFFBEB" strokeWidth="0.9" />
+      <path d="M14 18V15.5C14 14.4 14.9 13.5 16 13.5C17.1 13.5 18 14.4 18 15.5V18" stroke="#FFFBEB" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="16" cy="20.2" r="0.9" fill="#78350F" />
+      {/* ริบบิ้นมาตรฐานรับรองด้านล่าง (Certified Ribbon) */}
+      <path d="M10 27L12 24.5H20L22 27L16 29L10 27Z" fill={`url(#entGold_${id})`} stroke="#FEF08A" strokeWidth="0.8" />
+    </svg>
+  );
+}
+

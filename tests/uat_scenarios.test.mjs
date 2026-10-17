@@ -107,6 +107,28 @@ describe('InsightFlow User Acceptance Testing (UAT) Scenarios', () => {
       cashflowContent.includes('SalesVsFeesComparisonIcon') || cashflowContent.includes('ReorderPointControlIcon'),
       'Acceptance Criteria: Sales vs Fees or Reorder Point Control Icon must be embedded in Cash Flow & Demand Forecast'
     );
+
+    // 4. "ตารางแสดงข้อความและข้อมูลจริง", "แนวโน้มปกติเดิม", "ยอดขายเฉลี่ยรายวัน", "มาตรฐานองค์กร"
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(
+      appContent.includes('ActualParsedDataTableIcon') && appContent.includes('BaselineTrajectoryIcon'),
+      'Acceptance Criteria: ActualParsedDataTableIcon and BaselineTrajectoryIcon must be embedded in App.jsx'
+    );
+
+    const advancedPath = path.join(componentsDir, 'AdvancedAnalyticsSuite.jsx');
+    const advancedContent = fs.readFileSync(advancedPath, 'utf8');
+    assert.ok(
+      advancedContent.includes('DailyAverageDemandIcon'),
+      'Acceptance Criteria: DailyAverageDemandIcon must be embedded in Advanced Analytics Suite'
+    );
+
+    const governancePath = path.join(componentsDir, 'DataGovernanceCenter.jsx');
+    const governanceContent = fs.readFileSync(governancePath, 'utf8');
+    assert.ok(
+      governanceContent.includes('EnterpriseStandardIcon'),
+      'Acceptance Criteria: EnterpriseStandardIcon must be embedded in Data Governance Center'
+    );
   });
 
   // ----------------------------------------------------------------------------

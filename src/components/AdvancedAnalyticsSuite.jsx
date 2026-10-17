@@ -8,7 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Line } from 'react-chartjs-2';
-import { LuxuryModuleIcon } from './LuxuryIcons';
+import { LuxuryModuleIcon, DailyAverageDemandIcon } from './LuxuryIcons';
 
 export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
   const isEn = lang === 'en';
@@ -467,7 +467,7 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
 
             <div className="glass-card rounded-xl p-4 border border-white/10 bg-slate-900/70">
               <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
-                <span>📊</span>
+                <DailyAverageDemandIcon size={18} className="flex-shrink-0" />
                 <span>{tx('ยอดขายเฉลี่ยรายวัน (Baseline)', 'Daily Average Demand')}</span>
               </span>
               <div className="mt-2">

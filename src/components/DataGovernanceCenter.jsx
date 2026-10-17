@@ -19,6 +19,7 @@ import {
   BranchScopeIcon,
   PrivacyMaskIcon,
   QuarantineDomeIcon,
+  EnterpriseStandardIcon,
 } from './LuxuryIcons';
 
 export default function DataGovernanceCenter({ lang = 'th' }) {
@@ -130,8 +131,8 @@ export default function DataGovernanceCenter({ lang = 'th' }) {
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black tracking-wider uppercase bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+              <EnterpriseStandardIcon size={16} className="inline-block" />
               <span>{tx('มาตรฐานระดับองค์กร (Enterprise Data Governance & Security)', 'Enterprise Data Governance & Security Standard')}</span>
             </div>
             
