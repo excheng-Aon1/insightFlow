@@ -8167,6 +8167,7 @@ export function DatabaseTab({
   onAddCustomFile,
   onDeleteUploadedFile,
   onResetAllFiles,
+  onRestoreDemoFiles,
   isUploading = false,
   theme = 'dark'
 }) {
@@ -8341,7 +8342,7 @@ export function DatabaseTab({
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {onResetAllFiles && (
+            {onResetAllFiles && Object.keys(pageUploadedFiles).length > 0 && (
               <button
                 type="button"
                 onClick={onResetAllFiles}
@@ -8359,16 +8360,40 @@ export function DatabaseTab({
                   gap: '0.4rem',
                   transition: 'all 0.2s'
                 }}
-                title={tx('ล้างและรีเซ็ตไฟล์ทั้งหมดในคลังไฟล์เป็นค่าเริ่มต้น', 'Reset all files in registry to system defaults')}
+                title={tx('ลบไฟล์ทั้งหมดออกจากคลัง (ล้างไฟล์ตัวอย่างที่ติดมาออกทั้งหมด)', 'Delete all files from vault (clear all bundled demo files)')}
               >
                 <span>🗑️</span>
-                <span>{tx('ล้าง/รีเซ็ตไฟล์ทั้งหมด', 'Reset All Files')}</span>
+                <span>{tx('ลบไฟล์ที่ติดมาทั้งหมด', 'Clear All Bundled Files')}</span>
               </button>
             )}
-            {onInspectUploadedFile && (
+            {onRestoreDemoFiles && (
               <button
                 type="button"
-                onClick={() => onInspectUploadedFile('database')}
+                onClick={onRestoreDemoFiles}
+                style={{
+                  padding: '0.6rem 0.95rem',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  color: '#38bdf8',
+                  fontWeight: 900,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  transition: 'all 0.2s'
+                }}
+                title={tx('นำไฟล์ตัวอย่างระบบเริ่มต้นกลับมา', 'Restore system demo files')}
+              >
+                <span>🔄</span>
+                <span>{tx('คืนค่าไฟล์ตัวอย่าง', 'Restore Demo Files')}</span>
+              </button>
+            )}
+            {onInspectUploadedFile && Object.keys(pageUploadedFiles).length > 0 && (
+              <button
+                type="button"
+                onClick={() => onInspectUploadedFile(Object.keys(pageUploadedFiles)[0] || 'database')}
                 style={{
                   padding: '0.6rem 1.15rem',
                   borderRadius: '12px',
@@ -8451,7 +8476,52 @@ export function DatabaseTab({
           </label>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem' }}>
+        {Object.keys(pageUploadedFiles).length === 0 ? (
+          <div
+            style={{
+              padding: '2.5rem 1.5rem',
+              borderRadius: '16px',
+              textAlign: 'center',
+              background: 'rgba(15, 23, 42, 0.6)',
+              border: '1.5px dashed rgba(251, 191, 36, 0.35)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.65rem'
+            }}
+          >
+            <span style={{ fontSize: '2.5rem' }}>📂</span>
+            <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 900, color: '#fbbf24' }}>
+              {tx('คลังไฟล์ว่างเปล่า (ไม่มีไฟล์ตัวอย่างค้างในระบบแล้ว)', 'File Vault is Empty (No Demo Files Remaining)')}
+            </h4>
+            <p style={{ margin: 0, fontSize: '0.84rem', color: '#cbd5e1', maxWidth: '480px' }}>
+              {tx(
+                'คุณสามารถกดปุ่ม "เลือกไฟล์เพื่อเพิ่มเข้าคลัง" ด้านบน เพื่อนำเข้าไฟล์ Excel/CSV จริงของคุณได้ทันที หรือกด "คืนค่าไฟล์ตัวอย่าง" หากต้องการทดสอบระบบครับ',
+                'Click "Add File to Vault" above to import your actual Excel/CSV files. You can also restore demo files anytime.'
+              )}
+            </p>
+            {onRestoreDemoFiles && (
+              <button
+                type="button"
+                onClick={onRestoreDemoFiles}
+                style={{
+                  marginTop: '0.5rem',
+                  padding: '0.55rem 1.15rem',
+                  borderRadius: '10px',
+                  background: 'rgba(56, 189, 248, 0.15)',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  color: '#38bdf8',
+                  fontWeight: 900,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer'
+                }}
+              >
+                🔄 {tx('นำไฟล์ตัวอย่างระบบกลับมา', 'Restore Demo Files')}
+              </button>
+            )}
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem' }}>
           {Object.entries(pageUploadedFiles).map(([tabId, fMeta]) => {
             const modTitle = moduleLabelsMap[tabId]?.[isEn ? 'en' : 'th'] || fMeta.customTitle || fMeta.filename || tabId;
             return (
@@ -8629,7 +8699,8 @@ export function DatabaseTab({
             );
           })}
         </div>
-      </div>
+      )}
+    </div>
 
       {/* Add Record Form */}
       <form
@@ -12464,10 +12535,10 @@ function App() {
   const [pageUploadedFiles, setPageUploadedFiles] = useState(() => {
     try {
       const saved = localStorage.getItem('insightflow_page_uploaded_files_v2');
-      if (saved) {
+      if (saved !== null) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
-          return { ...initialPageUploadedFiles, ...parsed };
+          return parsed;
         }
       }
     } catch (e) {
@@ -12485,12 +12556,12 @@ function App() {
     }
   }, [pageUploadedFiles]);
 
-  // Delete / Reset a file from the repository
+  // Delete a specific file from the repository completely
   const handleDeleteUploadedFile = (tabKey, filename) => {
     const fileDisplayName = filename || pageUploadedFiles[tabKey]?.filename || tabKey;
     const confirmMsg = isEn
-      ? `Are you sure you want to delete and reset file "${fileDisplayName}"?`
-      : `คุณต้องการลบและรีเซ็ตไฟล์ "${fileDisplayName}" หรือไม่?`;
+      ? `Are you sure you want to delete file "${fileDisplayName}" from the vault?`
+      : `คุณต้องการลบไฟล์ "${fileDisplayName}" ออกจากระบบหรือไม่?`;
 
     if (window.confirm && !window.confirm(confirmMsg)) {
       return;
@@ -12498,13 +12569,7 @@ function App() {
 
     setPageUploadedFiles(prev => {
       const next = { ...prev };
-      if (next[tabKey]?.isUserAdded) {
-        delete next[tabKey];
-      } else if (initialPageUploadedFiles[tabKey]) {
-        next[tabKey] = { ...initialPageUploadedFiles[tabKey] };
-      } else {
-        delete next[tabKey];
-      }
+      delete next[tabKey];
       return next;
     });
 
@@ -12520,29 +12585,46 @@ function App() {
     );
   };
 
-  // Reset all files in the repository to initial system defaults
-  const handleResetAllFiles = () => {
+  // Clear ALL files from the repository (both bundled and custom)
+  const handleClearAllFiles = () => {
     const confirmMsg = isEn
-      ? 'Are you sure you want to reset all files in registry to system defaults?'
-      : 'คุณต้องการล้างและรีเซ็ตไฟล์ทั้งหมดในคลังไฟล์เป็นค่าเริ่มต้นหรือไม่?';
+      ? 'Are you sure you want to delete all files from the vault? All demo and uploaded files will be removed.'
+      : 'คุณต้องการลบไฟล์ทั้งหมดออกจากคลังไฟล์หรือไม่? ไฟล์ตัวอย่างที่ติดมาจะถูกลบออกทั้งหมด';
     if (window.confirm && !window.confirm(confirmMsg)) {
       return;
     }
 
-    setPageUploadedFiles(initialPageUploadedFiles);
+    setPageUploadedFiles({});
     try {
-      localStorage.removeItem('insightflow_page_uploaded_files_v2');
+      localStorage.setItem('insightflow_page_uploaded_files_v2', JSON.stringify({}));
     } catch (e) {}
     if (inspectingUploadTab) {
       setInspectingUploadTab(null);
     }
     toast.success(
       tx(
-        '🗑️ รีเซ็ตไฟล์ทั้งหมดในคลังไฟล์กลับเป็นค่าเริ่มต้นเรียบร้อยแล้ว',
-        '🗑️ Reset all files in repository to initial system defaults'
+        '🗑️ ลบไฟล์ทั้งหมดออกจากคลังไฟล์เรียบร้อยแล้ว คลังไฟล์ว่างเปล่าพร้อมให้คุณใส่ไฟล์จริง',
+        '🗑️ Removed all files from vault. The vault is now clean for your own files.'
       )
     );
   };
+
+  // Restore demo system files
+  const handleRestoreDemoFiles = () => {
+    setPageUploadedFiles(initialPageUploadedFiles);
+    try {
+      localStorage.setItem('insightflow_page_uploaded_files_v2', JSON.stringify(initialPageUploadedFiles));
+    } catch (e) {}
+    toast.success(
+      tx(
+        '🔄 คืนค่าไฟล์ตัวอย่างระบบเริ่มต้นเรียบร้อยแล้ว',
+        '🔄 Restored default system demo files'
+      )
+    );
+  };
+
+  // Alias for backward compatibility
+  const handleResetAllFiles = handleClearAllFiles;
 
   // Business AI Assistant State
   const [bizProfile, setBizProfile] = useState({
@@ -13237,26 +13319,31 @@ function App() {
         changeSummaryEn = `AI analyzed "${file.name}" ("${firstLabel}") and updated recommendations`;
       }
 
-      // Always add imported rows into Master Store Database (dbRecords) so every uploaded file is recorded
-      const importedDbRows = sampleExtracted.slice(0, 4).map((item, idx) => ({
-        id: `FILE-${Math.floor(1000 + Math.random() * 8999)}-${idx + 1}`,
-        date: nowTime,
-        amount: Math.max(100, Math.round(item.primaryNum)),
-        itemsCount: Math.max(1, Math.round(item.secondaryNum)),
-        th: {
-          channel: `อัปโหลดจากไฟล์ (${file.name})`,
-          customer: item.primaryText,
-          product: `${item.secondaryText} (นำเข้าจากหน้า ${pageTitle})`,
-          status: 'ซิงก์ข้อมูลจากไฟล์สำเร็จ'
-        },
-        en: {
-          channel: `Uploaded File (${file.name})`,
-          customer: item.primaryText,
-          product: `${item.secondaryText} (Imported via ${pageTitle})`,
-          status: 'Synced from File'
-        }
-      }));
-      setDbRecords(prev => [...importedDbRows, ...prev]);
+      // Convert parsed rows from the uploaded file into store database records
+      const importedDbRows = dataRows.slice(0, 30).map((row, idx) => {
+        const item = extractRowTextAndNum(row, idx);
+        return {
+          id: `REC-${Math.floor(1000 + Math.random() * 8999)}-${idx + 1}`,
+          date: nowTime,
+          amount: Math.max(50, Math.round(item.primaryNum)),
+          itemsCount: Math.max(1, Math.round(item.secondaryNum)),
+          th: {
+            channel: `นำเข้าจากไฟล์ ${file.name}`,
+            customer: item.primaryText,
+            product: item.secondaryText,
+            status: 'ซิงก์ข้อมูลจากไฟล์สำเร็จ'
+          },
+          en: {
+            channel: `Imported from ${file.name}`,
+            customer: item.primaryText,
+            product: item.secondaryText,
+            status: 'Synced from File'
+          }
+        };
+      });
+      if (importedDbRows.length > 0) {
+        setDbRecords(importedDbRows);
+      }
 
       setPageUploadedFiles(prev => ({
         ...prev,
@@ -13272,7 +13359,7 @@ function App() {
           changeSummaryTh,
           changeSummaryEn,
           headers: detectedHeaders,
-          previewRows: dataRows.slice(0, 20)
+          previewRows: dataRows.slice(0, 30)
         }
       }));
 
@@ -16553,6 +16640,7 @@ function App() {
                   }}
                   onDeleteUploadedFile={handleDeleteUploadedFile}
                   onResetAllFiles={handleResetAllFiles}
+                  onRestoreDemoFiles={handleRestoreDemoFiles}
                   isUploading={isUploading}
                 />
               )}

@@ -236,8 +236,9 @@ describe('InsightFlow User Acceptance Testing (UAT) Scenarios', () => {
     // 2. Deletion & Reset Handlers
     assert.ok(
       appContent.includes('handleDeleteUploadedFile') &&
-      appContent.includes('handleResetAllFiles'),
-      'Acceptance Criteria: App.jsx must implement handleDeleteUploadedFile and handleResetAllFiles'
+      appContent.includes('handleClearAllFiles') &&
+      appContent.includes('handleRestoreDemoFiles'),
+      'Acceptance Criteria: App.jsx must implement handleDeleteUploadedFile, handleClearAllFiles, and handleRestoreDemoFiles'
     );
 
     // 3. Adding New Files to Vault
@@ -249,8 +250,9 @@ describe('InsightFlow User Acceptance Testing (UAT) Scenarios', () => {
     // 4. Per-file Delete / Reset and Replace controls
     assert.ok(
       appContent.includes('onDeleteUploadedFile') &&
-      appContent.includes('onUploadFileForTab'),
-      'Acceptance Criteria: Every file in registry must feature delete/reset and replace actions'
+      appContent.includes('onUploadFileForTab') &&
+      appContent.includes('onRestoreDemoFiles'),
+      'Acceptance Criteria: File registry must feature per-file delete/replace and restore demo actions'
     );
   });
 
