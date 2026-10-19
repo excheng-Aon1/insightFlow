@@ -279,4 +279,38 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 6. EXECUTIVE BI STUDIO & POWER BI SUITE (CANVAS, SLICERS & METRICS)
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-14: Executive BI Studio and Power BI Suite integration integrity', () => {
+    const biStudioPath = path.join(projectRoot, 'src', 'components', 'ExecutiveBiStudio.jsx');
+    assert.ok(fs.existsSync(biStudioPath), 'src/components/ExecutiveBiStudio.jsx must exist');
+
+    const biStudioContent = fs.readFileSync(biStudioPath, 'utf8');
+    assert.ok(
+      biStudioContent.includes('export default function ExecutiveBiStudio'),
+      'ExecutiveBiStudio.jsx must export default component'
+    );
+
+    // Verify Slicers, DAX calculated engine, and visuals exist
+    assert.ok(biStudioContent.includes('selectedBranch') && biStudioContent.includes('selectedChannel'), 'ExecutiveBiStudio must support multi-dimension slicers');
+    assert.ok(biStudioContent.includes('metrics.netOperatingProfit') && biStudioContent.includes('metrics.grossRevenue'), 'ExecutiveBiStudio must calculate DAX metrics');
+    assert.ok(biStudioContent.includes('waterfallLabels') && biStudioContent.includes('matrixTreeData'), 'ExecutiveBiStudio must include Waterfall and Matrix visuals');
+
+    // App.jsx integration
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(appContent.includes('import ExecutiveBiStudio'), 'App.jsx must import ExecutiveBiStudio');
+    assert.ok(appContent.includes("activeTab === 'bi_studio'"), 'App.jsx must render ExecutiveBiStudio on bi_studio tab');
+
+    // Luxury Icons
+    const iconsPath = path.join(projectRoot, 'src', 'components', 'LuxuryIcons.jsx');
+    const iconsContent = fs.readFileSync(iconsPath, 'utf8');
+    assert.ok(iconsContent.includes('export function PowerBiStudioIcon'), 'LuxuryIcons must export PowerBiStudioIcon');
+    assert.ok(iconsContent.includes('export function SlicerFilterIcon'), 'LuxuryIcons must export SlicerFilterIcon');
+    assert.ok(iconsContent.includes('export function WaterfallChartIcon'), 'LuxuryIcons must export WaterfallChartIcon');
+    assert.ok(iconsContent.includes('export function MatrixTableIcon'), 'LuxuryIcons must export MatrixTableIcon');
+  });
+
 });
+

@@ -26,6 +26,7 @@ import DataPipelineEtlCenter from './components/DataPipelineEtlCenter';
 import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
+import ExecutiveBiStudio from './components/ExecutiveBiStudio';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
   EtlPipelineIcon,
@@ -46,6 +47,7 @@ import {
   ActualParsedDataTableIcon,
   BaselineTrajectoryIcon,
   EnterpriseStandardIcon,
+  PowerBiStudioIcon,
 } from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
@@ -1725,6 +1727,22 @@ export const initialPageUploadedFiles = {
       ['2026-10-01', 'สาขาสยามพารากอน', 'เซรั่มบำรุงผิวพรีเมียม', '985,000'],
       ['2026-10-02', 'ช่องทางแชตร้านค้า & LINE OA', 'ชุดของขวัญดูแลผิว', '1,190,000'],
       ['2026-10-03', 'สาขาเซ็นทรัลลาดพร้าว', 'ครีมกันแดดสูตรน้ำ', '840,000']
+    ]
+  },
+  bi_studio: {
+    filename: 'PowerBI_Executive_Matrix_2026.csv',
+    rows: 1560,
+    fileSizeKb: 182,
+    updatedAtTh: 'พร้อมใช้งาน',
+    updatedAtEn: 'Ready',
+    isCustomUpload: false,
+    changeSummaryTh: 'เชื่อมโยงตารางข้อมูลข้ามมิติ สาขา, ช่องทาง, และงบกำไรขาดทุน',
+    changeSummaryEn: 'Synced multi-dimension matrix across branches, channels, and P&L bridge',
+    headers: ['วันที่บันทึก', 'สาขา / คลัง', 'ช่องทางการขาย', 'หมวดสินค้า', 'ยอดขาย (บาท)', 'กำไรสุทธิ (บาท)'],
+    previewRows: [
+      ['2026-10-15', 'สยามพารากอน', 'หน้าร้าน POS', 'สกินแคร์และความงาม', '1,420,000', '369,200'],
+      ['2026-10-15', 'ช่องทางออนไลน์', 'TikTok Shop', 'อาหารและเครื่องดื่ม', '980,000', '254,800'],
+      ['2026-10-15', 'เอ็มควอเทียร์', 'หน้าร้าน POS', 'อิเล็กทรอนิกส์และสำนักงาน', '1,150,000', '299,000']
     ]
   },
   customers: {
@@ -12043,10 +12061,10 @@ function App() {
     accentColor: '#fbbf24',
     badgeBg: 'rgba(251, 191, 36, 0.22)',
     quotaSummary: tx(
-      'บัญชีผู้ดูแลระบบสูงสุด (pongsatornnantakong88@gmail.com) • ยกเว้นข้อจำกัดแพ็กเกจทั้งหมด • ปลดล็อกครบ 11 ระบบรวมหน้า Admin • ไม่จำกัดสาขาและลูกค้า',
-      'Super Admin (pongsatornnantakong88@gmail.com) • Exempt from all package limits • All 11 modules unlocked including Admin • Unlimited branches & customers'
+      'บัญชีผู้ดูแลระบบสูงสุด (pongsatornnantakong88@gmail.com) • ยกเว้นข้อจำกัดแพ็กเกจทั้งหมด • ปลดล็อกครบ 12 ระบบรวม Power BI และหน้า Admin • ไม่จำกัดสาขาและลูกค้า',
+      'Super Admin (pongsatornnantakong88@gmail.com) • Exempt from all package limits • All 12 modules unlocked including Power BI & Admin • Unlimited branches & customers'
     ),
-    allowedTabs: ['overview', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'admin', 'settings']
+    allowedTabs: ['overview', 'bi_studio', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'admin', 'settings']
   };
 
   const planTiersMap = {
@@ -12062,10 +12080,10 @@ function App() {
       accentColor: '#38bdf8',
       badgeBg: 'rgba(56, 189, 248, 0.16)',
       quotaSummary: tx(
-        'รองรับ 1 สาขาหลัก + ออนไลน์ • วิเคราะห์ลูกค้าสูงสุด 2,500 ราย • คลังสินค้าอัจฉริยะ • อัปโหลดไฟล์ได้ทุกหน้า',
-        '1 Main Store + Online • Up to 2,500 Customers CRM • Smart Inventory • Self-Service File Upload'
+        'รองรับ 1 สาขาหลัก + ออนไลน์ • Executive BI Studio (Power BI) • วิเคราะห์ลูกค้า 2,500 ราย • คลังสินค้าอัจฉริยะ',
+        '1 Main Store + Online • Executive BI Studio (Power BI) • Up to 2,500 Customers CRM • Smart Inventory'
       ),
-      allowedTabs: ['overview', 'customers', 'inventory', 'live', 'database', 'settings']
+      allowedTabs: ['overview', 'bi_studio', 'customers', 'inventory', 'live', 'database', 'settings']
     },
     professional: {
       id: 'professional',
@@ -12079,10 +12097,10 @@ function App() {
       accentColor: '#fbbf24',
       badgeBg: 'rgba(251, 191, 36, 0.18)',
       quotaSummary: tx(
-        'รองรับสูงสุด 5 สาขา • ตรวจจับทุจริตแคชเชียร์ • วิเคราะห์ข้อมูลด้วย AI พยากรณ์ 30 วัน • สรุปยอดเข้ามือถือ 22:00 น.',
-        'Up to 5 Branches • Cashier Fraud Audit • 30-Day AI Forecast • Daily 22:00 Mobile Report'
+        'รองรับสูงสุด 5 สาขา • Executive BI Studio (Power BI) • ตรวจจับทุจริตแคชเชียร์ • พยากรณ์ AI 30 วัน • สรุปยอดเข้ามือถือ',
+        'Up to 5 Branches • Executive BI Studio (Power BI) • Cashier Fraud Audit • 30-Day AI Forecast • Daily Mobile Report'
       ),
-      allowedTabs: ['overview', 'customers', 'staff_pos', 'multi_channel', 'inventory', 'insights', 'live', 'database', 'settings']
+      allowedTabs: ['overview', 'bi_studio', 'customers', 'staff_pos', 'multi_channel', 'inventory', 'insights', 'live', 'database', 'settings']
     },
     premium: {
       id: 'premium',
@@ -12096,10 +12114,10 @@ function App() {
       accentColor: '#c084fc',
       badgeBg: 'rgba(192, 132, 252, 0.18)',
       quotaSummary: tx(
-        'ไม่จำกัดสาขา/โรงงาน/คลังสินค้า • จัดซื้อรวมศูนย์ (Central PO) & คะแนนซัพพลายเออร์ • เปิดครบทุกฟีเจอร์สำหรับลูกค้าองค์กร',
-        'Unlimited Branches & Factories • Central Procurement PO & Vendor Scorecard • All Customer Enterprise Modules'
+        'ไม่จำกัดสาขา/โรงงาน/คลังสินค้า • Executive BI Studio (Power BI) • จัดซื้อรวมศูนย์ (Central PO) • สิทธิ์องค์กรครบถ้วน',
+        'Unlimited Branches & Factories • Executive BI Studio (Power BI) • Central Procurement PO • All Enterprise Modules'
       ),
-      allowedTabs: ['overview', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'settings']
+      allowedTabs: ['overview', 'bi_studio', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'settings']
     }
   };
 
@@ -15740,6 +15758,14 @@ function App() {
       minPlan: 'starter'
     },
     {
+      id: 'bi_studio',
+      label: tx('Executive BI Studio (Power BI)', 'Executive BI Studio (Power BI)'),
+      subLabel: tx('สไลเซอร์กรองข้ามกราฟและพิวอตแมทริกซ์', 'Interactive Slicers & Pivot Matrix'),
+      badge: 'Power BI',
+      variant: 'gold',
+      minPlan: 'starter'
+    },
+    {
       id: 'customers',
       label: tx('วิเคราะห์ลูกค้า', 'Customer Insights'),
       subLabel: tx('ลูกค้าชั้นดีและคนหาย', 'VIP & Inactive Buyers'),
@@ -16246,8 +16272,8 @@ function App() {
                     <span className="inline-flex items-center gap-1 font-bold text-emerald-300">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
                       {isExemptAdminMode
-                        ? tx('🏆 ปลดล็อกครบ 11/11 ระบบ', '🏆 11/11 Modules Unlocked')
-                        : tx(`✨ ปลดล็อก ${activePlanMeta.allowedTabs.length}/10 ระบบ • ${activePlanMeta.quotaSummary}`, `✨ ${activePlanMeta.allowedTabs.length}/10 Modules • ${activePlanMeta.quotaSummary}`)}
+                        ? tx('🏆 ปลดล็อกครบ 12/12 ระบบ', '🏆 12/12 Modules Unlocked')
+                        : tx(`✨ ปลดล็อก ${activePlanMeta.allowedTabs.length}/11 ระบบ • ${activePlanMeta.quotaSummary}`, `✨ ${activePlanMeta.allowedTabs.length}/11 Modules • ${activePlanMeta.quotaSummary}`)}
                     </span>
                   </div>
                 </div>
@@ -16512,6 +16538,17 @@ function App() {
                     setActiveTab={setActiveTab}
                     lineChartOptions={lineChartOptions}
                     barChartOptions={barChartOptions}
+                  />
+                </>
+              )}
+
+              {activeTab === 'bi_studio' && (
+                <>
+                  {renderUploadZone('bi_studio', tx('Executive BI Studio (สไตล์ Power BI)', 'Executive BI Studio (Power BI Canvas)'))}
+                  <ExecutiveBiStudio
+                    lang={lang}
+                    theme={theme}
+                    dbRecords={dbRecords}
                   />
                 </>
               )}
@@ -16936,9 +16973,9 @@ function App() {
           <div className="grid grid-cols-6 gap-1 max-w-xl mx-auto">
             {[
               { id: 'overview', label: tx('ภาพรวม', 'Overview'), variant: 'gold' },
+              { id: 'bi_studio', label: tx('Power BI', 'Power BI'), variant: 'gold' },
               { id: 'customers', label: tx('ลูกค้า', 'CRM'), variant: 'ruby' },
               { id: 'staff_pos', label: tx('แคชเชียร์', 'POS'), variant: 'sapphire' },
-              { id: 'procurement', label: tx('จัดซื้อรวม', 'Central PO'), variant: 'emerald' },
               { id: 'insights', label: tx('วิเคราะห์ AI', 'AI Insights'), variant: 'amethyst' }
             ].map(mNav => {
               const unlocked = isTabUnlocked(mNav.id);

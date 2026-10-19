@@ -653,6 +653,10 @@ export function LuxuryModuleIcon({ type = 'overview', size = 26 }) {
     case 'data_governance':
       return <DataGovernanceIcon size={size} />;
 
+    case 'bi_studio':
+    case 'power_bi':
+      return <PowerBiStudioIcon size={size} />;
+
     default:
       return null;
   }
@@ -1973,4 +1977,238 @@ export function EnterpriseStandardIcon({ size = 24, className = '' }) {
     </svg>
   );
 }
+
+/**
+ * 11. PowerBiStudioIcon: โลโก้ Executive BI Studio & Power BI Suite 3 มิติ
+ * ดีไซน์: แท่งชาร์ต 3 มิติชั้นนำสไตล์ Power BI สีทอง 24K และสีเหลืองอำพัน-ไซอัน
+ * พร้อมวงแหวนโดนัทสะท้อนแสง และเส้นเชื่อมโยงโครงข่ายการวิเคราะห์ขั้นสูง
+ */
+export function PowerBiStudioIcon({ size = 26, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`pbiGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="40%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`pbiCyan_${id}`} x1="6" y1="10" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+        <linearGradient id={`pbiAmber_${id}`} x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FDE68A" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
+      {/* แท่นฐานแคนวาส 3 มิติ */}
+      <rect x="3" y="24" width="26" height="5" rx="2" fill="#0B132B" stroke={`url(#pbiGold_${id})`} strokeWidth="1.2" />
+      {/* เสากราฟ 3 มิติ 3 ระดับ (Power BI Trio Columns) */}
+      <rect x="5.5" y="16" width="5.5" height="10" rx="1.8" fill={`url(#pbiCyan_${id})`} stroke="#BAE6FD" strokeWidth="0.8" />
+      <rect x="13.25" y="10" width="5.5" height="16" rx="1.8" fill={`url(#pbiGold_${id})`} stroke="#FFFBEB" strokeWidth="0.8" />
+      <rect x="21" y="5" width="5.5" height="21" rx="1.8" fill={`url(#pbiAmber_${id})`} stroke="#FEF08A" strokeWidth="0.9" />
+      {/* วงแหวนสะท้อน Donut Highlight */}
+      <circle cx="23.75" cy="5" r="2.2" fill="#FEF08A" />
+      {/* เส้นแนวโน้มพุ่งทะยานเชื่อมหัวเสา */}
+      <path d="M8.25 15.5L16 9.5L23.75 4.5" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="8.25" cy="15.5" r="1.5" fill="#38BDF8" />
+      <circle cx="16" cy="9.5" r="1.5" fill="#F59E0B" />
+    </svg>
+  );
+}
+
+/**
+ * 12. SlicerFilterIcon: สไลเซอร์และตัวกรองข้ามมิติ (Interactive Visual Slicer & Cross-Filter)
+ */
+export function SlicerFilterIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`slcGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`slcCyan_${id}`} x1="6" y1="8" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#BAE6FD" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+      </defs>
+      {/* กรวยกรองคริสตัล 3 มิติ */}
+      <path d="M4 6.5C4 5.4 4.9 4.5 6 4.5H26C27.1 4.5 28 5.4 28 6.5V9C28 9.6 27.7 10.2 27.2 10.6L19 17.5V26.5C19 27.2 18.5 27.8 17.8 28L13.8 29.3C13.2 29.5 12.5 29.1 12.5 28.5V17.5L4.8 10.6C4.3 10.2 4 9.6 4 9V6.5Z" fill="#0B132B" stroke={`url(#slcGold_${id})`} strokeWidth="1.6" strokeLinejoin="round" />
+      {/* ลายเส้นรังสีสไลเซอร์หลายระดับ */}
+      <line x1="8" y1="9" x2="24" y2="9" stroke={`url(#slcCyan_${id})`} strokeWidth="2" strokeLinecap="round" />
+      <circle cx="14" cy="9" r="2.2" fill="#FEF08A" />
+      <line x1="11" y1="13" x2="21" y2="13" stroke="#FEF08A" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="17" cy="13" r="1.8" fill={`url(#slcCyan_${id})`} />
+      {/* ละอองข้อมูลที่ผ่านการกรอง (Refined Data Particles) */}
+      <circle cx="16" cy="22" r="1.5" fill="#38BDF8" />
+      <circle cx="16" cy="25" r="1.2" fill="#FEF08A" />
+    </svg>
+  );
+}
+
+/**
+ * 13. WaterfallChartIcon: สะพานงบการเงิน P&L และความแปรปรวน (Waterfall Variance Chart)
+ */
+export function WaterfallChartIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`wfGreen_${id}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#6EE7B7" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+        <linearGradient id={`wfRed_${id}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FCA5A5" />
+          <stop offset="100%" stopColor="#DC2626" />
+        </linearGradient>
+        <linearGradient id={`wfGold_${id}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      {/* เส้นแกนนอน */}
+      <line x1="3" y1="27" x2="29" y2="27" stroke="#64748B" strokeWidth="1.2" />
+      {/* เสาเริ่มต้น (รายได้รวม - เขียว) */}
+      <rect x="4" y="9" width="4.5" height="18" rx="1.2" fill={`url(#wfGreen_${id})`} />
+      {/* เส้นประเชื่อม 1 */}
+      <line x1="8.5" y1="9" x2="10.5" y2="9" stroke="#94A3B8" strokeWidth="1" strokeDasharray="1.5 1.5" />
+      {/* เสาลด 1 (CoGS - แดง) */}
+      <rect x="10.5" y="9" width="4.5" height="7" rx="1.2" fill={`url(#wfRed_${id})`} />
+      {/* เส้นประเชื่อม 2 */}
+      <line x1="15" y1="16" x2="17" y2="16" stroke="#94A3B8" strokeWidth="1" strokeDasharray="1.5 1.5" />
+      {/* เสาลด 2 (Ad Spend / OPEX - แดง) */}
+      <rect x="17" y="16" width="4.5" height="5" rx="1.2" fill={`url(#wfRed_${id})`} />
+      {/* เส้นประเชื่อม 3 */}
+      <line x1="21.5" y1="21" x2="23.5" y2="21" stroke="#94A3B8" strokeWidth="1" strokeDasharray="1.5 1.5" />
+      {/* เสาสรุปผลลัพธ์สุทธิ (Net Operating Profit - ทองคำ) */}
+      <rect x="23.5" y="14" width="5" height="13" rx="1.2" fill={`url(#wfGold_${id})`} stroke="#FFFBEB" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/**
+ * 14. MatrixTableIcon: ตารางพิวอตแมทริกซ์ 3 มิติ (Executive Pivot Matrix Table)
+ */
+export function MatrixTableIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`matGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      <rect x="4" y="4.5" width="24" height="23" rx="3.5" fill="#0B132B" stroke={`url(#matGold_${id})`} strokeWidth="1.5" />
+      {/* แถบหัวตาราง */}
+      <rect x="4.5" y="5" width="23" height="6" rx="2" fill={`url(#matGold_${id})`} />
+      <circle cx="8" cy="8" r="1.2" fill="#78350F" />
+      <circle cx="16" cy="8" r="1.2" fill="#78350F" />
+      <circle cx="24" cy="8" r="1.2" fill="#78350F" />
+      {/* เส้นแบ่งคอลัมน์ */}
+      <line x1="12" y1="11" x2="12" y2="27" stroke="#334155" strokeWidth="1" />
+      <line x1="20" y1="11" x2="20" y2="27" stroke="#334155" strokeWidth="1" />
+      {/* เส้นแบ่งแถว */}
+      <line x1="4.5" y1="16" x2="27.5" y2="16" stroke="#334155" strokeWidth="1" />
+      <line x1="4.5" y1="21.5" x2="27.5" y2="21.5" stroke="#334155" strokeWidth="1" />
+      {/* หลอด Data Bar ในช่องตาราง */}
+      <rect x="13.5" y="13" width="5" height="2" rx="1" fill="#38BDF8" />
+      <rect x="13.5" y="18" width="3.5" height="2" rx="1" fill="#34D399" />
+      <rect x="21.5" y="13" width="4.5" height="2" rx="1" fill="#FBBF24" />
+      <rect x="21.5" y="18" width="5" height="2" rx="1" fill="#38BDF8" />
+      <rect x="21.5" y="23.5" width="3.5" height="2" rx="1" fill="#34D399" />
+    </svg>
+  );
+}
+
+/**
+ * 15. GaugeMeterIcon: เกจวัดเป้าหมายและผลสัมฤทธิ์ (Target Achievement Gauge)
+ */
+export function GaugeMeterIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`gaugeGrad_${id}`} x1="4" y1="20" x2="28" y2="20" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#EF4444" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#10B981" />
+        </linearGradient>
+      </defs>
+      {/* วงโค้งหน้าปัดเกจ */}
+      <path d="M6 22C6 14.268 12.268 8 20 8C23.866 8 27.366 9.567 29.899 12.1" stroke="#334155" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M6 22C6 14.268 12.268 8 20 8C23.5 8 26.6 9.3 29 11.5" stroke={`url(#gaugeGrad_${id})`} strokeWidth="3.2" strokeLinecap="round" />
+      {/* ฐานเข็มชี้ */}
+      <circle cx="18" cy="22" r="3.5" fill="#0B132B" stroke="#FEF08A" strokeWidth="1.5" />
+      {/* เข็มชี้หน้าปัดชี้ไปทางสีเขียวเป้าหมายสำเร็จ */}
+      <line x1="18" y1="22" x2="25" y2="13" stroke="#FEF08A" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="18" cy="22" r="1.5" fill="#F59E0B" />
+      {/* ดาวเป้าหมาย */}
+      <circle cx="28" cy="11.5" r="2" fill="#34D399" />
+    </svg>
+  );
+}
+
+/**
+ * 16. ExecutiveCopilotIcon: ปัญญาประดิษฐ์ถาม-ตอบภาษาธรรมชาติ (Power BI Q&A Copilot)
+ */
+export function ExecutiveCopilotIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`copiGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`copiOrb_${id}`} x1="8" y1="8" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#C084FC" />
+          <stop offset="50%" stopColor="#818CF8" />
+          <stop offset="100%" stopColor="#38BDF8" />
+        </linearGradient>
+      </defs>
+      {/* ลูกแก้วควอนตัม AI Core */}
+      <circle cx="16" cy="15" r="9.5" fill="#0B132B" stroke={`url(#copiGold_${id})`} strokeWidth="1.5" />
+      <circle cx="16" cy="15" r="6.5" fill={`url(#copiOrb_${id})`} opacity="0.9" />
+      {/* ประกายดาวปัญญาประดิษฐ์ (AI Sparkle Stars) */}
+      <polygon points="16,8.5 17.5,12 21,13.5 17.5,15 16,18.5 14.5,15 11,13.5 14.5,12" fill="#FFFBEB" />
+      {/* คลื่นเสียงวิเคราะห์คำถาม Q&A */}
+      <path d="M7 26C11 23 21 23 25 26" stroke="#38BDF8" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="16" cy="27" r="1.5" fill="#FEF08A" />
+    </svg>
+  );
+}
+
+/**
+ * 17. PresentationModeIcon: โหมดนำเสนอผู้บริหารเต็มจอ (Executive Presentation Mode)
+ */
+export function PresentationModeIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`presGold_${id}`} x1="3" y1="3" x2="29" y2="29" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      {/* จอฉายโปรเจกเตอร์ / บอร์ดนำเสนอ 3 มิติ */}
+      <rect x="4" y="5" width="24" height="16" rx="3" fill="#0B132B" stroke={`url(#presGold_${id})`} strokeWidth="1.6" />
+      {/* ขาตั้งบอร์ดนำเสนอ */}
+      <line x1="16" y1="21" x2="16" y2="26" stroke={`url(#presGold_${id})`} strokeWidth="2" strokeLinecap="round" />
+      <line x1="10" y1="26" x2="22" y2="26" stroke={`url(#presGold_${id})`} strokeWidth="2" strokeLinecap="round" />
+      {/* เนื้อหากราฟย่อบนจอพรีเซนต์ */}
+      <path d="M7 16L12 11L16 14L22 9L25 11" stroke="#38BDF8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="22" cy="9" r="1.5" fill="#FEF08A" />
+    </svg>
+  );
+}
+
 
