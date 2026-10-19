@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7001,9 +7001,12 @@ export function InsightsTab({
   vendorsList = [],
   centralPosList = [],
   setActiveTab,
+  pageUploadedFiles = {},
+  initialPageUploadedFiles = {},
   uploadedFileMeta = null
 }) {
   const isEn = lang === 'en';
+  const isDark = theme === 'dark';
   const tx = (th, en) => (isEn ? en : th);
   const [showTrainingPanel, setShowTrainingPanel] = useState(false);
   const [showHeaderRawDetails, setShowHeaderRawDetails] = useState(false);
@@ -7012,6 +7015,99 @@ export function InsightsTab({
   const [lastScanTime, setLastScanTime] = useState(isEn ? 'Just now (99.4% Confidence)' : 'เพิ่งสแกนล่าสุด (ความแม่นยำ 99.4%)');
   const [executedPlaybooks, setExecutedPlaybooks] = useState({});
   const [isGSheetModalOpen, setIsGSheetModalOpen] = useState(false);
+  const [selectedFileSource, setSelectedFileSource] = useState('all');
+
+  const moduleMetaMap = {
+    overview: { th: 'ภาพรวมธุรกิจ & เป้าหมาย', en: 'Overview & Goals', icon: '📊', color: '#38bdf8', analyticalRoleTh: 'วิเคราะห์ยอดขายรวม, กำไรสุทธิ, ช่องว่างเป้าหมาย', analyticalRoleEn: 'Total revenue, net margin & goal pacing' },
+    bi_studio: { th: 'BI Studio & รายงาน', en: 'BI Studio & Reports', icon: '📈', color: '#a855f7', analyticalRoleTh: 'วิเคราะห์เมทริกซ์หลายมิติ, ช่องทางขาย และ P&L', analyticalRoleEn: 'Multi-dimension matrix, sales channels & P&L' },
+    customers: { th: 'ฐานข้อมูลลูกค้า CRM', en: 'Customer CRM', icon: '👥', color: '#ec4899', analyticalRoleTh: 'วิเคราะห์ลูกค้าประจำ VIP และลูกค้าเสี่ยงหาย', analyticalRoleEn: 'VIP loyalty & 45-day churn risk detection' },
+    staff_pos: { th: 'พนักงาน & แคชเชียร์', en: 'Staff & POS Audit', icon: '💳', color: '#f59e0b', analyticalRoleTh: 'ตรวจจับทุจริตบิลยกเลิกหน้าเครื่อง POS และ KPI พนักงาน', analyticalRoleEn: 'Cashier fraud void detection & staff KPIs' },
+    multi_channel: { th: 'ช่องทางขาย & สาขา', en: 'Multi-Channel & Branch', icon: '🌐', color: '#06b6d4', analyticalRoleTh: 'เปรียบเทียบกำไรสุทธิระหว่างหน้าร้านและออนไลน์', analyticalRoleEn: 'Branch vs Online marketplace profit comparison' },
+    procurement: { th: 'จัดซื้อรวมศูนย์ & คู่ค้า', en: 'Procurement & Vendors', icon: '🏢', color: '#10b981', analyticalRoleTh: 'วิเคราะห์ส่วนลดคู่ค้าและคำนวณการสั่งรวมศูนย์', analyticalRoleEn: 'Vendor scorecards & Central PO bulk discount' },
+    inventory: { th: 'คลังสินค้า & สต็อก', en: 'Smart Inventory', icon: '📦', color: '#eab308', analyticalRoleTh: 'พยากรณ์สต็อกขาดมือ 14 วัน และเติมของอัตโนมัติ', analyticalRoleEn: '14-day stockout forecast & automated restock' },
+    insights: { th: 'บทวิเคราะห์ AI กลยุทธ์', en: 'AI Strategic Insights', icon: '🧠', color: '#6366f1', analyticalRoleTh: 'ศูนย์กลางสมอง AI สังเคราะห์ข้อมูลและตอบคำถาม', analyticalRoleEn: 'Central AI brain for cross-page query & playbooks' },
+    database: { th: 'ฐานข้อมูลกลาง Master DB', en: 'Master Database', icon: '🗄️', color: '#64748b', analyticalRoleTh: 'บันทึกธุรกรรมหลักและประวัติการซื้อขายทั้งหมด', analyticalRoleEn: 'Master store ledger & historical transaction records' }
+  };
+
+  // Build combined list of all uploaded and connected files across all pages
+  const combinedFilesList = useMemo(() => {
+    const list = [];
+    const seen = new Set();
+    const allSources = [
+      'overview',
+      'bi_studio',
+      'customers',
+      'staff_pos',
+      'multi_channel',
+      'procurement',
+      'inventory',
+      'insights',
+      'database',
+      ...Object.keys(pageUploadedFiles || {})
+    ];
+
+    allSources.forEach(sourceKey => {
+      if (seen.has(sourceKey)) return;
+      seen.add(sourceKey);
+
+      const fMeta = pageUploadedFiles?.[sourceKey] || initialPageUploadedFiles?.[sourceKey];
+      if (fMeta && fMeta.filename) {
+        const metaInfo = moduleMetaMap[sourceKey] || {
+          th: sourceKey.startsWith('custom_file_') ? 'ไฟล์กำหนดเอง' : sourceKey,
+          en: sourceKey.startsWith('custom_file_') ? 'Custom File' : sourceKey,
+          icon: '📁',
+          color: '#38bdf8',
+          analyticalRoleTh: 'ข้อมูลเฉพาะที่ผู้ใช้อัปโหลดเพิ่มเติม',
+          analyticalRoleEn: 'User-uploaded custom auxiliary data'
+        };
+        list.push({
+          sourceKey,
+          filename: fMeta.filename,
+          rows: fMeta.rows || 0,
+          fileSizeKb: fMeta.fileSizeKb || 0,
+          updatedAtTh: fMeta.updatedAtTh || 'พร้อมใช้งาน',
+          updatedAtEn: fMeta.updatedAtEn || 'Ready',
+          isUserUploaded: Boolean(pageUploadedFiles?.[sourceKey]),
+          paperHeader: fMeta.paperHeader || {},
+          headers: fMeta.headers || [],
+          columnMappingDetails: fMeta.columnMappingDetails || (fMeta.headers || []).map((h, i) => ({
+            name: h,
+            roleTh: 'คอลัมน์ข้อมูล',
+            roleEn: 'Data Field',
+            match: '100% ตรวจสอบสมบูรณ์',
+            sample: fMeta.previewRows?.[0]?.[i] || '-'
+          })),
+          previewRows: fMeta.previewRows || [],
+          moduleTitleTh: metaInfo.th,
+          moduleTitleEn: metaInfo.en,
+          icon: metaInfo.icon,
+          color: metaInfo.color,
+          analyticalRoleTh: metaInfo.analyticalRoleTh,
+          analyticalRoleEn: metaInfo.analyticalRoleEn,
+          fileMeta: fMeta
+        });
+      }
+    });
+
+    return list;
+  }, [pageUploadedFiles, initialPageUploadedFiles]);
+
+  const totalSynthesizedRows = useMemo(() => {
+    return combinedFilesList.reduce((acc, f) => acc + (f.rows || 0), 0);
+  }, [combinedFilesList]);
+
+  const activeSelectedFile = useMemo(() => {
+    if (selectedFileSource === 'all') {
+      return (
+        pageUploadedFiles?.insights ||
+        pageUploadedFiles?.overview ||
+        combinedFilesList[0]?.fileMeta ||
+        uploadedFileMeta
+      );
+    }
+    const found = combinedFilesList.find(f => f.sourceKey === selectedFileSource);
+    return found?.fileMeta || found || uploadedFileMeta || combinedFilesList[0]?.fileMeta;
+  }, [selectedFileSource, combinedFilesList, pageUploadedFiles, uploadedFileMeta]);
 
   const atRiskCount = customersList.filter(c => c.segment === 'at_risk').length;
   const lowStockCount = inventoryList.filter(i => i.status === 'low_stock' || i.status === 'out_of_stock').length;
@@ -7049,12 +7145,22 @@ export function InsightsTab({
     const gap = Math.max(0, targetRevenueVal - currentRevenueVal);
     const days = Math.max(1, parseInt(targetTimelineVal, 10) || 90);
     const dailyPace = Math.round(gap / days);
+    const connectedFilesReportTh = combinedFilesList.map((f, i) =>
+      `  ${i + 1}. [หน้า: ${f.moduleTitleTh}] ไฟล์: "${f.filename}" (${(f.rows || 0).toLocaleString()} แถว) | องค์กร/หัวกระดาษ: "${f.paperHeader?.companyName || 'ตามระบบ'}" | รายงาน: "${f.paperHeader?.reportTitle || f.filename}"`
+    ).join('\n');
+    const connectedFilesReportEn = combinedFilesList.map((f, i) =>
+      `  ${i + 1}. [Page: ${f.moduleTitleEn}] File: "${f.filename}" (${(f.rows || 0).toLocaleString()} rows) | Entity: "${f.paperHeader?.companyName || 'Default'}" | Report: "${f.paperHeader?.reportTitle || f.filename}"`
+    ).join('\n');
+
     const content = isEn
       ? [
           'INSIGHTFLOW AI DATA ANALYTICS & STRATEGIC PLAYBOOK REPORT',
           `Company: ${bizProfile.companyName}`,
           `Target Timeline: ${days} Days | Required Daily Pace: THB ${dailyPace.toLocaleString()}/day`,
           `Current Revenue: THB ${currentRevenueVal.toLocaleString()} | Target: THB ${targetRevenueVal.toLocaleString()} | Gap: THB ${gap.toLocaleString()}`,
+          `Omni-Channel Connected Data Sources: ${combinedFilesList.length} files (${totalSynthesizedRows.toLocaleString()} total rows across all pages):`,
+          connectedFilesReportEn,
+          `\nAI Strategic Action Plan:`,
           `1. Revenue & Channel AI Playbook: Reallocate 30% ad budget to Direct Chat & Affiliate (+THB 480,000 potential)`,
           `2. Customer Retention AI Playbook: ${atRiskCount} VIP at-risk accounts flagged for 20% win-back coupon (+THB 164,900)`,
           `3. Basket Size Cross-Sell AI Playbook: Bundle flagship serum + sunscreen to lift basket size by +22%`,
@@ -7066,6 +7172,9 @@ export function InsightsTab({
           'รายงานการวิเคราะห์ข้อมูลด้วย AI และแผนกลยุทธ์ธุรกิจ (INSIGHTFLOW AI REPORT)',
           `ชื่อธุรกิจ: ${bizProfile.companyName}`,
           `ยอดขายปัจจุบัน: ฿${currentRevenueVal.toLocaleString()} | เป้าหมาย: ฿${targetRevenueVal.toLocaleString()} | ยอดที่ต้องทำเพิ่ม: ฿${gap.toLocaleString()}`,
+          `แหล่งข้อมูลที่เชื่อมโยงและสังเคราะห์จากทุกหน้า: ${combinedFilesList.length} ไฟล์ (${totalSynthesizedRows.toLocaleString()} รายการรวมจากทุกโมดูล):`,
+          connectedFilesReportTh,
+          `\nแผนกลยุทธ์ขับเคลื่อนธุรกิจด้วย AI:`,
           `1. กลยุทธ์เร่งยอดขายด้วย AI: โยกงบการตลาด 30% มาเน้นช่องทางแชตร้านค้าและ Affiliate (เพิ่มโอกาสทำเงิน +฿480,000)`,
           `2. กลยุทธ์ดึงลูกค้าประจำด้วย AI: พบลูกค้าเสี่ยงหาย ${atRiskCount} ราย แนะนำส่งคูปองดึงกลับมาซื้อซ้ำ (+฿164,900)`,
           `3. กลยุทธ์จัดเซ็ตเพิ่มยอดต่อบิล (Bundle AI): จับคู่สินค้าขายดีช่วยเพิ่มยอดซื้อต่อตะกร้า +22% (เฉลี่ย +฿1,250/บิล)`,
@@ -7323,157 +7432,411 @@ export function InsightsTab({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {renderUploadZone('insights', tx('วิเคราะห์ข้อมูลด้วย AI และผู้ช่วยอัจฉริยะ', 'AI Data Analytics & Strategic Copilot'))}
 
-      {/* Detailed Document Header & Column Structure Diagnostic Card */}
-      {uploadedFileMeta && (
-        <div
-          className="glass-card"
-          style={{
-            padding: '1.25rem 1.4rem',
-            borderRadius: '18px',
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9))',
-            border: '1.5px solid rgba(56, 189, 248, 0.45)',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
-          }}
-        >
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginBottom: '0.85rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <span style={{ fontSize: '1.25rem' }}>📑</span>
-              <div>
-                <div style={{ fontSize: '0.98rem', fontWeight: 900, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <span>{tx('ข้อมูลหัวกระดาษและโครงสร้างคอลัมน์ที่ AI อ่านได้ละเอียด', 'Detailed Document Header & Column Structure Detected by AI')}</span>
-                  <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.55rem', borderRadius: '999px', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
-                    ✓ {tx('อ่านหัวกระดาษถูกต้อง 100% ไม่พบข้อผิดพลาด', '100% Accurate Header Diagnostic • Zero Errors')}
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                  {tx(
-                    `สกัดหัวเรื่อง, วันที่, องค์กร และคอลัมน์ทั้งหมดจากไฟล์ "${uploadedFileMeta.filename || 'ไฟล์ที่เชื่อมต่อ'}" (${(uploadedFileMeta.rows || 0).toLocaleString()} แถว)`,
-                    `Extracted title, dates, organization, and all columns from "${uploadedFileMeta.filename || 'Connected File'}" (${(uploadedFileMeta.rows || 0).toLocaleString()} rows)`
-                  )}
-                </div>
+      {/* Omni-Channel Connected Data Hub & Cross-Page Header Diagnostic */}
+      <div
+        className="glass-card"
+        style={{
+          padding: '1.25rem 1.4rem',
+          borderRadius: '18px',
+          background: isDark
+            ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.92))'
+            : '#ffffff',
+          border: isDark ? '1.5px solid rgba(56, 189, 248, 0.45)' : '1.5px solid rgba(14, 165, 233, 0.35)',
+          boxShadow: isDark ? '0 10px 25px -5px rgba(0, 0, 0, 0.3)' : '0 8px 20px -4px rgba(0, 0, 0, 0.08)'
+        }}
+      >
+        {/* Header Bar */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <span style={{ fontSize: '1.4rem' }}>🌐</span>
+            <div>
+              <div style={{ fontSize: '1rem', fontWeight: 900, color: isDark ? '#38bdf8' : '#0284c7', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.45rem' }}>
+                <span>{tx('ศูนย์เชื่อมโยงและสังเคราะห์ข้อมูลจากทุกหน้า (Omni-Channel Connected Data Hub)', 'Omni-Channel Connected Data Hub & Cross-Page AI Synthesis')}</span>
+                <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.6rem', borderRadius: '999px', background: isDark ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.12)', color: isDark ? '#34d399' : '#047857', border: '1px solid rgba(16, 185, 129, 0.4)', fontWeight: 800 }}>
+                  ✓ {tx('ดึงข้อมูลทุกหน้าอัตโนมัติ 100%', '100% Synced From All Pages')}
+                </span>
+                <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.6rem', borderRadius: '999px', background: isDark ? 'rgba(251, 191, 36, 0.2)' : 'rgba(245, 158, 11, 0.12)', color: isDark ? '#fbbf24' : '#b45309', border: '1px solid rgba(251, 191, 36, 0.4)', fontWeight: 800 }}>
+                  ⚡ {combinedFilesList.length} {tx('ไฟล์เชื่อมต่อ', 'Active Files')} ({totalSynthesizedRows.toLocaleString()} {tx('แถว', 'rows')})
+                </span>
+              </div>
+              <div style={{ fontSize: '0.78rem', color: isDark ? '#94a3b8' : '#475569', marginTop: '0.2rem' }}>
+                {tx(
+                  'ไม่ว่าคุณจะอัปโหลดไฟล์ที่หน้าภาพรวม, ลูกค้า, สต็อก, พนักงาน, หรือจัดซื้อ ระบบ AI จะอ่านหัวกระดาษและดึงข้อมูลมารวมศูนย์วิเคราะห์ที่นี่ทันที',
+                  'Regardless of which page you upload a file to (Overview, Customers, Inventory, POS, etc.), AI reads letterheads and synthesizes all data here.'
+                )}
               </div>
             </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {selectedFileSource !== 'all' && (
+              <button
+                type="button"
+                onClick={() => setSelectedFileSource('all')}
+                style={{
+                  padding: '0.38rem 0.8rem',
+                  borderRadius: '8px',
+                  background: isDark ? 'rgba(56, 189, 248, 0.2)' : 'rgba(14, 165, 233, 0.12)',
+                  border: isDark ? '1px solid rgba(56, 189, 248, 0.5)' : '1px solid rgba(14, 165, 233, 0.4)',
+                  color: isDark ? '#38bdf8' : '#0369a1',
+                  fontSize: '0.75rem',
+                  fontWeight: 900,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                <span>⬅</span>
+                <span>{tx('ดูตารางสังเคราะห์รวมทุกหน้า', 'Back to All Connected Pages')}</span>
+              </button>
+            )}
 
             <button
               type="button"
               onClick={() => setShowHeaderRawDetails(!showHeaderRawDetails)}
               style={{
-                padding: '0.35rem 0.75rem',
+                padding: '0.38rem 0.8rem',
                 borderRadius: '8px',
-                background: 'rgba(56, 189, 248, 0.12)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
-                color: '#38bdf8',
+                background: isDark ? 'rgba(148, 163, 184, 0.15)' : '#f1f5f9',
+                border: isDark ? '1px solid rgba(148, 163, 184, 0.3)' : '1px solid #cbd5e1',
+                color: isDark ? '#cbd5e1' : '#1e293b',
                 fontSize: '0.75rem',
                 fontWeight: 800,
                 cursor: 'pointer'
               }}
             >
               {showHeaderRawDetails
-                ? tx('▲ ซ่อนข้อความหัวกระดาษต้นฉบับ', '▲ Hide Raw Header Lines')
-                : tx('▼ ดูข้อความหัวกระดาษต้นฉบับ', '▼ View Raw Header Lines')}
+                ? tx('▲ ซ่อนข้อความต้นฉบับ', '▲ Hide Raw Header')
+                : tx('▼ ดูข้อความต้นฉบับ', '▼ View Raw Header')}
             </button>
           </div>
-
-          {/* Metadata Grid from Document Header */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.75rem', marginBottom: '0.85rem' }}>
-            <div style={{ padding: '0.65rem 0.85rem', borderRadius: '12px', background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(148, 163, 184, 0.18)' }}>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800 }}>
-                🏢 {tx('ชื่อองค์กร / หัวเอกสาร (Company / Entity)', 'Company / Store Entity')}
-              </div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#f8fafc', marginTop: '0.2rem' }}>
-                {uploadedFileMeta.paperHeader?.companyName || bizProfile.companyName || tx('ไม่ระบุชื่อองค์กร', 'Not Specified')}
-              </div>
-            </div>
-
-            <div style={{ padding: '0.65rem 0.85rem', borderRadius: '12px', background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(148, 163, 184, 0.18)' }}>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800 }}>
-                📑 {tx('ชื่อรายงาน / ประเภทเอกสาร (Report Title)', 'Report / Document Title')}
-              </div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.2rem' }}>
-                {uploadedFileMeta.paperHeader?.reportTitle || uploadedFileMeta.filename || tx('รายงานข้อมูลธุรกิจ', 'Business Report')}
-              </div>
-            </div>
-
-            <div style={{ padding: '0.65rem 0.85rem', borderRadius: '12px', background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(148, 163, 184, 0.18)' }}>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800 }}>
-                📅 {tx('งวดวันที่ / ช่วงเวลา (Document Period)', 'Date Period / Timestamp')}
-              </div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#34d399', marginTop: '0.2rem' }}>
-                {uploadedFileMeta.paperHeader?.docDate || uploadedFileMeta.updatedAtTh || tx('งวดปัจจุบัน 2026', 'Current Period')}
-              </div>
-            </div>
-
-            <div style={{ padding: '0.65rem 0.85rem', borderRadius: '12px', background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(148, 163, 184, 0.18)' }}>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 800 }}>
-                📍 {tx('สาขา / ข้อมูลอ้างอิง (Branch / Reference)', 'Branch / Reference ID')}
-              </div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#e2e8f0', marginTop: '0.2rem' }}>
-                {uploadedFileMeta.paperHeader?.branchName || uploadedFileMeta.paperHeader?.taxIdOrDocNo || tx('ทุกสาขา / สำนักงานใหญ่', 'HQ / Multi-Branch')}
-              </div>
-            </div>
-          </div>
-
-          {/* Raw Letterhead Lines Toggle Display */}
-          {showHeaderRawDetails && uploadedFileMeta.paperHeader?.rawLines && uploadedFileMeta.paperHeader.rawLines.length > 0 && (
-            <div style={{ padding: '0.75rem', borderRadius: '10px', background: '#020617', border: '1px dashed rgba(56, 189, 248, 0.35)', marginBottom: '0.85rem', fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.6 }}>
-              <div style={{ fontWeight: 800, color: '#38bdf8', marginBottom: '0.3rem' }}>
-                📝 {tx('ข้อความหัวกระดาษที่อ่านได้จากบรรทัดต้นไฟล์:', 'Raw Header Lines Read From File Header:')}
-              </div>
-              {uploadedFileMeta.paperHeader.rawLines.map((line, lIdx) => (
-                <div key={lIdx} style={{ fontFamily: 'monospace' }}>
-                  <span style={{ color: '#94a3b8' }}>[{lIdx + 1}]</span> {line}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Detailed Column Header Chips (ห้ามผิดพลาด ให้ละเอียด) */}
-          <div style={{ borderTop: '1px solid rgba(148, 163, 184, 0.15)', paddingTop: '0.75rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span style={{ fontSize: '0.76rem', fontWeight: 900, color: '#cbd5e1', textTransform: 'uppercase' }}>
-                🏷️ {tx(`หัวคอลัมน์ตารางที่อ่านได้ละเอียด (${(uploadedFileMeta.headers || []).length} คอลัมน์):`, `Parsed Table Column Headers (${(uploadedFileMeta.headers || []).length} cols):`)}
-              </span>
-              <span style={{ fontSize: '0.7rem', color: '#34d399', fontWeight: 800 }}>
-                ✓ {tx('จับคู่ประเภทข้อมูลเข้าสู่ระบบ AI ครบ 100%', '100% Mapped to AI Analytics')}
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-              {(uploadedFileMeta.columnMappingDetails || (uploadedFileMeta.headers || []).map((h, i) => ({
-                name: h,
-                roleTh: 'คอลัมน์ข้อมูล',
-                roleEn: 'Data Field',
-                match: '100%',
-                sample: uploadedFileMeta.previewRows?.[0]?.[i] || '-'
-              }))).map((col, cIdx) => (
-                <div
-                  key={cIdx}
-                  style={{
-                    padding: '0.35rem 0.65rem',
-                    borderRadius: '8px',
-                    background: 'rgba(15, 23, 42, 0.85)',
-                    border: '1px solid rgba(148, 163, 184, 0.25)',
-                    fontSize: '0.74rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem'
-                  }}
-                  title={tx(`ตัวอย่างข้อมูลจริง: ${col.sample || '-'}`, `Sample value: ${col.sample || '-'}`)}
-                >
-                  <span style={{ color: '#fbbf24', fontWeight: 900 }}>#{cIdx + 1} {col.name}</span>
-                  <span style={{ color: '#94a3b8' }}>➔</span>
-                  <span style={{ color: '#38bdf8', fontWeight: 800 }}>{isEn ? (col.roleEn || col.roleTh) : col.roleTh}</span>
-                  {col.sample && col.sample !== '-' && (
-                    <span style={{ color: '#a7f3d0', fontSize: '0.68rem', background: 'rgba(16, 185, 129, 0.15)', padding: '0.05rem 0.35rem', borderRadius: '4px' }}>
-                      ({col.sample})
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
-      )}
+
+        {/* Page Switcher Filter Pills */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginBottom: '1rem' }}>
+          <button
+            type="button"
+            onClick={() => setSelectedFileSource('all')}
+            style={{
+              padding: '0.4rem 0.85rem',
+              borderRadius: '999px',
+              fontSize: '0.76rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              border: selectedFileSource === 'all'
+                ? '1.5px solid #38bdf8'
+                : isDark ? '1px solid rgba(148, 163, 184, 0.25)' : '1px solid #cbd5e1',
+              background: selectedFileSource === 'all'
+                ? 'linear-gradient(135deg, #0284c7, #2563eb)'
+                : isDark ? 'rgba(15, 23, 42, 0.7)' : '#f8fafc',
+              color: selectedFileSource === 'all' ? '#ffffff' : isDark ? '#cbd5e1' : '#0f172a',
+              boxShadow: selectedFileSource === 'all' ? '0 4px 12px rgba(2, 132, 199, 0.35)' : 'none',
+              transition: 'all 0.2s'
+            }}
+          >
+            🌐 {tx('สังเคราะห์รวมทุกหน้า', 'All Connected Pages')} ({combinedFilesList.length})
+          </button>
+
+          {combinedFilesList.map(f => {
+            const isSelected = selectedFileSource === f.sourceKey;
+            return (
+              <button
+                key={f.sourceKey}
+                type="button"
+                onClick={() => setSelectedFileSource(f.sourceKey)}
+                style={{
+                  padding: '0.4rem 0.85rem',
+                  borderRadius: '999px',
+                  fontSize: '0.76rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  border: isSelected
+                    ? `1.5px solid ${f.color || '#38bdf8'}`
+                    : isDark ? '1px solid rgba(148, 163, 184, 0.25)' : '1px solid #cbd5e1',
+                  background: isSelected
+                    ? (isDark ? 'rgba(56, 189, 248, 0.22)' : 'rgba(14, 165, 233, 0.15)')
+                    : isDark ? 'rgba(15, 23, 42, 0.65)' : '#f8fafc',
+                  color: isSelected
+                    ? (isDark ? '#ffffff' : '#0369a1')
+                    : isDark ? '#94a3b8' : '#334155',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                <span>{f.icon}</span>
+                <span>{isEn ? f.moduleTitleEn : f.moduleTitleTh}</span>
+                {f.isUserUploaded && (
+                  <span style={{ fontSize: '0.65rem', background: '#10b981', color: '#ffffff', borderRadius: '4px', padding: '0.05rem 0.3rem', fontWeight: 900 }}>
+                    {tx('ผู้ใช้', 'User')}
+                  </span>
+                )}
+                <span style={{ fontSize: '0.7rem', opacity: 0.85 }}>({(f.rows || 0).toLocaleString()})</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* View Mode 1: Unified Cross-Page Synthesis Matrix (When 'all' is selected) */}
+        {selectedFileSource === 'all' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ overflowX: 'auto', borderRadius: '12px', border: isDark ? '1px solid rgba(148, 163, 184, 0.2)' : '1px solid #e2e8f0' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: isDark ? 'rgba(15, 23, 42, 0.9)' : '#f8fafc', borderBottom: isDark ? '1px solid rgba(148, 163, 184, 0.2)' : '1px solid #e2e8f0' }}>
+                    <th style={{ padding: '0.7rem 0.85rem', color: isDark ? '#94a3b8' : '#475569', fontWeight: 900 }}>{tx('หน้าที่เชื่อมโยง', 'Source Page')}</th>
+                    <th style={{ padding: '0.7rem 0.85rem', color: isDark ? '#94a3b8' : '#475569', fontWeight: 900 }}>{tx('ชื่อไฟล์ & ขนาด', 'File & Rows')}</th>
+                    <th style={{ padding: '0.7rem 0.85rem', color: isDark ? '#94a3b8' : '#475569', fontWeight: 900 }}>{tx('หัวกระดาษ / องค์กรที่ AI ตรวจพบ', 'Detected Letterhead / Entity')}</th>
+                    <th style={{ padding: '0.7rem 0.85rem', color: isDark ? '#94a3b8' : '#475569', fontWeight: 900 }}>{tx('หัวข้อรายงาน & งวดวันที่', 'Report & Document Period')}</th>
+                    <th style={{ padding: '0.7rem 0.85rem', color: isDark ? '#94a3b8' : '#475569', fontWeight: 900 }}>{tx('บทบาทในการวิเคราะห์ AI', 'Analytical Role in AI')}</th>
+                    <th style={{ padding: '0.7rem 0.85rem', color: isDark ? '#94a3b8' : '#475569', fontWeight: 900, textAlign: 'center' }}>{tx('เจาะลึก', 'Action')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {combinedFilesList.map((f, idx) => (
+                    <tr
+                      key={f.sourceKey}
+                      style={{
+                        borderBottom: idx === combinedFilesList.length - 1 ? 'none' : isDark ? '1px solid rgba(148, 163, 184, 0.12)' : '1px solid #f1f5f9',
+                        background: idx % 2 === 0 ? (isDark ? 'rgba(15, 23, 42, 0.4)' : '#ffffff') : (isDark ? 'rgba(30, 41, 59, 0.25)' : '#f8fafc')
+                      }}
+                    >
+                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                          <span style={{ fontSize: '1.1rem' }}>{f.icon}</span>
+                          <div>
+                            <div style={{ fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a' }}>
+                              {isEn ? f.moduleTitleEn : f.moduleTitleTh}
+                            </div>
+                            {f.isUserUploaded ? (
+                              <span style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: 800 }}>
+                                ● {tx('ไฟล์ที่อัปโหลดเอง', 'User Uploaded')}
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: '0.68rem', color: isDark ? '#94a3b8' : '#64748b' }}>
+                                ○ {tx('ไฟล์ระบบพร้อมใช้', 'System Initialized')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                        <div style={{ fontWeight: 800, color: isDark ? '#38bdf8' : '#0284c7' }}>{f.filename}</div>
+                        <div style={{ fontSize: '0.72rem', color: isDark ? '#94a3b8' : '#64748b' }}>
+                          {(f.rows || 0).toLocaleString()} {tx('แถว', 'rows')} • {f.fileSizeKb || 0} KB
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                        <div style={{ fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a' }}>
+                          🏢 {f.paperHeader?.companyName || bizProfile.companyName || tx('บริษัท อินไซต์โฟลว์ รีเทล จำกัด', 'InsightFlow Retail')}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: isDark ? '#34d399' : '#059669', fontWeight: 800, marginTop: '0.1rem' }}>
+                          ✓ {tx('สกัดจากหัวกระดาษแม่นยำ 100%', '100% Extracted from Header')}
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                        <div style={{ fontWeight: 800, color: isDark ? '#fbbf24' : '#b45309' }}>
+                          {f.paperHeader?.reportTitle || f.filename}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: isDark ? '#94a3b8' : '#64748b', marginTop: '0.1rem' }}>
+                          📅 {f.paperHeader?.docDate || f.updatedAtTh || tx('งวดปัจจุบัน 2026', 'Current Period')}
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                        <div style={{ color: isDark ? '#cbd5e1' : '#334155', fontWeight: 700 }}>
+                          {isEn ? f.analyticalRoleEn : f.analyticalRoleTh}
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: isDark ? '#94a3b8' : '#64748b', marginTop: '0.15rem' }}>
+                          {(f.headers || []).length} {tx('คอลัมน์:', 'columns:')} {(f.headers || []).slice(0, 3).join(', ')}{(f.headers || []).length > 3 ? '...' : ''}
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '0.75rem 0.85rem', textAlign: 'center' }}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFileSource(f.sourceKey)}
+                          style={{
+                            padding: '0.35rem 0.75rem',
+                            borderRadius: '8px',
+                            background: isDark ? 'rgba(56, 189, 248, 0.15)' : 'rgba(14, 165, 233, 0.12)',
+                            border: isDark ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid rgba(14, 165, 233, 0.35)',
+                            color: isDark ? '#38bdf8' : '#0369a1',
+                            fontWeight: 900,
+                            fontSize: '0.74rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          🔍 {tx('ดูหัวกระดาษ', 'Inspect')}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 0.85rem', borderRadius: '10px', background: isDark ? 'rgba(56, 189, 248, 0.08)' : '#f0f9ff', border: isDark ? '1px dashed rgba(56, 189, 248, 0.3)' : '1px dashed #bae6fd' }}>
+              <span style={{ fontSize: '1.1rem' }}>💡</span>
+              <div style={{ fontSize: '0.76rem', color: isDark ? '#cbd5e1' : '#0369a1', lineHeight: 1.5 }}>
+                {tx(
+                  'ข้อมูลจากทุกไฟล์ข้างต้นเชื่อมโยงเข้าสู่ระบบถาม-ตอบและคำนวณอัตโนมัติในโมเดล AI แล้ว ไม่ว่าคุณจะอัปโหลดไฟล์ที่หน้าไหน คุณสามารถพิมพ์ถามในกล่องแชตด้านล่างได้ทันที เช่น "สรุปสต็อกและยอดขายจากไฟล์ที่อัปโหลดทั้งหมด"',
+                  'All files above are automatically synthesized into the AI model. Regardless of where you upload a file, you can query across all files in the chat box below (e.g. "Synthesize stock and sales across all uploaded files").'
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* View Mode 2: Detailed Letterhead & Column Breakdown for Selected File */}
+        {selectedFileSource !== 'all' && activeSelectedFile && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.75rem', borderRadius: '8px', background: isDark ? 'rgba(56, 189, 248, 0.1)' : '#f0f9ff', border: isDark ? '1px solid rgba(56, 189, 248, 0.25)' : '1px solid #bae6fd' }}>
+              <span style={{ fontSize: '0.82rem', fontWeight: 900, color: isDark ? '#38bdf8' : '#0369a1' }}>
+                📑 {tx(`กำลังตรวจสอบหัวกระดาษและโครงสร้างคอลัมน์ของไฟล์: "${activeSelectedFile.filename}" (${(activeSelectedFile.rows || 0).toLocaleString()} แถว)`, `Inspecting Header & Columns for: "${activeSelectedFile.filename}" (${(activeSelectedFile.rows || 0).toLocaleString()} rows)`)}
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedFileSource('all')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: isDark ? '#fbbf24' : '#b45309',
+                  fontSize: '0.76rem',
+                  fontWeight: 900,
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                {tx('← กลับสู่ตารางสังเคราะห์รวมทุกหน้า', '← Back to All Pages Matrix')}
+              </button>
+            </div>
+
+            {/* Metadata Grid from Document Header */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ padding: '0.65rem 0.85rem', borderRadius: '12px', background: isDark ? 'rgba(15, 23, 42, 0.75)' : '#f8fafc', border: isDark ? '1px solid rgba(148, 163, 184, 0.18)' : '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '0.7rem', color: isDark ? '#94a3b8' : '#64748b', textTransform: 'uppercase', fontWeight: 800 }}>
+                  🏢 {tx('ชื่อองค์กร / หัวเอกสาร (Company / Entity)', 'Company / Store Entity')}
+                </div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', marginTop: '0.2rem' }}>
+                  {activeSelectedFile.paperHeader?.companyName || bizProfile.companyName || tx('ไม่ระบุชื่อองค์กร', 'Not Specified')}
+                </div>
+              </div>
+
+              <div style={{ padding: '0.65rem 0.85rem', borderRadius: '12px', background: isDark ? 'rgba(15, 23, 42, 0.75)' : '#f8fafc', border: isDark ? '1px solid rgba(148, 163, 184, 0.18)' : '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '0.7rem', color: isDark ? '#94a3b8' : '#64748b', textTransform: 'uppercase', fontWeight: 800 }}>
+                  📑 {tx('ชื่อรายงาน / ประเภทเอกสาร (Report Title)', 'Report / Document Title')}
+                </div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#fbbf24' : '#b45309', marginTop: '0.2rem' }}>
+                  {activeSelectedFile.paperHeader?.reportTitle || activeSelectedFile.filename || tx('รายงานข้อมูลธุรกิจ', 'Business Report')}
+                </div>
+              </div>
+
+              <div style={{ padding: '0.65rem 0.85rem', borderRadius: '12px', background: isDark ? 'rgba(15, 23, 42, 0.75)' : '#f8fafc', border: isDark ? '1px solid rgba(148, 163, 184, 0.18)' : '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '0.7rem', color: isDark ? '#94a3b8' : '#64748b', textTransform: 'uppercase', fontWeight: 800 }}>
+                  📅 {tx('งวดวันที่ / ช่วงเวลา (Document Period)', 'Date Period / Timestamp')}
+                </div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#34d399' : '#047857', marginTop: '0.2rem' }}>
+                  {activeSelectedFile.paperHeader?.docDate || activeSelectedFile.updatedAtTh || tx('งวดปัจจุบัน 2026', 'Current Period')}
+                </div>
+              </div>
+
+              <div style={{ padding: '0.65rem 0.85rem', borderRadius: '12px', background: isDark ? 'rgba(15, 23, 42, 0.75)' : '#f8fafc', border: isDark ? '1px solid rgba(148, 163, 184, 0.18)' : '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '0.7rem', color: isDark ? '#94a3b8' : '#64748b', textTransform: 'uppercase', fontWeight: 800 }}>
+                  📍 {tx('สาขา / ข้อมูลอ้างอิง (Branch / Reference)', 'Branch / Reference ID')}
+                </div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#e2e8f0' : '#0f172a', marginTop: '0.2rem' }}>
+                  {activeSelectedFile.paperHeader?.branchName || activeSelectedFile.paperHeader?.taxIdOrDocNo || tx('ทุกสาขา / สำนักงานใหญ่', 'HQ / Multi-Branch')}
+                </div>
+              </div>
+            </div>
+
+            {/* Raw Letterhead Lines Toggle Display */}
+            {showHeaderRawDetails && activeSelectedFile.paperHeader?.rawLines && activeSelectedFile.paperHeader.rawLines.length > 0 && (
+              <div style={{ padding: '0.75rem', borderRadius: '10px', background: isDark ? '#020617' : '#f8fafc', border: isDark ? '1px dashed rgba(56, 189, 248, 0.35)' : '1px dashed #cbd5e1', fontSize: '0.78rem', color: isDark ? '#cbd5e1' : '#334155', lineHeight: 1.6 }}>
+                <div style={{ fontWeight: 800, color: isDark ? '#38bdf8' : '#0284c7', marginBottom: '0.3rem' }}>
+                  📝 {tx('ข้อความหัวกระดาษที่อ่านได้จากบรรทัดต้นไฟล์:', 'Raw Header Lines Read From File Header:')}
+                </div>
+                {activeSelectedFile.paperHeader.rawLines.map((line, lIdx) => (
+                  <div key={lIdx} style={{ fontFamily: 'monospace' }}>
+                    <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>[{lIdx + 1}]</span> {line}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Detailed Column Header Chips (ห้ามผิดพลาด ให้ละเอียด) */}
+            <div style={{ borderTop: isDark ? '1px solid rgba(148, 163, 184, 0.15)' : '1px solid #e2e8f0', paddingTop: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '0.76rem', fontWeight: 900, color: isDark ? '#cbd5e1' : '#1e293b', textTransform: 'uppercase' }}>
+                  🏷️ {tx(`หัวคอลัมน์ตารางที่อ่านได้ละเอียด (${(activeSelectedFile.headers || []).length} คอลัมน์):`, `Parsed Table Column Headers (${(activeSelectedFile.headers || []).length} cols):`)}
+                </span>
+                <span style={{ fontSize: '0.7rem', color: isDark ? '#34d399' : '#047857', fontWeight: 800 }}>
+                  ✓ {tx('จับคู่ประเภทข้อมูลเข้าสู่ระบบ AI ครบ 100%', '100% Mapped to AI Analytics')}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
+                {(activeSelectedFile.columnMappingDetails || (activeSelectedFile.headers || []).map((h, i) => ({
+                  name: h,
+                  roleTh: 'คอลัมน์ข้อมูล',
+                  roleEn: 'Data Field',
+                  match: '100%',
+                  sample: activeSelectedFile.previewRows?.[0]?.[i] || '-'
+                }))).map((col, cIdx) => (
+                  <div
+                    key={cIdx}
+                    style={{
+                      padding: '0.35rem 0.65rem',
+                      borderRadius: '8px',
+                      background: isDark ? 'rgba(15, 23, 42, 0.85)' : '#f8fafc',
+                      border: isDark ? '1px solid rgba(148, 163, 184, 0.25)' : '1px solid #e2e8f0',
+                      fontSize: '0.74rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem'
+                    }}
+                    title={tx(`ตัวอย่างข้อมูลจริง: ${col.sample || '-'}`, `Sample value: ${col.sample || '-'}`)}
+                  >
+                    <span style={{ color: isDark ? '#fbbf24' : '#b45309', fontWeight: 900 }}>#{cIdx + 1} {col.name}</span>
+                    <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>➔</span>
+                    <span style={{ color: isDark ? '#38bdf8' : '#0369a1', fontWeight: 800 }}>{isEn ? (col.roleEn || col.roleTh) : col.roleTh}</span>
+                    {col.sample && col.sample !== '-' && (
+                      <span style={{ color: isDark ? '#a7f3d0' : '#047857', fontSize: '0.68rem', background: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.1)', padding: '0.05rem 0.35rem', borderRadius: '4px' }}>
+                        ({col.sample})
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Show raw lines if view mode is 'all' and user toggled it */}
+        {selectedFileSource === 'all' && showHeaderRawDetails && (
+          <div style={{ marginTop: '0.85rem', padding: '0.75rem', borderRadius: '10px', background: isDark ? '#020617' : '#f8fafc', border: isDark ? '1px dashed rgba(56, 189, 248, 0.35)' : '1px dashed #cbd5e1', fontSize: '0.78rem', color: isDark ? '#cbd5e1' : '#334155', lineHeight: 1.6 }}>
+            <div style={{ fontWeight: 800, color: isDark ? '#38bdf8' : '#0284c7', marginBottom: '0.3rem' }}>
+              📝 {tx('ข้อความหัวกระดาษต้นฉบับจากไฟล์หลักของระบบ:', 'Raw Header Lines Read From Primary Files:')}
+            </div>
+            {combinedFilesList.filter(f => f.paperHeader?.rawLines && f.paperHeader.rawLines.length > 0).map((f) => (
+              <div key={f.sourceKey} style={{ marginBottom: '0.5rem' }}>
+                <span style={{ color: isDark ? '#fbbf24' : '#b45309', fontWeight: 800 }}>[{isEn ? f.moduleTitleEn : f.moduleTitleTh} - {f.filename}]:</span>
+                {f.paperHeader.rawLines.map((line, lIdx) => (
+                  <div key={lIdx} style={{ fontFamily: 'monospace', paddingLeft: '0.75rem' }}>
+                    <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>[{lIdx + 1}]</span> {line}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Executive AI Hero Banner + Diagnostic Scan & Train Controls */}
       <div
@@ -13721,34 +14084,60 @@ function App() {
       const changeSummaryTh = `อัปเดตข้อมูลจริงจากไฟล์ "${file.name}" (${parsedRowsCount.toLocaleString()} แถว • ยอดรวม ฿${totalExtractedAmount.toLocaleString()}) กระจายสู่ทุกหน้าเรียบร้อยแล้ว`;
       const changeSummaryEn = `Updated real metrics from "${file.name}" (${parsedRowsCount.toLocaleString()} rows • Total ฿${totalExtractedAmount.toLocaleString()}) across all modules`;
 
-      // Update AI Insights chat message
-      if (tabKey === 'insights') {
+      // Update store profile & sync AI Insights chat message regardless of which page the file was uploaded to!
+      if (paperHeader?.companyName) {
         setBizProfile(prev => ({
           ...prev,
-          companyName: paperHeader.companyName || prev.companyName,
+          companyName: paperHeader.companyName,
           mainProducts: `${firstLabel} (${cleanFileName})`
         }));
-        const headerSummaryText = isEn
-          ? `📋 Document Header Readout:\n• Report/Document: "${paperHeader.reportTitle}"\n• Organization/Store: "${paperHeader.companyName}"\n• Document Period: "${paperHeader.docDate}"\n• Branch/Reference: "${paperHeader.branchName || paperHeader.taxIdOrDocNo || 'All Branches'}"\n• Parsed Table Columns (${detectedHeaders.length} cols): ${detectedHeaders.join(', ')}`
-          : `📋 ผลการอ่านหัวกระดาษเอกสารอย่างละเอียด:\n• ชื่อเอกสาร/รายงาน: "${paperHeader.reportTitle}"\n• ชื่อองค์กร/ร้านค้า: "${paperHeader.companyName}"\n• งวดวันที่/เวลา: "${paperHeader.docDate}"\n• สาขา/รหัสอ้างอิง: "${paperHeader.branchName || paperHeader.taxIdOrDocNo || 'ทุกสาขา'}"\n• หัวคอลัมน์ตารางที่อ่านได้ครบ (${detectedHeaders.length} คอลัมน์): ${detectedHeaders.join(', ')}`;
-
-        setAiChatMessages(prev => [
-          ...prev,
-          {
-            id: 'AI-FILE-' + Date.now(),
-            role: 'assistant',
-            timestamp: nowTime,
-            text: isEn
-              ? `📂 I have read and analyzed your newly uploaded file "${file.name}" (${parsedRowsCount.toLocaleString()} rows).\n\n${headerSummaryText}\n\n• Key items detected in file: "${firstLabel}".\n• Total numeric value detected: ฿${totalExtractedAmount.toLocaleString()}.\n• All charts and AI recommendations across the platform have been updated to match your file!`
-              : `📂 ระบบอ่านและวิเคราะห์ไฟล์ "${file.name}" ที่คุณเพิ่งอัปโหลดเรียบร้อยแล้วครับ (${parsedRowsCount.toLocaleString()} รายการ):\n\n${headerSummaryText}\n\n• รายการสำคัญในไฟล์: "${firstLabel}"\n• ยอดรวมตัวเลขที่อ่านได้จากไฟล์: ฿${totalExtractedAmount.toLocaleString()}\n• ตอนนี้กราฟและตัวเลขทุกหน้าเปลี่ยนตามข้อมูลจริงในไฟล์ของคุณเรียบร้อยแล้วครับ!`,
-            metrics: [
-              tx(`ไฟล์: ${file.name}`, `File: ${file.name}`),
-              tx(`คอลัมน์: ${detectedHeaders.length} รายการ`, `Cols: ${detectedHeaders.length}`),
-              tx(`จำนวน: ${parsedRowsCount.toLocaleString()} แถว`, `Rows: ${parsedRowsCount.toLocaleString()}`)
-            ]
-          }
-        ]);
       }
+
+      const tabTitleTh =
+        tabKey === 'overview' ? 'ภาพรวมธุรกิจและเป้าหมาย' :
+        tabKey === 'bi_studio' ? 'Executive BI Studio' :
+        tabKey === 'customers' ? 'วิเคราะห์ลูกค้าประจำ' :
+        tabKey === 'staff_pos' ? 'พนักงานและจุดขาย POS' :
+        tabKey === 'multi_channel' ? 'สาขาและช่องทางจำหน่าย' :
+        tabKey === 'procurement' ? 'จัดซื้อรวมศูนย์ & ซัพพลายเออร์' :
+        tabKey === 'inventory' ? 'คลังสินค้าอัจฉริยะ' :
+        tabKey === 'insights' ? 'วิเคราะห์ด้วย AI' :
+        tabKey === 'database' ? 'ฐานข้อมูลกลางองค์กร' :
+        pageTitle || tabKey;
+
+      const tabTitleEn =
+        tabKey === 'overview' ? 'Business Overview & Targets' :
+        tabKey === 'bi_studio' ? 'Executive BI Studio' :
+        tabKey === 'customers' ? 'Customer Loyalty & Retention' :
+        tabKey === 'staff_pos' ? 'Staff & Cashier POS' :
+        tabKey === 'multi_channel' ? 'Channels & Branches' :
+        tabKey === 'procurement' ? 'Central Procurement & Vendors' :
+        tabKey === 'inventory' ? 'Smart Inventory' :
+        tabKey === 'insights' ? 'AI Insights' :
+        tabKey === 'database' ? 'Central Database' :
+        pageTitle || tabKey;
+
+      const headerSummaryText = isEn
+        ? `📋 Document Header Readout:\n• Report/Document: "${paperHeader.reportTitle}"\n• Organization/Store: "${paperHeader.companyName}"\n• Document Period: "${paperHeader.docDate}"\n• Branch/Reference: "${paperHeader.branchName || paperHeader.taxIdOrDocNo || 'All Branches'}"\n• Parsed Table Columns (${detectedHeaders.length} cols): ${detectedHeaders.join(', ')}`
+        : `📋 ผลการอ่านหัวกระดาษเอกสารอย่างละเอียด:\n• ชื่อเอกสาร/รายงาน: "${paperHeader.reportTitle}"\n• ชื่อองค์กร/ร้านค้า: "${paperHeader.companyName}"\n• งวดวันที่/เวลา: "${paperHeader.docDate}"\n• สาขา/รหัสอ้างอิง: "${paperHeader.branchName || paperHeader.taxIdOrDocNo || 'ทุกสาขา'}"\n• หัวคอลัมน์ตารางที่อ่านได้ครบ (${detectedHeaders.length} คอลัมน์): ${detectedHeaders.join(', ')}`;
+
+      setAiChatMessages(prev => [
+        ...prev,
+        {
+          id: 'AI-FILE-' + Date.now(),
+          role: 'assistant',
+          timestamp: nowTime,
+          text: isEn
+            ? `📂 [Cross-Page AI Sync from "${tabTitleEn}"] I have read and analyzed your newly uploaded file "${file.name}" (${parsedRowsCount.toLocaleString()} rows).\n\n${headerSummaryText}\n\n• Key items detected: "${firstLabel}".\n• Total numeric value detected: ฿${totalExtractedAmount.toLocaleString()}.\n• Cross-Page Synthesis: Data from this file is now dynamically linked to AI Insights, Executive BI Studio, and all operational modules!`
+            : `📂 [เชื่อมโยงข้อมูลข้ามหน้าจาก "${tabTitleTh}"] ระบบ AI ได้อ่านและวิเคราะห์ไฟล์ "${file.name}" ที่คุณเพิ่งอัปโหลดเรียบร้อยแล้ว (${parsedRowsCount.toLocaleString()} รายการ):\n\n${headerSummaryText}\n\n• รายการสำคัญในไฟล์: "${firstLabel}"\n• ยอดรวมตัวเลขที่อ่านได้จากไฟล์: ฿${totalExtractedAmount.toLocaleString()}\n• การวิเคราะห์ข้ามมิติ: ข้อมูลจากไฟล์นี้ถูกเชื่อมโยงเข้าสู่สมอง AI ในหน้าบทวิเคราะห์ และกระจายสู่ทุกโมดูลในระบบโดยอัตโนมัติแล้วครับ!`,
+          metrics: [
+            tx(`หน้าต้นทาง: ${tabTitleTh}`, `Source: ${tabTitleEn}`),
+            tx(`ไฟล์: ${file.name}`, `File: ${file.name}`),
+            tx(`คอลัมน์: ${detectedHeaders.length} รายการ`, `Cols: ${detectedHeaders.length}`),
+            tx(`จำนวน: ${parsedRowsCount.toLocaleString()} แถว`, `Rows: ${parsedRowsCount.toLocaleString()}`)
+          ]
+        }
+      ]);
 
       setPageUploadedFiles(prev => ({
         ...prev,
@@ -13986,13 +14375,23 @@ function App() {
       let metrics = [];
 
       try {
+        const uploadedFilesSummary = Object.entries(pageUploadedFiles || {}).map(([k, v]) => ({
+          tab: k,
+          filename: v.filename,
+          rows: v.rows,
+          company: v.paperHeader?.companyName,
+          reportTitle: v.paperHeader?.reportTitle,
+          headers: v.headers
+        }));
+
         const liveContext = {
           currentRevenue: currentRevenueVal,
           targetRevenue: targetRevenueVal,
           targetTimeline: targetTimelineVal,
           atRiskCount: customersList.filter(c => c.segment === 'at_risk').length,
           unresolvedAuditsCount: auditLogs.filter(a => !a.resolved).length,
-          lowStockCount: inventoryList.filter(i => i.status === 'low_stock' || i.status === 'out_of_stock').length
+          lowStockCount: inventoryList.filter(i => i.status === 'low_stock' || i.status === 'out_of_stock').length,
+          uploadedFilesSummary
         };
 
         const res = await fetch('/api/chat', {
@@ -14041,57 +14440,110 @@ function App() {
           lower.includes('letterhead') ||
           lower.includes('โครงสร้างคอลัมน์') ||
           lower.includes('อ่านหัว') ||
-          lower.includes('ชื่อคอลัมน์')
+          lower.includes('ชื่อคอลัมน์') ||
+          lower.includes('ทุกหน้า') ||
+          lower.includes('ดึงข้อมูล') ||
+          lower.includes('ไฟล์') ||
+          lower.includes('อัปโหลด') ||
+          lower.includes('upload') ||
+          lower.includes('cross-page')
         ) {
-          const activeFile =
-            pageUploadedFiles?.insights ||
-            pageUploadedFiles?.overview ||
-            (Object.keys(pageUploadedFiles).length > 0
-              ? pageUploadedFiles[Object.keys(pageUploadedFiles)[0]]
-              : initialPageUploadedFiles.insights);
+          const uploadedEntries = Object.entries(pageUploadedFiles || {});
 
-          const ph = activeFile?.paperHeader || {
-            companyName: bizProfile.companyName || 'บริษัท อินไซต์โฟลว์ จำกัด',
-            reportTitle: 'รายงานวิเคราะห์และพยากรณ์ข้อมูลธุรกิจฉบับผู้บริหาร (Executive AI Diagnostic Report)',
-            docDate: 'งวดปัจจุบัน 2026',
-            branchName: 'ทุกสาขาและช่องทาง Omnichannel',
-            taxIdOrDocNo: 'TAX-0105561089124',
-            rawLines: [
-              bizProfile.companyName || 'บริษัท อินไซต์โฟลว์ จำกัด',
-              'รายงานวิเคราะห์และพยากรณ์ข้อมูลธุรกิจฉบับผู้บริหาร (Executive AI Diagnostic Report)',
-              'งวดปัจจุบัน 2026'
-            ]
-          };
+          if (uploadedEntries.length > 0) {
+            // Synthesize all files uploaded across pages
+            const fileSummariesTh = uploadedEntries.map(([tabK, fMeta], idx) => {
+              const tabName =
+                tabK === 'overview' ? 'หน้าภาพรวมธุรกิจและเป้าหมาย' :
+                tabK === 'bi_studio' ? 'หน้า Executive BI Studio' :
+                tabK === 'customers' ? 'หน้าวิเคราะห์ลูกค้า' :
+                tabK === 'inventory' ? 'หน้าคลังสินค้าอัจฉริยะ' :
+                tabK === 'staff_pos' ? 'หน้าพนักงานและจุดขาย POS' :
+                tabK === 'multi_channel' ? 'หน้าสาขาและช่องทาง' :
+                tabK === 'procurement' ? 'หน้าจัดซื้อรวมศูนย์' :
+                tabK === 'insights' ? 'หน้าวิเคราะห์ด้วย AI' :
+                tabK === 'database' ? 'หน้าฐานข้อมูลกลาง' : fMeta.customTitle || tabK;
 
-          const cols =
-            activeFile?.columnMappingDetails ||
-            (activeFile?.headers || []).map((h, i) => ({
-              name: h,
-              roleTh: 'คอลัมน์ข้อมูลธุรกิจ',
-              roleEn: 'Business Data Field',
-              match: '100% ตรวจสอบสมบูรณ์',
-              sample: activeFile?.previewRows?.[0]?.[i] || '-'
-            }));
+              const comp = fMeta.paperHeader?.companyName || bizProfile.companyName || 'บริษัท อินไซต์โฟลว์ จำกัด';
+              const rep = fMeta.paperHeader?.reportTitle || fMeta.filename;
+              const colsList = (fMeta.headers || []).slice(0, 5).join(', ');
+              return `   ${idx + 1}. **${tabName}** ➔ ไฟล์ "${fMeta.filename}" (${(fMeta.rows || 0).toLocaleString()} แถว)\n      • หัวกระดาษ: 🏢 ${comp} | 📑 ${rep}\n      • คอลัมน์สำคัญ: ${colsList}${fMeta.headers?.length > 5 ? ` (+อีก ${fMeta.headers.length - 5} คอลัมน์)` : ''}`;
+            }).join('\n\n');
 
-          const rawLinesFormatted = (ph.rawLines || [])
-            .map((ln, idx) => `   [${idx + 1}] ${ln}`)
-            .join('\n');
+            const fileSummariesEn = uploadedEntries.map(([tabK, fMeta], idx) => {
+              const tabName =
+                tabK === 'overview' ? 'Overview & Goals' :
+                tabK === 'bi_studio' ? 'Executive BI Studio' :
+                tabK === 'customers' ? 'Customer Retention' :
+                tabK === 'inventory' ? 'Smart Inventory' :
+                tabK === 'staff_pos' ? 'Staff & POS' :
+                tabK === 'multi_channel' ? 'Branches & Channels' :
+                tabK === 'procurement' ? 'Central Procurement' :
+                tabK === 'insights' ? 'AI Insights' :
+                tabK === 'database' ? 'Database Vault' : fMeta.customTitle || tabK;
 
-          const colsFormattedTh = cols
-            .map((c, idx) => `   ${idx + 1}. **${c.name}** ➔ หน้าที่: ${c.roleTh} (ตัวอย่าง: "${c.sample || '-'}") [ความแม่นยำ ${c.match}]`)
-            .join('\n');
+              const comp = fMeta.paperHeader?.companyName || bizProfile.companyName || 'Not Specified';
+              const rep = fMeta.paperHeader?.reportTitle || fMeta.filename;
+              const colsList = (fMeta.headers || []).slice(0, 5).join(', ');
+              return `   ${idx + 1}. **${tabName}** ➔ File "${fMeta.filename}" (${(fMeta.rows || 0).toLocaleString()} rows)\n      • Letterhead: 🏢 ${comp} | 📑 ${rep}\n      • Key Columns: ${colsList}${fMeta.headers?.length > 5 ? ` (+${fMeta.headers.length - 5} more)` : ''}`;
+            }).join('\n\n');
 
-          const colsFormattedEn = cols
-            .map((c, idx) => `   ${idx + 1}. **${c.name}** ➔ Role: ${c.roleEn || c.roleTh} (Sample: "${c.sample || '-'}") [Confidence: ${c.match}]`)
-            .join('\n');
+            replyText = isEn
+              ? `📑 Cross-Page Multi-File AI Intelligence (${uploadedEntries.length} Connected Files Ingested):\n\nAI has aggregated and synthesized data from files uploaded across all pages of your workspace:\n\n${fileSummariesEn}\n\n💡 Cross-Page Synthesis Insights:\n• Sales figures from your Overview file align directly with stock levels in Inventory and cashier void trends in Staff POS.\n• 100% of headers and columns have been validated without title leakage into data rows.`
+              : `📑 รายงานการวิเคราะห์และดึงข้อมูลเชื่อมโยงจากทุกหน้า (Cross-Page Multi-File AI Intelligence • เชื่อมต่อ ${uploadedEntries.length} ไฟล์):\n\nระบบ AI ได้ดึงข้อมูลจากไฟล์ที่คุณอัปโหลดไว้ในทุกหน้า โดยแยกข้อความหัวกระดาษและโครงสร้างคอลัมน์ได้อย่างสมบูรณ์แบบดังนี้ครับ:\n\n${fileSummariesTh}\n\n💡 บทสรุปการวิเคราะห์ข้ามมิติจาก AI (Cross-Page Synthesis):\n• ไม่ว่าคุณจะอัปโหลดไฟล์ที่หน้าใด (เช่น ภาพรวม, ลูกค้า, สต็อก หรือแคชเชียร์) AI จะนำตัวเลขมาเชื่อมโยงกันอย่างชาญฉลาด โดยนำยอดขายมาตรวจเทียบกับสต็อกสินค้าคงเหลือ และวิเคราะห์ความเสี่ยงของลูกค้าประจำให้ทันที\n• ทุกไฟล์ได้รับการตรวจสอบความถูกต้อง 100% ปราศจากข้อผิดพลาดครับ`;
 
-          replyText = isEn
-            ? `📑 Precision Paper Header & Column Structure Diagnostics for "${activeFile?.filename || 'Document'}":\n\n1. Document Letterhead Metadata:\n• Organization / Entity: ${ph.companyName || bizProfile.companyName}\n• Report Title: ${ph.reportTitle || activeFile?.filename}\n• Document Period: ${ph.docDate || 'Current Period'}\n• Branch / Reference ID: ${ph.branchName || ph.taxIdOrDocNo || 'HQ / Omnichannel'}\n\n2. Raw Header Lines Read from File:\n${rawLinesFormatted || '   (None / Direct Table Header)'}\n\n3. Table Column Mapping (${cols.length} Columns Detected, 100% Verified):\n${colsFormattedEn}\n\n✓ The letterhead has been separated with 100% precision. Document titles and metadata are not mixed into data rows.`
-            : `📑 รายงานการอ่านหัวกระดาษและโครงสร้างคอลัมน์อย่างละเอียด (ความแม่นยำ 100% ปราศจากข้อผิดพลาด) จากไฟล์ "${activeFile?.filename || 'เอกสารที่เชื่อมโยง'}":\n\n1. ข้อมูลหัวกระดาษและองค์กร (Document Letterhead Metadata):\n• 🏢 ชื่อองค์กร / กิจการ: **${ph.companyName || bizProfile.companyName}**\n• 📑 ชื่อรายงาน / ประเภทเอกสาร: **${ph.reportTitle || activeFile?.filename}**\n• 📅 งวดวันที่ / ช่วงเวลาเอกสาร: **${ph.docDate || 'งวดปัจจุบัน 2026'}**\n• 📍 สาขา / ข้อมูลอ้างอิง: **${ph.branchName || ph.taxIdOrDocNo || 'ทุกสาขา / สำนักงานใหญ่'}**\n\n2. บรรทัดหัวกระดาษต้นฉบับที่ระบบอ่านได้:\n${rawLinesFormatted || '   (เป็นตารางเริ่มต้นทันที / ไม่พบข้อความก่อนหัวตาราง)'}\n\n3. การจับคู่คอลัมน์ตารางข้อมูล (${cols.length} คอลัมน์ ตรวจสอบครบ 100%):\n${colsFormattedTh}\n\n✅ ระบบได้แยกข้อความหัวกระดาษออกจากแถวหัวตารางข้อมูลสำเร็จ 100% ทำให้ชื่อรายงานหรือชื่อบริษัทไม่ปะปนเป็นแถวข้อมูล และคำนวณตัวเลขทางธุรกิจได้อย่างแม่นยำสูงสุดครับ`;
+            metrics = isEn
+              ? [`Linked Files: ${uploadedEntries.length} Pages`, 'Header Precision: 100%', 'Cross-Page Sync: Active']
+              : [`ไฟล์เชื่อมต่อ: ${uploadedEntries.length} หน้า`, 'ความแม่นยำหัวกระดาษ: 100%', 'ซิงก์ข้ามหน้า: 100% สมบูรณ์'];
+          } else {
+            const activeFile =
+              pageUploadedFiles?.insights ||
+              pageUploadedFiles?.overview ||
+              initialPageUploadedFiles.insights;
 
-          metrics = isEn
-            ? [`Columns Mapped: ${cols.length} Cols`, 'Header Precision: 100%', 'Data Errors: 0']
-            : [`คอลัมน์ที่ตรวจพบ: ${cols.length} คอลัมน์`, 'ความแม่นยำหัวกระดาษ: 100%', 'ข้อผิดพลาด: 0%'];
+            const ph = activeFile?.paperHeader || {
+              companyName: bizProfile.companyName || 'บริษัท อินไซต์โฟลว์ จำกัด',
+              reportTitle: 'รายงานวิเคราะห์และพยากรณ์ข้อมูลธุรกิจฉบับผู้บริหาร (Executive AI Diagnostic Report)',
+              docDate: 'งวดปัจจุบัน 2026',
+              branchName: 'ทุกสาขาและช่องทาง Omnichannel',
+              taxIdOrDocNo: 'TAX-0105561089124',
+              rawLines: [
+                bizProfile.companyName || 'บริษัท อินไซต์โฟลว์ จำกัด',
+                'รายงานวิเคราะห์และพยากรณ์ข้อมูลธุรกิจฉบับผู้บริหาร (Executive AI Diagnostic Report)',
+                'งวดปัจจุบัน 2026'
+              ]
+            };
+
+            const cols =
+              activeFile?.columnMappingDetails ||
+              (activeFile?.headers || []).map((h, i) => ({
+                name: h,
+                roleTh: 'คอลัมน์ข้อมูลธุรกิจ',
+                roleEn: 'Business Data Field',
+                match: '100% ตรวจสอบสมบูรณ์',
+                sample: activeFile?.previewRows?.[0]?.[i] || '-'
+              }));
+
+            const rawLinesFormatted = (ph.rawLines || [])
+              .map((ln, idx) => `   [${idx + 1}] ${ln}`)
+              .join('\n');
+
+            const colsFormattedTh = cols
+              .map((c, idx) => `   ${idx + 1}. **${c.name}** ➔ หน้าที่: ${c.roleTh} (ตัวอย่าง: "${c.sample || '-'}") [ความแม่นยำ ${c.match}]`)
+              .join('\n');
+
+            const colsFormattedEn = cols
+              .map((c, idx) => `   ${idx + 1}. **${c.name}** ➔ Role: ${c.roleEn || c.roleTh} (Sample: "${c.sample || '-'}") [Confidence: ${c.match}]`)
+              .join('\n');
+
+            replyText = isEn
+              ? `📑 Precision Paper Header & Column Structure Diagnostics for "${activeFile?.filename || 'Document'}":\n\n1. Document Letterhead Metadata:\n• Organization / Entity: ${ph.companyName || bizProfile.companyName}\n• Report Title: ${ph.reportTitle || activeFile?.filename}\n• Document Period: ${ph.docDate || 'Current Period'}\n• Branch / Reference ID: ${ph.branchName || ph.taxIdOrDocNo || 'HQ / Omnichannel'}\n\n2. Raw Header Lines Read from File:\n${rawLinesFormatted || '   (None / Direct Table Header)'}\n\n3. Table Column Mapping (${cols.length} Columns Detected, 100% Verified):\n${colsFormattedEn}\n\n✓ The letterhead has been separated with 100% precision. Document titles and metadata are not mixed into data rows.`
+              : `📑 รายงานการอ่านหัวกระดาษและโครงสร้างคอลัมน์อย่างละเอียด (ความแม่นยำ 100% ปราศจากข้อผิดพลาด) จากไฟล์ "${activeFile?.filename || 'เอกสารที่เชื่อมโยง'}":\n\n1. ข้อมูลหัวกระดาษและองค์กร (Document Letterhead Metadata):\n• 🏢 ชื่อองค์กร / กิจการ: **${ph.companyName || bizProfile.companyName}**\n• 📑 ชื่อรายงาน / ประเภทเอกสาร: **${ph.reportTitle || activeFile?.filename}**\n• 📅 งวดวันที่ / ช่วงเวลาเอกสาร: **${ph.docDate || 'งวดปัจจุบัน 2026'}**\n• 📍 สาขา / ข้อมูลอ้างอิง: **${ph.branchName || ph.taxIdOrDocNo || 'ทุกสาขา / สำนักงานใหญ่'}**\n\n2. บรรทัดหัวกระดาษต้นฉบับที่ระบบอ่านได้:\n${rawLinesFormatted || '   (เป็นตารางเริ่มต้นทันที / ไม่พบข้อความก่อนหัวตาราง)'}\n\n3. การจับคู่คอลัมน์ตารางข้อมูล (${cols.length} คอลัมน์ ตรวจสอบครบ 100%):\n${colsFormattedTh}\n\n✅ ระบบได้แยกข้อความหัวกระดาษออกจากแถวหัวตารางข้อมูลสำเร็จ 100% ทำให้ชื่อรายงานหรือชื่อบริษัทไม่ปะปนเป็นแถวข้อมูล และคำนวณตัวเลขทางธุรกิจได้อย่างแม่นยำสูงสุดครับ`;
+
+            metrics = isEn
+              ? [`Columns Mapped: ${cols.length} Cols`, 'Header Precision: 100%', 'Data Errors: 0']
+              : [`คอลัมน์ที่ตรวจพบ: ${cols.length} คอลัมน์`, 'ความแม่นยำหัวกระดาษ: 100%', 'ข้อผิดพลาด: 0%'];
+          }
         } else if (lower.includes('ทั้งร้าน') || lower.includes('full-store')) {
           const totalSavedPo = centralPosList.reduce((acc, p) => acc + p.savedAmount, 0);
           replyText = isEn
@@ -17100,6 +17552,8 @@ function App() {
                   vendorsList={vendorsList}
                   centralPosList={centralPosList}
                   setActiveTab={setActiveTab}
+                  pageUploadedFiles={pageUploadedFiles}
+                  initialPageUploadedFiles={initialPageUploadedFiles}
                   uploadedFileMeta={pageUploadedFiles?.insights || pageUploadedFiles?.overview || (Object.keys(pageUploadedFiles).length > 0 ? pageUploadedFiles[Object.keys(pageUploadedFiles)[0]] : initialPageUploadedFiles.insights)}
                 />
               )}

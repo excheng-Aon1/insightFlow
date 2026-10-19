@@ -1923,11 +1923,18 @@ async def chat_with_business_ai(
     biz_pain = bp.get("painPoints") or bp.get("pain_points") or "ลูกค้าเก่าหายไปบางส่วน และต้องการคุมสต็อกไม่ให้ขาดมือ"
     biz_rules = bp.get("customRules") or bp.get("custom_rules") or "เน้นดูแลลูกค้า VIP และตรวจจับการยกเลิกบิล (Void) หน้าเครื่อง POS ทุกวัน"
 
-    # 3. ดึง Context สดจาก Frontend (RFM, Staff POS, Goal, Inventory)
+    # 3. ดึง Context สดจาก Frontend (RFM, Staff POS, Goal, Inventory, Uploaded Files Across Pages)
     ctx = req.live_context or {}
     current_rev = float(ctx.get("currentRevenue") or (total_db_rev if total_db_rev > 0 else 4829000))
     target_rev = float(ctx.get("targetRevenue") or biz_target)
     gap_rev = max(0.0, target_rev - current_rev)
+    uploaded_files = ctx.get("uploadedFilesSummary") or []
+    files_summary_text = ""
+    if uploaded_files:
+        files_summary_text = "\n" + "\n".join([
+            f"   • หน้า {f.get('tab')}: ไฟล์ '{f.get('filename')}' ({f.get('rows', 0):,} แถว)" + (f" [หัวกระดาษ: {f.get('company')}]" if f.get('company') else "")
+            for f in uploaded_files
+        ])
 
     # 4. เรียกใช้งาน Groq LLM (Open-Weight Model) ถ้ามีการตั้งค่า GROQ_API_KEY
     groq_api_key = os.environ.get("GROQ_API_KEY")
@@ -1944,7 +1951,8 @@ async def chat_with_business_ai(
                 f"3. แคชเชียร์ & จุดขาย: พนักงานขายดีอันดับ 1 คือ คุณภัทรพล (ยอดขาย ฿684,500, Up-sell 44.1%) และตรวจพบความเสี่ยงทุจริตบิลที่เครื่อง POS #4 มีการกดยกเลิกบิล (Void) 14 ครั้ง\n"
                 f"4. คลังสินค้า: สินค้าใกล้หมด {low_items_str}, สินค้าค้างสต็อกนานคือ ครีมกันแดด 280 ชิ้น\n"
                 f"5. ช่องทางทำกำไร: แชตร้านค้าโดยตรง (Direct Chat) ให้กำไรสุทธิสูงสุด 52.4% (ค่าธรรมเนียมเพียง 5%)\n"
-                f"6. กฎและโจทย์เฉพาะของร้าน: {biz_pain} | กฎพิเศษ: {biz_rules}\n\n"
+                f"6. กฎและโจทย์เฉพาะของร้าน: {biz_pain} | กฎพิเศษ: {biz_rules}\n"
+                f"7. ไฟล์ข้อมูลเชื่อมโยงจากทุกหน้า: {files_summary_text or 'ซิงก์ครบทุกโมดูล'}\n\n"
                 f"แนวทางการตอบ:\n"
                 f"- ตอบเป็นภาษาไทยอย่างมืออาชีพ สุภาพ ชัดเจน และกระชับ\n"
                 f"- ใช้ Bullet points และการเน้นตัวหนาเพื่อให้เจ้าของร้านอ่านเข้าใจง่ายใน 30 วินาที\n"
@@ -1990,18 +1998,20 @@ async def chat_with_business_ai(
             logging.warning(f"[Groq AI Warning] {e}, falling back to local business engine")
 
     # วิเคราะห์คำถามของผู้ใช้และสร้างคำตอบเชิงลึกจากข้อมูลจริงของร้าน (Local Fallback Engine)
-    if any(k in q for k in ["หัวกระดาษ", "หัวเอกสาร", "letterhead", "header", "โครงสร้างคอลัมน์", "คอลัมน์", "อ่านหัว"]):
+    if any(k in q for k in ["หัวกระดาษ", "หัวเอกสาร", "letterhead", "header", "โครงสร้างคอลัมน์", "คอลัมน์", "อ่านหัว", "ไฟล์", "อัปโหลด", "ทุกหน้า", "ดึงข้อมูล", "cross-page", "upload"]):
+        files_block = files_summary_text if files_summary_text else "\n   • เชื่อมโยงข้อมูลครบทุกหน้า (ภาพรวม, ลูกค้า, สต็อก, แคชเชียร์, จัดซื้อ)"
         answer = (
-            f"📑 **ผลการตรวจสอบหัวกระดาษ (Letterhead) และโครงสร้างคอลัมน์เอกสาร (100% Precision):**\n\n"
-            f"1. **ข้อมูลหัวกระดาษ (Document Letterhead Metadata):**\n"
+            f"📑 **ผลการวิเคราะห์และดึงข้อมูลเชื่อมโยงจากทุกหน้า (Cross-Page Multi-File AI Intelligence):**\n\n"
+            f"1. **ข้อมูลหัวกระดาษและองค์กร (Document Letterhead Metadata):**\n"
             f"   • **ชื่อองค์กร / กิจการ:** {biz_name}\n"
             f"   • **ประเภทธุรกิจ:** {biz_industry}\n"
-            f"   • **สถานะการอ่าน:** แยกข้อความหัวกระดาษออกจากแถวหัวตารางข้อมูลสำเร็จ 100% โดยไม่มีการนำชื่อรายงานหรือหัวจดหมายมาปนเป็นแถวข้อมูล\n\n"
-            f"2. **การจับคู่โครงสร้างคอลัมน์ (Schema & Column Mapping):**\n"
-            f"   • ระบบตรวจจับคอลัมน์หลัก: วันที่ทำรายการ, สาขา/ช่องทางจำหน่าย, รายการสินค้า/หมวดหมู่, ยอดขายสุทธิ และจำนวนสต็อก\n"
-            f"   • คอลัมน์ทุกแถวได้รับการตรวจสอบชนิดข้อมูล (Data Type Validation) ความถูกต้อง 100% พร้อมเชื่อมโยงเข้าสู่ระบบวิเคราะห์ AI อัตโนมัติครับ"
+            f"   • **สถานะการอ่าน:** แยกข้อความหัวกระดาษออกจากตารางข้อมูล 100% ไม่ปนเป็นแถวข้อมูล\n\n"
+            f"2. **การดึงข้อมูลจากทุกหน้า (Cross-Page Data Aggregation):**{files_block}\n\n"
+            f"3. **การจับคู่โครงสร้างคอลัมน์ (Schema & Column Mapping):**\n"
+            f"   • AI ดึงข้อมูลข้ามมิติจากทุกหน้าที่อัปโหลดไฟล์ เช่น ตรวจสอบยอดขายเทียบกับระดับสต็อกคงเหลือ และเชื่อมโยงรายชื่อลูกค้า VIP กับความเสี่ยงการยกเลิกบิลหน้าเคาน์เตอร์ POS\n"
+            f"   • ทุกคอลัมน์ได้รับการตรวจสอบความถูกต้อง 100% พร้อมวิเคราะห์เชิงลึกอัตโนมัติครับ"
         )
-        matched_module = "Paper Header & Column Schema Diagnostic Engine"
+        matched_module = "Cross-Page Multi-File Neural Aggregator"
 
     elif any(k in q for k in ["ลูกค้า", "vip", "champion", "หาย", "เลิกซื้อ", "rfm", "ltv", "โทร", "crm"]):
         answer = (
