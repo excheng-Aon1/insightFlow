@@ -7008,7 +7008,10 @@ export function InsightsTab({
   setActiveTab,
   pageUploadedFiles = {},
   initialPageUploadedFiles = {},
-  uploadedFileMeta = null
+  uploadedFileMeta = null,
+  channelsList = [],
+  branchesList = [],
+  dbRecords = []
 }) {
   const isEn = lang === 'en';
   const isDark = theme === 'dark';
@@ -8197,10 +8200,18 @@ export function InsightsTab({
       {/* Cash Flow Management & Demand Forecasting Engine */}
       <CashFlowAndDemandForecast
         lang={lang}
+        theme={theme}
         inventoryList={inventoryList}
         setInventoryList={setInventoryList}
         currentRevenueVal={currentRevenueVal}
         setActiveTab={setActiveTab}
+        pageUploadedFiles={pageUploadedFiles}
+        initialPageUploadedFiles={initialPageUploadedFiles}
+        centralPosList={centralPosList}
+        vendorsList={vendorsList}
+        channelsList={channelsList}
+        branchesList={branchesList}
+        dbRecords={dbRecords}
       />
 
       {/* Industry Benchmarking & Daily Goal Decomposition Engine */}
@@ -17436,6 +17447,9 @@ function App() {
                   pageUploadedFiles={pageUploadedFiles}
                   initialPageUploadedFiles={initialPageUploadedFiles}
                   uploadedFileMeta={pageUploadedFiles?.insights || pageUploadedFiles?.overview || (Object.keys(pageUploadedFiles).length > 0 ? pageUploadedFiles[Object.keys(pageUploadedFiles)[0]] : initialPageUploadedFiles.insights)}
+                  channelsList={channelsList}
+                  branchesList={branchesList}
+                  dbRecords={dbRecords}
                 />
               )}
 
