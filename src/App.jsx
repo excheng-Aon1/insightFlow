@@ -3846,7 +3846,9 @@ export function OverviewTab({
   handleExportGoalPlan,
   setActiveTab,
   lineChartOptions,
-  barChartOptions
+  barChartOptions,
+  customersList = [],
+  dbRecords = []
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
@@ -16566,6 +16568,8 @@ function App() {
                     setActiveTab={setActiveTab}
                     lineChartOptions={lineChartOptions}
                     barChartOptions={barChartOptions}
+                    customersList={customersList}
+                    dbRecords={dbRecords}
                   />
                 </>
               )}
