@@ -56,21 +56,23 @@ export default function AdvancedAnalyticsSuite({ lang = 'th', currentRevenueVal 
   const buildRopFromInventory = (inv) => {
     if (!inv || inv.length === 0) return [];
     return inv.map(item => {
-      const dailyDemand = item.dailyDemand || Math.max(1, Math.round((item.qty || 10) / 10));
+      const stockVal = Number(item.stock ?? item.qty ?? item.currentStock ?? 0);
+      const nameVal = (isEn ? item.en?.name : item.th?.name) || item.name || item.title || tx('สินค้า', 'Product');
+      const dailyDemand = item.dailyDemand || Math.max(1, Math.round((stockVal || 10) / 10));
       const leadTime = item.leadTime || 3;
       const safetyStock = Math.round(dailyDemand * 1.65 * 1.2);
       const rop = (dailyDemand * leadTime) + safetyStock;
-      const isUrgent = (item.qty || 0) <= rop;
+      const isUrgent = stockVal <= rop;
       return {
         sku: item.sku || item.code || 'SKU',
-        name: item.name || item.title || tx('สินค้า', 'Product'),
-        currentStock: item.qty || 0,
+        name: nameVal,
+        currentStock: stockVal,
         dailyDemand: dailyDemand,
         leadTime: leadTime,
         safetyStock: safetyStock,
         rop: rop,
         status: isUrgent ? 'URGENT' : 'HEALTHY',
-        suggestedQty: isUrgent ? Math.round(dailyDemand * 14) : 0,
+        suggestedQty: isUrgent ? Math.max(20, Math.round(dailyDemand * 14)) : 0,
         unit: item.unit || tx('ชิ้น', 'units'),
       };
     });

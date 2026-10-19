@@ -6975,6 +6975,7 @@ export function InventoryTab({
 
 export function InsightsTab({
   lang,
+  theme = 'dark',
   bizProfile,
   setBizProfile,
   aiChatMessages,
@@ -6990,6 +6991,9 @@ export function InsightsTab({
   lineChartOptions,
   currentRevenueVal = 0,
   targetRevenueVal = 0,
+  setTargetRevenueVal,
+  targetTimelineVal = '90',
+  setTargetTimelineVal,
   customersList = [],
   inventoryList = [],
   setInventoryList,
@@ -7043,10 +7047,13 @@ export function InsightsTab({
   // Export AI Executive Analytics Report (.csv / .txt)
   const handleExportAiReport = () => {
     const gap = Math.max(0, targetRevenueVal - currentRevenueVal);
+    const days = Math.max(1, parseInt(targetTimelineVal, 10) || 90);
+    const dailyPace = Math.round(gap / days);
     const content = isEn
       ? [
           'INSIGHTFLOW AI DATA ANALYTICS & STRATEGIC PLAYBOOK REPORT',
           `Company: ${bizProfile.companyName}`,
+          `Target Timeline: ${days} Days | Required Daily Pace: THB ${dailyPace.toLocaleString()}/day`,
           `Current Revenue: THB ${currentRevenueVal.toLocaleString()} | Target: THB ${targetRevenueVal.toLocaleString()} | Gap: THB ${gap.toLocaleString()}`,
           `1. Revenue & Channel AI Playbook: Reallocate 30% ad budget to Direct Chat & Affiliate (+THB 480,000 potential)`,
           `2. Customer Retention AI Playbook: ${atRiskCount} VIP at-risk accounts flagged for 20% win-back coupon (+THB 164,900)`,
@@ -7831,9 +7838,10 @@ export function InsightsTab({
       {/* Industry Benchmarking & Daily Goal Decomposition Engine */}
       <IndustryBenchmarkAndGoalDecomposition
         lang={lang}
+        theme={theme}
         currentRevenueVal={currentRevenueVal}
         targetRevenueVal={targetRevenueVal}
-        targetTimelineVal="30"
+        targetTimelineVal={targetTimelineVal || '90'}
         setActiveTab={setActiveTab}
       />
 
@@ -17066,6 +17074,7 @@ function App() {
               {activeTab === 'insights' && (
                 <InsightsTab
                   lang={lang}
+                  theme={theme}
                   bizProfile={bizProfile}
                   setBizProfile={setBizProfile}
                   aiChatMessages={aiChatMessages}
@@ -17081,6 +17090,9 @@ function App() {
                   lineChartOptions={lineChartOptions}
                   currentRevenueVal={currentRevenueVal}
                   targetRevenueVal={targetRevenueVal}
+                  setTargetRevenueVal={setTargetRevenueVal}
+                  targetTimelineVal={targetTimelineVal}
+                  setTargetTimelineVal={setTargetTimelineVal}
                   customersList={customersList}
                   inventoryList={inventoryList}
                   setInventoryList={setInventoryList}

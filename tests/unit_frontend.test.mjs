@@ -312,5 +312,41 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(iconsContent.includes('export function MatrixTableIcon'), 'LuxuryIcons must export MatrixTableIcon');
   });
 
+  // ----------------------------------------------------------------------------
+  // 7. AI INSIGHTS & ACTIONABLE COPILOT COHERENCE
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-15: InsightsTab architectural integrity, live state coherence and relative API routing', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // Verify InsightsTab receives theme and targetTimelineVal
+    assert.ok(
+      appContent.includes('theme={theme}') &&
+      appContent.includes('targetTimelineVal={targetTimelineVal}') &&
+      appContent.includes('uploadedFileMeta='),
+      'App.jsx must pass theme, targetTimelineVal, and uploadedFileMeta to InsightsTab'
+    );
+
+    // Verify relative API endpoints in ActionableAiCenter
+    const actionablePath = path.join(projectRoot, 'src', 'components', 'ActionableAiCenter.jsx');
+    const actionableContent = fs.readFileSync(actionablePath, 'utf8');
+    assert.ok(
+      !actionableContent.includes('http://127.0.0.1:8000'),
+      'ActionableAiCenter.jsx must NOT use hardcoded http://127.0.0.1:8000'
+    );
+    assert.ok(
+      actionableContent.includes("fetch('/api/actionable/ask-copilot'"),
+      'ActionableAiCenter.jsx must use relative /api/actionable/ask-copilot'
+    );
+
+    // Verify relative API endpoints in DataPipelineEtlCenter
+    const etlPath = path.join(projectRoot, 'src', 'components', 'DataPipelineEtlCenter.jsx');
+    const etlContent = fs.readFileSync(etlPath, 'utf8');
+    assert.ok(
+      !etlContent.includes('http://127.0.0.1:8000'),
+      'DataPipelineEtlCenter.jsx must NOT use hardcoded http://127.0.0.1:8000'
+    );
+  });
+
 });
 

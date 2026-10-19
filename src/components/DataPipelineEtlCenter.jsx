@@ -179,7 +179,7 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
     let isMounted = true;
     async function fetchEtlStatus() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/etl/status');
+        const res = await fetch('/api/etl/status');
         if (res.ok) {
           const data = await res.json();
           if (isMounted && data.status === 'success') {
@@ -222,7 +222,7 @@ export default function DataPipelineEtlCenter({ lang = 'th', onSyncSuccess }) {
     try {
       let resultData = null;
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/etl/trigger', {
+        const res = await fetch('/api/etl/trigger', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sources: ['POS_SYSTEM', 'FACEBOOK_ADS', 'TIKTOK_ADS', 'WAREHOUSE_ERP'] }),

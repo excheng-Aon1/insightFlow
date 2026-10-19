@@ -137,18 +137,71 @@ export default function ActionableAiCenter({
     },
   ];
 
-  const [anomalies, setAnomalies] = useState(() => (currentRevenueVal > 0 ? defaultAnomalies : []));
-  const [selectedAlert, setSelectedAlert] = useState(() => (currentRevenueVal > 0 ? defaultAnomalies[0] : null));
+  const buildLiveAnomalies = () => {
+    if (currentRevenueVal === 0) return [];
+    const list = [];
+
+    // 1. Audit logs anomalies (unresolved POS voids / drawer anomalies)
+    const pendingAudits = (auditLogs || []).filter(a => !a.resolved);
+    if (pendingAudits.length > 0) {
+      pendingAudits.slice(0, 2).forEach(a => {
+        list.push({
+          id: a.logId || `ANOMALY-AUDIT-${a.staffId || '01'}`,
+          title: isEn ? (a.en?.eventLabel || 'Unresolved POS Anomaly') : (a.th?.eventLabel || 'พบรายการยกเลิกบิล/ลิ้นชักผิดปกติที่เคาน์เตอร์'),
+          location: isEn ? (a.en?.branchName || 'Cashier Station') : (a.th?.branchName || 'เคาน์เตอร์แคชเชียร์'),
+          metric: a.amount > 0 ? `฿${a.amount.toLocaleString()} (${tx('ยังไม่ได้รับการอนุมัติ', 'Unresolved')})` : tx('เปิดลิ้นชักผิดปกติ', 'Suspicious Drawer Open'),
+          sigma: '+3.15σ',
+          cause: isEn ? (a.en?.aiAnomalyDetail || a.en?.reasonStated || 'Flagged by POS Anomaly Shield') : (a.th?.aiAnomalyDetail || a.th?.reasonStated || 'ตรวจพบการกดยกเลิกบิลหลังรับเงินสด'),
+          action: tx('ตรวจสอบกล้องวงจรปิดในแท็บ "พนักงานและจุดขาย" และเปิดบังคับรหัส PIN', 'Audit void log in Cashier tab and enforce Manager PIN'),
+          time: isEn ? (a.en?.timestamp || 'Today') : (a.th?.timestamp || 'วันนี้'),
+          severity: 'CRITICAL',
+        });
+      });
+    }
+
+    // 2. Inventory critical stock items (e.g. stock <= 15)
+    const lowStock = (inventoryList || []).filter(i => (i.stock ?? i.qty ?? 0) <= 15 && i.status !== 'in_stock');
+    if (lowStock.length > 0) {
+      lowStock.slice(0, 2).forEach(item => {
+        const name = (isEn ? item.en?.name : item.th?.name) || item.name || item.sku;
+        const curStock = item.stock ?? item.qty ?? 0;
+        list.push({
+          id: `ANOMALY-STOCK-${item.sku}`,
+          title: tx(`สินค้า ${name} เหลือต่ำกว่าจุดสั่งซื้อ ROP`, `${name} below Reorder Point`),
+          location: tx('คลังสินค้า', 'Central Warehouse'),
+          metric: tx(`คงเหลือ ${curStock} ชิ้น (จุดสั่งซื้อ ROP คือ 25 ชิ้น)`, `${curStock} units left (ROP is 25 units)`),
+          sigma: tx('เสี่ยงของขาดใน 2-4 วัน', 'Stockout in 2-4 days'),
+          cause: tx('ยอดขายพุ่งขึ้นทำให้สินค้าถูกจำหน่ายเร็วกว่ารอบปกติ', 'Surge in orders depleted stock faster than planned'),
+          action: tx('กดสั่งซื้อ PO เพิ่มด่วนในแท็บ "คลังสินค้า" หรือ "จัดซื้อรวมศูนย์"', 'Issue PO reorder immediately via Inventory or Central PO'),
+          time: tx('วันนี้', 'Today'),
+          severity: 'HIGH',
+        });
+      });
+    }
+
+    // 3. Fill up with default anomalies if fewer than 3
+    defaultAnomalies.forEach(def => {
+      if (list.length < 3 && !list.some(x => x.id === def.id)) {
+        list.push(def);
+      }
+    });
+
+    return list;
+  };
+
+  const [anomalies, setAnomalies] = useState(() => (currentRevenueVal > 0 ? buildLiveAnomalies() : []));
+  const [selectedAlert, setSelectedAlert] = useState(() => (currentRevenueVal > 0 ? buildLiveAnomalies()[0] : null));
 
   useEffect(() => {
     if (currentRevenueVal === 0) {
       setAnomalies([]);
       setSelectedAlert(null);
     } else {
-      setAnomalies(defaultAnomalies);
-      setSelectedAlert(defaultAnomalies[0]);
+      const live = buildLiveAnomalies();
+      setAnomalies(live);
+      setSelectedAlert(prev => (live.find(x => x.id === prev?.id) || live[0] || null));
     }
-  }, [currentRevenueVal]);
+  }, [currentRevenueVal, auditLogs, inventoryList]);
   const [isSendingLine, setIsSendingLine] = useState(false);
 
   const handleSendLineAlert = () => {
@@ -208,7 +261,7 @@ export default function ActionableAiCenter({
     try {
       let answerText = '';
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/actionable/ask-copilot', {
+        const res = await fetch('/api/actionable/ask-copilot', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: q }),
