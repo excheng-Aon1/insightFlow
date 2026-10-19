@@ -6111,6 +6111,18 @@ export function InventoryTab({
   );
 }
 
+const moduleMetaMap = {
+  overview: { th: 'ภาพรวมธุรกิจ & เป้าหมาย', en: 'Overview & Goals', icon: '📊', color: '#38bdf8', analyticalRoleTh: 'วิเคราะห์ยอดขายรวม, กำไรสุทธิ, ช่องว่างเป้าหมาย', analyticalRoleEn: 'Total revenue, net margin & goal pacing' },
+  bi_studio: { th: 'BI Studio & รายงาน', en: 'BI Studio & Reports', icon: '📈', color: '#a855f7', analyticalRoleTh: 'วิเคราะห์เมทริกซ์หลายมิติ, ช่องทางขาย และ P&L', analyticalRoleEn: 'Multi-dimension matrix, sales channels & P&L' },
+  customers: { th: 'ฐานข้อมูลลูกค้า CRM', en: 'Customer CRM', icon: '👥', color: '#ec4899', analyticalRoleTh: 'วิเคราะห์ลูกค้าประจำ VIP และลูกค้าเสี่ยงหาย', analyticalRoleEn: 'VIP loyalty & 45-day churn risk detection' },
+  staff_pos: { th: 'พนักงาน & แคชเชียร์', en: 'Staff & POS Audit', icon: '💳', color: '#f59e0b', analyticalRoleTh: 'ตรวจจับทุจริตบิลยกเลิกหน้าเครื่อง POS และ KPI พนักงาน', analyticalRoleEn: 'Cashier fraud void detection & staff KPIs' },
+  multi_channel: { th: 'ช่องทางขาย & สาขา', en: 'Multi-Channel & Branch', icon: '🌐', color: '#06b6d4', analyticalRoleTh: 'เปรียบเทียบกำไรสุทธิระหว่างหน้าร้านและออนไลน์', analyticalRoleEn: 'Branch vs Online marketplace profit comparison' },
+  procurement: { th: 'จัดซื้อรวมศูนย์ & คู่ค้า', en: 'Procurement & Vendors', icon: '🏢', color: '#10b981', analyticalRoleTh: 'วิเคราะห์ส่วนลดคู่ค้าและคำนวณการสั่งรวมศูนย์', analyticalRoleEn: 'Vendor scorecards & Central PO bulk discount' },
+  inventory: { th: 'คลังสินค้า & สต็อก', en: 'Smart Inventory', icon: '📦', color: '#eab308', analyticalRoleTh: 'พยากรณ์สต็อกขาดมือ 14 วัน และเติมของอัตโนมัติ', analyticalRoleEn: '14-day stockout forecast & automated restock' },
+  insights: { th: 'บทวิเคราะห์ AI กลยุทธ์', en: 'AI Strategic Insights', icon: '🧠', color: '#6366f1', analyticalRoleTh: 'ศูนย์กลางสมอง AI สังเคราะห์ข้อมูลและตอบคำถาม', analyticalRoleEn: 'Central AI brain for cross-page query & playbooks' },
+  database: { th: 'ฐานข้อมูลกลาง Master DB', en: 'Master Database', icon: '🗄️', color: '#64748b', analyticalRoleTh: 'บันทึกธุรกรรมหลักและประวัติการซื้อขายทั้งหมด', analyticalRoleEn: 'Master store ledger & historical transaction records' }
+};
+
 export function InsightsTab({
   lang,
   theme = 'dark',
@@ -6157,18 +6169,6 @@ export function InsightsTab({
   const [executedPlaybooks, setExecutedPlaybooks] = useState({});
   const [isGSheetModalOpen, setIsGSheetModalOpen] = useState(false);
   const [selectedFileSource, setSelectedFileSource] = useState('all');
-
-  const moduleMetaMap = {
-    overview: { th: 'ภาพรวมธุรกิจ & เป้าหมาย', en: 'Overview & Goals', icon: '📊', color: '#38bdf8', analyticalRoleTh: 'วิเคราะห์ยอดขายรวม, กำไรสุทธิ, ช่องว่างเป้าหมาย', analyticalRoleEn: 'Total revenue, net margin & goal pacing' },
-    bi_studio: { th: 'BI Studio & รายงาน', en: 'BI Studio & Reports', icon: '📈', color: '#a855f7', analyticalRoleTh: 'วิเคราะห์เมทริกซ์หลายมิติ, ช่องทางขาย และ P&L', analyticalRoleEn: 'Multi-dimension matrix, sales channels & P&L' },
-    customers: { th: 'ฐานข้อมูลลูกค้า CRM', en: 'Customer CRM', icon: '👥', color: '#ec4899', analyticalRoleTh: 'วิเคราะห์ลูกค้าประจำ VIP และลูกค้าเสี่ยงหาย', analyticalRoleEn: 'VIP loyalty & 45-day churn risk detection' },
-    staff_pos: { th: 'พนักงาน & แคชเชียร์', en: 'Staff & POS Audit', icon: '💳', color: '#f59e0b', analyticalRoleTh: 'ตรวจจับทุจริตบิลยกเลิกหน้าเครื่อง POS และ KPI พนักงาน', analyticalRoleEn: 'Cashier fraud void detection & staff KPIs' },
-    multi_channel: { th: 'ช่องทางขาย & สาขา', en: 'Multi-Channel & Branch', icon: '🌐', color: '#06b6d4', analyticalRoleTh: 'เปรียบเทียบกำไรสุทธิระหว่างหน้าร้านและออนไลน์', analyticalRoleEn: 'Branch vs Online marketplace profit comparison' },
-    procurement: { th: 'จัดซื้อรวมศูนย์ & คู่ค้า', en: 'Procurement & Vendors', icon: '🏢', color: '#10b981', analyticalRoleTh: 'วิเคราะห์ส่วนลดคู่ค้าและคำนวณการสั่งรวมศูนย์', analyticalRoleEn: 'Vendor scorecards & Central PO bulk discount' },
-    inventory: { th: 'คลังสินค้า & สต็อก', en: 'Smart Inventory', icon: '📦', color: '#eab308', analyticalRoleTh: 'พยากรณ์สต็อกขาดมือ 14 วัน และเติมของอัตโนมัติ', analyticalRoleEn: '14-day stockout forecast & automated restock' },
-    insights: { th: 'บทวิเคราะห์ AI กลยุทธ์', en: 'AI Strategic Insights', icon: '🧠', color: '#6366f1', analyticalRoleTh: 'ศูนย์กลางสมอง AI สังเคราะห์ข้อมูลและตอบคำถาม', analyticalRoleEn: 'Central AI brain for cross-page query & playbooks' },
-    database: { th: 'ฐานข้อมูลกลาง Master DB', en: 'Master Database', icon: '🗄️', color: '#64748b', analyticalRoleTh: 'บันทึกธุรกรรมหลักและประวัติการซื้อขายทั้งหมด', analyticalRoleEn: 'Master store ledger & historical transaction records' }
-  };
 
   // Build combined list of all uploaded and connected files across all pages
   const combinedFilesList = useMemo(() => {
@@ -11944,6 +11944,7 @@ function App() {
     }
   });
   const [authPassword, setAuthPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [authName, setAuthName] = useState(() => {
     try {
       const savedCreds = JSON.parse(localStorage.getItem('insightflow_saved_credentials') || '{}');
@@ -12150,25 +12151,6 @@ function App() {
   const [customGoogleEmail, setCustomGoogleEmail] = useState('');
   const [customGoogleName, setCustomGoogleName] = useState('');
 
-  // Auto-init Google Identity Services (GIS) if Client ID is configured
-  useEffect(() => {
-    const googleClientId = import.meta?.env?.VITE_GOOGLE_CLIENT_ID;
-    if (googleClientId && typeof window !== 'undefined' && window.google?.accounts?.id) {
-      try {
-        window.google.accounts.id.initialize({
-          client_id: googleClientId,
-          callback: response => {
-            if (response?.credential) {
-              handleGoogleSignIn({ credential: response.credential });
-            }
-          }
-        });
-      } catch (e) {
-        console.warn('GIS auto-init notice:', e);
-      }
-    }
-  }, []);
-
   const handleGoogleSignIn = async (directPayload = null) => {
     setIsGoogleSigningIn(true);
     try {
@@ -12290,12 +12272,31 @@ function App() {
         ),
         { icon: '🌐', duration: 4500 }
       );
-    } catch (err) {
+    } catch (_err) {
       toast.error(tx('⚠️ เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google', '⚠️ Google sign-in failed'));
     } finally {
       setIsGoogleSigningIn(false);
     }
   };
+
+  // Auto-init Google Identity Services (GIS) if Client ID is configured
+  useEffect(() => {
+    const googleClientId = import.meta?.env?.VITE_GOOGLE_CLIENT_ID;
+    if (googleClientId && typeof window !== 'undefined' && window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: response => {
+            if (response?.credential) {
+              handleGoogleSignIn({ credential: response.credential });
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('GIS auto-init notice:', e);
+      }
+    }
+  }, []);
 
 
   // Interactive Business State across all tabs (Defaults to 0 / Clean Slate until file is uploaded)

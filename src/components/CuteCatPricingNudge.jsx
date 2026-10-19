@@ -15,8 +15,6 @@ export default function CuteCatPricingNudge({
   onOpenPricing,
   onOpenRegister
 }) {
-  if (hasSubscribed) return null;
-
   const [isVisible, setIsVisible] = useState(false);
   const [isWalking, setIsWalking] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
@@ -182,7 +180,7 @@ export default function CuteCatPricingNudge({
     window.addEventListener('touchend', handleTouchEnd);
   };
 
-  if (!isVisible) return null;
+  if (hasSubscribed || !isVisible) return null;
 
   return (
     <aside

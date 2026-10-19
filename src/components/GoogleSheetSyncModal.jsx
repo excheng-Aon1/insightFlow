@@ -70,8 +70,6 @@ export function GoogleSheetSyncModal({
   setInventoryList,
   onSheetDataSynced
 }) {
-  if (!isOpen) return null;
-
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
 
@@ -208,6 +206,8 @@ export function GoogleSheetSyncModal({
       );
     }, 620);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
