@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { Line } from 'react-chartjs-2';
 import { LuxuryModuleIcon, DailyAverageDemandIcon } from './LuxuryIcons';
 
-export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
+export default function AdvancedAnalyticsSuite({ lang = 'th', currentRevenueVal = 0, inventoryList = [] }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
 
@@ -20,7 +20,8 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
   // 1. STATE: FORECASTING & DYNAMIC ROP
   // ----------------------------------------------------------------------------
   const [forecastDays, setForecastDays] = useState(30);
-  const [forecastData, setForecastData] = useState({
+
+  const defaultForecastData = {
     totalProjectedRevenue: 548900,
     growthRatePct: 8.4,
     dailyMean: 17850,
@@ -33,63 +34,54 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
       { date: 'Day 25', predicted: 20300, upper: 22900, lower: 17700 },
       { date: 'Day 30', predicted: 24500, upper: 27500, lower: 21500 },
     ],
-  });
+  };
 
-  const [ropItems, setRopItems] = useState([
-    {
-      sku: 'SKU-COF-01',
-      name: tx('เมล็ดกาแฟ House Blend คั่วกลาง (1 กก.)', 'Medium Roast House Blend (1kg)'),
-      currentStock: 28,
-      dailyDemand: 18.1,
-      leadTime: 3,
-      safetyStock: 11,
-      rop: 65,
-      status: 'URGENT',
-      suggestedQty: 250,
-      unit: tx('ถุง', 'bags'),
-    },
-    {
-      sku: 'SKU-COF-02',
-      name: tx('ผงมัทฉะเกรดพิธีการ Ceremonial Matcha (500g)', 'Ceremonial Matcha Powder (500g)'),
-      currentStock: 14,
-      dailyDemand: 4.6,
-      leadTime: 5,
-      safetyStock: 6,
-      rop: 29,
-      status: 'URGENT',
-      suggestedQty: 60,
-      unit: tx('กระปุก', 'tins'),
-    },
-    {
-      sku: 'SKU-BAK-01',
-      name: tx('เนยสดแท้ฝรั่งเศสพรีเมียม AOP (1 กก.)', 'French AOP Butter (1kg)'),
-      currentStock: 18,
-      dailyDemand: 12.6,
-      leadTime: 2,
-      safetyStock: 6,
-      rop: 32,
-      status: 'URGENT',
-      suggestedQty: 180,
-      unit: tx('ก้อน', 'blocks'),
-    },
-    {
-      sku: 'SKU-DES-01',
-      name: tx('ครีมชีสฟิลาเดลเฟียสำหรับหน้าไหม้ (2 กก.)', 'Philadelphia Cream Cheese (2kg)'),
-      currentStock: 42,
-      dailyDemand: 7.5,
-      leadTime: 4,
-      safetyStock: 6,
-      rop: 36,
-      status: 'HEALTHY',
-      suggestedQty: 0,
-      unit: tx('กล่อง', 'boxes'),
-    },
-  ]);
+  const zeroForecastData = {
+    totalProjectedRevenue: 0,
+    growthRatePct: 0,
+    dailyMean: 0,
+    series: [
+      { date: 'Day 1', predicted: 0, upper: 0, lower: 0 },
+      { date: 'Day 5', predicted: 0, upper: 0, lower: 0 },
+      { date: 'Day 10', predicted: 0, upper: 0, lower: 0 },
+      { date: 'Day 15', predicted: 0, upper: 0, lower: 0 },
+      { date: 'Day 20', predicted: 0, upper: 0, lower: 0 },
+      { date: 'Day 25', predicted: 0, upper: 0, lower: 0 },
+      { date: 'Day 30', predicted: 0, upper: 0, lower: 0 },
+    ],
+  };
+
+  const [forecastData, setForecastData] = useState(() => (currentRevenueVal > 0 ? defaultForecastData : zeroForecastData));
+
+  const buildRopFromInventory = (inv) => {
+    if (!inv || inv.length === 0) return [];
+    return inv.map(item => {
+      const dailyDemand = item.dailyDemand || Math.max(1, Math.round((item.qty || 10) / 10));
+      const leadTime = item.leadTime || 3;
+      const safetyStock = Math.round(dailyDemand * 1.65 * 1.2);
+      const rop = (dailyDemand * leadTime) + safetyStock;
+      const isUrgent = (item.qty || 0) <= rop;
+      return {
+        sku: item.sku || item.code || 'SKU',
+        name: item.name || item.title || tx('สินค้า', 'Product'),
+        currentStock: item.qty || 0,
+        dailyDemand: dailyDemand,
+        leadTime: leadTime,
+        safetyStock: safetyStock,
+        rop: rop,
+        status: isUrgent ? 'URGENT' : 'HEALTHY',
+        suggestedQty: isUrgent ? Math.round(dailyDemand * 14) : 0,
+        unit: item.unit || tx('ชิ้น', 'units'),
+      };
+    });
+  };
+
+  const [ropItems, setRopItems] = useState(() => (inventoryList.length > 0 ? buildRopFromInventory(inventoryList) : []));
 
   // ----------------------------------------------------------------------------
   // 2. STATE: RFM & MARKET BASKET
   // ----------------------------------------------------------------------------
-  const [rfmSegments, setRfmSegments] = useState([
+  const defaultRfmSegments = [
     {
       id: 'champions',
       name: tx('🏆 ลูกค้าชั้นยอด (Champions VIP)', 'Champions VIP Customers'),
@@ -145,9 +137,69 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
       action: tx('แคมเปญ Re-engagement ช่วงเทศกาล หรือตัดงบโฆษณาตาม', 'Seasonal reactivation or exclude from paid ads'),
       color: 'from-slate-500/20 to-slate-700/10 border-slate-500/30 text-slate-300',
     },
-  ]);
+  ];
 
-  const [marketBasketRules, setMarketBasketRules] = useState([
+  const zeroRfmSegments = [
+    {
+      id: 'champions',
+      name: tx('🏆 ลูกค้าชั้นยอด (Champions VIP)', 'Champions VIP Customers'),
+      rfm: '0-0-0',
+      count: 0,
+      share: '0.0%',
+      revenue: '฿0',
+      churnRisk: tx('ไม่มีข้อมูล', 'No data'),
+      action: tx('รออัปโหลดข้อมูลลูกค้า', 'Waiting for customer data'),
+      color: 'from-amber-500/20 to-amber-600/10 border-amber-400/40 text-amber-300',
+    },
+    {
+      id: 'loyal',
+      name: tx('💎 ขาประจำเหนียวแน่น (Loyal Customers)', 'Loyal Regulars'),
+      rfm: '0-0-0',
+      count: 0,
+      share: '0.0%',
+      revenue: '฿0',
+      churnRisk: tx('ไม่มีข้อมูล', 'No data'),
+      action: tx('รออัปโหลดข้อมูลลูกค้า', 'Waiting for customer data'),
+      color: 'from-sky-500/20 to-blue-600/10 border-sky-400/40 text-sky-300',
+    },
+    {
+      id: 'potential',
+      name: tx('🌱 มีศักยภาพเติบโต (Potential Loyalists)', 'Potential Loyalists'),
+      rfm: '0-0-0',
+      count: 0,
+      share: '0.0%',
+      revenue: '฿0',
+      churnRisk: tx('ไม่มีข้อมูล', 'No data'),
+      action: tx('รออัปโหลดข้อมูลลูกค้า', 'Waiting for customer data'),
+      color: 'from-emerald-500/20 to-teal-600/10 border-emerald-400/40 text-emerald-300',
+    },
+    {
+      id: 'at_risk',
+      name: tx('⚠️ ขาประจำเริ่มหาย (At-Risk VIPs)', 'At-Risk VIP Customers'),
+      rfm: '0-0-0',
+      count: 0,
+      share: '0.0%',
+      revenue: '฿0',
+      churnRisk: tx('ไม่มีข้อมูล', 'No data'),
+      action: tx('รออัปโหลดข้อมูลลูกค้า', 'Waiting for customer data'),
+      color: 'from-rose-500/20 to-red-600/10 border-rose-400/40 text-rose-300',
+    },
+    {
+      id: 'churned',
+      name: tx('💤 หยุดซื้อแล้ว (Hibernating / Churned)', 'Hibernating / Lost'),
+      rfm: '0-0-0',
+      count: 0,
+      share: '0.0%',
+      revenue: '฿0',
+      churnRisk: tx('ไม่มีข้อมูล', 'No data'),
+      action: tx('รออัปโหลดข้อมูลลูกค้า', 'Waiting for customer data'),
+      color: 'from-slate-500/20 to-slate-700/10 border-slate-500/30 text-slate-300',
+    },
+  ];
+
+  const [rfmSegments, setRfmSegments] = useState(() => (currentRevenueVal > 0 ? defaultRfmSegments : zeroRfmSegments));
+
+  const defaultMarketBasketRules = [
     {
       itemA: tx('Espresso Double Shot', 'Espresso Double Shot'),
       itemB: tx('Almond Butter Croissant', 'Almond Butter Croissant'),
@@ -178,21 +230,32 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
       promo: tx('Brunch Special: โทสต์ทรัฟเฟิลคู่โคลด์บรูว์ส้มยูซุ', 'Brunch Special: Truffle Toast + Yuzu Cold Brew'),
       badge: '✨ Cross-Sell',
     },
-  ]);
+  ];
+
+  const [marketBasketRules, setMarketBasketRules] = useState(() => (currentRevenueVal > 0 ? defaultMarketBasketRules : []));
 
   // ----------------------------------------------------------------------------
   // 3. STATE: A/B TESTING CALCULATOR
   // ----------------------------------------------------------------------------
-  const [abInputs, setAbInputs] = useState({
+  const defaultAbInputs = {
     nameA: tx('แคมเปญ A: ลดราคา 10%', 'Campaign A: 10% Discount'),
     visitorsA: 1200,
     conversionsA: 68,
     nameB: tx('แคมเปญ B: ส่งฟรีไม่มีขั้นต่ำ', 'Campaign B: Free Delivery'),
     visitorsB: 1250,
     conversionsB: 102,
-  });
+  };
 
-  const [abResult, setAbResult] = useState({
+  const zeroAbInputs = {
+    nameA: tx('แคมเปญ A', 'Campaign A'),
+    visitorsA: 0,
+    conversionsA: 0,
+    nameB: tx('แคมเปญ B', 'Campaign B'),
+    visitorsB: 0,
+    conversionsB: 0,
+  };
+
+  const defaultAbResult = {
     rateA: 5.67,
     rateB: 8.16,
     lift: 43.9,
@@ -209,13 +272,58 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
       'ความแตกต่างไม่ได้เกิดจากความบังเอิญ แนะนำให้โยกงบการตลาดไปที่แคมเปญ B 100% ทันที',
       'Difference is real and not random. Allocate 100% marketing budget to Campaign B.'
     ),
-  });
+  };
+
+  const zeroAbResult = {
+    rateA: 0,
+    rateB: 0,
+    lift: 0,
+    zScore: 0,
+    pValue: 1,
+    confidence: 0,
+    isSignificant: false,
+    winner: 'NONE',
+    verdict: tx('⚖️ ยังไม่มีข้อมูลการทดสอบ A/B', '⚖️ No A/B testing data available'),
+    recommendation: tx('กรุณาอัปโหลดข้อมูลหรือใส่จำนวนผู้เข้าชมและ Conversion เพื่อเริ่มคำนวณ', 'Please upload data or input visitors and conversions to calculate.'),
+  };
+
+  const [abInputs, setAbInputs] = useState(() => (currentRevenueVal > 0 ? defaultAbInputs : zeroAbInputs));
+  const [abResult, setAbResult] = useState(() => (currentRevenueVal > 0 ? defaultAbResult : zeroAbResult));
+
+  // Sync state when props change
+  useEffect(() => {
+    if (currentRevenueVal === 0) {
+      setForecastData(zeroForecastData);
+      setRfmSegments(zeroRfmSegments);
+      setMarketBasketRules([]);
+      setAbInputs(zeroAbInputs);
+      setAbResult(zeroAbResult);
+    } else {
+      setForecastData(defaultForecastData);
+      setRfmSegments(defaultRfmSegments);
+      setMarketBasketRules(defaultMarketBasketRules);
+      setAbInputs(defaultAbInputs);
+      setAbResult(defaultAbResult);
+    }
+  }, [currentRevenueVal]);
+
+  useEffect(() => {
+    setRopItems(inventoryList && inventoryList.length > 0 ? buildRopFromInventory(inventoryList) : []);
+  }, [inventoryList]);
 
   // Calculate A/B Test Live
   const runLiveAbCalculation = (inputs) => {
-    const vA = Math.max(1, Number(inputs.visitorsA) || 1);
+    const rawVA = Number(inputs.visitorsA) || 0;
+    const rawVB = Number(inputs.visitorsB) || 0;
+
+    if (rawVA === 0 && rawVB === 0) {
+      setAbResult(zeroAbResult);
+      return;
+    }
+
+    const vA = Math.max(1, rawVA);
     const cA = Math.min(vA, Math.max(0, Number(inputs.conversionsA) || 0));
-    const vB = Math.max(1, Number(inputs.visitorsB) || 1);
+    const vB = Math.max(1, rawVB);
     const cB = Math.min(vB, Math.max(0, Number(inputs.conversionsB) || 0));
 
     const pA = cA / vA;
@@ -487,10 +595,12 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
               </span>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-2xl font-black text-rose-400">
-                  3 {tx('รายการ', 'SKUs')}
+                  {ropItems.filter(i => i.status === 'URGENT').length} {tx('รายการ', 'SKUs')}
                 </span>
                 <span className="text-xs text-rose-300">
-                  {tx('ของอาจขาดใน 3-5 วัน', 'Stockout in 3-5 days')}
+                  {ropItems.some(i => i.status === 'URGENT')
+                    ? tx('ของอาจขาดใน 3-5 วัน', 'Stockout in 3-5 days')
+                    : tx('สต็อกพร้อมขาย', 'Adequate Stock')}
                 </span>
               </div>
               <p className="text-[11px] text-rose-300/80 mt-1">
@@ -547,53 +657,61 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {ropItems.map((item) => (
-                    <tr key={item.sku} className="hover:bg-white/5 transition-colors">
-                      <td className="py-3 px-3">
-                        <span className="font-mono font-bold text-amber-300 block">{item.sku}</span>
-                        <strong className="text-white text-xs">{item.name}</strong>
-                      </td>
-                      <td className="py-3 px-3 font-bold text-white text-sm">
-                        {item.currentStock} {item.unit}
-                      </td>
-                      <td className="py-3 px-3 text-slate-300">
-                        {item.dailyDemand} {item.unit}/วัน
-                      </td>
-                      <td className="py-3 px-3 text-slate-300 font-mono">
-                        {item.leadTime} วัน
-                      </td>
-                      <td className="py-3 px-3 text-slate-300 font-mono font-bold">
-                        +{item.safetyStock} {item.unit}
-                      </td>
-                      <td className="py-3 px-3 font-mono font-black text-rose-400 text-sm">
-                        ≤ {item.rop} {item.unit}
-                      </td>
-                      <td className="py-3 px-3">
-                        {item.status === 'URGENT' ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse">
-                            🚨 {tx('ต้องสั่งด่วน!', 'Order Now!')}
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                            ✅ {tx('สต็อกพอดี', 'Healthy')}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3 px-3">
-                        {item.suggestedQty > 0 ? (
-                          <button
-                            type="button"
-                            onClick={() => toast.success(tx(`🛒 สร้างใบสั่งซื้อ ${item.sku} จำนวน ${item.suggestedQty} ${item.unit} เรียบร้อย!`, `🛒 Generated PO for ${item.suggestedQty} ${item.unit}!`))}
-                            className="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-black text-[11px] hover:brightness-110 active:scale-95 shadow"
-                          >
-                            {tx(`สั่งเพิ่ม +${item.suggestedQty} ${item.unit}`, `Order +${item.suggestedQty} ${item.unit}`)}
-                          </button>
-                        ) : (
-                          <span className="text-slate-400 text-[11px]">{tx('ยังไม่ต้องสั่งเพิ่ม', 'No order needed')}</span>
-                        )}
+                  {ropItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center text-slate-400 font-bold">
+                        {tx('ไม่มีรายการสินค้าที่ต้องสั่งซื้อ หรือยังไม่ได้อัปโหลดไฟล์สต็อก', 'No reorder items found or no inventory file uploaded')}
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    ropItems.map((item) => (
+                      <tr key={item.sku} className="hover:bg-white/5 transition-colors">
+                        <td className="py-3 px-3">
+                          <span className="font-mono font-bold text-amber-300 block">{item.sku}</span>
+                          <strong className="text-white text-xs">{item.name}</strong>
+                        </td>
+                        <td className="py-3 px-3 font-bold text-white text-sm">
+                          {item.currentStock} {item.unit}
+                        </td>
+                        <td className="py-3 px-3 text-slate-300">
+                          {item.dailyDemand} {item.unit}/วัน
+                        </td>
+                        <td className="py-3 px-3 text-slate-300 font-mono">
+                          {item.leadTime} วัน
+                        </td>
+                        <td className="py-3 px-3 text-slate-300 font-mono font-bold">
+                          +{item.safetyStock} {item.unit}
+                        </td>
+                        <td className="py-3 px-3 font-mono font-black text-rose-400 text-sm">
+                          ≤ {item.rop} {item.unit}
+                        </td>
+                        <td className="py-3 px-3">
+                          {item.status === 'URGENT' ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse">
+                              🚨 {tx('ต้องสั่งด่วน!', 'Order Now!')}
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                              ✅ {tx('สต็อกพอดี', 'Healthy')}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-3">
+                          {item.suggestedQty > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => toast.success(tx(`🛒 สร้างใบสั่งซื้อ ${item.sku} จำนวน ${item.suggestedQty} ${item.unit} เรียบร้อย!`, `🛒 Generated PO for ${item.suggestedQty} ${item.unit}!`))}
+                              className="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-black text-[11px] hover:brightness-110 active:scale-95 shadow"
+                            >
+                              {tx(`สั่งเพิ่ม +${item.suggestedQty} ${item.unit}`, `Order +${item.suggestedQty} ${item.unit}`)}
+                            </button>
+                          ) : (
+                            <span className="text-slate-400 text-[11px]">{tx('ยังไม่ต้องสั่งเพิ่ม', 'No order needed')}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -618,7 +736,9 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
               </p>
             </div>
             <div className="px-3.5 py-1.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-bold">
-              {tx('รายได้ที่เสี่ยงหลุดลอย (At-Risk Revenue): ฿1,139,200', 'Revenue at Risk: ฿1,139,200')}
+              {currentRevenueVal > 0
+                ? tx('รายได้ที่เสี่ยงหลุดลอย (At-Risk Revenue): ฿1,139,200', 'Revenue at Risk: ฿1,139,200')
+                : tx('รายได้ที่เสี่ยงหลุดลอย: ฿0', 'Revenue at Risk: ฿0')}
             </div>
           </div>
 
@@ -681,52 +801,58 @@ export default function AdvancedAnalyticsSuite({ lang = 'th' }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {marketBasketRules.map((rule, idx) => (
-                <div
-                  key={idx}
-                  className="bg-slate-950/70 border border-white/10 rounded-xl p-4 flex flex-col justify-between gap-3 shadow-lg hover:border-amber-400/40 transition-all"
-                >
-                  <div>
-                    <span className="text-[10px] font-black text-amber-300 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 inline-block mb-2">
-                      {rule.badge}
-                    </span>
-
-                    <div className="flex items-center gap-2 text-sm font-black text-white">
-                      <span>{rule.itemA}</span>
-                      <span className="text-amber-400">➔</span>
-                      <span>{rule.itemB}</span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-1.5 mt-3 pt-3 border-t border-white/10 text-center font-mono text-[11px]">
-                      <div className="bg-slate-900/80 p-1.5 rounded">
-                        <span className="text-[10px] text-slate-400 block">Support</span>
-                        <strong className="text-slate-200">{rule.support}</strong>
-                      </div>
-                      <div className="bg-slate-900/80 p-1.5 rounded">
-                        <span className="text-[10px] text-slate-400 block">Confidence</span>
-                        <strong className="text-cyan-300">{rule.confidence}</strong>
-                      </div>
-                      <div className="bg-slate-900/80 p-1.5 rounded">
-                        <span className="text-[10px] text-slate-400 block">Lift Factor</span>
-                        <strong className="text-amber-400 font-black">{rule.lift}x</strong>
-                      </div>
-                    </div>
-
-                    <div className="mt-2.5 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-lg text-emerald-300 text-xs">
-                      <strong>💡 {tx('ไอเดียโปรโมชัน:', 'Bundle Idea:')}</strong>
-                      <p className="mt-0.5 text-slate-200 text-[11px]">{rule.promo}</p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => toast.success(tx(`✨ นำชุดโปรโมชัน ${rule.itemA} + ${rule.itemB} ขึ้นระบบ POS เรียบร้อย!`, `✨ Deployed bundle promo to POS system!`))}
-                    className="w-full py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-xs hover:brightness-110 active:scale-95 shadow"
-                  >
-                    {tx('✨ ตั้งเป็นโปรโมชันหน้าร้านทันที', 'Launch Bundle Promo on POS')}
-                  </button>
+              {marketBasketRules.length === 0 ? (
+                <div className="col-span-full py-8 text-center text-slate-400 font-bold glass-card rounded-xl border border-white/5">
+                  {tx('ยังไม่มีข้อมูลการจับคู่สินค้า หรือยังไม่ได้อัปโหลดไฟล์ยอดขาย', 'No market basket association rules or no sales data uploaded')}
                 </div>
-              ))}
+              ) : (
+                marketBasketRules.map((rule, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-slate-950/70 border border-white/10 rounded-xl p-4 flex flex-col justify-between gap-3 shadow-lg hover:border-amber-400/40 transition-all"
+                  >
+                    <div>
+                      <span className="text-[10px] font-black text-amber-300 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 inline-block mb-2">
+                        {rule.badge}
+                      </span>
+
+                      <div className="flex items-center gap-2 text-sm font-black text-white">
+                        <span>{rule.itemA}</span>
+                        <span className="text-amber-400">➔</span>
+                        <span>{rule.itemB}</span>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-1.5 mt-3 pt-3 border-t border-white/10 text-center font-mono text-[11px]">
+                        <div className="bg-slate-900/80 p-1.5 rounded">
+                          <span className="text-[10px] text-slate-400 block">Support</span>
+                          <strong className="text-slate-200">{rule.support}</strong>
+                        </div>
+                        <div className="bg-slate-900/80 p-1.5 rounded">
+                          <span className="text-[10px] text-slate-400 block">Confidence</span>
+                          <strong className="text-cyan-300">{rule.confidence}</strong>
+                        </div>
+                        <div className="bg-slate-900/80 p-1.5 rounded">
+                          <span className="text-[10px] text-slate-400 block">Lift Factor</span>
+                          <strong className="text-amber-400 font-black">{rule.lift}x</strong>
+                        </div>
+                      </div>
+
+                      <div className="mt-2.5 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-lg text-emerald-300 text-xs">
+                        <strong>💡 {tx('ไอเดียโปรโมชัน:', 'Bundle Idea:')}</strong>
+                        <p className="mt-0.5 text-slate-200 text-[11px]">{rule.promo}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => toast.success(tx(`✨ นำชุดโปรโมชัน ${rule.itemA} + ${rule.itemB} ขึ้นระบบ POS เรียบร้อย!`, `✨ Deployed bundle promo to POS system!`))}
+                      className="w-full py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-xs hover:brightness-110 active:scale-95 shadow"
+                    >
+                      {tx('✨ ตั้งเป็นโปรโมชันหน้าร้านทันที', 'Launch Bundle Promo on POS')}
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

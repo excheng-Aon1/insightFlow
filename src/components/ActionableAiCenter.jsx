@@ -5,11 +5,16 @@
 //              and Interactive What-If Scenario Simulator with Breakeven Lift
 // ==============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { LuxuryModuleIcon } from './LuxuryIcons';
 
-export default function ActionableAiCenter({ lang = 'th' }) {
+export default function ActionableAiCenter({
+  lang = 'th',
+  currentRevenueVal = 0,
+  inventoryList = [],
+  auditLogs = []
+}) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
 
@@ -18,14 +23,33 @@ export default function ActionableAiCenter({ lang = 'th' }) {
   // ----------------------------------------------------------------------------
   // 1. WHAT-IF SCENARIO SIMULATOR STATE
   // ----------------------------------------------------------------------------
-  const [whatIfParams, setWhatIfParams] = useState({
+  const defaultWhatIfParams = {
     basePrice: 120,
     baseCost: 45,
     baseMonthlyQty: 500,
     discountPct: 10,
     costInflationPct: 5,
     expectedVolumeLiftPct: 25,
-  });
+  };
+
+  const zeroWhatIfParams = {
+    basePrice: 0,
+    baseCost: 0,
+    baseMonthlyQty: 0,
+    discountPct: 0,
+    costInflationPct: 0,
+    expectedVolumeLiftPct: 0,
+  };
+
+  const [whatIfParams, setWhatIfParams] = useState(() => (currentRevenueVal > 0 ? defaultWhatIfParams : zeroWhatIfParams));
+
+  useEffect(() => {
+    if (currentRevenueVal === 0) {
+      setWhatIfParams(zeroWhatIfParams);
+    } else {
+      setWhatIfParams(prev => (prev.basePrice === 0 && prev.baseMonthlyQty === 0 ? defaultWhatIfParams : prev));
+    }
+  }, [currentRevenueVal]);
 
   // Calculate What-If in real time
   const p0 = whatIfParams.basePrice;
@@ -37,33 +61,36 @@ export default function ActionableAiCenter({ lang = 'th' }) {
 
   const unitMarginBefore = p0 - c0;
   const totalProfitBefore = q0 * unitMarginBefore;
-  const marginPctBefore = (unitMarginBefore / p0) * 100;
+  const marginPctBefore = p0 > 0 ? (unitMarginBefore / p0) * 100 : 0;
 
-  const p1 = Math.max(0.1, p0 * (1 - disc / 100));
-  const c1 = Math.max(0, c0 * (1 + infl / 100));
+  const p1 = p0 > 0 ? Math.max(0.1, p0 * (1 - disc / 100)) : 0;
+  const c1 = c0 > 0 ? Math.max(0, c0 * (1 + infl / 100)) : 0;
   const unitMarginAfter = p1 - c1;
-  const marginPctAfter = (unitMarginAfter / p1) * 100;
+  const marginPctAfter = p1 > 0 ? (unitMarginAfter / p1) * 100 : 0;
 
-  let breakevenQty = 999999;
-  let unitsNeededMore = 999999;
-  let breakevenLiftPct = 999;
+  let breakevenQty = 0;
+  let unitsNeededMore = 0;
+  let breakevenLiftPct = 0;
   let isBreakevenAchievable = false;
 
-  if (unitMarginAfter > 0) {
+  if (p0 > 0 && unitMarginAfter > 0 && q0 > 0) {
     breakevenQty = Math.ceil(totalProfitBefore / unitMarginAfter);
     unitsNeededMore = Math.max(0, breakevenQty - q0);
     breakevenLiftPct = Number((((breakevenQty - q0) / q0) * 100).toFixed(1));
     isBreakevenAchievable = breakevenLiftPct <= 100;
   }
 
-  const projectedQty = Math.ceil(q0 * (1 + lift / 100));
+  const projectedQty = q0 > 0 ? Math.ceil(q0 * (1 + lift / 100)) : 0;
   const projectedProfit = Math.round(projectedQty * unitMarginAfter);
   const profitDiff = Math.round(projectedProfit - totalProfitBefore);
   const profitGrowthPct = totalProfitBefore > 0 ? Number(((profitDiff / totalProfitBefore) * 100).toFixed(1)) : 0;
 
   let marginStatus = 'HEALTHY';
   let marginWarning = tx('✅ โครงสร้างโปรโมชันปลอดภัย อัตรากำไรต่อชิ้นยังอยู่ในเกณฑ์ดี', 'Healthy margin structure. Promo is financially sound.');
-  if (unitMarginAfter <= 0) {
+  if (p0 === 0) {
+    marginStatus = 'NEUTRAL';
+    marginWarning = tx('รอข้อมูลหรือปรับแต่งค่าตัวแปรด้านล่างเพื่อเริ่มจำลองสถานการณ์', 'Waiting for data or adjust parameters below to simulate scenario');
+  } else if (unitMarginAfter <= 0) {
     marginStatus = 'LOSS';
     marginWarning = tx('🚨 ขาดทุนต่อทุกชิ้นที่ขาย! ราคาหลังลดต่ำกว่าต้นทุน ห้ามทำเด็ดขาด', 'Loss on every unit! Price is below cost.');
   } else if (marginPctAfter < 18) {
@@ -74,7 +101,7 @@ export default function ActionableAiCenter({ lang = 'th' }) {
   // ----------------------------------------------------------------------------
   // 2. AUTOMATED ALERTS & ANOMALY DETECTION STATE
   // ----------------------------------------------------------------------------
-  const [anomalies, setAnomalies] = useState([
+  const defaultAnomalies = [
     {
       id: 'ANOMALY-SALES-01',
       title: tx('ยอดขายช่วงบ่ายตกผิดปกติ -38.4%', 'Afternoon Sales Flash Drop -38.4%'),
@@ -108,9 +135,20 @@ export default function ActionableAiCenter({ lang = 'th' }) {
       time: tx('4 ชั่วโมงที่แล้ว', '4 hours ago'),
       severity: 'MEDIUM',
     },
-  ]);
+  ];
 
-  const [selectedAlert, setSelectedAlert] = useState(anomalies[0]);
+  const [anomalies, setAnomalies] = useState(() => (currentRevenueVal > 0 ? defaultAnomalies : []));
+  const [selectedAlert, setSelectedAlert] = useState(() => (currentRevenueVal > 0 ? defaultAnomalies[0] : null));
+
+  useEffect(() => {
+    if (currentRevenueVal === 0) {
+      setAnomalies([]);
+      setSelectedAlert(null);
+    } else {
+      setAnomalies(defaultAnomalies);
+      setSelectedAlert(defaultAnomalies[0]);
+    }
+  }, [currentRevenueVal]);
   const [isSendingLine, setIsSendingLine] = useState(false);
 
   const handleSendLineAlert = () => {
@@ -516,107 +554,119 @@ export default function ActionableAiCenter({ lang = 'th' }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Anomalies List */}
-            <div className="lg:col-span-7 space-y-3">
-              {anomalies.map((anom) => (
-                <div
-                  key={anom.id}
-                  onClick={() => setSelectedAlert(anom)}
-                  className={`glass-card rounded-2xl p-4.5 border transition-all cursor-pointer flex flex-col justify-between gap-3 shadow-lg ${
-                    selectedAlert.id === anom.id
-                      ? 'border-rose-400/60 bg-rose-950/30 ring-1 ring-rose-400/40'
-                      : 'border-white/10 bg-slate-900/70 hover:border-white/20'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                          anom.severity === 'CRITICAL'
-                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                            : anom.severity === 'HIGH'
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                            : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
-                        }`}>
-                          {anom.severity}
-                        </span>
-                        <span className="text-[11px] text-slate-400 font-mono">{anom.time}</span>
-                      </div>
-                      <h5 className="text-sm font-black text-white">{anom.title}</h5>
-                      <span className="text-xs text-slate-400 block">{anom.location}</span>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="font-mono text-xs font-black text-amber-300 block">{anom.metric}</span>
-                      <span className="font-mono text-[11px] text-rose-400">{anom.sigma}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-black/30 p-2.5 rounded-xl border border-white/5 text-xs text-slate-300">
-                    <strong className="text-amber-300/90 text-[11px] block">🔍 {tx('สาเหตุที่ตรวจพบ:', 'Root Cause:')}</strong>
-                    <p className="text-[11px] text-slate-200 mt-0.5">{anom.cause}</p>
-                  </div>
-                </div>
-              ))}
+          {anomalies.length === 0 || !selectedAlert ? (
+            <div className="glass-card rounded-2xl p-8 border border-white/10 bg-slate-900/60 text-center text-slate-400">
+              <div className="text-3xl mb-2">✅</div>
+              <div className="font-bold text-white text-base">
+                {tx('ไม่พบความผิดปกติในระบบ (สถานะปกติ 100%)', 'No Anomalies Detected (All Normal 100%)')}
+              </div>
+              <div className="text-xs text-slate-400 mt-1">
+                {tx('ระบบตรวจจับไม่พบความผิดปกติ หรือยังไม่มีข้อมูลการขาย/สต็อกที่อัปโหลด', 'No anomalies detected or no sales/inventory data uploaded yet.')}
+              </div>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Anomalies List */}
+              <div className="lg:col-span-7 space-y-3">
+                {anomalies.map((anom) => (
+                  <div
+                    key={anom.id}
+                    onClick={() => setSelectedAlert(anom)}
+                    className={`glass-card rounded-2xl p-4.5 border transition-all cursor-pointer flex flex-col justify-between gap-3 shadow-lg ${
+                      selectedAlert.id === anom.id
+                        ? 'border-rose-400/60 bg-rose-950/30 ring-1 ring-rose-400/40'
+                        : 'border-white/10 bg-slate-900/70 hover:border-white/20'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                            anom.severity === 'CRITICAL'
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              : anom.severity === 'HIGH'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                              : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                          }`}>
+                            {anom.severity}
+                          </span>
+                          <span className="text-[11px] text-slate-400 font-mono">{anom.time}</span>
+                        </div>
+                        <h5 className="text-sm font-black text-white">{anom.title}</h5>
+                        <span className="text-xs text-slate-400 block">{anom.location}</span>
+                      </div>
 
-            {/* Live LINE Flex Message Smartphone Mockup */}
-            <div className="lg:col-span-5 flex flex-col items-center">
-              <span className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2 flex items-center gap-1.5">
-                <span>📱</span>
-                <span>{tx('ตัวอย่างหน้าจอ LINE Flex Message ที่ส่งจริง', 'Live LINE Flex Card Simulation')}</span>
-              </span>
+                      <div className="text-right">
+                        <span className="font-mono text-xs font-black text-amber-300 block">{anom.metric}</span>
+                        <span className="font-mono text-[11px] text-rose-400">{anom.sigma}</span>
+                      </div>
+                    </div>
 
-              {/* Smartphone Frame */}
-              <div className="w-full max-w-sm rounded-[36px] p-4 bg-slate-950 border-4 border-slate-700 shadow-2xl relative overflow-hidden">
-                <div className="w-32 h-4 bg-slate-800 rounded-b-xl mx-auto mb-3" />
+                    <div className="bg-black/30 p-2.5 rounded-xl border border-white/5 text-xs text-slate-300">
+                      <strong className="text-amber-300/90 text-[11px] block">🔍 {tx('สาเหตุที่ตรวจพบ:', 'Root Cause:')}</strong>
+                      <p className="text-[11px] text-slate-200 mt-0.5">{anom.cause}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-                {/* LINE Chat Bubble */}
-                <div className="rounded-2xl overflow-hidden shadow-2xl border border-emerald-500/30 bg-[#1e293b]">
-                  {/* Header */}
-                  <div className={`p-4 ${selectedAlert.severity === 'CRITICAL' ? 'bg-[#991b1b]' : 'bg-[#92400e]'}`}>
-                    <span className="text-[10px] font-black text-amber-200 uppercase tracking-wider block">
-                      🚨 INSIGHTFLOW REAL-TIME ALERT
-                    </span>
-                    <h5 className="text-sm font-black text-white mt-1 leading-snug">
-                      {selectedAlert.title}
-                    </h5>
+              {/* Live LINE Flex Message Smartphone Mockup */}
+              <div className="lg:col-span-5 flex flex-col items-center">
+                <span className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2 flex items-center gap-1.5">
+                  <span>📱</span>
+                  <span>{tx('ตัวอย่างหน้าจอ LINE Flex Message ที่ส่งจริง', 'Live LINE Flex Card Simulation')}</span>
+                </span>
+
+                {/* Smartphone Frame */}
+                <div className="w-full max-w-sm rounded-[36px] p-4 bg-slate-950 border-4 border-slate-700 shadow-2xl relative overflow-hidden">
+                  <div className="w-32 h-4 bg-slate-800 rounded-b-xl mx-auto mb-3" />
+
+                  {/* LINE Chat Bubble */}
+                  <div className="rounded-2xl overflow-hidden shadow-2xl border border-emerald-500/30 bg-[#1e293b]">
+                    {/* Header */}
+                    <div className={`p-4 ${selectedAlert.severity === 'CRITICAL' ? 'bg-[#991b1b]' : 'bg-[#92400e]'}`}>
+                      <span className="text-[10px] font-black text-amber-200 uppercase tracking-wider block">
+                        🚨 INSIGHTFLOW REAL-TIME ALERT
+                      </span>
+                      <h5 className="text-sm font-black text-white mt-1 leading-snug">
+                        {selectedAlert.title}
+                      </h5>
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-4 space-y-2 text-xs text-slate-200 bg-[#0f172a]">
+                      <p className="text-[11px] text-slate-400">📍 {selectedAlert.location}</p>
+                      <p className="font-bold text-amber-300">📊 {selectedAlert.metric}</p>
+                      <hr className="border-white/10 my-2" />
+                      <p className="text-[11px] text-slate-300 leading-tight">
+                        <strong>🔍 สาเหตุ:</strong> {selectedAlert.cause}
+                      </p>
+                      <p className="text-[11px] text-emerald-400 font-bold leading-tight mt-1">
+                        <strong>💡 ทางแก้:</strong> {selectedAlert.action}
+                      </p>
+                    </div>
+
+                    {/* Footer Action Button */}
+                    <div className="p-3 bg-slate-900 border-t border-white/10">
+                      <button
+                        type="button"
+                        onClick={handleSendLineAlert}
+                        disabled={isSendingLine}
+                        className="w-full py-2.5 rounded-xl bg-[#06c755] hover:bg-[#05b34c] text-white font-black text-xs active:scale-95 transition-all shadow flex items-center justify-center gap-2"
+                      >
+                        <span className="text-sm">💬</span>
+                        <span>{isSendingLine ? tx('กำลังยิงเข้า LINE...', 'Pushing to LINE...') : tx('ทดสอบยิงเข้า LINE ทันที (Send Flex)', 'Push Alert to LINE Now')}</span>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Body */}
-                  <div className="p-4 space-y-2 text-xs text-slate-200 bg-[#0f172a]">
-                    <p className="text-[11px] text-slate-400">📍 {selectedAlert.location}</p>
-                    <p className="font-bold text-amber-300">📊 {selectedAlert.metric}</p>
-                    <hr className="border-white/10 my-2" />
-                    <p className="text-[11px] text-slate-300 leading-tight">
-                      <strong>🔍 สาเหตุ:</strong> {selectedAlert.cause}
-                    </p>
-                    <p className="text-[11px] text-emerald-400 font-bold leading-tight mt-1">
-                      <strong>💡 ทางแก้:</strong> {selectedAlert.action}
-                    </p>
+                  <div className="mt-3 text-center text-[10px] text-slate-500">
+                    {tx('เชื่อมต่อผ่าน LINE Messaging API Webhook Channel', 'Connected via LINE Messaging API Webhook')}
                   </div>
-
-                  {/* Footer Action Button */}
-                  <div className="p-3 bg-slate-900 border-t border-white/10">
-                    <button
-                      type="button"
-                      onClick={handleSendLineAlert}
-                      disabled={isSendingLine}
-                      className="w-full py-2.5 rounded-xl bg-[#06c755] hover:bg-[#05b34c] text-white font-black text-xs active:scale-95 transition-all shadow flex items-center justify-center gap-2"
-                    >
-                      <span className="text-sm">💬</span>
-                      <span>{isSendingLine ? tx('กำลังยิงเข้า LINE...', 'Pushing to LINE...') : tx('ทดสอบยิงเข้า LINE ทันที (Send Flex)', 'Push Alert to LINE Now')}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-3 text-center text-[10px] text-slate-500">
-                  {tx('เชื่อมต่อผ่าน LINE Messaging API Webhook Channel', 'Connected via LINE Messaging API Webhook')}
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -637,37 +687,45 @@ export default function ActionableAiCenter({ lang = 'th' }) {
             </div>
 
             <h4 className="text-base font-black text-white">
-              {tx('ภาพรวมผลการดำเนินงานสัปดาห์นี้: ยอดขายเติบโต +8.4% แต่กำไรสุทธิถูกกดดันจากต้นทุนวัตถุดิบพุ่ง', 'Weekly Performance: Sales up +8.4% but net profit pressured by ingredient cost surge')}
+              {currentRevenueVal > 0
+                ? tx('ภาพรวมผลการดำเนินงานสัปดาห์นี้: ยอดขายเติบโต +8.4% แต่กำไรสุทธิถูกกดดันจากต้นทุนวัตถุดิบพุ่ง', 'Weekly Performance: Sales up +8.4% but net profit pressured by ingredient cost surge')
+                : tx('ภาพรวมผลการดำเนินงาน: ยังไม่มีข้อมูล หรือรออัปโหลดไฟล์ข้อมูลธุรกิจ', 'Performance Overview: No data available. Waiting for data upload.')}
             </h4>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="bg-slate-950/70 p-3.5 rounded-xl border border-emerald-500/30 space-y-1">
                 <span className="text-xs font-black text-emerald-400 flex items-center gap-1.5">
                   <span>✔</span>
-                  <span>{tx('1. ยอดขายโตจาก Combo', '1. Combo Sales Surge')}</span>
+                  <span>{currentRevenueVal > 0 ? tx('1. ยอดขายโตจาก Combo', '1. Combo Sales Surge') : tx('1. ยอดขายและ Basket Size', '1. Sales & Basket Size')}</span>
                 </span>
                 <p className="text-xs text-slate-300">
-                  {tx('Basket Size เพิ่มเป็น ฿245/บิล (+18.2%) เมนูเด่นคือกาแฟคู่ครัวซองต์', 'Basket size up to ฿245/order (+18.2%) led by Coffee + Croissant bundle')}
+                  {currentRevenueVal > 0
+                    ? tx('Basket Size เพิ่มเป็น ฿245/บิล (+18.2%) เมนูเด่นคือกาแฟคู่ครัวซองต์', 'Basket size up to ฿245/order (+18.2%) led by Coffee + Croissant bundle')
+                    : tx('รออัปโหลดข้อมูลเพื่อวิเคราะห์ยอดขายและตะกร้าสินค้า', 'Waiting for sales data to analyze orders and basket sizes.')}
                 </p>
               </div>
 
               <div className="bg-slate-950/70 p-3.5 rounded-xl border border-rose-500/30 space-y-1">
                 <span className="text-xs font-black text-rose-400 flex items-center gap-1.5">
                   <span>⚠</span>
-                  <span>{tx('2. มาร์จิ้นเบเกอรี่หด -14.2%', '2. Bakery Margin Squeeze')}</span>
+                  <span>{currentRevenueVal > 0 ? tx('2. มาร์จิ้นเบเกอรี่หด -14.2%', '2. Bakery Margin Squeeze') : tx('2. อัตรากำไรสุทธิ', '2. Net Profit Margin')}</span>
                 </span>
                 <p className="text-xs text-slate-300">
-                  {tx('เกิดจากต้นทุนเนยสดฝรั่งเศส AOP ปรับขึ้นราคา 18% แต่หน้าร้านยังคงราคาเดิม', 'French butter cost rose 18% while retail price remained unchanged')}
+                  {currentRevenueVal > 0
+                    ? tx('เกิดจากต้นทุนเนยสดฝรั่งเศส AOP ปรับขึ้นราคา 18% แต่หน้าร้านยังคงราคาเดิม', 'French butter cost rose 18% while retail price remained unchanged')
+                    : tx('รอข้อมูลเพื่อคำนวณ Gross Margin และความผันผวนของต้นทุน', 'Waiting for data to calculate margins and cost volatility.')}
                 </p>
               </div>
 
               <div className="bg-slate-950/70 p-3.5 rounded-xl border border-amber-500/30 space-y-1">
                 <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
                   <span>🔔</span>
-                  <span>{tx('3. ลูกค้า VIP เสี่ยงหาย 89 ท่าน', '3. 89 VIP Customers at Risk')}</span>
+                  <span>{currentRevenueVal > 0 ? tx('3. ลูกค้า VIP เสี่ยงหาย 89 ท่าน', '3. 89 VIP Customers at Risk') : tx('3. กลุ่มลูกค้าและ Churn Risk', '3. Customer Retention & Churn')}</span>
                 </span>
                 <p className="text-xs text-slate-300">
-                  {tx('เว้นช่วงซื้อเกิน 45 วัน คิดเป็นเม็ดเงิน ฿1,139,200 ส่งคูปองดึงกลับด่วน', 'Inactive for 45+ days representing ฿1.13M revenue at risk')}
+                  {currentRevenueVal > 0
+                    ? tx('เว้นช่วงซื้อเกิน 45 วัน คิดเป็นเม็ดเงิน ฿1,139,200 ส่งคูปองดึงกลับด่วน', 'Inactive for 45+ days representing ฿1.13M revenue at risk')
+                    : tx('รอข้อมูลลูกค้าเพื่อตรวจจับขาประจำและประเมินความเสี่ยงลูกค้าหาย', 'Waiting for customer data to segment VIPs and detect churn risks.')}
                 </p>
               </div>
             </div>

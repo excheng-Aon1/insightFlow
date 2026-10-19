@@ -56,42 +56,52 @@ export function ActionablePlaybooks({
     }
   ];
 
-  const currentInventory = inventoryList.length > 0 ? inventoryList : defaultItems;
+  const hasInventory = Boolean(inventoryList && inventoryList.length > 0);
+  const currentInventory = hasInventory ? inventoryList : [];
   const deadStockItems = currentInventory.filter(
     i => i.status === 'dead_stock' || i.sku === 'SKU-A045'
   );
   const deadStockTarget =
     currentInventory.find(i => i.sku === selectedDeadStockSku) ||
     deadStockItems[0] ||
-    defaultItems[1];
+    currentInventory[0] ||
+    null;
 
   // =========================================================================
   // MISSION 1: MARKET BASKET ANALYSIS LOGIC & ACTIONS
   // =========================================================================
-  const productA = currentInventory.find(i => i.sku === 'SRM-001') || defaultItems[0];
-  const productB = currentInventory.find(i => i.sku === 'SKU-A045') || defaultItems[1];
+  const productA = currentInventory[0] || null;
+  const productB = currentInventory[1] || currentInventory[0] || null;
 
-  const originalBundleSum = productA.price + productB.price; // 1,290 + 450 = 1,740
-  const discountedBundlePrice = Math.round(originalBundleSum * (1 - bundleDiscountPct / 100)); // 1,566
-  const bundleSavedAmount = originalBundleSum - discountedBundlePrice; // 174
-  const estimatedBasketLift = Math.round(
+  const originalBundleSum = productA && productB ? (productA.price || 0) + (productB.price || 0) : 0;
+  const discountedBundlePrice = Math.round(originalBundleSum * (1 - bundleDiscountPct / 100));
+  const bundleSavedAmount = originalBundleSum - discountedBundlePrice;
+  const estimatedBasketLift = productA && (productA.price || 0) > 0 ? Math.round(
     ((discountedBundlePrice - productA.price) / productA.price) * 100
-  ); // +21%
+  ) : 0;
 
   const handleApplyBundlePromo = () => {
+    if (!productA || !productB) {
+      toast.error(tx('ยังไม่มีสินค้าในระบบ กรุณาอัปโหลดไฟล์สินค้าก่อนครับ', 'No products available. Please upload inventory file first.'));
+      return;
+    }
     setIsBundleApplied(true);
     toast.success(
       tx(
-        `⚡ เปิดโปรโมชันเซ็ตคู่ "${productA.th.name} + ${productB.th.name}" ลด ${bundleDiscountPct}% เข้าหน้า POS สำเร็จ!`,
-        `⚡ Activated "${productA.en.name} + ${productB.en.name}" (${bundleDiscountPct}% OFF) bundle to POS!`
+        `⚡ เปิดโปรโมชันเซ็ตคู่ "${productA.th?.name || productA.sku} + ${productB.th?.name || productB.sku}" ลด ${bundleDiscountPct}% เข้าหน้า POS สำเร็จ!`,
+        `⚡ Activated "${productA.en?.name || productA.sku} + ${productB.en?.name || productB.sku}" (${bundleDiscountPct}% OFF) bundle to POS!`
       )
     );
   };
 
   const handleCopyLineCaption = () => {
+    if (!productA || !productB) {
+      toast.error(tx('ยังไม่มีสินค้าในระบบ', 'No products in inventory'));
+      return;
+    }
     const caption = isEn
-      ? `🔥 EXCLUSIVE VIP BUNDLE! Pair "${productA.en.name}" with "${productB.en.name}" today for only ฿${discountedBundlePrice.toLocaleString()} (was ฿${originalBundleSum.toLocaleString()}, save ฿${bundleSavedAmount.toLocaleString()})! Limited sets this week only.`
-      : `🔥 โปรโมชันเซ็ตคู่พิเศษประจำสัปดาห์! ซื้อคู่กันคุ้มกว่า "${productA.th.name}" + "${productB.th.name}" เพียง ฿${discountedBundlePrice.toLocaleString()} (จากปกติ ฿${originalBundleSum.toLocaleString()} ประหยัดทันที ฿${bundleSavedAmount.toLocaleString()}) สั่งซื้อด่วนทาง LINE ทันที!`;
+      ? `🔥 EXCLUSIVE VIP BUNDLE! Pair "${productA.en?.name || productA.sku}" with "${productB.en?.name || productB.sku}" today for only ฿${discountedBundlePrice.toLocaleString()} (was ฿${originalBundleSum.toLocaleString()}, save ฿${bundleSavedAmount.toLocaleString()})! Limited sets this week only.`
+      : `🔥 โปรโมชันเซ็ตคู่พิเศษประจำสัปดาห์! ซื้อคู่กันคุ้มกว่า "${productA.th?.name || productA.sku}" + "${productB.th?.name || productB.sku}" เพียง ฿${discountedBundlePrice.toLocaleString()} (จากปกติ ฿${originalBundleSum.toLocaleString()} ประหยัดทันที ฿${bundleSavedAmount.toLocaleString()}) สั่งซื้อด่วนทาง LINE ทันที!`;
 
     navigator.clipboard.writeText(caption);
     toast.success(
@@ -105,14 +115,13 @@ export function ActionablePlaybooks({
   // =========================================================================
   // MISSION 2: DEAD STOCK & CUSTOMIZABLE FLASH SALE LOGIC & ACTIONS
   // =========================================================================
-  const deadStockCost = deadStockTarget.cost || Math.round(deadStockTarget.price * 0.55);
-  const sunkCapital = (deadStockTarget.stock || 280) * deadStockCost; // 280 * 250 = 70,000
+  const deadStockCost = deadStockTarget ? (deadStockTarget.cost || Math.round((deadStockTarget.price || 0) * 0.55)) : 0;
+  const sunkCapital = deadStockTarget ? (deadStockTarget.stock || 0) * deadStockCost : 0;
 
-  const calculatedFlashPrice = Math.max(
-    deadStockCost + 10,
-    Math.round(deadStockTarget.price * (1 - flashSaleDiscountPct / 100))
-  );
-  const unlockedCash = calculatedFlashPrice * Math.min(flashSaleQuota, deadStockTarget.stock || 280);
+  const calculatedFlashPrice = deadStockTarget
+    ? Math.max(deadStockCost + 10, Math.round((deadStockTarget.price || 0) * (1 - flashSaleDiscountPct / 100)))
+    : 0;
+  const unlockedCash = deadStockTarget ? calculatedFlashPrice * Math.min(flashSaleQuota, deadStockTarget.stock || 0) : 0;
   const flashSaleProfit =
     (calculatedFlashPrice - deadStockCost) *
     Math.min(flashSaleQuota, deadStockTarget.stock || 280);

@@ -4,8 +4,8 @@ import { LuxuryIconBadge, LuxuryModuleIcon, MarketPositionRadarIcon } from './Lu
 
 export function IndustryBenchmarkAndGoalDecomposition({
   lang = 'th',
-  currentRevenueVal = 4829000,
-  targetRevenueVal = 6500000,
+  currentRevenueVal = 0,
+  targetRevenueVal = 0,
   targetTimelineVal = '30',
   theme = 'dark',
   setActiveTab
@@ -292,20 +292,20 @@ export function IndustryBenchmarkAndGoalDecomposition({
   // 2. GOAL DECOMPOSITION (ซอยเป้าหมายใหญ่ให้เป็นรายวัน)
   // =========================================================================
   // Simulation Inputs
-  const [basketSizeInput, setBasketSizeInput] = useState(850);
-  const [todayAchievedBills, setTodayAchievedBills] = useState(14);
-  const [todayAchievedSales, setTodayAchievedSales] = useState(12500);
+  const [basketSizeInput, setBasketSizeInput] = useState(currentRevenueVal > 0 ? 850 : 0);
+  const [todayAchievedBills, setTodayAchievedBills] = useState(currentRevenueVal > 0 ? 14 : 0);
+  const [todayAchievedSales, setTodayAchievedSales] = useState(currentRevenueVal > 0 ? 12500 : 0);
   const [isPosPinned, setIsPosPinned] = useState(false);
 
   // Calculations
-  const revenueTarget = targetRevenueVal || 1000000;
-  const revenueCurrent = currentRevenueVal || 420000;
+  const revenueTarget = targetRevenueVal || 0;
+  const revenueCurrent = currentRevenueVal || 0;
   const remainingGap = Math.max(0, revenueTarget - revenueCurrent);
   const totalDays = Math.max(1, parseInt(targetTimelineVal, 10) || 30);
   const remainingDays = Math.max(1, Math.round(totalDays * 0.6)); // e.g. 18 days left in 30-day target
 
   const dailyTargetRevenue = Math.round(remainingGap / remainingDays);
-  const currentBasket = Math.max(10, basketSizeInput || 850);
+  const currentBasket = Math.max(0, basketSizeInput || 0);
 
   // Daily Required Bills
   const requiredBillsPerDay = Math.ceil(dailyTargetRevenue / currentBasket);

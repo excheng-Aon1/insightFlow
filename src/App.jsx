@@ -6953,8 +6953,8 @@ export function InsightsTab({
   chatEndRef,
   renderUploadZone,
   lineChartOptions,
-  currentRevenueVal = 8920000,
-  targetRevenueVal = 10000000,
+  currentRevenueVal = 0,
+  targetRevenueVal = 0,
   customersList = [],
   inventoryList = [],
   setInventoryList,
@@ -7068,12 +7068,14 @@ export function InsightsTab({
     datasets: [
       {
         label: tx('ยอดขายที่ AI พยากรณ์ตามแผนที่เลือก (บาท)', 'AI Projected Revenue (THB)'),
-        data: [
-          2150000,
-          2380000,
-          Math.round(2490000 * scenarioMultiplier),
-          Math.round(2850000 * scenarioMultiplier)
-        ],
+        data: currentRevenueVal > 0
+          ? [
+              Math.round(currentRevenueVal * 0.22),
+              Math.round(currentRevenueVal * 0.25),
+              Math.round(currentRevenueVal * 0.26 * scenarioMultiplier),
+              Math.round(currentRevenueVal * 0.30 * scenarioMultiplier)
+            ]
+          : [0, 0, 0, 0],
         borderColor: '#fbbf24',
         backgroundColor: 'rgba(251, 191, 36, 0.18)',
         borderWidth: 3,
@@ -7083,7 +7085,14 @@ export function InsightsTab({
       },
       {
         label: tx('แนวโน้มเดิมหากไม่ใช้กลยุทธ์ AI (บาท)', 'Baseline Without AI Optimization (THB)'),
-        data: [2150000, 2380000, 2320000, 2410000],
+        data: currentRevenueVal > 0
+          ? [
+              Math.round(currentRevenueVal * 0.22),
+              Math.round(currentRevenueVal * 0.25),
+              Math.round(currentRevenueVal * 0.24),
+              Math.round(currentRevenueVal * 0.25)
+            ]
+          : [0, 0, 0, 0],
         borderColor: '#38bdf8',
         borderDash: [6, 6],
         borderWidth: 2,
@@ -7100,15 +7109,19 @@ export function InsightsTab({
       id: 'channel_roas',
       variant: 'gold',
       iconType: 'overview',
-      badge: tx('+฿480,000 โอกาสทำเงินเพิ่ม', '+฿480,000 Revenue Potential'),
+      badge: tx(currentRevenueVal > 0 ? `+฿${Math.round(currentRevenueVal * 0.08).toLocaleString()} โอกาสทำเงินเพิ่ม` : '฿0', currentRevenueVal > 0 ? `+฿${Math.round(currentRevenueVal * 0.08).toLocaleString()} Revenue Potential` : '฿0'),
       badgeColor: '#34d399',
       title: tx(
         'วิเคราะห์ช่องทางทำกำไรสูงสุด & จัดสรรงบการตลาดด้วย AI',
         'AI Channel Margin & Ad Spend Optimizer'
       ),
       desc: tx(
-        'AI ตรวจพบว่าช่องทางแชตร้านค้าและเว็บไซต์โดยตรงมีอัตรากำไรสุทธิสูงถึง 52.4% (Conversion 9.1%) แนะนำให้โยกงบโฆษณา 30% จากแคมเปญที่เสียค่าธรรมเนียมสูงมาเร่งยอดขายช่องทางตรงทันที',
-        'AI detected a 52.4% net margin and 9.1% conversion rate on Direct Chat & Website. Reallocating 30% of high-fee marketplace ad spend unlocks +฿480,000 in net revenue.'
+        currentRevenueVal > 0
+          ? 'AI ตรวจพบว่าช่องทางแชตร้านค้าและเว็บไซต์โดยตรงมีอัตรากำไรสุทธิสูงถึง 52.4% (Conversion 9.1%) แนะนำให้โยกงบโฆษณา 30% จากแคมเปญที่เสียค่าธรรมเนียมสูงมาเร่งยอดขายช่องทางตรงทันที'
+          : 'ยังไม่มีข้อมูลยอดขายแยกตามช่องทางเพื่อวิเคราะห์งบการตลาด (อัปโหลดข้อมูลยอดขายเพื่อเริ่มวิเคราะห์)',
+        currentRevenueVal > 0
+          ? 'AI detected a 52.4% net margin and 9.1% conversion rate on Direct Chat & Website. Reallocating 30% of high-fee marketplace ad spend unlocks higher net revenue.'
+          : 'No channel sales data available to analyze ad spend. Upload sales data to begin.'
       ),
       actionLabel: tx('ดูหน้าเปรียบเทียบช่องทาง', 'Open Channel Compare'),
       targetTab: 'multi_channel',
@@ -7121,15 +7134,19 @@ export function InsightsTab({
       id: 'churn_prevention',
       variant: 'ruby',
       iconType: 'customers',
-      badge: tx(`พบลูกค้าเสี่ยงหาย ${atRiskCount} ราย (ดึงยอด ฿164,900)`, `${atRiskCount} VIPs At-Risk (฿164,900 LTV)`),
-      badgeColor: '#fda4af',
+      badge: tx(atRiskCount > 0 ? `พบลูกค้าเสี่ยงหาย ${atRiskCount} ราย (ดึงยอด ฿164,900)` : 'พบลูกค้าเสี่ยงหาย 0 ราย', atRiskCount > 0 ? `${atRiskCount} VIPs At-Risk (฿164,900 LTV)` : '0 VIPs At-Risk'),
+      badgeColor: atRiskCount > 0 ? '#fda4af' : '#94a3b8',
       title: tx(
         'ตรวจจับกลุ่มลูกค้าประจำที่มีความเสี่ยงชะลอการสั่งซื้อด้วย AI',
         'AI Customer Churn & VIP Retention Predictor'
       ),
       desc: tx(
-        `โมเดล RFM ของ AI ตรวจพบลูกค้าประจำมูลค่าสูง ${atRiskCount} ท่าน (รวมถึงบัญชีองค์กร 142 บัญชี) ที่เว้นช่วงซื้อนานเกิน 45 วัน แนะนำให้ส่งคูปองส่วนลด 20% เฉพาะบุคคลเพื่อดึงยอดซื้อซ้ำกลับมาทันที`,
-        `AI RFM analysis flagged ${atRiskCount} high-LTV VIP customers inactive for 45+ days. Triggering an automated 20% win-back offer recovers over ฿164,900 in repeat sales.`
+        atRiskCount > 0
+          ? `โมเดล RFM ของ AI ตรวจพบลูกค้าประจำมูลค่าสูง ${atRiskCount} ท่าน ที่เว้นช่วงซื้อนานเกิน 45 วัน แนะนำให้ส่งคูปองส่วนลด 20% เฉพาะบุคคลเพื่อดึงยอดซื้อซ้ำกลับมาทันที`
+          : 'โมเดล RFM ยังไม่พบลูกค้าที่มีความเสี่ยงชะลอการสั่งซื้อ หรือยังไม่ได้อัปโหลดข้อมูลลูกค้า',
+        atRiskCount > 0
+          ? `AI RFM analysis flagged ${atRiskCount} high-LTV VIP customers inactive for 45+ days. Triggering an automated 20% win-back offer recovers repeat sales.`
+          : 'No at-risk VIP customers detected or no customer data uploaded yet.'
       ),
       actionLabel: tx('ไปที่หน้าวิเคราะห์ลูกค้า', 'Open Customer Insights'),
       targetTab: 'customers',
@@ -7142,15 +7159,19 @@ export function InsightsTab({
       id: 'bundle_basket',
       variant: 'sapphire',
       iconType: 'basket',
-      badge: tx('+22% ยอดซื้อต่อตะกร้า (เฉลี่ย +฿1,250/บิล)', '+22% Avg Basket Size (+฿1,250/Order)'),
+      badge: tx(currentRevenueVal > 0 ? '+22% ยอดซื้อต่อตะกร้า (เฉลี่ย +฿1,250/บิล)' : '0% ยอดซื้อต่อตะกร้า', currentRevenueVal > 0 ? '+22% Avg Basket Size (+฿1,250/Order)' : '0% Basket Size'),
       badgeColor: '#38bdf8',
       title: tx(
         'กลยุทธ์จัดเซ็ตสินค้าคู่กัน (AI Cross-Sell & Bundle Engine)',
         'AI Smart Bundle & Basket Size Accelerator'
       ),
       desc: tx(
-        'จากการวิเคราะห์ตะกร้าสินค้าด้วย AI ลูกค้า 68% มักซื้อเซรั่มเพียงชิ้นเดียว การจัดโปรโมชั่นจับคู่เซรั่มวิตามินซี + ครีมกันแดดในราคาพิเศษหน้าจุดชำระเงิน จะช่วยดันยอดต่อบิลเพิ่มขึ้น 22% ทันที',
-        'AI basket analysis shows 68% single-item checkouts. Pairing Vitamin C Serum with Waterproof Sunscreen at checkout lifts average order value by +22%.'
+        currentRevenueVal > 0
+          ? 'จากการวิเคราะห์ตะกร้าสินค้าด้วย AI ลูกค้า 68% มักซื้อเซรั่มเพียงชิ้นเดียว การจัดโปรโมชั่นจับคู่เซรั่มวิตามินซี + ครีมกันแดดในราคาพิเศษหน้าจุดชำระเงิน จะช่วยดันยอดต่อบิลเพิ่มขึ้น 22% ทันที'
+          : 'ยังไม่มีข้อมูลตะกร้าสินค้าเพื่อวิเคราะห์การจับคู่สินค้า (อัปโหลดไฟล์ยอดขายเพื่อเริ่มวิเคราะห์)',
+        currentRevenueVal > 0
+          ? 'AI basket analysis shows 68% single-item checkouts. Pairing Vitamin C Serum with Waterproof Sunscreen at checkout lifts average order value by +22%.'
+          : 'No basket data available for cross-sell analysis. Upload sales data to begin.'
       ),
       actionLabel: tx('ไปที่หน้าพนักงานและจุดขาย', 'Open Staff & POS'),
       targetTab: 'staff_pos',
@@ -7163,15 +7184,19 @@ export function InsightsTab({
       id: 'stock_forecast',
       variant: 'amethyst',
       iconType: 'inventory',
-      badge: tx(`พยากรณ์ล่วงหน้า 14 วัน • ของใกล้หมด ${lowStockCount} รายการ`, `14-Day Forecast • ${lowStockCount} Low-Stock SKUs`),
-      badgeColor: '#e9d5ff',
+      badge: tx(lowStockCount > 0 ? `พยากรณ์ล่วงหน้า 14 วัน • ของใกล้หมด ${lowStockCount} รายการ` : 'ของใกล้หมด 0 รายการ', lowStockCount > 0 ? `14-Day Forecast • ${lowStockCount} Low-Stock SKUs` : '0 Low-Stock SKUs'),
+      badgeColor: lowStockCount > 0 ? '#e9d5ff' : '#94a3b8',
       title: tx(
         'คาดการณ์คลังสินค้าอัจฉริยะ & ป้องกันของขาดสต็อกด้วย AI',
         'AI 14-Day Demand Forecast & Stockout Prevention'
       ),
       desc: tx(
-        `โมเดลพยากรณ์ความต้องการสินค้าชี้ว่ามีสินค้าหลัก ${lowStockCount} รายการเสี่ยงของหมดคลังภายใน 5 วันข้างหน้า แนะนำให้กดเติมสต็อกล่วงหน้าและระบายสินค้าค้างคลังเพื่อรักษาระดับส่งมอบ 99.8%`,
-        `AI 14-day demand model predicts stockout risk on ${lowStockCount} core SKUs within 5 days. Pre-restocking now preserves a 99.8% order fulfillment rate.`
+        lowStockCount > 0
+          ? `โมเดลพยากรณ์ความต้องการสินค้าชี้ว่ามีสินค้าหลัก ${lowStockCount} รายการเสี่ยงของหมดคลังภายใน 5 วันข้างหน้า แนะนำให้กดเติมสต็อกล่วงหน้าและระบายสินค้าค้างคลังเพื่อรักษาระดับส่งมอบ 99.8%`
+          : 'คลังสินค้าอยู่ในเกณฑ์ปกติ ไม่พบสินค้าใกล้หมดสต็อก หรือยังไม่ได้อัปโหลดไฟล์สต็อก',
+        lowStockCount > 0
+          ? `AI 14-day demand model predicts stockout risk on ${lowStockCount} core SKUs within 5 days. Pre-restocking now preserves a 99.8% order fulfillment rate.`
+          : 'Inventory is healthy. No stockout risks detected or no inventory data uploaded.'
       ),
       actionLabel: tx('ไปที่หน้าคลังสินค้าอัจฉริยะ', 'Open Smart Inventory'),
       targetTab: 'inventory',
@@ -7184,15 +7209,19 @@ export function InsightsTab({
       id: 'procurement_po',
       variant: 'emerald',
       iconType: 'procurement',
-      badge: tx(`ประหยัดต้นทุนสะสม ฿${totalPoSaved.toLocaleString()} (-15%)`, `Saved ฿${totalPoSaved.toLocaleString()} (-15% Bulk Tier)`),
-      badgeColor: '#34d399',
+      badge: tx(totalPoSaved > 0 ? `ประหยัดต้นทุนสะสม ฿${totalPoSaved.toLocaleString()} (-15%)` : '฿0', totalPoSaved > 0 ? `Saved ฿${totalPoSaved.toLocaleString()} (-15% Bulk Tier)` : '฿0'),
+      badgeColor: totalPoSaved > 0 ? '#34d399' : '#94a3b8',
       title: tx(
         'วิเคราะห์ซัพพลายเออร์ & ออกใบสั่งซื้อรวมศูนย์อัตโนมัติด้วย AI',
         'AI Central Procurement & Vendor Scorecard Optimizer'
       ),
       desc: tx(
-        `AI เปรียบเทียบ Lead Time และ Fill Rate ของซัพพลายเออร์ทั้ง ${vendorsList.length} ราย แนะนำให้รวมยอดขอซื้อจากทุกสาขามาออกใบสั่งซื้อกลาง (Central PO) ที่สำนักงานใหญ่เพื่อรับส่วนลด Volume Discount 12%–16%`,
-        `AI benchmarked ${vendorsList.length} suppliers on Lead Time & Fill Rate. Consolidating multi-branch low-stock orders into a single HQ Central PO unlocks 12%–16% volume discounts.`
+        vendorsList.length > 0
+          ? `AI เปรียบเทียบ Lead Time และ Fill Rate ของซัพพลายเออร์ทั้ง ${vendorsList.length} ราย แนะนำให้รวมยอดขอซื้อจากทุกสาขามาออกใบสั่งซื้อกลาง (Central PO) ที่สำนักงานใหญ่เพื่อรับส่วนลด Volume Discount 12%–16%`
+          : 'ยังไม่มีข้อมูลซัพพลายเออร์สำหรับการวิเคราะห์การจัดซื้อรวมศูนย์',
+        vendorsList.length > 0
+          ? `AI benchmarked ${vendorsList.length} suppliers on Lead Time & Fill Rate. Consolidating multi-branch low-stock orders into a single HQ Central PO unlocks 12%–16% volume discounts.`
+          : 'No supplier data available for central procurement.'
       ),
       actionLabel: tx('ไปที่หน้าจัดซื้อรวมศูนย์', 'Open Central Procurement'),
       targetTab: 'procurement',
@@ -7205,15 +7234,19 @@ export function InsightsTab({
       id: 'fraud_shield',
       variant: 'ruby',
       iconType: 'alert',
-      badge: tx(`ตรวจพบรายการผิดปกติ ${pendingAuditCount} เคส`, `${pendingAuditCount} POS Anomalies Detected`),
-      badgeColor: '#fda4af',
+      badge: tx(pendingAuditCount > 0 ? `ตรวจพบรายการผิดปกติ ${pendingAuditCount} เคส` : '0 เคส', pendingAuditCount > 0 ? `${pendingAuditCount} POS Anomalies Detected` : '0 POS Anomalies'),
+      badgeColor: pendingAuditCount > 0 ? '#fda4af' : '#94a3b8',
       title: tx(
         'ระบบ AI ตรวจจับความผิดปกติหน้าเครื่องคิดเงิน & ป้องกันทุจริต',
         'AI POS Anomaly & Bill Cancellation Fraud Shield'
       ),
       desc: tx(
-        `AI ตรวจจับพฤติกรรมการกดยกเลิกบิลหลังรับเงินสดและการเปิดลิ้นชักโดยไม่มีรายการขายรวม ${pendingAuditCount} รายการที่รอตรวจสอบ แนะนำให้เปิดระบบบังคับใส่รหัสผู้จัดการ (Manager PIN) ทันที`,
-        `AI anomaly detection flagged ${pendingAuditCount} suspicious post-cash bill voids and no-sale drawer opens. Enforce Manager PIN approval immediately.`
+        pendingAuditCount > 0
+          ? `AI ตรวจจับพฤติกรรมการกดยกเลิกบิลหลังรับเงินสดและการเปิดลิ้นชักโดยไม่มีรายการขายรวม ${pendingAuditCount} รายการที่รอตรวจสอบ แนะนำให้เปิดระบบบังคับใส่รหัสผู้จัดการ (Manager PIN) ทันที`
+          : 'ไม่พบรายการผิดปกติหน้าเครื่องคิดเงิน แคชเชียร์ทำงานปกติ 100%',
+        pendingAuditCount > 0
+          ? `AI anomaly detection flagged ${pendingAuditCount} suspicious post-cash bill voids and no-sale drawer opens. Enforce Manager PIN approval immediately.`
+          : 'No suspicious POS activities detected. Checkouts operating normally.'
       ),
       actionLabel: tx('ตรวจสอบกล้องวงจรปิดและแคชเชียร์', 'Inspect POS Audit Logs'),
       targetTab: 'staff_pos',
@@ -7366,7 +7399,7 @@ export function InsightsTab({
             {tx('โอกาสเพิ่มกำไรที่ AI ค้นพบเดือนนี้', 'AI Identified Profit Uplift')}
           </div>
           <div style={{ fontSize: '1.7rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.3rem' }}>
-            +฿737,500
+            {currentRevenueVal > 0 ? `+฿${Math.round(currentRevenueVal * 0.15).toLocaleString()}` : '฿0'}
           </div>
           <div style={{ fontSize: '0.78rem', color: '#fde68a', marginTop: '0.15rem' }}>
             {tx('รวมจากแผนเร่งยอดขาย + ดึงลูกค้า + ลดต้นทุน PO', 'Combined from Channel, CRM & Central PO AI')}
@@ -7378,7 +7411,7 @@ export function InsightsTab({
             {tx('ความแม่นยำในการพยากรณ์ของ AI', 'AI Forecast Accuracy Score')}
           </div>
           <div style={{ fontSize: '1.7rem', fontWeight: 900, color: '#34d399', marginTop: '0.3rem' }}>
-            99.4%
+            {currentRevenueVal > 0 ? '99.4%' : '0.0%'}
           </div>
           <div style={{ fontSize: '0.78rem', color: '#a7f3d0', marginTop: '0.15rem' }}>
             {tx('ประมวลผลจากฐานข้อมูลจริงทุกสาขาแบบเรียลไทม์', 'Trained on live multi-branch store records')}
@@ -7405,7 +7438,7 @@ export function InsightsTab({
             {tx('แผนกลยุทธ์ AI ที่พร้อมกดสั่งงานทันที', 'Ready-to-Execute AI Playbooks')}
           </div>
           <div style={{ fontSize: '1.7rem', fontWeight: 900, color: '#e9d5ff', marginTop: '0.3rem' }}>
-            6 {tx('แผนกลยุทธ์', 'Playbooks')}
+            {currentRevenueVal > 0 ? 6 : 0} {tx('แผนกลยุทธ์', 'Playbooks')}
           </div>
           <div style={{ fontSize: '0.78rem', color: '#d8b4fe', marginTop: '0.15rem' }}>
             {tx(
@@ -7575,10 +7608,19 @@ export function InsightsTab({
       )}
 
       {/* Downstream: Actionable AI & Decision Intelligence Center */}
-      <ActionableAiCenter lang={lang} />
+      <ActionableAiCenter
+        lang={lang}
+        currentRevenueVal={currentRevenueVal}
+        inventoryList={inventoryList}
+        auditLogs={auditLogs}
+      />
 
       {/* Midstream Advanced Analytics & Statistical Modeling Center */}
-      <AdvancedAnalyticsSuite lang={lang} />
+      <AdvancedAnalyticsSuite
+        lang={lang}
+        currentRevenueVal={currentRevenueVal}
+        inventoryList={inventoryList}
+      />
 
       {/* Actionable Prescriptive AI Hub: Market Basket, Dead Stock, Pricing Simulator */}
       <ActionablePlaybooks

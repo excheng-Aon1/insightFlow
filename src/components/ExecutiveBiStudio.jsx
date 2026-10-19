@@ -967,6 +967,7 @@ export default function ExecutiveBiStudio({
                 <div>
                   <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">{lbl}</div>
                   <div className={`text-lg font-black ${isTotal ? (theme === 'dark' ? 'text-white' : 'text-[#000000]') : isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    {val < 0 ? `-฿${Math.abs(val).toLocaleString()}` : `฿${val.toLocaleString()}`}
                     {val != null && !isNaN(val) ? (val < 0 ? `-฿${Math.abs(val).toLocaleString()}` : `฿${val.toLocaleString()}`) : '฿0'}
                   </div>
                 </div>

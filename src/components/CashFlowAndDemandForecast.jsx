@@ -6,7 +6,7 @@ export function CashFlowAndDemandForecast({
   lang = 'th',
   inventoryList = [],
   setInventoryList,
-  currentRevenueVal = 8920000,
+  currentRevenueVal = 0,
   setActiveTab
 }) {
   const isEn = lang === 'en';
@@ -225,24 +225,24 @@ export function CashFlowAndDemandForecast({
   // =========================================================================
   // 3. CASH RUNWAY & PROFIT TRACKER CALCULATIONS
   // =========================================================================
-  const grossRevenue = currentRevenueVal || 8920000;
+  const grossRevenue = currentRevenueVal || 0;
   const cogsAmount = Math.round(grossRevenue * 0.465); // 46.5% cost of goods
   const grossProfit = grossRevenue - cogsAmount; // 53.5%
 
   // Hidden Costs & Operational Leakages
   const platformFees = Math.round(grossRevenue * 0.054); // 5.4% marketplace & gateway fees
   const packagingShipping = Math.round(grossRevenue * 0.022); // 2.2% shipping & pack supplies
-  const uncollectedReceivables = 320000; // Overdue invoices
-  const fixedOpex = 1420000; // Rent, salaries, utilities
+  const uncollectedReceivables = grossRevenue > 0 ? 320000 : 0; // Overdue invoices
+  const fixedOpex = grossRevenue > 0 ? 1420000 : 0; // Rent, salaries, utilities
   const totalHiddenAndOpex = platformFees + packagingShipping + uncollectedReceivables + fixedOpex;
 
   const trueNetCashProfit = Math.max(0, grossProfit - totalHiddenAndOpex);
-  const trueNetMarginPct = Math.round((trueNetCashProfit / grossRevenue) * 1000) / 10;
+  const trueNetMarginPct = grossRevenue > 0 ? Math.round((trueNetCashProfit / grossRevenue) * 1000) / 10 : 0;
 
   // Cash Runway Calculation
-  const cashInHand = 3850000;
-  const monthlyBurnRate = 720000; // Fixed cash burn
-  const cashRunwayMonths = Math.round((cashInHand / monthlyBurnRate) * 10) / 10; // 5.3 months
+  const cashInHand = grossRevenue > 0 ? 3850000 : 0;
+  const monthlyBurnRate = grossRevenue > 0 ? 720000 : 0; // Fixed cash burn
+  const cashRunwayMonths = monthlyBurnRate > 0 ? Math.round((cashInHand / monthlyBurnRate) * 10) / 10 : 0;
 
   const handleExportCashflowReport = () => {
     const content = isEn
