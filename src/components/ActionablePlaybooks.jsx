@@ -61,11 +61,20 @@ export function ActionablePlaybooks({
   const deadStockItems = currentInventory.filter(
     i => i.status === 'dead_stock' || i.sku === 'SKU-A045'
   );
+  const fallbackDeadStock = {
+    sku: 'SKU-NONE',
+    th: { name: tx('ไม่มีรายการสินค้าค้างสต็อก', 'No dead stock item') },
+    en: { name: 'No dead stock item' },
+    stock: 0,
+    price: 0,
+    cost: 0,
+  };
+
   const deadStockTarget =
     currentInventory.find(i => i.sku === selectedDeadStockSku) ||
     deadStockItems[0] ||
     currentInventory[0] ||
-    null;
+    fallbackDeadStock;
 
   // =========================================================================
   // MISSION 1: MARKET BASKET ANALYSIS LOGIC & ACTIONS
@@ -118,13 +127,14 @@ export function ActionablePlaybooks({
   const deadStockCost = deadStockTarget ? (deadStockTarget.cost || Math.round((deadStockTarget.price || 0) * 0.55)) : 0;
   const sunkCapital = deadStockTarget ? (deadStockTarget.stock || 0) * deadStockCost : 0;
 
-  const calculatedFlashPrice = deadStockTarget
+  const calculatedFlashPrice = deadStockTarget && (deadStockTarget.price || 0) > 0
     ? Math.max(deadStockCost + 10, Math.round((deadStockTarget.price || 0) * (1 - flashSaleDiscountPct / 100)))
     : 0;
   const unlockedCash = deadStockTarget ? calculatedFlashPrice * Math.min(flashSaleQuota, deadStockTarget.stock || 0) : 0;
-  const flashSaleProfit =
-    (calculatedFlashPrice - deadStockCost) *
-    Math.min(flashSaleQuota, deadStockTarget.stock || 280);
+  const flashSaleProfit = deadStockTarget
+    ? (calculatedFlashPrice - deadStockCost) *
+      Math.min(flashSaleQuota, deadStockTarget.stock || 0)
+    : 0;
 
   const campaignTypeNames = {
     '24h_rush': {
