@@ -832,7 +832,7 @@ export default function ExecutiveBiStudio({
                   },
                   tooltip: {
                     callbacks: {
-                      label: ctx => `${ctx.dataset.label}: ฿${ctx.parsed.y.toLocaleString()}`
+                      label: ctx => `${ctx.dataset.label}: ฿${(ctx.parsed?.y || 0).toLocaleString()}`
                     }
                   }
                 },
@@ -901,7 +901,7 @@ export default function ExecutiveBiStudio({
                   },
                   tooltip: {
                     callbacks: {
-                      label: ctx => `${ctx.label}: ฿${ctx.parsed.toLocaleString()}`
+                      label: ctx => `${ctx.label}: ฿${(ctx.parsed || 0).toLocaleString()}`
                     }
                   }
                 },
@@ -967,7 +967,7 @@ export default function ExecutiveBiStudio({
                 <div>
                   <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">{lbl}</div>
                   <div className={`text-lg font-black ${isTotal ? (theme === 'dark' ? 'text-white' : 'text-[#000000]') : isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    {val < 0 ? `-฿${Math.abs(val).toLocaleString()}` : `฿${val.toLocaleString()}`}
+                    {val != null && !isNaN(val) ? (val < 0 ? `-฿${Math.abs(val).toLocaleString()}` : `฿${val.toLocaleString()}`) : '฿0'}
                   </div>
                 </div>
 
@@ -1085,10 +1085,10 @@ export default function ExecutiveBiStudio({
                         </span>
                       </td>
                       <td className={`py-3.5 px-4 text-right ${theme === 'dark' ? 'text-slate-300' : 'text-slate-800'}`}>
-                        {branchItem.orders.toLocaleString()}
+                        {(branchItem.orders || 0).toLocaleString()}
                       </td>
                       <td className={`py-3.5 px-4 text-right font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-                        ฿{branchItem.totalRevenue.toLocaleString()}
+                        ฿{(branchItem.totalRevenue || 0).toLocaleString()}
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="w-36 h-2.5 rounded-full bg-slate-800 overflow-hidden">
@@ -1111,9 +1111,9 @@ export default function ExecutiveBiStudio({
                             <span className="text-purple-400 font-bold">└</span>
                             <span>🏷️ {catItem.name}</span>
                           </td>
-                          <td className="py-2.5 px-4 text-right text-slate-400">{catItem.orders}</td>
+                          <td className="py-2.5 px-4 text-right text-slate-400">{(catItem.orders || 0).toLocaleString()}</td>
                           <td className={`py-2.5 px-4 text-right font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
-                            ฿{catItem.revenue.toLocaleString()}
+                            ฿{(catItem.revenue || 0).toLocaleString()}
                           </td>
                           <td className="py-2.5 px-4">
                             <div className="w-24 h-1.5 rounded-full bg-slate-800 overflow-hidden">

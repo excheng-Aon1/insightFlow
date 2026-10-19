@@ -4789,16 +4789,16 @@ export function CustomersTab({
             </thead>
             <tbody className="divide-y divide-white/10 text-sm">
               {filteredCustomers.map((cust) => {
-                const loc = isEn ? cust.en : cust.th;
+                const loc = (isEn ? cust.en : cust.th) || {};
                 return (
                   <tr key={cust.id} className="hover:bg-white/[0.04] transition">
                     <td className="p-4">
                       <div className={`font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                        {loc.name}
+                        {loc.name || cust.id}
                       </div>
                       <div className="text-xs text-slate-300 mt-1 flex flex-wrap gap-2">
-                        <span>📞 {cust.phone}</span>
-                        <span className="text-emerald-400 font-bold">{cust.lineId}</span>
+                        <span>📞 {cust.phone || '-'}</span>
+                        <span className="text-emerald-400 font-bold">{cust.lineId || '-'}</span>
                       </div>
                     </td>
 
@@ -4809,32 +4809,32 @@ export function CustomersTab({
                         cust.segment === 'loyal' ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' :
                         'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                       }`}>
-                        {loc.segmentLabel}
+                        {loc.segmentLabel || tx('ลูกค้าทั่วไป', 'Customer')}
                       </span>
                     </td>
 
                     <td className="p-4">
                       <span className={`font-bold text-xs ${cust.recencyDays > 40 ? 'text-rose-400' : 'text-slate-200'}`}>
-                        {loc.recencyText}
+                        {loc.recencyText || '-'}
                       </span>
                     </td>
 
                     <td className="p-4">
-                      <span className="font-black text-white">{cust.frequency} {tx('ครั้ง', 'orders')}</span>
+                      <span className="font-black text-white">{cust.frequency || 0} {tx('ครั้ง', 'orders')}</span>
                       <div className="text-xs text-slate-400">
-                        {tx(`เฉลี่ย ฿${cust.aov.toLocaleString()}/บิล`, `Avg ฿${cust.aov.toLocaleString()}/bill`)}
+                        {tx(`เฉลี่ย ฿${(cust.aov || 0).toLocaleString()}/บิล`, `Avg ฿${(cust.aov || 0).toLocaleString()}/bill`)}
                       </div>
                     </td>
 
                     <td className="p-4">
                       <span className="text-base font-black text-amber-400 font-mono">
-                        ฿ {cust.ltv.toLocaleString()}
+                        ฿ {(cust.ltv || 0).toLocaleString()}
                       </span>
                     </td>
 
                     <td className="p-4 max-w-xs">
-                      <div className="text-xs font-bold text-slate-200">🛍️ {loc.favoriteProduct}</div>
-                      <div className="text-xs text-slate-400 mt-1">{loc.aiAction}</div>
+                      <div className="text-xs font-bold text-slate-200">🛍️ {loc.favoriteProduct || '-'}</div>
+                      <div className="text-xs text-slate-400 mt-1">{loc.aiAction || '-'}</div>
                     </td>
 
                     <td className="p-4 text-right">
@@ -4843,7 +4843,7 @@ export function CustomersTab({
                           onClick={() => setSelectedCustomerId(cust.id)}
                           className="px-3 py-2 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40 text-xs font-bold transition cursor-pointer"
                         >
-                          📜 {tx(`ดูประวัติซื้อ (${loc.orders.length})`, `View Orders (${loc.orders.length})`)}
+                          📜 {tx(`ดูประวัติซื้อ (${(loc.orders || []).length})`, `View Orders (${(loc.orders || []).length})`)}
                         </button>
                         <button
                           onClick={() => handleContactCustomer(cust, 'call')}
@@ -4868,7 +4868,7 @@ export function CustomersTab({
 
         {/* 5. หน้าต่างแสดงประวัติการซื้อรายบุคคล (เมื่อคลิกดูประวัติซื้อ) */}
         {selectedCustomerProfile && (() => {
-          const profLoc = isEn ? selectedCustomerProfile.en : selectedCustomerProfile.th;
+          const profLoc = (isEn ? selectedCustomerProfile.en : selectedCustomerProfile.th) || {};
           return (
             <div className={`mt-6 p-6 rounded-3xl border-2 border-amber-400 shadow-2xl animate-in fade-in duration-200 ${
               theme === 'dark' ? 'bg-[#060b18]' : 'bg-amber-50/50'
@@ -4879,10 +4879,10 @@ export function CustomersTab({
                     {tx('ประวัติการซื้อรายบุคคลโดยละเอียด', 'Detailed Customer Purchase History')}
                   </span>
                   <h4 className="text-xl font-black text-white mt-1.5">
-                    {profLoc.name} — {tx('ยอดซื้อสะสมรวม:', 'Total Lifetime Spend:')} <span className="text-amber-400">฿ {selectedCustomerProfile.ltv.toLocaleString()}</span>
+                    {profLoc.name || selectedCustomerProfile.id} — {tx('ยอดซื้อสะสมรวม:', 'Total Lifetime Spend:')} <span className="text-amber-400">฿ {(selectedCustomerProfile.ltv || 0).toLocaleString()}</span>
                   </h4>
                   <p className="text-xs text-slate-300 mt-0.5">
-                    📞 {selectedCustomerProfile.phone} • 💬 {selectedCustomerProfile.lineId} • ✉️ {selectedCustomerProfile.email}
+                    📞 {selectedCustomerProfile.phone || '-'} • 💬 {selectedCustomerProfile.lineId || '-'} • ✉️ {selectedCustomerProfile.email || '-'}
                   </p>
                 </div>
 
@@ -4903,14 +4903,14 @@ export function CustomersTab({
               </div>
 
               <div className="space-y-2.5">
-                {profLoc.orders.map((ord) => (
+                {(profLoc.orders || []).map((ord) => (
                   <div key={ord.orderId} className="p-4 rounded-2xl border border-white/10 bg-black/30 flex flex-wrap items-center justify-between gap-3 text-xs">
                     <div>
                       <span className="font-mono font-bold text-amber-400">{ord.orderId}</span>
                       <span className="text-slate-300 ml-2">• {ord.date} ({ord.method})</span>
                       <p className="text-white font-bold mt-1 text-sm">{ord.items}</p>
                     </div>
-                    <span className="text-base font-black text-emerald-400 font-mono">฿ {ord.total.toLocaleString()}</span>
+                    <span className="text-base font-black text-emerald-400 font-mono">฿ {(ord.total || 0).toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -5381,23 +5381,23 @@ export function StaffPosTab({
           </thead>
           <tbody>
             {filteredStaff.map(st => {
-              const info = st[isEn ? 'en' : 'th'];
+              const info = (st && st[isEn ? 'en' : 'th']) || {};
               const riskColor =
                 st.riskLevel === 'high' ? '#f43f5e' : st.riskLevel === 'medium' ? '#f59e0b' : '#10b981';
               return (
                 <tr key={st.id} style={{ borderBottom: '1px solid rgba(148,163,184,0.12)' }}>
                   <td style={{ padding: '0.85rem 0.75rem' }}>
-                    <div style={{ fontWeight: 800, color: '#f8fafc' }}>{info.name}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{info.branchName}</div>
+                    <div style={{ fontWeight: 800, color: '#f8fafc' }}>{info.name || st.id}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{info.branchName || '-'}</div>
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: '#38bdf8' }}>
-                    ฿{st.totalSales.toLocaleString()}
+                    ฿{(st.totalSales || 0).toLocaleString()}
                     <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                      {st.billsCount} {tx('บิล', 'bills')}
+                      {st.billsCount || 0} {tx('บิล', 'bills')}
                     </div>
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: '#fbbf24' }}>
-                    ฿{st.basketSize.toLocaleString()}
+                    ฿{(st.basketSize || 0).toLocaleString()}
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem' }}>
                     <span
@@ -5410,11 +5410,11 @@ export function StaffPosTab({
                         fontSize: '0.84rem'
                       }}
                     >
-                      {st.upsellRate}% (+฿{st.upsellRevenue.toLocaleString()})
+                      {st.upsellRate || 0}% (+฿{(st.upsellRevenue || 0).toLocaleString()})
                     </span>
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem', fontSize: '0.86rem', color: '#cbd5e1' }}>
-                    {info.topUpsellItem}
+                    {info.topUpsellItem || '-'}
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem' }}>
                     <span
@@ -6376,20 +6376,20 @@ export function MultiChannelTab({
                 </div>
                 <div style={{ fontSize: '0.86rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                   <div>
-                    {tx('ยอดขายรวม:', 'Revenue:')} <strong>฿{ch.revenue.toLocaleString()}</strong> ({ch.orders} {tx('คำสั่งซื้อ', 'orders')})
+                    {tx('ยอดขายรวม:', 'Revenue:')} <strong>฿{(ch.revenue || 0).toLocaleString()}</strong> ({ch.orders || 0} {tx('คำสั่งซื้อ', 'orders')})
                   </div>
                   <div>
-                    {tx('ค่าใช้จ่าย:', 'Fees/Costs:')} <span style={{ color: '#fda4af' }}>-฿{ch.costAndFees.toLocaleString()}</span> ({info.feeDesc})
+                    {tx('ค่าใช้จ่าย:', 'Fees/Costs:')} <span style={{ color: '#fda4af' }}>-฿{(ch.costAndFees || 0).toLocaleString()}</span> ({info.feeDesc || '-'})
                   </div>
                   <div>
                     {tx('กำไรสุทธิ:', 'Net Profit:')}{' '}
                     <strong style={{ color: '#34d399' }}>
-                      ฿{ch.netProfit.toLocaleString()} ({ch.grossMarginPct}%)
+                      ฿{(ch.netProfit || 0).toLocaleString()} ({ch.grossMarginPct || 0}%)
                     </strong>
                   </div>
                 </div>
                 <div style={{ marginTop: '0.6rem', paddingTop: '0.55rem', borderTop: '1px dashed rgba(148,163,184,0.2)', fontSize: '0.82rem', color: '#94a3b8' }}>
-                  💡 {info.aiAdvice}
+                  💡 {info.aiAdvice || '-'}
                 </div>
               </div>
             );
@@ -6415,34 +6415,34 @@ export function MultiChannelTab({
           </thead>
           <tbody>
             {branchesList.map(br => {
-              const info = br[isEn ? 'en' : 'th'];
+              const info = (br && br[isEn ? 'en' : 'th']) || {};
               return (
                 <tr key={br.branchId} style={{ borderBottom: '1px solid rgba(148,163,184,0.12)' }}>
                   <td style={{ padding: '0.85rem 0.75rem' }}>
                     <div style={{ fontWeight: 900, color: '#f8fafc' }}>
-                      #{br.rank} {info.branchName}
+                      #{br.rank || 1} {info.branchName || br.branchId}
                     </div>
                     <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                      {tx('ผู้จัดการ:', 'Manager:')} {info.manager}
+                      {tx('ผู้จัดการ:', 'Manager:')} {info.manager || '-'}
                     </div>
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: '#38bdf8' }}>
-                    ฿{br.revenue.toLocaleString()}
+                    ฿{(br.revenue || 0).toLocaleString()}
                     <div style={{ fontSize: '0.78rem', color: '#34d399' }}>
-                      {tx('อัตรากำไร', 'Margin')} {br.netMarginPct}%
+                      {tx('อัตรากำไร', 'Margin')} {br.netMarginPct || 0}%
                     </div>
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: '#fbbf24' }}>
-                    {br.inventoryTurnover} {tx('รอบ/ปี', 'turns/yr')}
+                    {br.inventoryTurnover || 0} {tx('รอบ/ปี', 'turns/yr')}
                     <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
-                      ({tx(`ขายออกเฉลี่ย ${br.turnoverDays} วัน`, `Avg ${br.turnoverDays} days to sell`)})
+                      ({tx(`ขายออกเฉลี่ย ${br.turnoverDays || 0} วัน`, `Avg ${br.turnoverDays || 0} days to sell`)})
                     </div>
                   </td>
-                  <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: br.deadStockValue > 40000 ? '#f43f5e' : '#cbd5e1' }}>
-                    ฿{br.deadStockValue.toLocaleString()}
+                  <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: (br.deadStockValue || 0) > 40000 ? '#f43f5e' : '#cbd5e1' }}>
+                    ฿{(br.deadStockValue || 0).toLocaleString()}
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem', fontSize: '0.84rem', color: '#e2e8f0' }}>
-                    {info.statusText}
+                    {info.statusText || '-'}
                   </td>
                   <td style={{ padding: '0.85rem 0.75rem' }}>
                     {br.deadStockValue > 0 ? (
@@ -6845,7 +6845,7 @@ export function InventoryTab({
             </thead>
             <tbody>
               {filteredItems.map(item => {
-                const info = item[isEn ? 'en' : 'th'];
+                const info = (item && item[isEn ? 'en' : 'th']) || {};
                 const badgeColor =
                   item.status === 'in_stock'
                     ? '#10b981'
@@ -6856,14 +6856,14 @@ export function InventoryTab({
                   <tr key={item.sku} style={{ borderBottom: '1px solid rgba(148,163,184,0.12)' }}>
                     <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: '#38bdf8' }}>{item.sku}</td>
                     <td style={{ padding: '0.85rem 0.75rem' }}>
-                      <div style={{ fontWeight: 800, color: '#f8fafc' }}>{info.name}</div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{info.category}</div>
+                      <div style={{ fontWeight: 800, color: '#f8fafc' }}>{info.name || item.sku}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{info.category || '-'}</div>
                     </td>
                     <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: '#fbbf24' }}>
-                      ฿{item.price.toLocaleString()}
+                      ฿{(item.price || 0).toLocaleString()}
                     </td>
-                    <td style={{ padding: '0.85rem 0.75rem', fontWeight: 900, color: item.stock <= 15 ? '#fda4af' : '#f8fafc' }}>
-                      {item.stock.toLocaleString()} {tx('ชิ้น', 'units')}
+                    <td style={{ padding: '0.85rem 0.75rem', fontWeight: 900, color: (item.stock || 0) <= 15 ? '#fda4af' : '#f8fafc' }}>
+                      {(item.stock || 0).toLocaleString()} {tx('ชิ้น', 'units')}
                     </td>
                     <td style={{ padding: '0.85rem 0.75rem' }}>
                       <span
@@ -13290,25 +13290,46 @@ function App() {
       const importedCustomers = uniqueCustNames.slice(0, 50).map((name, idx) => {
         const custRows = importedDbRows.filter(r => r.th.customer === name);
         const custTotal = custRows.reduce((sum, r) => sum + r.amount, 0);
+        const aov = Math.round(custTotal / Math.max(1, custRows.length));
         return {
           id: `CUS-${idx + 1}`,
           segment: idx % 3 === 0 ? 'champion' : idx % 3 === 1 ? 'loyal' : 'at_risk',
           recencyDays: idx % 3 === 0 ? 2 : idx % 3 === 1 ? 14 : 52,
           frequency: custRows.length,
           ltv: custTotal,
+          aov: aov,
+          rfmScore: '5-5-5',
+          contactedCount: 0,
           phone: authPhone || `08${(idx + 1).toString().padStart(8, '0')}`,
           lineId: `@vip.${idx + 1}`,
+          email: `client${idx + 1}@insightflow.vip`,
           th: {
             name,
             segmentLabel: idx % 3 === 0 ? '🏆 ลูกค้าชั้นดีจากไฟล์' : idx % 3 === 1 ? '💎 ลูกค้าประจำจากไฟล์' : '⚠️ ลูกค้าที่ต้องติดตาม',
             recencyText: `ซื้อล่าสุด (${custRows[0]?.date || nowTime})`,
-            favoriteProduct: custRows[0]?.th.product || cleanFileName
+            favoriteProduct: custRows[0]?.th.product || cleanFileName,
+            aiAction: 'มอบสิทธิ์พิเศษและแนะนำโปรโมชันตามประวัติในไฟล์',
+            orders: custRows.slice(0, 5).map((cr, oIdx) => ({
+              orderId: `ORD-${idx + 1}-${oIdx + 1}`,
+              date: cr.date || nowTime,
+              items: cr.th?.product || cleanFileName,
+              total: cr.amount || 0,
+              method: cr.th?.channel || 'หน้าร้าน'
+            }))
           },
           en: {
             name,
             segmentLabel: idx % 3 === 0 ? '🏆 VIP from File' : idx % 3 === 1 ? '💎 Loyal from File' : '⚠️ Needs Follow-Up',
             recencyText: `Latest in file (${custRows[0]?.date || nowTime})`,
-            favoriteProduct: custRows[0]?.en.product || cleanFileName
+            favoriteProduct: custRows[0]?.en.product || cleanFileName,
+            aiAction: 'Provide exclusive personalized recommendations from transaction history',
+            orders: custRows.slice(0, 5).map((cr, oIdx) => ({
+              orderId: `ORD-${idx + 1}-${oIdx + 1}`,
+              date: cr.date || nowTime,
+              items: cr.en?.product || cleanFileName,
+              total: cr.amount || 0,
+              method: cr.en?.channel || 'Store POS'
+            }))
           }
         };
       });
