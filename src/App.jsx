@@ -29,6 +29,11 @@ import DataGovernanceCenter from './components/DataGovernanceCenter';
 import ExecutiveBiStudio from './components/ExecutiveBiStudio';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
+  BasketballHoopZone,
+  BasketballCourtModal,
+  BasketballQuickButton
+} from './components/BasketballUploadHub';
+import {
   EtlPipelineIcon,
   MasterRecordsIcon,
   DataGovernanceIcon,
@@ -12820,8 +12825,9 @@ function App() {
     }
   });
   const [rememberPassword, setRememberPassword] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
   const [inspectingUploadTab, setInspectingUploadTab] = useState(null);
+  const [isBasketballModalOpen, setIsBasketballModalOpen] = useState(false);
+
 
   // OTP 2FA State & Handlers
   const [otpCode, setOtpCode] = useState('');
@@ -14174,151 +14180,23 @@ function App() {
     reader.readAsText(file, 'utf-8');
   };
 
-  // Reusable Upload Zone Renderer passed to tabs (Cyber-Cute Capsule Design Option A)
+  // Reusable Basketball Hoop & Ball Upload Zone Renderer passed to tabs
   const renderUploadZone = (tabKey, pageNameDisplay) => {
     const fileMeta = pageUploadedFiles[tabKey] || null;
     const totalUploadedCount = Object.keys(pageUploadedFiles).length;
-    const isDragOver = dragOverTabKey === tabKey;
 
     return (
-      <div
-        onDragOver={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (dragOverTabKey !== tabKey) setDragOverTabKey(tabKey);
-        }}
-        onDragLeave={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          setDragOverTabKey(null);
-        }}
-        onDrop={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          setDragOverTabKey(null);
-          const droppedFile = e.dataTransfer?.files?.[0];
-          if (droppedFile) {
-            handlePageFileUpload(tabKey, pageNameDisplay, droppedFile);
-          }
-        }}
-        className={`p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border-2 border-dashed transition-all duration-300 shadow-xl relative overflow-hidden ${
-          isDragOver
-            ? 'cyber-drag-active scale-[1.015]'
-            : theme === 'dark'
-            ? 'bg-gradient-to-r from-amber-500/10 via-[#081024] to-emerald-500/10 border-amber-400/45 hover:border-amber-400/70'
-            : 'bg-gradient-to-r from-amber-50/90 via-white to-emerald-50/90 border-amber-400 hover:border-amber-500'
-        }`}
-      >
-        {/* Subtle Cyber Neon Ambient Beam */}
-        <div
-          className="absolute -top-12 -right-12 w-32 h-32 rounded-full pointer-events-none blur-2xl opacity-40 transition-opacity"
-          style={{ background: isDragOver ? '#34d399' : '#fbbf24' }}
-        />
-
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 sm:gap-4 relative z-10">
-          <div className="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0">
-            <div className="hidden sm:block flex-shrink-0 cyber-cute-float">
-              <LuxuryIconBadge variant="gold" size="lg" active>
-                <LuxuryModuleIcon type="upload" size={28} />
-              </LuxuryIconBadge>
-            </div>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <span className="text-[11px] sm:text-xs font-black px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 shadow-sm flex items-center gap-1">
-                  <span className="cyber-sparkle-spin inline-block text-[10px]">✨</span>
-                  <span>{pageNameDisplay}</span>
-                </span>
-                {fileMeta ? (
-                  <span className="text-xs text-emerald-400 font-bold truncate flex items-center gap-1">
-                    <span>●</span>
-                    <strong>{fileMeta.filename}</strong>
-                    <span className="text-[11px] text-slate-400 font-normal">({(fileMeta.rows || 0).toLocaleString()} {tx('รายการ', 'rows')})</span>
-                  </span>
-                ) : (
-                  <span className="text-xs text-amber-400/90 font-medium truncate flex items-center gap-1">
-                    <span className="text-slate-400">○</span>
-                    <span>{tx('ยังไม่มีไฟล์ที่เชื่อมต่อ (พร้อมรับไฟล์ใหม่)', 'No file connected (Ready for data)')}</span>
-                  </span>
-                )}
-              </div>
-              <h4 className={`text-sm sm:text-base font-black mt-1 leading-snug ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                {isDragOver
-                  ? tx('✨ ปล่อยไฟล์ลงกล่องนี้ได้เลยครับ ✨', '✨ Drop file right here ✨')
-                  : tx(`อัปโหลดไฟล์ข้อมูล (${pageNameDisplay})`, `Upload Data File (${pageNameDisplay})`)}
-              </h4>
-            </div>
-          </div>
-
-          {/* Cyber-Cute Capsule Buttons Group */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 flex-shrink-0">
-            {/* View Uploaded Files Capsule Pill */}
-            <button
-              type="button"
-              onClick={() => setInspectingUploadTab(tabKey)}
-              className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-full bg-slate-900/80 hover:bg-slate-800 text-sky-300 border border-sky-400/40 hover:border-sky-300 font-black text-xs sm:text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 active:scale-95 hover:shadow-sky-500/20"
-              title={tx('เปิดดูเนื้อหาในไฟล์ที่อัปโหลดทั้งหมด', 'Inspect all uploaded files')}
-            >
-              <FileRegistryIcon size={18} />
-              <span className="truncate">
-                {tx(`คลังไฟล์ (${totalUploadedCount})`, `Files (${totalUploadedCount})`)}
-              </span>
-            </button>
-
-            {/* Quick Reset Capsule Button if File was uploaded */}
-            {fileMeta && (
-              <button
-                type="button"
-                onClick={() => handleDeleteUploadedFile(tabKey, fileMeta.filename)}
-                className="px-3 sm:px-3.5 py-2.5 sm:py-3 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-black text-xs sm:text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
-                title={tx('ลบไฟล์นี้ออกจากหน้านี้', 'Remove this file')}
-              >
-                <span>🗑️</span>
-                <span className="hidden sm:inline">{tx('ลบไฟล์', 'Remove')}</span>
-              </button>
-            )}
-
-            {/* Cyber-Cute Animated Upload Capsule Button */}
-            <label className="cyber-cute-upload-btn group relative overflow-hidden rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-slate-950 font-black px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 cursor-pointer select-none">
-              {/* Glossy Top Edge Highlight */}
-              <span className="absolute inset-x-0 top-0 h-[1.5px] bg-white/70 pointer-events-none" />
-
-              {/* Shimmer sweep effect */}
-              <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-out pointer-events-none" />
-
-              {isUploading ? (
-                <>
-                  <span className="cyber-radar-spin text-base inline-block">⚡</span>
-                  <span className="truncate tracking-tight font-extrabold">
-                    {tx('กำลังอ่านและคำนวณ...', 'Reading Data...')}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="cyber-arrow-icon text-sm sm:text-base inline-block">🚀</span>
-                  <span className="truncate tracking-tight font-extrabold">
-                    {tx('อัปโหลดไฟล์', 'Upload File')}
-                  </span>
-                  <span className="cyber-sparkle-spin text-xs inline-block">✨</span>
-                </>
-              )}
-
-              <input
-                type="file"
-                accept=".csv,.xlsx,.xls,.txt,.json"
-                className="hidden"
-                disabled={isUploading}
-                onChange={e => {
-                  const f = e.target.files?.[0];
-                  if (f) {
-                    handlePageFileUpload(tabKey, pageNameDisplay, f);
-                    e.target.value = '';
-                  }
-                }}
-              />
-            </label>
-          </div>
-        </div>
-      </div>
+      <BasketballHoopZone
+        tabKey={tabKey}
+        pageNameDisplay={pageNameDisplay}
+        fileMeta={fileMeta}
+        totalUploadedCount={totalUploadedCount}
+        theme={theme}
+        isEn={isEn}
+        onFileDropped={handlePageFileUpload}
+        onInspectFiles={() => setInspectingUploadTab(tabKey)}
+        onDeleteFile={fileMeta ? () => handleDeleteUploadedFile(tabKey, fileMeta.filename) : null}
+      />
     );
   };
 
@@ -17061,6 +16939,9 @@ function App() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+            {/* Universal Basketball Ingest Quick Action */}
+            <BasketballQuickButton onClick={() => setIsBasketballModalOpen(true)} isEn={isEn} />
+
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
             {renderLanguageSwitcher()}
 
@@ -17910,6 +17791,16 @@ function App() {
               </div>
             </div>
           )}
+
+          {/* Universal Central Basketball Shoot-in Modal Hub */}
+          <BasketballCourtModal
+            isOpen={isBasketballModalOpen}
+            onClose={() => setIsBasketballModalOpen(false)}
+            lang={lang}
+            theme={theme}
+            onFileDispatched={handlePageFileUpload}
+            setActiveTab={setActiveTab}
+          />
         </main>
 
         {/* Fixed Bottom App Navigation Dock for Smartphone & Tablet (< 1024px) */}
