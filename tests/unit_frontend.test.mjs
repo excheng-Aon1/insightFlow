@@ -348,5 +348,48 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 16. WAYFINDING SIGNAGE & AIRPORT PICTOGRAM ICON SYSTEM
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-16: Wayfinding Signage & Airport Pictogram system covers all pages', () => {
+    const iconsPath = path.join(projectRoot, 'src', 'components', 'LuxuryIcons.jsx');
+    const iconsContent = fs.readFileSync(iconsPath, 'utf8');
+
+    // 1. Wayfinding Signage badges & icon components exported
+    assert.ok(iconsContent.includes('export function LuxuryIconBadge'), 'LuxuryIcons must export LuxuryIconBadge');
+    assert.ok(iconsContent.includes('export function LuxuryModuleIcon'), 'LuxuryIcons must export LuxuryModuleIcon');
+    assert.ok(iconsContent.includes('wayfinding-icon-badge'), 'LuxuryIconBadge must include wayfinding-icon-badge class');
+
+    // 2. All 12 primary pages and modules supported in LuxuryModuleIcon
+    const expectedModules = [
+      'overview',
+      'bi_studio',
+      'customers',
+      'staff_pos',
+      'multi_channel',
+      'procurement',
+      'inventory',
+      'insights',
+      'live',
+      'database',
+      'admin',
+      'settings'
+    ];
+    for (const mod of expectedModules) {
+      assert.ok(
+        iconsContent.includes(`case '${mod}':`),
+        `LuxuryModuleIcon must handle pictogram for module: ${mod}`
+      );
+    }
+
+    // 3. App.jsx imports and re-exports canonical Wayfinding Icon components
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(
+      appContent.includes("export { LuxuryIconBadge, LuxuryModuleIcon } from './components/LuxuryIcons'"),
+      'App.jsx must export canonical Wayfinding icons from LuxuryIcons.jsx'
+    );
+  });
+
 });
 
