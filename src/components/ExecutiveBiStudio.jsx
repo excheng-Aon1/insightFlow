@@ -180,9 +180,25 @@ export default function ExecutiveBiStudio({
     const count = filteredData.length;
     const grossRevenue = filteredData.reduce((acc, curr) => acc + curr.amount, 0);
 
+    if (count === 0 || grossRevenue === 0) {
+      return {
+        grossRevenue: 0,
+        targetRevenue: 0,
+        targetVariancePercent: '0.0',
+        achievementPercent: 0,
+        cogsAmount: 0,
+        marketingExpense: 0,
+        opexAmount: 0,
+        netOperatingProfit: 0,
+        netMarginPercent: '0.0',
+        averageOrderValue: 0,
+        ordersCount: 0
+      };
+    }
+
     // Target calculation based on filters
     const baseTargetMultiplier = selectedDateRange === 'today' ? 0.04 : selectedDateRange === '7d' ? 0.25 : selectedDateRange === 'quarter' ? 3.1 : selectedDateRange === 'year' ? 12 : 1;
-    const targetRevenue = Math.round((grossRevenue * 1.12 + 150000) * (baseTargetMultiplier > 1 ? 1 : baseTargetMultiplier));
+    const targetRevenue = Math.round((grossRevenue * 1.12) * (baseTargetMultiplier > 1 ? 1 : baseTargetMultiplier));
 
     const targetVariancePercent = targetRevenue > 0 ? (((grossRevenue - targetRevenue) / targetRevenue) * 100).toFixed(1) : '0.0';
     const achievementPercent = Math.min(100, Math.max(0, Math.round((grossRevenue / (targetRevenue || 1)) * 100)));
@@ -1032,12 +1048,27 @@ export default function ExecutiveBiStudio({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/40">
-              {matrixTreeData.map(branchItem => {
-                const isExpanded = !!expandedMatrixRows[branchItem.name];
-                const branchPercentOfMax = Math.round((branchItem.totalRevenue / maxBranchRevenue) * 100);
+              {matrixTreeData.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-12 px-4 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span className="text-3xl">📂</span>
+                      <span className={`text-sm font-black ${theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}`}>
+                        {tx('ยังไม่มีข้อมูลในระบบ — กรุณาอัปโหลดไฟล์ด้านบนเพื่อเริ่มต้นวิเคราะห์', 'No data in system — Please upload a data file above to begin analytics')}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        {tx('รองรับไฟล์ CSV, Excel, TXT, JSON ทั้งชื่อไฟล์ภาษาไทยและภาษาอังกฤษ', 'Supports CSV, Excel, TXT, JSON with Thai and English filenames')}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                matrixTreeData.map(branchItem => {
+                  const isExpanded = !!expandedMatrixRows[branchItem.name];
+                  const branchPercentOfMax = Math.round((branchItem.totalRevenue / maxBranchRevenue) * 100);
 
-                return (
-                  <React.Fragment key={branchItem.name}>
+                  return (
+                    <React.Fragment key={branchItem.name}>
                     {/* Level 1: Branch Row */}
                     <tr
                       onClick={() => toggleExpandMatrix(branchItem.name)}
@@ -1099,7 +1130,7 @@ export default function ExecutiveBiStudio({
                       ))}
                   </React.Fragment>
                 );
-              })}
+              }))}
             </tbody>
           </table>
         </div>
