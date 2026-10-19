@@ -257,12 +257,50 @@ def dispatch_background_task(
 # 2. HELPER: PARSE EXCEL / CSV IN BACKGROUND WORKER
 # ------------------------------------------------------------------------------
 def _read_dataframe_from_bytes(contents: bytes, filename_lower: str) -> pd.DataFrame:
+    """
+    อ่านไฟล์ Excel/CSV อย่างละเอียด โดยตรวจจับแถวหัวกระดาษ (Header Rows) อัตโนมัติ
+    เพื่อป้องกันไม่ให้ข้อความหัวกระดาษ (ชื่อบริษัท/ชื่อรายงาน) ถูกเข้าใจผิดว่าเป็นคอลัมน์
+    """
+    header_keywords = [
+        "date", "time", "created", "branch", "channel", "store", "customer", 
+        "product", "item", "sku", "amount", "revenue", "price", "sales", "total", 
+        "qty", "quantity", "status", "วันที่", "สาขา", "ช่องทาง", "ลูกค้า", 
+        "สินค้า", "รายการ", "ยอด", "ราคา", "จำนวน", "สถานะ", "หมวด"
+    ]
+    
+    header_to_use = 0
+    try:
+        if filename_lower.endswith(".csv") or filename_lower.endswith(".txt"):
+            try:
+                sample_df = pd.read_csv(io.BytesIO(contents), header=None, encoding="utf-8-sig", nrows=10)
+            except UnicodeDecodeError:
+                sample_df = pd.read_csv(io.BytesIO(contents), header=None, encoding="cp874", nrows=10)
+        else:
+            sample_df = pd.read_excel(io.BytesIO(contents), header=None, nrows=10)
+            
+        best_header_row = 0
+        best_score = -1
+        for r_idx in range(len(sample_df)):
+            row_vals = [str(x).strip().lower() for x in sample_df.iloc[r_idx] if pd.notna(x) and str(x).strip()]
+            if len(row_vals) <= 1:
+                continue
+            score = sum(1 for v in row_vals if any(k in v for k in header_keywords))
+            score += len(row_vals) * 0.5
+            if score > best_score:
+                best_score = score
+                best_header_row = r_idx
+                
+        if best_score >= 2:
+            header_to_use = best_header_row
+    except Exception:
+        header_to_use = 0
+
     if filename_lower.endswith(".csv") or filename_lower.endswith(".txt"):
         try:
-            return pd.read_csv(io.BytesIO(contents), encoding="utf-8-sig")
+            return pd.read_csv(io.BytesIO(contents), header=header_to_use, encoding="utf-8-sig")
         except UnicodeDecodeError:
-            return pd.read_csv(io.BytesIO(contents), encoding="cp874")
-    return pd.read_excel(io.BytesIO(contents))
+            return pd.read_csv(io.BytesIO(contents), header=header_to_use, encoding="cp874")
+    return pd.read_excel(io.BytesIO(contents), header=header_to_use)
 
 
 # ------------------------------------------------------------------------------
