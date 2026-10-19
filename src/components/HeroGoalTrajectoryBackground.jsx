@@ -24,20 +24,9 @@ export function HeroGoalTrajectoryBackground({
   children
 }) {
   const isEn = lang === 'en';
-  const [activeStyle, setActiveStyle] = useState('trajectory'); // 'trajectory' | 'terminal' | 'summit'
   const [isAnimationPaused, setIsAnimationPaused] = useState(false);
-
-  const images = {
-    trajectory: '/hero-goal-achievement-3d.jpg',
-    terminal: '/hero-goals-target.jpg',
-    summit: '/hero-victory-bg.jpg'
-  };
-
-  const styleLabels = {
-    trajectory: isEn ? '3D Goal Trajectory Highway' : 'ทางด่วน 3D สู่เป้าหมาย',
-    terminal: isEn ? '3D Target Radar Hub' : 'แท่นเรดาร์เป้าหมาย 3D',
-    summit: isEn ? '3D Summit Victory Peak' : 'พิชิตยอดเขาแห่งเป้าหมาย'
-  };
+  // ภาพพื้นหลังหน้าหลัก: ยอดเขาแห่งความสำเร็จ (Mountain of Success / Victory Summit) เพียงภาพเดียว
+  const mountainVictoryImage = '/hero-victory-bg.jpg';
 
   return (
     <div
@@ -54,9 +43,9 @@ export function HeroGoalTrajectoryBackground({
             isAnimationPaused ? '' : 'animate-goal-3d-breathe'
           }`}
           style={{
-            backgroundImage: `url('${images[activeStyle] || images.trajectory}')`,
+            backgroundImage: `url('${mountainVictoryImage}')`,
             backgroundSize: 'cover',
-            backgroundPosition: 'right 30% center',
+            backgroundPosition: 'right 20% center',
             filter: theme === 'dark' ? 'brightness(0.92) contrast(1.12)' : 'brightness(1.02) contrast(1.05)'
           }}
         />
@@ -224,94 +213,19 @@ export function HeroGoalTrajectoryBackground({
         )}
       </svg>
 
-      {/* =====================================================================
-          LAYER 4: FLOATING 3D HOLOGRAPHIC GOAL MILESTONES (HUD BADGES)
-          ===================================================================== */}
-      <div className="absolute inset-0 pointer-events-none select-none z-[2] hidden xl:block">
-        {/* Milestone 1: Start & Plan */}
-        <div
-          className="absolute left-[38%] bottom-[12%] animate-goal-float-slow"
-          style={{ transform: 'perspective(600px) rotateY(-8deg) rotateX(6deg)' }}
-        >
-          <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl bg-[#0b1224]/85 border border-amber-400/40 backdrop-blur-md shadow-[0_8px_24px_rgba(245,158,11,0.25)] text-xs text-white">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
-            <span className="font-bold text-amber-300">
-              {isEn ? 'Phase 1: Goal Blueprint' : 'ระยะที่ 1: วางแผนสู่เป้าหมาย'}
-            </span>
-          </div>
-        </div>
-
-        {/* Milestone 2: Q1-Q3 Beat Target */}
-        <div
-          className="absolute right-[22%] top-[54%] animate-goal-float-delayed"
-          style={{ transform: 'perspective(600px) rotateY(-12deg) rotateX(8deg)' }}
-        >
-          <div className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-[#09152b]/90 border border-emerald-400/50 backdrop-blur-md shadow-[0_10px_28px_rgba(52,211,153,0.3)] text-xs text-white">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-            <span className="font-black text-emerald-300">
-              {isEn ? 'Q1-Q3 Target Exceeded (+14%)' : 'ไตรมาส 1-3 ทะลุเป้า (+14%)'}
-            </span>
-            <span className="text-[11px] font-bold text-emerald-400/90 bg-emerald-500/20 px-2 py-0.5 rounded-full">
-              ฿8,920,000
-            </span>
-          </div>
-        </div>
-
-        {/* Milestone 3: Ultimate Pinnacle Target Achievement */}
-        <div
-          className="absolute right-[6%] top-[11%] animate-goal-float-slow"
-          style={{ transform: 'perspective(600px) rotateY(-14deg) rotateX(10deg)' }}
-        >
-          <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-950/85 via-[#0b1329]/95 to-sky-950/85 border-2 border-amber-400/60 backdrop-blur-xl shadow-[0_12px_36px_rgba(251,191,36,0.45)] text-xs text-white">
-            <span className="text-base animate-bounce">👑</span>
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-wider text-amber-300">
-                {isEn ? 'Annual Target Summit' : 'พิชิตเป้าหมายสูงสุดแห่งปี'}
-              </div>
-              <div className="text-sm font-black text-white flex items-center gap-2">
-                <span>฿10,000,000</span>
-                <span className="text-[10px] text-emerald-300 bg-emerald-500/20 px-1.5 py-0.5 rounded font-bold">
-                  {isEn ? '100% Achieved' : 'สำเร็จ 100%'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* =====================================================================
-          LAYER 5: INTERACTIVE 3D THEME & ANIMATION CONTROLLER PILL
+          LAYER 5: MOUNTAIN OF SUCCESS (ภูเขาแห่งความสำเร็จ) SINGLE BADGE & ANIMATION CONTROLLER
           ===================================================================== */}
       <div className="absolute right-4 sm:right-8 top-4 z-20 flex items-center gap-2 pointer-events-auto">
-        {/* Style Selector Dropdown Pill */}
-        <div className="flex items-center gap-1 p-1 rounded-2xl bg-[#090e1f]/85 border border-white/15 backdrop-blur-xl shadow-lg text-[11px] font-bold">
-          <span className="text-amber-400 pl-2 pr-1 hidden sm:inline select-none">
-            🎯 3D Visual:
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#090e1f]/85 border border-amber-400/30 backdrop-blur-xl shadow-lg text-[11px] font-bold">
+          <span className="flex items-center gap-1.5 text-amber-300">
+            <span>🏔️</span>
+            <span>{isEn ? 'Mountain of Success' : 'ภูเขาแห่งความสำเร็จ'}</span>
           </span>
-          {[
-            { id: 'trajectory', icon: '🚀', label: styleLabels.trajectory },
-            { id: 'terminal', icon: '🎯', label: styleLabels.terminal },
-            { id: 'summit', icon: '🏔️', label: styleLabels.summit }
-          ].map(s => (
-            <button
-              key={s.id}
-              onClick={() => setActiveStyle(s.id)}
-              className={`px-2.5 py-1 rounded-xl transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                activeStyle === s.id
-                  ? 'bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black shadow'
-                  : 'text-slate-300 hover:text-white hover:bg-white/10'
-              }`}
-              title={s.label}
-            >
-              <span>{s.icon}</span>
-              <span className="hidden md:inline">{s.label}</span>
-            </button>
-          ))}
-
-          {/* Pause / Play 60FPS Animation */}
           <button
             onClick={() => setIsAnimationPaused(!isAnimationPaused)}
-            className="px-2 py-1 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer ml-1 border-l border-white/10"
+            className="px-2 py-0.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer ml-1 border-l border-white/15"
             title={isAnimationPaused ? (isEn ? 'Resume 3D Animation' : 'เล่นแอนิเมชัน') : (isEn ? 'Pause 3D Animation' : 'หยุดแอนิเมชันชั่วคราว')}
           >
             {isAnimationPaused ? '▶' : '⏸'}
@@ -328,4 +242,5 @@ export function HeroGoalTrajectoryBackground({
     </div>
   );
 }
+
 

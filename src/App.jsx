@@ -14549,7 +14549,7 @@ function App() {
         <HeroGoalTrajectoryBackground theme={theme} lang={lang}>
           <div className="px-4 sm:px-8 lg:px-16 py-6 sm:py-12 max-w-[1600px] mx-auto w-full">
             <div id="home" className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
-              <div className="lg:col-span-6">
+              <div className="lg:col-span-8 xl:col-span-7 py-4 sm:py-8">
               <div className={`inline-flex items-center gap-2 text-xs font-black px-3.5 py-1.5 rounded-full mb-4 sm:mb-6 border ${
                 theme === 'light'
                   ? 'bg-blue-50 text-blue-700 border-blue-200'
@@ -14660,45 +14660,6 @@ function App() {
                     </div>
                   );
                 })}
-              </div>
-            </div>
-
-            <div className="lg:col-span-6">
-              {/* Apple-Style 3D Motion Short Video Loop using Our Own InsightFlow Logo */}
-              <AppleKeynoteLogoFilm
-                lang={lang}
-                onOpenFullscreen={() => setIsAppleFilmOpen(true)}
-              />
-
-              <div className="bg-[#0b1120]/95 border border-amber-400/30 rounded-3xl p-6 shadow-2xl">
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10 text-xs">
-                  <span className="font-black text-white flex items-center gap-2.5">
-                    <LuxuryIconBadge variant="gold" size="sm" active>
-                      <LuxuryModuleIcon type="precision_target" size={18} />
-                    </LuxuryIconBadge>
-                    <span>{t.heroHubTitle}</span>
-                  </span>
-                  <span className="font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full">
-                    {t.heroHubStatus}
-                  </span>
-                </div>
-                <div className="rounded-2xl overflow-hidden border border-white/10 bg-[#070b16] p-5 mb-4">
-                  <div className="flex justify-between items-center mb-3">
-                    <div>
-                      <p className="text-xs text-slate-400 font-bold">{t.heroTargetLabel}</p>
-                      <h4 className="text-2xl font-black text-white mt-0.5">฿10,000,000</h4>
-                      <span className="text-xs text-emerald-400 font-bold">฿8,920,000 {t.heroTargetActual}</span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-slate-400 font-bold">{t.heroAccLabel}</p>
-                      <h4 className="text-2xl font-black text-amber-400 mt-0.5">99.4%</h4>
-                      <span className="text-xs text-emerald-400 font-bold">{t.heroAccBadge}</span>
-                    </div>
-                  </div>
-                  <div className="h-36 w-full">
-                    <Line data={heroGoalChartData} options={lineChartOptions} />
-                  </div>
-                </div>
               </div>
             </div>
           </div>

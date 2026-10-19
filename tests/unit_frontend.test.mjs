@@ -404,9 +404,13 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
       'HeroGoalTrajectoryBackground.jsx must export HeroGoalTrajectoryBackground'
     );
 
-    // 2. 3D Goal Trajectory assets exist in public folder
-    const publicHeroGoal = path.join(projectRoot, 'public', 'hero-goal-achievement-3d.jpg');
-    assert.ok(fs.existsSync(publicHeroGoal), 'public/hero-goal-achievement-3d.jpg must exist');
+    // 2. 3D Goal Trajectory & Mountain of Success assets exist in public folder
+    const publicHeroVictory = path.join(projectRoot, 'public', 'hero-victory-bg.jpg');
+    assert.ok(fs.existsSync(publicHeroVictory), 'public/hero-victory-bg.jpg (Mountain of Success) must exist');
+    assert.ok(
+      heroBgContent.includes('/hero-victory-bg.jpg'),
+      'HeroGoalTrajectoryBackground.jsx must use Mountain of Success (/hero-victory-bg.jpg) as the single hero background'
+    );
 
     // 3. Hardware-accelerated 3D keyframe animations in index.css
     const cssPath = path.join(projectRoot, 'src', 'index.css');
