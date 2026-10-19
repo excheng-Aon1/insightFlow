@@ -79,8 +79,25 @@ export function ActionablePlaybooks({
   // =========================================================================
   // MISSION 1: MARKET BASKET ANALYSIS LOGIC & ACTIONS
   // =========================================================================
-  const productA = currentInventory[0] || null;
-  const productB = currentInventory[1] || currentInventory[0] || null;
+  const fallbackProductA = {
+    sku: 'SKU-A',
+    th: { name: tx('สินค้าขายดี A', 'Top Seller A') },
+    en: { name: 'Top Seller A' },
+    price: 0,
+    cost: 0,
+    stock: 0,
+  };
+  const fallbackProductB = {
+    sku: 'SKU-B',
+    th: { name: tx('สินค้าขายดี B', 'Top Seller B') },
+    en: { name: 'Top Seller B' },
+    price: 0,
+    cost: 0,
+    stock: 0,
+  };
+
+  const productA = currentInventory[0] || (hasInventory ? fallbackProductA : null);
+  const productB = currentInventory[1] || currentInventory[0] || (hasInventory ? fallbackProductB : null);
 
   const originalBundleSum = productA && productB ? (productA.price || 0) + (productB.price || 0) : 0;
   const discountedBundlePrice = Math.round(originalBundleSum * (1 - bundleDiscountPct / 100));
@@ -109,8 +126,8 @@ export function ActionablePlaybooks({
       return;
     }
     const caption = isEn
-      ? `🔥 EXCLUSIVE VIP BUNDLE! Pair "${productA.en?.name || productA.sku}" with "${productB.en?.name || productB.sku}" today for only ฿${discountedBundlePrice.toLocaleString()} (was ฿${originalBundleSum.toLocaleString()}, save ฿${bundleSavedAmount.toLocaleString()})! Limited sets this week only.`
-      : `🔥 โปรโมชันเซ็ตคู่พิเศษประจำสัปดาห์! ซื้อคู่กันคุ้มกว่า "${productA.th?.name || productA.sku}" + "${productB.th?.name || productB.sku}" เพียง ฿${discountedBundlePrice.toLocaleString()} (จากปกติ ฿${originalBundleSum.toLocaleString()} ประหยัดทันที ฿${bundleSavedAmount.toLocaleString()}) สั่งซื้อด่วนทาง LINE ทันที!`;
+      ? `🔥 EXCLUSIVE VIP BUNDLE! Pair "${productA?.en?.name || productA?.sku || ''}" with "${productB?.en?.name || productB?.sku || ''}" today for only ฿${discountedBundlePrice.toLocaleString()} (was ฿${originalBundleSum.toLocaleString()}, save ฿${bundleSavedAmount.toLocaleString()})! Limited sets this week only.`
+      : `🔥 โปรโมชันเซ็ตคู่พิเศษประจำสัปดาห์! ซื้อคู่กันคุ้มกว่า "${productA?.th?.name || productA?.sku || ''}" + "${productB?.th?.name || productB?.sku || ''}" เพียง ฿${discountedBundlePrice.toLocaleString()} (จากปกติ ฿${originalBundleSum.toLocaleString()} ประหยัดทันที ฿${bundleSavedAmount.toLocaleString()}) สั่งซื้อด่วนทาง LINE ทันที!`;
 
     navigator.clipboard.writeText(caption);
     toast.success(
@@ -232,20 +249,20 @@ export function ActionablePlaybooks({
   // MISSION 3: DYNAMIC PRICING & PROMO SIMULATOR CALCULATION
   // =========================================================================
   const simItem = currentInventory.find(i => i.sku === simSelectedSku) || defaultItems[0];
-  const simCost = simItem.cost || Math.round(simItem.price * 0.4); // Cost per unit
-  const originalUnitPrice = simItem.price;
-  const originalUnitMargin = originalUnitPrice - simCost;
-  const originalMarginPct = (originalUnitMargin / originalUnitPrice) * 100; // e.g. (1290-450)/1290 = 65.1%
+  const simCost = simItem ? (simItem.cost || Math.round((simItem.price || 0) * 0.4)) : 0; // Cost per unit
+  const originalUnitPrice = simItem ? (simItem.price || 0) : 0;
+  const originalUnitMargin = Math.max(0, originalUnitPrice - simCost);
+  const originalMarginPct = originalUnitPrice > 0 ? (originalUnitMargin / originalUnitPrice) * 100 : 0; // e.g. (1290-450)/1290 = 65.1%
 
   const newUnitPrice = Math.round(originalUnitPrice * (1 - simDiscountPct / 100));
   const newUnitMargin = newUnitPrice - simCost;
-  const newMarginPct = (newUnitMargin / newUnitPrice) * 100;
+  const newMarginPct = newUnitPrice > 0 ? (newUnitMargin / newUnitPrice) * 100 : 0;
 
   // Formula for Break-Even Volume Uplift:
   // Required Q_new * newUnitMargin = Q_base * originalUnitMargin
   // Required Uplift % = (originalUnitMargin / newUnitMargin - 1) * 100
   const isLossMaking = newUnitMargin <= 0;
-  const breakEvenMultiplier = isLossMaking ? 999 : originalUnitMargin / newUnitMargin;
+  const breakEvenMultiplier = isLossMaking || newUnitMargin <= 0 ? 999 : (originalUnitMargin / newUnitMargin);
   const requiredUpliftPct = isLossMaking ? 999 : Math.round((breakEvenMultiplier - 1) * 100);
   const requiredTotalQty = Math.round(simMonthlyBaseQty * breakEvenMultiplier);
   const requiredExtraUnits = Math.max(0, requiredTotalQty - simMonthlyBaseQty);
@@ -370,9 +387,12 @@ export function ActionablePlaybooks({
                   {tx('💡 ระบบวิเคราะห์ประวัติการสั่งซื้อพบพฤติกรรมเด่น:', '💡 Order history diagnostic discovered:')}
                 </div>
                 <div style={{ fontSize: '0.92rem', color: '#e2e8f0', fontWeight: 700, lineHeight: 1.55 }}>
-                  "{tx(
-                    `ลูกค้าที่ซื้อ "${productA.th?.name}" มักจะซื้อ "${productB.th?.name}" ควบคู่กันสูงถึง 68%`,
-                    `Customers purchasing "${productA.en?.name}" pair with "${productB.en?.name}" in 68% of orders.`
+                  "{productA && productB ? tx(
+                    `ลูกค้าที่ซื้อ "${productA?.th?.name || productA?.sku}" มักจะซื้อ "${productB?.th?.name || productB?.sku}" ควบคู่กันสูงถึง 68%`,
+                    `Customers purchasing "${productA?.en?.name || productA?.sku}" pair with "${productB?.en?.name || productB?.sku}" in 68% of orders.`
+                  ) : tx(
+                    'ยังไม่มีข้อมูลการจับคู่สินค้า (กรุณาอัปโหลดไฟล์คำสั่งซื้อหรือสินค้าเพื่อวิเคราะห์ Basket Analysis)',
+                    'No bundling data available yet (Please upload sales orders or inventory to run Basket Analysis)'
                   )}"
                 </div>
               </div>
@@ -399,9 +419,12 @@ export function ActionablePlaybooks({
                 </div>
 
                 <div style={{ fontSize: '0.85rem', color: '#f1f5f9', lineHeight: 1.6 }}>
-                  {tx(
-                    `จัดโปรโมชันจับคู่ "${productA.th?.name} + ${productB.th?.name}" ลด ${bundleDiscountPct}% ในสัปดาห์หน้าเพื่อเพิ่มยอดซื้อต่อบิล`,
-                    `Launch "${productA.en?.name} + ${productB.en?.name}" at ${bundleDiscountPct}% OFF next week to lift average order value.`
+                  {productA && productB ? tx(
+                    `จัดโปรโมชันจับคู่ "${productA?.th?.name || productA?.sku} + ${productB?.th?.name || productB?.sku}" ลด ${bundleDiscountPct}% ในสัปดาห์หน้าเพื่อเพิ่มยอดซื้อต่อบิล`,
+                    `Launch "${productA?.en?.name || productA?.sku} + ${productB?.en?.name || productB?.sku}" at ${bundleDiscountPct}% OFF next week to lift average order value.`
+                  ) : tx(
+                    'อัปโหลดข้อมูลสินค้าเพื่อสร้างโปรโมชันจับคู่และข้อเสนอแนะอัตโนมัติ',
+                    'Upload inventory data to generate automated bundle promotions and recommendations'
                   )}
                 </div>
 
@@ -1059,9 +1082,9 @@ export function ActionablePlaybooks({
                   style={{ width: '100%', accentColor: '#34d399', cursor: 'pointer' }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#94a3b8' }}>
-                  <span>10% (฿{Math.round(deadStockTarget.price * 0.9)})</span>
-                  <span>35% (฿{Math.round(deadStockTarget.price * 0.65)})</span>
-                  <span>50% (฿{Math.round(deadStockTarget.price * 0.5)})</span>
+                  <span>10% (฿{Math.round((deadStockTarget?.price || 0) * 0.9)})</span>
+                  <span>35% (฿{Math.round((deadStockTarget?.price || 0) * 0.65)})</span>
+                  <span>50% (฿{Math.round((deadStockTarget?.price || 0) * 0.5)})</span>
                 </div>
               </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { LuxuryIconBadge, LuxuryModuleIcon, MarketPositionRadarIcon } from './LuxuryIcons';
 
@@ -297,6 +297,14 @@ export function IndustryBenchmarkAndGoalDecomposition({
   const [todayAchievedSales, setTodayAchievedSales] = useState(currentRevenueVal > 0 ? 12500 : 0);
   const [isPosPinned, setIsPosPinned] = useState(false);
 
+  useEffect(() => {
+    if (currentRevenueVal === 0) {
+      setBasketSizeInput(0);
+      setTodayAchievedBills(0);
+      setTodayAchievedSales(0);
+    }
+  }, [currentRevenueVal]);
+
   // Calculations
   const revenueTarget = targetRevenueVal || 0;
   const revenueCurrent = currentRevenueVal || 0;
@@ -304,21 +312,21 @@ export function IndustryBenchmarkAndGoalDecomposition({
   const totalDays = Math.max(1, parseInt(targetTimelineVal, 10) || 30);
   const remainingDays = Math.max(1, Math.round(totalDays * 0.6)); // e.g. 18 days left in 30-day target
 
-  const dailyTargetRevenue = Math.round(remainingGap / remainingDays);
+  const dailyTargetRevenue = remainingDays > 0 ? Math.round(remainingGap / remainingDays) : 0;
   const currentBasket = Math.max(0, basketSizeInput || 0);
 
   // Daily Required Bills
-  const requiredBillsPerDay = Math.ceil(dailyTargetRevenue / currentBasket);
+  const requiredBillsPerDay = currentBasket > 0 && dailyTargetRevenue > 0 ? Math.ceil(dailyTargetRevenue / currentBasket) : 0;
 
   // Boosted Basket Scenario (e.g. +350 THB from combo bundle)
-  const boostedBasket = currentBasket + 350;
-  const requiredBillsBoosted = Math.ceil(dailyTargetRevenue / boostedBasket);
+  const boostedBasket = currentBasket > 0 ? currentBasket + 350 : 0;
+  const requiredBillsBoosted = boostedBasket > 0 && dailyTargetRevenue > 0 ? Math.ceil(dailyTargetRevenue / boostedBasket) : 0;
   const billsSaved = Math.max(0, requiredBillsPerDay - requiredBillsBoosted);
 
   // Today's Progress
   const todayRemainingBills = Math.max(0, requiredBillsPerDay - todayAchievedBills);
   const todayRemainingSales = Math.max(0, dailyTargetRevenue - todayAchievedSales);
-  const todayProgressPct = Math.min(100, Math.round((todayAchievedSales / Math.max(1, dailyTargetRevenue)) * 100));
+  const todayProgressPct = dailyTargetRevenue > 0 ? Math.min(100, Math.round((todayAchievedSales / dailyTargetRevenue) * 100)) : 0;
 
   const handleCopyDailyBriefing = () => {
     const text = isEn
@@ -673,7 +681,7 @@ export function IndustryBenchmarkAndGoalDecomposition({
                     <input
                       type="number"
                       value={basketSizeInput}
-                      onChange={e => setBasketSizeInput(Math.max(50, Number(e.target.value) || 850))}
+                      onChange={e => setBasketSizeInput(Math.max(0, Number(e.target.value) || 0))}
                       style={{ width: '65px', padding: '0.15rem 0.35rem', borderRadius: '6px', background: '#0f172a', color: '#38bdf8', border: '1px solid #38bdf8', fontSize: '0.75rem', fontWeight: 800, textAlign: 'right' }}
                     />
                     <span style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>฿</span>
@@ -756,8 +764,8 @@ export function IndustryBenchmarkAndGoalDecomposition({
                 }}
               >
                 {isPosPinned
-                  ? tx('✓ ปักหมุดเป้าหมาย 38 บิลบนหน้าจอ POS แล้ว', '✓ Pinned 38 Bills Goal to POS')
-                  : tx('🎯 ปักหมุดเป้าหมาย 38 บิลนี้ขึ้นหน้าจอ POS ประจำวันทันที', '🎯 Pin Daily Receipt Target to Cashier POS Display')}
+                  ? tx(`✓ ปักหมุดเป้าหมาย ${requiredBillsPerDay} บิลบนหน้าจอ POS แล้ว`, `✓ Pinned ${requiredBillsPerDay} Bills Goal to POS`)
+                  : tx(`🎯 ปักหมุดเป้าหมาย ${requiredBillsPerDay} บิลนี้ขึ้นหน้าจอ POS ประจำวันทันที`, `🎯 Pin ${requiredBillsPerDay} Bills Goal to Cashier POS Display`)}
               </button>
             </div>
           </div>
