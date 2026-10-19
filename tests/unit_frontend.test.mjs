@@ -391,5 +391,43 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 17. 3D ANIMATED GOAL TRAJECTORY HERO BACKGROUND INTEGRATION
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-17: 3D Animated Goal Trajectory Hero Background Integration', () => {
+    // 1. Component exists and exports HeroGoalTrajectoryBackground
+    const heroBgPath = path.join(projectRoot, 'src', 'components', 'HeroGoalTrajectoryBackground.jsx');
+    assert.ok(fs.existsSync(heroBgPath), 'HeroGoalTrajectoryBackground.jsx must exist');
+    const heroBgContent = fs.readFileSync(heroBgPath, 'utf8');
+    assert.ok(
+      heroBgContent.includes('export function HeroGoalTrajectoryBackground'),
+      'HeroGoalTrajectoryBackground.jsx must export HeroGoalTrajectoryBackground'
+    );
+
+    // 2. 3D Goal Trajectory assets exist in public folder
+    const publicHeroGoal = path.join(projectRoot, 'public', 'hero-goal-achievement-3d.jpg');
+    assert.ok(fs.existsSync(publicHeroGoal), 'public/hero-goal-achievement-3d.jpg must exist');
+
+    // 3. Hardware-accelerated 3D keyframe animations in index.css
+    const cssPath = path.join(projectRoot, 'src', 'index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+    assert.ok(cssContent.includes('@keyframes goal3dBreathe'), 'index.css must define goal3dBreathe');
+    assert.ok(cssContent.includes('@keyframes goalLaserFlow'), 'index.css must define goalLaserFlow');
+    assert.ok(cssContent.includes('@keyframes goalRadarPulse1'), 'index.css must define goalRadarPulse1');
+    assert.ok(cssContent.includes('@keyframes goalSummitPulse'), 'index.css must define goalSummitPulse');
+
+    // 4. App.jsx imports and wraps the Hero section in HeroGoalTrajectoryBackground
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(
+      appContent.includes("import { HeroGoalTrajectoryBackground } from './components/HeroGoalTrajectoryBackground'"),
+      'App.jsx must import HeroGoalTrajectoryBackground'
+    );
+    assert.ok(
+      appContent.includes('<HeroGoalTrajectoryBackground') && appContent.includes('</HeroGoalTrajectoryBackground>'),
+      'App.jsx must wrap hero with HeroGoalTrajectoryBackground'
+    );
+  });
+
 });
 

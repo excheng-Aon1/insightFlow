@@ -33,6 +33,7 @@ import {
   BasketballCourtModal,
   BasketballQuickButton
 } from './components/BasketballUploadHub';
+import { HeroGoalTrajectoryBackground } from './components/HeroGoalTrajectoryBackground';
 import {
   LuxuryIconBadge,
   LuxuryModuleIcon,
@@ -14544,10 +14545,11 @@ function App() {
           </nav>
         </header>
 
-        {/* Hero Section */}
-        <main className="flex-1 px-4 sm:px-8 lg:px-16 py-6 sm:py-14 max-w-[1600px] mx-auto w-full">
-          <div id="home" className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center mb-12 sm:mb-24">
-            <div className="lg:col-span-6">
+        {/* 3D Animated Goal Trajectory Hero Background (การนำพาธุรกิจสู่เป้าหมาย) */}
+        <HeroGoalTrajectoryBackground theme={theme} lang={lang}>
+          <div className="px-4 sm:px-8 lg:px-16 py-6 sm:py-12 max-w-[1600px] mx-auto w-full">
+            <div id="home" className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
+              <div className="lg:col-span-6">
               <div className={`inline-flex items-center gap-2 text-xs font-black px-3.5 py-1.5 rounded-full mb-4 sm:mb-6 border ${
                 theme === 'light'
                   ? 'bg-blue-50 text-blue-700 border-blue-200'
@@ -14700,7 +14702,10 @@ function App() {
               </div>
             </div>
           </div>
+        </div>
+      </HeroGoalTrajectoryBackground>
 
+      <main className="flex-1 px-4 sm:px-8 lg:px-16 max-w-[1600px] mx-auto w-full">
           {/* Fullscreen Apple Keynote Logo Motion Film Modal */}
           {isAppleFilmOpen && (
             <div

@@ -1987,4 +1987,146 @@ html[data-theme="dark"] .minimal-card-surface {
   }
 }
 
+/* ==========================================================================
+   3D HERO GOAL TRAJECTORY ANIMATION ENGINE (การนำพาธุรกิจสู่เป้าหมาย)
+   ========================================================================== */
+.animate-goal-3d-breathe {
+  animation: goal3dBreathe 22s ease-in-out infinite alternate;
+}
+
+@keyframes goal3dBreathe {
+  0% {
+    transform: scale(1.0) translate(0%, 0%);
+  }
+  50% {
+    transform: scale(1.045) translate(-1%, -0.8%);
+  }
+  100% {
+    transform: scale(1.0) translate(0%, 0%);
+  }
+}
+
+.animate-goal-laser-flow {
+  animation: goalLaserFlow 4s linear infinite;
+}
+
+.animate-goal-laser-flow-fast {
+  animation: goalLaserFlow 2.8s linear infinite;
+}
+
+@keyframes goalLaserFlow {
+  0% {
+    stroke-dashoffset: 280;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-goal-radar-ring-1 {
+  animation: goalRadarPulse1 2.6s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+  transform-origin: center;
+}
+
+.animate-goal-radar-ring-2 {
+  animation: goalRadarPulse2 2.6s cubic-bezier(0.2, 0.8, 0.4, 1) infinite 0.9s;
+  transform-origin: center;
+}
+
+@keyframes goalRadarPulse1 {
+  0% {
+    r: 6px;
+    opacity: 0.9;
+  }
+  80% {
+    r: 32px;
+    opacity: 0;
+  }
+  100% {
+    r: 32px;
+    opacity: 0;
+  }
+}
+
+@keyframes goalRadarPulse2 {
+  0% {
+    r: 8px;
+    opacity: 0.7;
+  }
+  80% {
+    r: 44px;
+    opacity: 0;
+  }
+  100% {
+    r: 44px;
+    opacity: 0;
+  }
+}
+
+.animate-goal-summit-pulse-1 {
+  animation: goalSummitPulse 3.2s ease-out infinite;
+  transform-origin: center;
+}
+
+.animate-goal-summit-pulse-2 {
+  animation: goalSummitPulse 3.2s ease-out infinite 1s;
+  transform-origin: center;
+}
+
+.animate-goal-summit-pulse-3 {
+  animation: goalSummitPulse 3.2s ease-out infinite 2s;
+  transform-origin: center;
+}
+
+@keyframes goalSummitPulse {
+  0% {
+    r: 12px;
+    opacity: 0.85;
+  }
+  100% {
+    r: 68px;
+    opacity: 0;
+  }
+}
+
+.animate-goal-diamond-spin {
+  animation: goalDiamondFloat 4s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+@keyframes goalDiamondFloat {
+  0% {
+    transform: scale(0.92) rotate(-4deg);
+  }
+  100% {
+    transform: scale(1.08) rotate(4deg);
+  }
+}
+
+.animate-goal-float-slow {
+  animation: goalFloatSlow 5s ease-in-out infinite alternate;
+}
+
+.animate-goal-float-delayed {
+  animation: goalFloatDelayed 6s ease-in-out infinite alternate 1.5s;
+}
+
+@keyframes goalFloatSlow {
+  0% {
+    transform: translateY(0px) rotate(-1deg);
+  }
+  100% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes goalFloatDelayed {
+  0% {
+    transform: translateY(0px) rotate(1deg);
+  }
+  100% {
+    transform: translateY(-10px) rotate(-1.5deg);
+  }
+}
+
 
