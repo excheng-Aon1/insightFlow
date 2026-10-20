@@ -29,9 +29,7 @@ import DataGovernanceCenter from './components/DataGovernanceCenter';
 import ExecutiveBiStudio from './components/ExecutiveBiStudio';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
-  BasketballHoopZone,
-  BasketballCourtModal,
-  BasketballQuickButton
+  BasketballHoopZone
 } from './components/BasketballUploadHub';
 import { HeroGoalTrajectoryBackground } from './components/HeroGoalTrajectoryBackground';
 import {
@@ -12165,9 +12163,6 @@ function App() {
   });
   const [rememberPassword, setRememberPassword] = useState(true);
   const [inspectingUploadTab, setInspectingUploadTab] = useState(null);
-  const [isBasketballModalOpen, setIsBasketballModalOpen] = useState(false);
-  const centralFileInputRef = useRef(null);
-
 
   // OTP 2FA State & Handlers
   const [otpCode, setOtpCode] = useState('');
@@ -16487,43 +16482,6 @@ function App() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {/* Central Unified File Upload Button (Shared across all pages) */}
-            <input
-              type="file"
-              ref={centralFileInputRef}
-              onChange={e => {
-                const f = e.target.files && e.target.files[0];
-                if (f) {
-                  handlePageFileUpload(activeTab || 'overview', f.name, f);
-                  e.target.value = '';
-                }
-              }}
-              accept=".csv,.xlsx,.xls,.json,.txt"
-              style={{ display: 'none' }}
-            />
-            <button
-              type="button"
-              onClick={() => centralFileInputRef.current?.click()}
-              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-emerald-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
-              title={tx('อัปโหลดไฟล์กลาง (ข้อมูลจะซิงก์และเชื่อมต่อทุกหน้า)', 'Upload Central File (Syncs across all pages)')}
-            >
-              <span className="text-sm sm:text-base">📂</span>
-              <span className="font-black">
-                {tx('อัปโหลดไฟล์กลาง', 'Upload Central File')}
-              </span>
-            </button>
-
-            {/* Quick Basketball Shoot-In Modal Button */}
-            <button
-              type="button"
-              onClick={() => setIsBasketballModalOpen(true)}
-              className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-2xl bg-orange-500/20 hover:bg-orange-500/30 border border-orange-400/40 text-amber-300 font-black text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer flex-shrink-0"
-              title={tx('เปิดกล่องชู้ตไฟล์บาสเก็ตบอล', 'Open Basketball Dropzone Hub')}
-            >
-              <span className="animate-bounce">🏀</span>
-              <span className="hidden md:inline">{tx('ชู้ตไฟล์', 'Shoot')}</span>
-            </button>
-
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
             {renderLanguageSwitcher()}
 
@@ -17371,15 +17329,6 @@ function App() {
             </div>
           )}
 
-          {/* Universal Central Basketball Shoot-in Modal Hub */}
-          <BasketballCourtModal
-            isOpen={isBasketballModalOpen}
-            onClose={() => setIsBasketballModalOpen(false)}
-            lang={lang}
-            theme={theme}
-            onFileDispatched={handlePageFileUpload}
-            setActiveTab={setActiveTab}
-          />
         </main>
 
         {/* Fixed Bottom App Navigation Dock for Smartphone & Tablet (< 1024px) */}
@@ -17448,5 +17397,4 @@ function App() {
 }
 
 export default App;
-
 
