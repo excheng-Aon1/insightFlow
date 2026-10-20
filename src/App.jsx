@@ -13335,6 +13335,9 @@ function App() {
       const colQtyIdx = findCol(/qty|quantity|units|count|items|จำนวน|ชิ้น|ออเดอร์|ปริมาณ/i);
       const colStatusIdx = findCol(/status|state|สถานะ|ชำระ/i);
       const colStaffIdx = findCol(/staff|cashier|employee|seller|waiter|rep|พนักงาน|แคชเชียร์|ผู้ขาย|พนักงานขาย/i);
+      const colCategoryIdx = findCol(/category|group|type|dept|หมวด|ประเภท|กลุ่มสินค้า/i);
+      const colStockIdx = findCol(/stock|inventory|remain|onhand|balance|สต็อก|คงเหลือ/i);
+      const colCostIdx = findCol(/cost|cogs|buyprice|ราคาทุน|ต้นทุน/i);
 
       // Detailed Column Mapping Profile for zero-error verification
       const columnMappingDetails = detectedHeaders.map((headerName, idx) => {
@@ -13348,6 +13351,9 @@ function App() {
         else if (idx === colQtyIdx) { roleTh = '📦 จำนวนชิ้น / หน่วย'; roleEn = '📦 Quantity / Units'; }
         else if (idx === colStatusIdx) { roleTh = '⚡ สถานะรายการ'; roleEn = '⚡ Transaction Status'; }
         else if (idx === colStaffIdx) { roleTh = '👤 พนักงาน / แคชเชียร์'; roleEn = '👤 Staff / Cashier'; }
+        else if (idx === colCategoryIdx) { roleTh = '🏷️ หมวดหมู่สินค้า'; roleEn = '🏷️ Product Category'; }
+        else if (idx === colStockIdx) { roleTh = '📦 สต็อกคงเหลือ'; roleEn = '📦 Stock on Hand'; }
+        else if (idx === colCostIdx) { roleTh = '💵 ต้นทุนสินค้า'; roleEn = '💵 Unit Cost'; }
 
         const sampleVal = dataRows[0] && dataRows[0][idx] ? String(dataRows[0][idx]).trim() : '-';
         return {
@@ -13366,8 +13372,9 @@ function App() {
         return !isNaN(n) && n > 0 ? n : 0;
       };
 
-      // 4. Map parsed rows into enterprise database records
-      const importedDbRows = dataRows.slice(0, 500).map((row, idx) => {
+      // 4. Map parsed rows into enterprise database records (Scalable up to 10,000 rows without bottleneck)
+      const maxRowsToProcess = Math.min(10000, dataRows.length);
+      const importedDbRows = dataRows.slice(0, maxRowsToProcess).map((row, idx) => {
         let amount = 0;
         if (colAmountIdx >= 0 && row[colAmountIdx]) {
           amount = parseAmountFromCell(row[colAmountIdx]);
@@ -13397,23 +13404,27 @@ function App() {
         const customerVal = (colCustomerIdx >= 0 && row[colCustomerIdx]) || `Customer #${idx + 1}`;
         const productVal = (colProductIdx >= 0 && row[colProductIdx]) || (row[1] || `${cleanFileName} Item #${idx + 1}`);
         const statusVal = (colStatusIdx >= 0 && row[colStatusIdx]) || tx('ชำระเงินสำเร็จ', 'Paid & Completed');
+        const categoryVal = (colCategoryIdx >= 0 && row[colCategoryIdx]) || cleanFileName;
 
         return {
           id: `REC-${cleanFileName.slice(0, 4).toUpperCase()}-${idx + 1}`,
           date: dateVal,
           amount,
           itemsCount: qty,
+          category: categoryVal,
           th: {
             channel: channelVal,
             customer: customerVal,
             product: productVal,
-            status: statusVal
+            status: statusVal,
+            category: categoryVal
           },
           en: {
             channel: channelVal,
             customer: customerVal,
             product: productVal,
-            status: statusVal
+            status: statusVal,
+            category: categoryVal
           }
         };
       });
@@ -13427,31 +13438,123 @@ function App() {
       setIsPlanActive(true);
       setDbRecords(importedDbRows);
 
-      // Populate Customers from file
-      const uniqueCustNames = Array.from(new Set(importedDbRows.map(r => r.th.customer)));
-      const importedCustomers = uniqueCustNames.slice(0, 50).map((name, idx) => {
-        const custRows = importedDbRows.filter(r => r.th.customer === name);
-        const custTotal = custRows.reduce((sum, r) => sum + r.amount, 0);
-        const aov = Math.round(custTotal / Math.max(1, custRows.length));
+      // Populate Customers from file using real Mathematical RFM (Recency, Frequency, Monetary)
+      const custRowsMap = new Map();
+      importedDbRows.forEach(r => {
+        const cName = r.th.customer;
+        if (!custRowsMap.has(cName)) {
+          custRowsMap.set(cName, []);
+        }
+        custRowsMap.get(cName).push(r);
+      });
+
+      const nowTs = Date.now();
+      const rawCustList = [];
+
+      custRowsMap.forEach((cRows, cName) => {
+        const custTotal = cRows.reduce((sum, r) => sum + r.amount, 0);
+        const aov = Math.round(custTotal / Math.max(1, cRows.length));
+
+        // Find most recent transaction date
+        let latestDateTs = 0;
+        let latestDateStr = '';
+        cRows.forEach(cr => {
+          if (cr.date) {
+            const parsedTs = Date.parse(cr.date);
+            if (!isNaN(parsedTs) && parsedTs > latestDateTs) {
+              latestDateTs = parsedTs;
+              latestDateStr = cr.date;
+            }
+          }
+        });
+
+        let recencyDays = 14;
+        if (latestDateTs > 0) {
+          const diffDays = Math.max(1, Math.round((nowTs - latestDateTs) / (1000 * 60 * 60 * 24)));
+          recencyDays = Math.min(180, diffDays);
+        } else {
+          recencyDays = cRows.length > 2 ? 3 : 48;
+        }
+
+        rawCustList.push({
+          name: cName,
+          cRows,
+          custTotal,
+          aov,
+          frequency: cRows.length,
+          recencyDays,
+          latestDateStr: latestDateStr || cRows[0]?.date || nowTime
+        });
+      });
+
+      const totalCustCount = rawCustList.length;
+
+      // Monetary percentile rank (higher is better)
+      const sortedByM = [...rawCustList].sort((a, b) => b.custTotal - a.custTotal);
+      const mRankMap = new Map();
+      sortedByM.forEach((c, idx) => mRankMap.set(c.name, 1 - (idx / Math.max(1, totalCustCount))));
+
+      // Frequency percentile rank (higher is better)
+      const sortedByF = [...rawCustList].sort((a, b) => b.frequency - a.frequency);
+      const fRankMap = new Map();
+      sortedByF.forEach((c, idx) => fRankMap.set(c.name, 1 - (idx / Math.max(1, totalCustCount))));
+
+      // Recency percentile rank (smaller days is better)
+      const sortedByR = [...rawCustList].sort((a, b) => a.recencyDays - b.recencyDays);
+      const rRankMap = new Map();
+      sortedByR.forEach((c, idx) => rRankMap.set(c.name, 1 - (idx / Math.max(1, totalCustCount))));
+
+      const importedCustomers = sortedByM.slice(0, 150).map((c, idx) => {
+        const rPct = rRankMap.get(c.name) ?? 0.5;
+        const fPct = fRankMap.get(c.name) ?? 0.5;
+        const mPct = mRankMap.get(c.name) ?? 0.5;
+
+        const rScore = Math.min(5, Math.max(1, Math.ceil(rPct * 5)));
+        const fScore = Math.min(5, Math.max(1, Math.ceil(fPct * 5)));
+        const mScore = Math.min(5, Math.max(1, Math.ceil(mPct * 5)));
+        const rfmScore = `${rScore}-${fScore}-${mScore}`;
+
+        let segment = 'loyal';
+        let segmentLabelTh = '💎 ลูกค้าประจำจากไฟล์';
+        let segmentLabelEn = '💎 Loyal Regular from File';
+
+        if (rScore >= 4 && (fScore >= 4 || mScore >= 4)) {
+          segment = 'champion';
+          segmentLabelTh = '🏆 ลูกค้าชั้นดีสูงสุด (VIP จากไฟล์)';
+          segmentLabelEn = '🏆 Top VIP Champion from File';
+        } else if (c.frequency === 1 && rScore >= 3) {
+          segment = 'new';
+          segmentLabelTh = '🌱 ลูกค้าใหม่เพิ่งซื้อจากไฟล์';
+          segmentLabelEn = '🌱 New First-Time Buyer from File';
+        } else if (rScore <= 2 || c.recencyDays >= 45) {
+          segment = 'at_risk';
+          segmentLabelTh = '⚠️ ลูกค้าห่างหาย (ต้องรีบติดตาม)';
+          segmentLabelEn = '⚠️ At-Risk Buyer (Needs Follow-Up)';
+        }
+
         return {
           id: `CUS-${idx + 1}`,
-          segment: idx % 3 === 0 ? 'champion' : idx % 3 === 1 ? 'loyal' : 'at_risk',
-          recencyDays: idx % 3 === 0 ? 2 : idx % 3 === 1 ? 14 : 52,
-          frequency: custRows.length,
-          ltv: custTotal,
-          aov: aov,
-          rfmScore: '5-5-5',
+          segment,
+          recencyDays: c.recencyDays,
+          frequency: c.frequency,
+          ltv: c.custTotal,
+          aov: c.aov,
+          rfmScore,
           contactedCount: 0,
           phone: authPhone || `08${(idx + 1).toString().padStart(8, '0')}`,
           lineId: `@vip.${idx + 1}`,
           email: `client${idx + 1}@insightflow.vip`,
           th: {
-            name,
-            segmentLabel: idx % 3 === 0 ? '🏆 ลูกค้าชั้นดีจากไฟล์' : idx % 3 === 1 ? '💎 ลูกค้าประจำจากไฟล์' : '⚠️ ลูกค้าที่ต้องติดตาม',
-            recencyText: `ซื้อล่าสุด (${custRows[0]?.date || nowTime})`,
-            favoriteProduct: custRows[0]?.th.product || cleanFileName,
-            aiAction: 'มอบสิทธิ์พิเศษและแนะนำโปรโมชันตามประวัติในไฟล์',
-            orders: custRows.slice(0, 5).map((cr, oIdx) => ({
+            name: c.name,
+            segmentLabel: segmentLabelTh,
+            recencyText: `ซื้อล่าสุด (${c.latestDateStr || nowTime})`,
+            favoriteProduct: c.cRows[0]?.th.product || cleanFileName,
+            aiAction: segment === 'champion'
+              ? 'มอบสิทธิ์ Early Access และของขวัญ VIP ประจำเดือน'
+              : segment === 'at_risk'
+              ? 'ส่งคูปองกระตุ้นความภักดี 15-20% ทาง LINE ด่วน'
+              : 'แนะนำสินค้าที่เกี่ยวข้องตามประวัติการซื้อในไฟล์',
+            orders: c.cRows.slice(0, 5).map((cr, oIdx) => ({
               orderId: `ORD-${idx + 1}-${oIdx + 1}`,
               date: cr.date || nowTime,
               items: cr.th?.product || cleanFileName,
@@ -13460,12 +13563,16 @@ function App() {
             }))
           },
           en: {
-            name,
-            segmentLabel: idx % 3 === 0 ? '🏆 VIP from File' : idx % 3 === 1 ? '💎 Loyal from File' : '⚠️ Needs Follow-Up',
-            recencyText: `Latest in file (${custRows[0]?.date || nowTime})`,
-            favoriteProduct: custRows[0]?.en.product || cleanFileName,
-            aiAction: 'Provide exclusive personalized recommendations from transaction history',
-            orders: custRows.slice(0, 5).map((cr, oIdx) => ({
+            name: c.name,
+            segmentLabel: segmentLabelEn,
+            recencyText: `Latest in file (${c.latestDateStr || nowTime})`,
+            favoriteProduct: c.cRows[0]?.en.product || cleanFileName,
+            aiAction: segment === 'champion'
+              ? 'Provide exclusive VIP rewards and early access'
+              : segment === 'at_risk'
+              ? 'Send win-back voucher discount via LINE immediately'
+              : 'Offer personalized cross-sell recommendations',
+            orders: c.cRows.slice(0, 5).map((cr, oIdx) => ({
               orderId: `ORD-${idx + 1}-${oIdx + 1}`,
               date: cr.date || nowTime,
               items: cr.en?.product || cleanFileName,
@@ -13477,26 +13584,50 @@ function App() {
       });
       setCustomersList(importedCustomers);
 
-      // Populate Inventory from file
-      const uniqueProducts = Array.from(new Set(importedDbRows.map(r => r.th.product)));
-      const importedInventory = uniqueProducts.slice(0, 50).map((prodName, idx) => {
-        const prodRows = importedDbRows.filter(r => r.th.product === prodName);
+      // Populate Inventory from file with real velocity & stock detection
+      const prodRowsMap = new Map();
+      importedDbRows.forEach(r => {
+        const pName = r.th.product;
+        if (!prodRowsMap.has(pName)) {
+          prodRowsMap.set(pName, []);
+        }
+        prodRowsMap.get(pName).push(r);
+      });
+
+      const sortedProds = Array.from(prodRowsMap.entries()).sort((a, b) => {
+        const sumA = a[1].reduce((s, r) => s + r.amount, 0);
+        const sumB = b[1].reduce((s, r) => s + r.amount, 0);
+        return sumB - sumA;
+      });
+
+      const importedInventory = sortedProds.slice(0, 150).map(([prodName, prodRows], idx) => {
         const prodTotal = prodRows.reduce((sum, r) => sum + r.amount, 0);
-        const avgPrice = Math.round(prodTotal / Math.max(1, prodRows.length));
+        const totalQty = prodRows.reduce((sum, r) => sum + (r.itemsCount || 1), 0);
+        const avgPrice = Math.max(20, Math.round(prodTotal / Math.max(1, totalQty)));
+        const catName = prodRows[0]?.category || cleanFileName;
+
+        let stockQty = 45 + (idx * 5) % 60;
+        if (colStockIdx >= 0) {
+          const rawStk = dataRows.find(dr => dr[colProductIdx] === prodName)?.[colStockIdx];
+          const parsedStk = parseAmountFromCell(rawStk);
+          if (parsedStk > 0) stockQty = parsedStk;
+        }
+
+        const isLowStock = stockQty <= 15;
         return {
           sku: `SKU-${idx + 101}`,
           price: avgPrice,
-          stock: 45 + (idx * 5) % 60,
-          status: 'in_stock',
+          stock: stockQty,
+          status: isLowStock ? 'low_stock' : 'in_stock',
           th: {
             name: prodName,
-            category: cleanFileName,
-            statusLabel: 'พร้อมขาย (จากไฟล์นำเข้า)'
+            category: catName,
+            statusLabel: isLowStock ? '⚠️ สต็อกใกล้หมด (จากไฟล์)' : '✅ พร้อมขาย (จากไฟล์นำเข้า)'
           },
           en: {
             name: prodName,
-            category: cleanFileName,
-            statusLabel: 'In Stock (From File)'
+            category: catName,
+            statusLabel: isLowStock ? '⚠️ Low Stock (From File)' : '✅ In Stock (From File)'
           }
         };
       });

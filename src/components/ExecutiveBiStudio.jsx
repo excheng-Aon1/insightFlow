@@ -64,7 +64,15 @@ export default function ExecutiveBiStudio({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDateRange, setSelectedDateRange] = useState('30d');
   const [isPresentationMode, setIsPresentationMode] = useState(false);
-  const [expandedMatrixRows, setExpandedMatrixRows] = useState({ 'Siam Paragon': true });
+  const [expandedMatrixRows, setExpandedMatrixRows] = useState({});
+
+  // Dynamic Cost Assumptions State (Configurable by Executive)
+  const [costAssumptions, setCostAssumptions] = useState({
+    cogsPct: 45, // Cost of Goods Sold %
+    marketingPct: 12, // Marketing / Ad Spend %
+    opexPct: 10 // Operational Overhead %
+  });
+  const [showCostSettings, setShowCostSettings] = useState(false);
 
   // Copilot Q&A State
   const [copilotQuery, setCopilotQuery] = useState('');
@@ -86,46 +94,60 @@ export default function ExecutiveBiStudio({
         (typeof rec.product === 'string' && rec.product) ||
         (idx % 3 === 0 ? 'เซรั่มบำรุงผิวสูตรเข้มข้นพิเศษ' : idx % 3 === 1 ? 'ชุดชาออร์แกนิกพรีเมียม' : 'หูฟังไร้สายตัดเสียงรบกวนรุ่นโปร');
 
-      // Categorize product
-      let category = 'สกินแคร์และความงาม';
-      let categoryEn = 'Skincare & Beauty';
-      if (productStr.includes('ชา') || productStr.includes('กาแฟ') || productStr.includes('อาหาร')) {
-        category = 'อาหารและเครื่องดื่ม';
-        categoryEn = 'Food & Beverage';
-      } else if (productStr.includes('หูฟัง') || productStr.includes('อุปกรณ์') || productStr.includes('พิมพ์')) {
-        category = 'อิเล็กทรอนิกส์และสำนักงาน';
-        categoryEn = 'Electronics & Office';
+      // 1. Dynamic Category: prioritize record category, then fallback to intelligent heuristic
+      let category = rec.category || rec.th?.category || rec.en?.category;
+      let categoryEn = category;
+      if (!category) {
+        if (productStr.includes('ชา') || productStr.includes('กาแฟ') || productStr.includes('อาหาร') || productStr.includes('เครื่องดื่ม') || productStr.includes('ขนม')) {
+          category = 'อาหารและเครื่องดื่ม';
+          categoryEn = 'Food & Beverage';
+        } else if (productStr.includes('หูฟัง') || productStr.includes('อุปกรณ์') || productStr.includes('พิมพ์') || productStr.includes('สาย') || productStr.includes('ไฟ')) {
+          category = 'อิเล็กทรอนิกส์และสำนักงาน';
+          categoryEn = 'Electronics & Office';
+        } else if (productStr.includes('เซรั่ม') || productStr.includes('ครีม') || productStr.includes('ผิว') || productStr.includes('ยา') || productStr.includes('คลินิก')) {
+          category = 'สกินแคร์และสุขภาพ';
+          categoryEn = 'Skincare & Health';
+        } else {
+          category = 'สินค้าทั่วไป';
+          categoryEn = 'General Merchandise';
+        }
       }
 
-      // Categorize branch
-      let branch = 'สยามพารากอน';
-      let branchEn = 'Siam Paragon';
-      if (channelStr.includes('เอ็มควอเทียร์')) {
+      // 2. Dynamic Branch: prioritize record branch, channel or location
+      let branch = channelStr;
+      let branchEn = channelStr;
+      if (channelStr.includes('สยาม') || channelStr.includes('พารากอน')) {
+        branch = 'สยามพารากอน';
+        branchEn = 'Siam Paragon';
+      } else if (channelStr.includes('เอ็มควอเทียร์') || channelStr.includes('EmQuartier')) {
         branch = 'เอ็มควอเทียร์';
         branchEn = 'EmQuartier';
       } else if (channelStr.includes('เซ็นทรัล') || channelStr.includes('ลาดพร้าว')) {
         branch = 'เซ็นทรัลเวิลด์';
         branchEn = 'Central World';
-      } else if (channelStr.includes('TikTok') || channelStr.includes('Shopee') || channelStr.includes('Lazada') || channelStr.includes('ออนไลน์')) {
+      } else if (/(tiktok|shopee|lazada|online|web|ออนไลน์|แชต|line)/i.test(channelStr)) {
         branch = 'ช่องทางออนไลน์ (E-Commerce)';
         branchEn = 'E-Commerce Hub';
       }
 
-      // Categorize platform channel
+      // 3. Dynamic Platform Channel
       let platform = 'หน้าร้าน POS';
       let platformEn = 'Storefront POS';
-      if (channelStr.includes('TikTok')) {
+      if (/tiktok/i.test(channelStr)) {
         platform = 'TikTok Shop';
         platformEn = 'TikTok Shop';
-      } else if (channelStr.includes('Shopee')) {
+      } else if (/shopee/i.test(channelStr)) {
         platform = 'Shopee Mall';
         platformEn = 'Shopee Mall';
-      } else if (channelStr.includes('Lazada')) {
+      } else if (/lazada/i.test(channelStr)) {
         platform = 'Lazada Mall';
         platformEn = 'Lazada Mall';
-      } else if (channelStr.includes('แชต') || channelStr.includes('LINE')) {
+      } else if (/(แชต|line|chat|inbox)/i.test(channelStr)) {
         platform = 'LINE OA Chat';
         platformEn = 'LINE OA Chat';
+      } else if (/(web|เว็บไซต์|app)/i.test(channelStr)) {
+        platform = 'Direct Website';
+        platformEn = 'Direct Website';
       }
 
       const amount = Number(rec.amount) || 1500;
@@ -204,11 +226,11 @@ export default function ExecutiveBiStudio({
     const targetVariancePercent = targetRevenue > 0 ? (((grossRevenue - targetRevenue) / targetRevenue) * 100).toFixed(1) : '0.0';
     const achievementPercent = Math.min(100, Math.max(0, Math.round((grossRevenue / (targetRevenue || 1)) * 100)));
 
-    // Financial Waterfall components
-    const cogsAmount = Math.round(grossRevenue * 0.48); // Cost of Goods Sold 48%
-    const marketingExpense = Math.round(grossRevenue * 0.15); // Ads & Marketplace Commission 15%
-    const opexAmount = Math.round(grossRevenue * 0.11); // Store OPEX & Staff 11%
-    const netOperatingProfit = grossRevenue - cogsAmount - marketingExpense - opexAmount; // 26%
+    // Financial Waterfall components (Dynamic from Executive Cost Assumptions)
+    const cogsAmount = Math.round(grossRevenue * (costAssumptions.cogsPct / 100));
+    const marketingExpense = Math.round(grossRevenue * (costAssumptions.marketingPct / 100));
+    const opexAmount = Math.round(grossRevenue * (costAssumptions.opexPct / 100));
+    const netOperatingProfit = Math.max(0, grossRevenue - cogsAmount - marketingExpense - opexAmount);
     const netMarginPercent = grossRevenue > 0 ? ((netOperatingProfit / grossRevenue) * 100).toFixed(1) : '0.0';
 
     const averageOrderValue = count > 0 ? Math.round(grossRevenue / count) : 0;
@@ -318,9 +340,9 @@ export default function ExecutiveBiStudio({
   // -------------------------------------------------------------
   const waterfallLabels = [
     tx('รายได้รวม', 'Gross Revenue'),
-    tx('ต้นทุนสินค้า (CoGS)', 'CoGS (-48%)'),
-    tx('ค่าการตลาด & แพลตฟอร์ม', 'Ads & Fees (-15%)'),
-    tx('ค่าใช้จ่ายสาขา (OPEX)', 'Store OPEX (-11%)'),
+    tx(`ต้นทุนสินค้า CoGS (-${costAssumptions.cogsPct}%)`, `CoGS (-${costAssumptions.cogsPct}%)`),
+    tx(`ค่าการตลาด & แพลตฟอร์ม (-${costAssumptions.marketingPct}%)`, `Ads & Fees (-${costAssumptions.marketingPct}%)`),
+    tx(`ค่าใช้จ่ายสาขา OPEX (-${costAssumptions.opexPct}%)`, `Store OPEX (-${costAssumptions.opexPct}%)`),
     tx('กำไรสุทธิจากการดำเนินงาน', 'Net Operating Profit')
   ];
 
@@ -934,22 +956,83 @@ export default function ExecutiveBiStudio({
           theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
         }`}
       >
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-            <WaterfallChartIcon size={22} />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+              <WaterfallChartIcon size={22} />
+            </div>
+            <div>
+              <h3 className={`text-base font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                {tx('สะพานงบกำไรขาดทุน P&L Bridge (Executive Financial Waterfall)', 'P&L Variance Bridge (Waterfall Visual)')}
+              </h3>
+              <p className={`text-xs font-semibold ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                {tx(
+                  'จำแนกจากรายได้รวม หักลบต้นทุนสินค้า (CoGS), ค่าโฆษณา & แพลตฟอร์ม, ค่าใช้จ่ายสาขา สู่กำไรสุทธิจากการดำเนินงาน',
+                  'Step-by-step breakdown from Gross Revenue to Net Operating Profit'
+                )}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className={`text-base font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-              {tx('สะพานงบกำไรขาดทุน P&L Bridge (Executive Financial Waterfall)', 'P&L Variance Bridge (Waterfall Visual)')}
-            </h3>
-            <p className={`text-xs font-semibold ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-              {tx(
-                'จำแนกจากรายได้รวม หักลบต้นทุนสินค้า (CoGS), ค่าโฆษณา & แพลตฟอร์ม, ค่าใช้จ่ายสาขา สู่กำไรสุทธิจากการดำเนินงาน',
-                'Step-by-step breakdown from Gross Revenue to Net Operating Profit'
-              )}
-            </p>
-          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowCostSettings(prev => !prev)}
+            className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-400/30 hover:bg-amber-500/25 transition cursor-pointer self-start sm:self-center flex items-center gap-1.5"
+          >
+            <span>⚙️</span>
+            <span>{showCostSettings ? tx('ซ่อนตัวปรับต้นทุน', 'Hide Cost Controls') : tx('ปรับสมมติฐานต้นทุน %', 'Adjust Cost %')}</span>
+          </button>
         </div>
+
+        {/* Interactive Cost Assumption Adjuster Panel */}
+        {showCostSettings && (
+          <div className={`mb-6 p-4 rounded-2xl border ${theme === 'dark' ? 'bg-slate-800/80 border-amber-400/30' : 'bg-amber-50/70 border-amber-200'} grid grid-cols-1 sm:grid-cols-3 gap-4 animate-in fade-in`}>
+            <div>
+              <div className="flex justify-between text-xs font-bold mb-1">
+                <span className={theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}>{tx('ต้นทุนสินค้า (CoGS %)', 'Cost of Goods Sold (CoGS %)')}</span>
+                <span className="text-amber-400 font-mono">{costAssumptions.cogsPct}%</span>
+              </div>
+              <input
+                type="range"
+                min="10"
+                max="80"
+                value={costAssumptions.cogsPct}
+                onChange={e => setCostAssumptions(prev => ({ ...prev, cogsPct: Number(e.target.value) }))}
+                className="w-full accent-amber-400 cursor-pointer"
+              />
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs font-bold mb-1">
+                <span className={theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}>{tx('ค่าการตลาดและแอด (Marketing %)', 'Marketing & Ads %')}</span>
+                <span className="text-sky-400 font-mono">{costAssumptions.marketingPct}%</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="40"
+                value={costAssumptions.marketingPct}
+                onChange={e => setCostAssumptions(prev => ({ ...prev, marketingPct: Number(e.target.value) }))}
+                className="w-full accent-sky-400 cursor-pointer"
+              />
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs font-bold mb-1">
+                <span className={theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}>{tx('ค่าใช้จ่ายสาขา/หน้าร้าน (OPEX %)', 'Store Overhead & OPEX %')}</span>
+                <span className="text-indigo-400 font-mono">{costAssumptions.opexPct}%</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="40"
+                value={costAssumptions.opexPct}
+                onChange={e => setCostAssumptions(prev => ({ ...prev, opexPct: Number(e.target.value) }))}
+                className="w-full accent-indigo-400 cursor-pointer"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Visual Waterfall Bars Representation */}
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">

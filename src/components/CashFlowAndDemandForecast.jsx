@@ -539,9 +539,19 @@ export function CashFlowAndDemandForecast({
   const trueNetCashProfit = Math.max(0, grossProfit - totalDeductions + centralPoSavings);
   const trueNetMarginPct = grossRevenue > 0 ? Math.round((trueNetCashProfit / grossRevenue) * 1000) / 10 : 0;
 
-  // Real Cash Runway
-  const cashInHand = Math.round(grossRevenue * 0.798 + centralPoSavings);
-  const monthlyBurnRate = Math.max(100000, Math.round(fixedOpex * 0.52 + platformFees + packagingShipping));
+  // Real Cash Runway (Dynamic with Executive Configurable Liquid Cash)
+  const defaultOpeningCash = Math.round(grossRevenue * 0.75 + centralPoSavings);
+  const [openingCashInput, setOpeningCashInput] = useState(() => {
+    try {
+      const saved = localStorage.getItem('insightflow_opening_cash_v1');
+      return saved !== null && Number(saved) > 0 ? Number(saved) : defaultOpeningCash;
+    } catch {
+      return defaultOpeningCash;
+    }
+  });
+
+  const cashInHand = openingCashInput > 0 ? openingCashInput : defaultOpeningCash;
+  const monthlyBurnRate = Math.max(50000, Math.round(fixedOpex * 0.52 + platformFees + packagingShipping));
   const cashRunwayMonths = monthlyBurnRate > 0 ? Math.round((cashInHand / monthlyBurnRate) * 10) / 10 : 0;
 
   const handleExportCashflowReport = () => {
@@ -1206,8 +1216,36 @@ export function CashFlowAndDemandForecast({
                   <div style={{ fontSize: '1.75rem', fontWeight: 900, color: isDark ? '#34d399' : '#059669', lineHeight: 1.2 }}>
                     {cashRunwayMonths} {tx('เดือน', 'Months')}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: isDark ? '#cbd5e1' : '#334155', marginTop: '0.2rem' }}>
-                    {tx(`เงินสดหมุนเวียน ฿${cashInHand.toLocaleString()} / เผาเดือนละ ฿${monthlyBurnRate.toLocaleString()}`, `Cash ฿${cashInHand.toLocaleString()} / Burn ฿${monthlyBurnRate.toLocaleString()}/mo`)}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginTop: '0.3rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.72rem', color: isDark ? '#cbd5e1' : '#334155' }}>
+                      {tx(`เงินสดในมือ ฿${cashInHand.toLocaleString()} / เผาเดือนละ ฿${monthlyBurnRate.toLocaleString()}`, `Cash ฿${cashInHand.toLocaleString()} / Burn ฿${monthlyBurnRate.toLocaleString()}/mo`)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const val = window.prompt(tx('ระบุเงินสดคงเหลือในบัญชีปัจจุบัน (บาท):', 'Enter current liquid cash balance (THB):'), String(cashInHand));
+                        if (val !== null) {
+                          const n = Number(String(val).replace(/[^0-9.-]/g, ''));
+                          if (!isNaN(n) && n >= 0) {
+                            setOpeningCashInput(n);
+                            try { localStorage.setItem('insightflow_opening_cash_v1', String(n)); } catch {}
+                            toast.success(tx('อัปเดตยอดเงินสดในมือเรียบร้อยแล้ว', 'Updated liquid cash reserve'));
+                          }
+                        }
+                      }}
+                      style={{
+                        fontSize: '0.68rem',
+                        padding: '0.15rem 0.45rem',
+                        borderRadius: '6px',
+                        border: isDark ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid #38bdf8',
+                        background: isDark ? 'rgba(56, 189, 248, 0.15)' : '#e0f2fe',
+                        color: isDark ? '#38bdf8' : '#0369a1',
+                        cursor: 'pointer',
+                        fontWeight: 700
+                      }}
+                    >
+                      ✏️ {tx('ปรับเงินสดจริง', 'Edit Cash')}
+                    </button>
                   </div>
                 </div>
 
