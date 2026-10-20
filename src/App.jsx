@@ -4245,8 +4245,6 @@ export function StaffPosTab({
 
   return (
     <div className=" staff-pos-tab-container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {renderUploadZone('staff_pos', tx('ผลงานพนักงานและเครื่องคิดเงินหน้าร้าน', 'Staff & Cashier Performance'))}
-
       {/* Top Executive Banner */}
       <div
         className="glass-card"
@@ -4918,8 +4916,6 @@ export function MultiChannelTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {renderUploadZone('multi_channel', tx('เปรียบเทียบสาขาและช่องทางออนไลน์', 'Branch & Multi-Channel Comparison'))}
-
       {/* Quick Wins: Automated Export & 22:00 Daily Summary Scheduler */}
       <div
         className="glass-card"
@@ -5837,8 +5833,6 @@ export function InventoryTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {renderUploadZone('inventory', tx('คลังสินค้าและสต็อกอัจฉริยะ', 'Smart Inventory & Stock Control'))}
-
       {/* Top Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
         <div className="glass-card" style={{ padding: '1.25rem', borderRadius: '16px', borderLeft: '4px solid #38bdf8' }}>
@@ -6772,8 +6766,6 @@ export function InsightsTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {renderUploadZone('insights', tx('วิเคราะห์ข้อมูลด้วย AI และผู้ช่วยอัจฉริยะ', 'AI Data Analytics & Strategic Copilot'))}
-
       {/* Omni-Channel Connected Data Hub & Cross-Page Header Diagnostic */}
       <div
         className="glass-card"
@@ -8314,8 +8306,6 @@ export function DatabaseTab({
       {/* 2. Manual Transaction Records & Uploads View */}
       {dbSubTab === 'records' && (
         <>
-          {renderUploadZone('database', tx('คลังฐานข้อมูลการขายของร้าน', 'Central Store Transaction Database'))}
-
       {/* Uploaded Files Registry across all modules */}
       <div
         className="glass-card"
@@ -10877,11 +10867,6 @@ export function ProcurementTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {renderUploadZone(
-        'procurement',
-        tx('รายงานซัพพลายเออร์และการจัดซื้อรวมศูนย์', 'Central Procurement & Vendor Scorecard')
-      )}
-
       {/* Executive Hero Banner */}
       <div
         className="glass-card"
@@ -12181,6 +12166,7 @@ function App() {
   const [rememberPassword, setRememberPassword] = useState(true);
   const [inspectingUploadTab, setInspectingUploadTab] = useState(null);
   const [isBasketballModalOpen, setIsBasketballModalOpen] = useState(false);
+  const centralFileInputRef = useRef(null);
 
 
   // OTP 2FA State & Handlers
@@ -16501,8 +16487,42 @@ function App() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {/* Universal Basketball Ingest Quick Action */}
-            <BasketballQuickButton onClick={() => setIsBasketballModalOpen(true)} isEn={isEn} />
+            {/* Central Unified File Upload Button (Shared across all pages) */}
+            <input
+              type="file"
+              ref={centralFileInputRef}
+              onChange={e => {
+                const f = e.target.files && e.target.files[0];
+                if (f) {
+                  handlePageFileUpload(activeTab || 'overview', f.name, f);
+                  e.target.value = '';
+                }
+              }}
+              accept=".csv,.xlsx,.xls,.json,.txt"
+              style={{ display: 'none' }}
+            />
+            <button
+              type="button"
+              onClick={() => centralFileInputRef.current?.click()}
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-emerald-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
+              title={tx('อัปโหลดไฟล์กลาง (ข้อมูลจะซิงก์และเชื่อมต่อทุกหน้า)', 'Upload Central File (Syncs across all pages)')}
+            >
+              <span className="text-sm sm:text-base">📂</span>
+              <span className="font-black">
+                {tx('อัปโหลดไฟล์กลาง', 'Upload Central File')}
+              </span>
+            </button>
+
+            {/* Quick Basketball Shoot-In Modal Button */}
+            <button
+              type="button"
+              onClick={() => setIsBasketballModalOpen(true)}
+              className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-2xl bg-orange-500/20 hover:bg-orange-500/30 border border-orange-400/40 text-amber-300 font-black text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer flex-shrink-0"
+              title={tx('เปิดกล่องชู้ตไฟล์บาสเก็ตบอล', 'Open Basketball Dropzone Hub')}
+            >
+              <span className="animate-bounce">🏀</span>
+              <span className="hidden md:inline">{tx('ชู้ตไฟล์', 'Shoot')}</span>
+            </button>
 
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
             {renderLanguageSwitcher()}
@@ -16857,55 +16877,46 @@ function App() {
             <>
               {/* Active Page Content (Unlocked by Current Subscription Plan) */}
               {activeTab === 'overview' && (
-                <>
-                  {renderUploadZone('overview', tx('ภาพรวมธุรกิจและเป้าหมายร้าน', 'Business Overview & Target Planner'))}
-                  <OverviewTab
-                    lang={lang}
-                    theme={theme}
-                    currentRevenueVal={currentRevenueVal}
-                    setCurrentRevenueVal={setCurrentRevenueVal}
-                    targetRevenueVal={targetRevenueVal}
-                    setTargetRevenueVal={setTargetRevenueVal}
-                    targetTimelineVal={targetTimelineVal}
-                    setTargetTimelineVal={setTargetTimelineVal}
-                    clientGoalType={clientGoalType}
-                    setClientGoalType={setClientGoalType}
-                    targetCategory={targetCategory}
-                    setTargetCategory={setTargetCategory}
-                    isPlanActive={isPlanActive}
-                    isGeneratingPlan={isGeneratingPlan}
-                    handleDeployGoalPlan={handleDeployGoalPlan}
-                    handleExportGoalPlan={handleExportGoalPlan}
-                    setActiveTab={setActiveTab}
-                    lineChartOptions={lineChartOptions}
-                    barChartOptions={barChartOptions}
-                    customersList={customersList}
-                    dbRecords={dbRecords}
-                  />
-                </>
+                <OverviewTab
+                  lang={lang}
+                  theme={theme}
+                  currentRevenueVal={currentRevenueVal}
+                  setCurrentRevenueVal={setCurrentRevenueVal}
+                  targetRevenueVal={targetRevenueVal}
+                  setTargetRevenueVal={setTargetRevenueVal}
+                  targetTimelineVal={targetTimelineVal}
+                  setTargetTimelineVal={setTargetTimelineVal}
+                  clientGoalType={clientGoalType}
+                  setClientGoalType={setClientGoalType}
+                  targetCategory={targetCategory}
+                  setTargetCategory={setTargetCategory}
+                  isPlanActive={isPlanActive}
+                  isGeneratingPlan={isGeneratingPlan}
+                  handleDeployGoalPlan={handleDeployGoalPlan}
+                  handleExportGoalPlan={handleExportGoalPlan}
+                  setActiveTab={setActiveTab}
+                  lineChartOptions={lineChartOptions}
+                  barChartOptions={barChartOptions}
+                  customersList={customersList}
+                  dbRecords={dbRecords}
+                />
               )}
 
               {activeTab === 'bi_studio' && (
-                <>
-                  {renderUploadZone('bi_studio', tx('Executive BI Studio (สไตล์ Power BI)', 'Executive BI Studio (Power BI Canvas)'))}
-                  <ExecutiveBiStudio
-                    lang={lang}
-                    theme={theme}
-                    dbRecords={dbRecords}
-                  />
-                </>
+                <ExecutiveBiStudio
+                  lang={lang}
+                  theme={theme}
+                  dbRecords={dbRecords}
+                />
               )}
 
               {activeTab === 'customers' && (
-                <>
-                  {renderUploadZone('customers', tx('วิเคราะห์ลูกค้าประจำและคนหาย', 'Customer Loyalty & Retention'))}
-                  <CustomersTab
-                    lang={lang}
-                    theme={theme}
-                    customersList={customersList.slice(0, activePlanMeta.maxCustomers)}
-                    setCustomersList={setCustomersList}
-                  />
-                </>
+                <CustomersTab
+                  lang={lang}
+                  theme={theme}
+                  customersList={customersList.slice(0, activePlanMeta.maxCustomers)}
+                  setCustomersList={setCustomersList}
+                />
               )}
 
               {activeTab === 'staff_pos' && (
