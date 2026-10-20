@@ -3044,6 +3044,19 @@ export function OverviewTab({
     }
   ]);
 
+  // Derive recent recorded sales dynamically from the latest uploaded file
+  const displayedRecentSales = useMemo(() => {
+    if (Array.isArray(dbRecords) && dbRecords.length > 0) {
+      return dbRecords.slice(0, 5).map((r, idx) => ({
+        id: r.id || `SL-${idx + 101}`,
+        time: r.date || tx('จากไฟล์ล่าสุด', 'Latest file'),
+        amount: r.amount || 0,
+        note: `${r.th?.product || r.product || tx('สินค้าจากไฟล์', 'Product from file')} (${r.th?.channel || r.channel || tx('ร้านค้า', 'Store')})`
+      }));
+    }
+    return recentRecordedSales;
+  }, [dbRecords, recentRecordedSales, tx]);
+
   const gap = Math.max(0, targetRevenueVal - currentRevenueVal);
   const days = Math.max(1, parseInt(targetTimelineVal, 10) || 90);
   const dailyRequired = Math.round(gap / days);
@@ -3123,34 +3136,81 @@ export function OverviewTab({
     ]
   };
 
-  const overviewDoughnutData = {
-    labels: isEn
-      ? ['Physical Branches', 'Short-Video & Live Store', 'Marketplace Mall', 'Direct Store Chat']
-      : ['หน้าร้านจริงทั้ง 4 สาขา', 'ช่องทางวิดีโอสั้นและไลฟ์สด', 'ร้านค้าบนแอปช้อปปิ้ง', 'แชตร้านค้าโดยตรง'],
-    datasets: [
-      {
-        data: currentRevenueVal > 0 ? [48, 24, 16, 12] : [0, 0, 0, 0],
-        backgroundColor: ['#fbbf24', '#38bdf8', '#34d399', '#a78bfa'],
-        borderColor: theme === 'dark' ? '#0b1120' : '#ffffff',
-        borderWidth: 3
+  const overviewDoughnutData = useMemo(() => {
+    if (Array.isArray(dbRecords) && dbRecords.length > 0) {
+      const channelSums = {};
+      dbRecords.forEach(r => {
+        const ch = (isEn ? r.en?.channel : r.th?.channel) || r.channel || (isEn ? 'Direct Store' : 'หน้าร้าน');
+        channelSums[ch] = (channelSums[ch] || 0) + (r.amount || 0);
+      });
+      const topChannels = Object.entries(channelSums).sort((a, b) => b[1] - a[1]).slice(0, 4);
+      if (topChannels.length > 0) {
+        return {
+          labels: topChannels.map(tc => tc[0]),
+          datasets: [
+            {
+              data: topChannels.map(tc => tc[1]),
+              backgroundColor: ['#fbbf24', '#38bdf8', '#34d399', '#a78bfa'],
+              borderColor: theme === 'dark' ? '#0b1120' : '#ffffff',
+              borderWidth: 3
+            }
+          ]
+        };
       }
-    ]
-  };
+    }
+    return {
+      labels: isEn
+        ? ['Physical Branches', 'Short-Video & Live Store', 'Marketplace Mall', 'Direct Store Chat']
+        : ['หน้าร้านจริงทั้ง 4 สาขา', 'ช่องทางวิดีโอสั้นและไลฟ์สด', 'ร้านค้าบนแอปช้อปปิ้ง', 'แชตร้านค้าโดยตรง'],
+      datasets: [
+        {
+          data: currentRevenueVal > 0 ? [48, 24, 16, 12] : [0, 0, 0, 0],
+          backgroundColor: ['#fbbf24', '#38bdf8', '#34d399', '#a78bfa'],
+          borderColor: theme === 'dark' ? '#0b1120' : '#ffffff',
+          borderWidth: 3
+        }
+      ]
+    };
+  }, [dbRecords, currentRevenueVal, isEn, theme]);
 
-  const overviewBarData = {
-    labels: isEn
-      ? ['Direct Store Chat', 'Physical Branches', 'Live Commerce', 'Search Ads', 'Marketplace Mall']
-      : ['แชตร้านค้าโดยตรง', 'หน้าร้านจริง', 'ไลฟ์สดขายสินค้า', 'โฆษณาค้นหา', 'แอปช้อปปิ้งมอลล์'],
-    datasets: [
-      {
-        label: tx('อัตราการซื้อสำเร็จ (%)', 'Conversion Rate (%)'),
-        data: [11.4, 9.2, 7.8, 6.4, 4.9],
-        backgroundColor: 'rgba(251, 191, 36, 0.85)',
-        hoverBackgroundColor: '#f59e0b',
-        borderRadius: 8
+  const overviewBarData = useMemo(() => {
+    if (Array.isArray(dbRecords) && dbRecords.length > 0) {
+      const channelCounts = {};
+      dbRecords.forEach(r => {
+        const ch = (isEn ? r.en?.channel : r.th?.channel) || r.channel || (isEn ? 'Direct Store' : 'หน้าร้าน');
+        channelCounts[ch] = (channelCounts[ch] || 0) + 1;
+      });
+      const topChannels = Object.entries(channelCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      if (topChannels.length > 0) {
+        return {
+          labels: topChannels.map(tc => tc[0]),
+          datasets: [
+            {
+              label: tx('จำนวนคำสั่งซื้อจากไฟล์ (ออร์เดอร์)', 'Order Count from File'),
+              data: topChannels.map(tc => tc[1]),
+              backgroundColor: 'rgba(251, 191, 36, 0.85)',
+              hoverBackgroundColor: '#f59e0b',
+              borderRadius: 8
+            }
+          ]
+        };
       }
-    ]
-  };
+    }
+    return {
+      labels: isEn
+        ? ['Direct Store Chat', 'Physical Branches', 'Live Commerce', 'Search Ads', 'Marketplace Mall']
+        : ['แชตร้านค้าโดยตรง', 'หน้าร้านจริง', 'ไลฟ์สดขายสินค้า', 'โฆษณาค้นหา', 'แอปช้อปปิ้งมอลล์'],
+      datasets: [
+        {
+          label: tx('อัตราการซื้อสำเร็จ (%)', 'Conversion Rate (%)'),
+          data: [11.4, 9.2, 7.8, 6.4, 4.9],
+          backgroundColor: 'rgba(251, 191, 36, 0.85)',
+          hoverBackgroundColor: '#f59e0b',
+          borderRadius: 8
+        }
+      ]
+    };
+  }, [dbRecords, isEn, tx]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
@@ -3396,7 +3456,7 @@ export function OverviewTab({
 
           <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2 items-center text-xs text-slate-200">
             <span className="font-bold text-emerald-300">{tx('รายการที่เพิ่งบันทึกล่าสุด:', 'Recently Recorded Sales:')}</span>
-            {recentRecordedSales.map((s) => (
+            {displayedRecentSales.map((s) => (
               <span key={s.id} className="px-2.5 py-1 rounded-lg bg-black/30 border border-white/10">
                 <strong>+฿{s.amount.toLocaleString()}</strong> • {s.note} <span className="text-slate-400">({s.time})</span>
               </span>
@@ -6368,32 +6428,41 @@ export function InsightsTab({
   const combinedFilesList = useMemo(() => {
     const list = [];
     const seen = new Set();
-    const allSources = [
-      'overview',
-      'bi_studio',
-      'customers',
-      'staff_pos',
-      'multi_channel',
-      'procurement',
-      'inventory',
-      'insights',
-      'database',
-      ...Object.keys(pageUploadedFiles || {})
-    ];
+    const userUploadedFiles = Object.entries(pageUploadedFiles || {}).filter(([_, f]) => f && f.filename && (f.isUserAdded || f.isCustomUpload || f.paperHeader || f.rows));
+    const hasUserFiles = userUploadedFiles.length > 0;
+
+    const allSources = hasUserFiles
+      ? [
+          'central',
+          ...Object.keys(pageUploadedFiles || {})
+        ]
+      : [
+          'central',
+          'overview',
+          'bi_studio',
+          'customers',
+          'staff_pos',
+          'multi_channel',
+          'procurement',
+          'inventory',
+          'insights',
+          'database',
+          ...Object.keys(pageUploadedFiles || {})
+        ];
 
     allSources.forEach(sourceKey => {
       if (seen.has(sourceKey)) return;
       seen.add(sourceKey);
 
-      const fMeta = pageUploadedFiles?.[sourceKey] || initialPageUploadedFiles?.[sourceKey];
+      const fMeta = pageUploadedFiles?.[sourceKey] || (!hasUserFiles ? initialPageUploadedFiles?.[sourceKey] : null);
       if (fMeta && fMeta.filename) {
         const metaInfo = moduleMetaMap[sourceKey] || {
-          th: sourceKey.startsWith('custom_file_') ? 'ไฟล์กำหนดเอง' : sourceKey,
-          en: sourceKey.startsWith('custom_file_') ? 'Custom File' : sourceKey,
-          icon: '📁',
+          th: sourceKey === 'central' ? 'ไฟล์กลาง (Shoot File)' : (sourceKey.startsWith('custom_file_') ? 'ไฟล์กำหนดเอง' : sourceKey),
+          en: sourceKey === 'central' ? 'Central Shoot File' : (sourceKey.startsWith('custom_file_') ? 'Custom File' : sourceKey),
+          icon: sourceKey === 'central' ? '🎯' : '📁',
           color: '#38bdf8',
-          analyticalRoleTh: 'ข้อมูลเฉพาะที่ผู้ใช้อัปโหลดเพิ่มเติม',
-          analyticalRoleEn: 'User-uploaded custom auxiliary data'
+          analyticalRoleTh: 'ข้อมูลจากไฟล์ล่าสุดที่นำเข้าสู่ระบบ',
+          analyticalRoleEn: 'Data from latest imported file'
         };
         list.push({
           sourceKey,
@@ -6434,6 +6503,7 @@ export function InsightsTab({
   const activeSelectedFile = useMemo(() => {
     if (selectedFileSource === 'all') {
       return (
+        pageUploadedFiles?.central ||
         pageUploadedFiles?.insights ||
         pageUploadedFiles?.overview ||
         combinedFilesList[0]?.fileMeta ||
@@ -6441,7 +6511,7 @@ export function InsightsTab({
       );
     }
     const found = combinedFilesList.find(f => f.sourceKey === selectedFileSource);
-    return found?.fileMeta || found || uploadedFileMeta || combinedFilesList[0]?.fileMeta;
+    return found?.fileMeta || found || uploadedFileMeta || pageUploadedFiles?.central || combinedFilesList[0]?.fileMeta;
   }, [selectedFileSource, combinedFilesList, pageUploadedFiles, uploadedFileMeta]);
 
   const atRiskCount = customersList.filter(c => c.segment === 'at_risk').length;
@@ -12552,6 +12622,34 @@ function App() {
     }
   }, [pageUploadedFiles]);
 
+  // Operational state rehydration from latest uploaded file cache
+  useEffect(() => {
+    try {
+      const cachedOperational = localStorage.getItem('insightflow_latest_operational_data_v1');
+      if (cachedOperational) {
+        const data = JSON.parse(cachedOperational);
+        if (data && Array.isArray(data.dbRecords) && data.dbRecords.length > 0) {
+          setDbRecords(data.dbRecords);
+          if (Array.isArray(data.customersList) && data.customersList.length > 0) setCustomersList(data.customersList);
+          if (Array.isArray(data.inventoryList) && data.inventoryList.length > 0) setInventoryList(data.inventoryList);
+          if (Array.isArray(data.branchesList) && data.branchesList.length > 0) setBranchesList(data.branchesList);
+          if (Array.isArray(data.channelsList) && data.channelsList.length > 0) setChannelsList(data.channelsList);
+          if (Array.isArray(data.staffList) && data.staffList.length > 0) setStaffList(data.staffList);
+          if (Array.isArray(data.auditLogs) && data.auditLogs.length > 0) setAuditLogs(data.auditLogs);
+          if (Array.isArray(data.vendorsList) && data.vendorsList.length > 0) setVendorsList(data.vendorsList);
+          if (Array.isArray(data.centralPosList) && data.centralPosList.length > 0) setCentralPosList(data.centralPosList);
+          if (typeof data.currentRevenueVal === 'number' && data.currentRevenueVal > 0) {
+            setCurrentRevenueVal(data.currentRevenueVal);
+            setTargetRevenueVal(data.targetRevenueVal || Math.round(data.currentRevenueVal * 1.25));
+            setIsPlanActive(true);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Could not rehydrate operational data cache', e);
+    }
+  }, []);
+
   // Delete a specific file from the repository completely
   const handleDeleteUploadedFile = (tabKey, filename) => {
     const fileDisplayName = filename || pageUploadedFiles[tabKey]?.filename || tabKey;
@@ -12609,6 +12707,7 @@ function App() {
     try {
       localStorage.setItem('insightflow_page_uploaded_files_v4', JSON.stringify({}));
       localStorage.setItem('insightflow_page_uploaded_files_v2', JSON.stringify({}));
+      localStorage.removeItem('insightflow_latest_operational_data_v1');
     } catch (e) {}
     if (inspectingUploadTab) {
       setInspectingUploadTab(null);
@@ -12642,6 +12741,7 @@ function App() {
     try {
       localStorage.setItem('insightflow_page_uploaded_files_v4', JSON.stringify(initialPageUploadedFiles));
       localStorage.setItem('insightflow_page_uploaded_files_v2', JSON.stringify(initialPageUploadedFiles));
+      localStorage.removeItem('insightflow_latest_operational_data_v1');
     } catch (e) {}
     toast.success(
       tx(
@@ -13760,22 +13860,27 @@ function App() {
         detectedModuleKeys.push('bi_studio');
       }
 
-      // If it's a central shoot or central file upload, ALL 9 modules receive & connect to it!
-      const allTargetKeys = (options?.isCentralShoot || tabKey === 'central' || tabKey === 'database')
-        ? Array.from(new Set([
-            'central',
-            'database',
-            'overview',
-            'inventory',
-            'customers',
-            'staff_pos',
-            'multi_channel',
-            'procurement',
-            'bi_studio',
-            'insights',
-            ...detectedModuleKeys
-          ]))
-        : Array.from(new Set(detectedModuleKeys));
+      // Every operational page and AI Insights must take data exclusively from the latest uploaded file
+      const operationalModuleKeys = [
+        'central',
+        'database',
+        'overview',
+        'inventory',
+        'customers',
+        'staff_pos',
+        'multi_channel',
+        'procurement',
+        'bi_studio',
+        'insights',
+        'cash_flow',
+        'playbooks',
+        'forecast'
+      ];
+      const allTargetKeys = Array.from(new Set([
+        ...operationalModuleKeys,
+        tabKey,
+        ...detectedModuleKeys
+      ]));
 
       const fileDataEntry = {
         filename: file.name,
@@ -13807,6 +13912,28 @@ function App() {
         });
         return nextState;
       });
+
+      // Persist operational snapshot from latest uploaded file into localStorage
+      try {
+        const operationalSnapshot = {
+          dbRecords: importedDbRows,
+          customersList: importedCustomers,
+          inventoryList: importedInventory,
+          branchesList: importedBranches,
+          channelsList: importedChannels,
+          staffList: importedStaff,
+          auditLogs: importedAuditLogs,
+          vendorsList: importedVendors,
+          centralPosList: importedCentralPosList,
+          currentRevenueVal: totalExtractedAmount,
+          targetRevenueVal: Math.round(totalExtractedAmount * 1.25) || 500000,
+          latestUploadedFile: fileDataEntry,
+          savedAt: Date.now()
+        };
+        localStorage.setItem('insightflow_latest_operational_data_v1', JSON.stringify(operationalSnapshot));
+      } catch (e) {
+        console.warn('LocalStorage save failed', e);
+      }
 
       setIsUploading(false);
       toast.success(
@@ -14018,8 +14145,10 @@ function App() {
               : [`ไฟล์เชื่อมต่อ: ${uploadedEntries.length} หน้า`, 'ความแม่นยำหัวกระดาษ: 100%', 'ซิงก์ข้ามหน้า: 100% สมบูรณ์'];
           } else {
             const activeFile =
+              pageUploadedFiles?.central ||
               pageUploadedFiles?.insights ||
               pageUploadedFiles?.overview ||
+              Object.values(pageUploadedFiles || {}).find(f => f && f.filename) ||
               initialPageUploadedFiles.insights;
 
             const ph = activeFile?.paperHeader || {
@@ -16943,6 +17072,7 @@ function App() {
                   lang={lang}
                   theme={theme}
                   dbRecords={dbRecords}
+                  latestUploadedFile={pageUploadedFiles?.central || pageUploadedFiles?.bi_studio || Object.values(pageUploadedFiles || {}).find(f => f && f.filename)}
                 />
               )}
 
@@ -17047,7 +17177,7 @@ function App() {
                   setActiveTab={setActiveTab}
                   pageUploadedFiles={pageUploadedFiles}
                   initialPageUploadedFiles={initialPageUploadedFiles}
-                  uploadedFileMeta={pageUploadedFiles?.insights || pageUploadedFiles?.overview || (Object.keys(pageUploadedFiles).length > 0 ? pageUploadedFiles[Object.keys(pageUploadedFiles)[0]] : initialPageUploadedFiles.insights)}
+                  uploadedFileMeta={pageUploadedFiles?.central || pageUploadedFiles?.insights || pageUploadedFiles?.overview || (Object.keys(pageUploadedFiles).length > 0 ? pageUploadedFiles[Object.keys(pageUploadedFiles)[0]] : initialPageUploadedFiles.insights)}
                   channelsList={channelsList}
                   branchesList={branchesList}
                   dbRecords={dbRecords}

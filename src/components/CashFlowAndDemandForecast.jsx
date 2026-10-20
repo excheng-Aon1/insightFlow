@@ -29,14 +29,16 @@ export function CashFlowAndDemandForecast({
   // =========================================================================
   const connectedFiles = useMemo(() => {
     const list = [];
-    const allFiles = { ...initialPageUploadedFiles, ...pageUploadedFiles };
+    const hasUserFiles = pageUploadedFiles && Object.values(pageUploadedFiles).some(f => f && f.filename && (f.isUserAdded || f.isCustomUpload || f.paperHeader || f.rows));
+    const allFiles = hasUserFiles ? pageUploadedFiles : { ...initialPageUploadedFiles, ...pageUploadedFiles };
     Object.keys(allFiles).forEach(key => {
       const file = allFiles[key];
       if (!file || !file.filename) return;
       let labelTh = key;
       let labelEn = key;
       let icon = '📄';
-      if (key === 'inventory') { labelTh = 'คลังสินค้า & สต็อก'; labelEn = 'Inventory'; icon = '📦'; }
+      if (key === 'central') { labelTh = 'ไฟล์กลาง (Shoot File)'; labelEn = 'Central Shoot File'; icon = '🎯'; }
+      else if (key === 'inventory') { labelTh = 'คลังสินค้า & สต็อก'; labelEn = 'Inventory'; icon = '📦'; }
       else if (key === 'overview') { labelTh = 'ยอดขาย & เป้าหมาย'; labelEn = 'Sales Overview'; icon = '📊'; }
       else if (key === 'procurement') { labelTh = 'จัดซื้อรวมศูนย์ & PO'; labelEn = 'Procurement'; icon = '🏢'; }
       else if (key === 'multi_channel') { labelTh = 'ช่องทางขาย & ค่าธรรมเนียม'; labelEn = 'Channels'; icon = '🌐'; }
@@ -123,7 +125,8 @@ export function CashFlowAndDemandForecast({
     }
 
     // 2. Scan ALL uploaded files across all modules for preview rows
-    const allUploaded = { ...initialPageUploadedFiles, ...pageUploadedFiles };
+    const hasUserFiles = pageUploadedFiles && Object.values(pageUploadedFiles).some(f => f && f.filename && (f.isUserAdded || f.isCustomUpload || f.paperHeader || f.rows));
+    const allUploaded = hasUserFiles ? pageUploadedFiles : { ...initialPageUploadedFiles, ...pageUploadedFiles };
     Object.keys(allUploaded).forEach(tabKey => {
       const upl = allUploaded[tabKey];
       if (upl?.previewRows && Array.isArray(upl.previewRows) && upl.previewRows.length > 0) {
@@ -171,8 +174,8 @@ export function CashFlowAndDemandForecast({
       }
     });
 
-    // 3. Fallbacks if completely empty
-    if (items.length === 0) {
+    // 3. Fallbacks if completely empty and no user file is present
+    if (items.length === 0 && !hasUserFiles) {
       items.push(
         {
           sku: 'PKG-009',

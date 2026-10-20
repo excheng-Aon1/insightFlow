@@ -39,10 +39,16 @@ export function ActionablePlaybooks({
   const [simDiscountPct, setSimDiscountPct] = useState(15);
   const [simMonthlyBaseQty, setSimMonthlyBaseQty] = useState(120);
 
-  // Detect active uploaded file across any tab
+  // Detect active uploaded file across any tab (prioritize central shoot file or latest user uploaded file)
   const activeUploadedFile = useMemo(() => {
-    const all = { ...initialPageUploadedFiles, ...pageUploadedFiles };
-    return Object.values(all).find(f => f && f.filename && (f.isUserAdded || f.isCustomUpload)) || Object.values(all)[0] || null;
+    if (pageUploadedFiles?.central && pageUploadedFiles.central.filename) {
+      return pageUploadedFiles.central;
+    }
+    const userFiles = Object.values(pageUploadedFiles || {}).filter(f => f && f.filename && (f.isUserAdded || f.isCustomUpload || f.paperHeader || f.rows));
+    if (userFiles.length > 0) {
+      return userFiles[userFiles.length - 1];
+    }
+    return Object.values(initialPageUploadedFiles || {})[0] || null;
   }, [pageUploadedFiles, initialPageUploadedFiles]);
 
   // Derive products dynamically from dbRecords if available

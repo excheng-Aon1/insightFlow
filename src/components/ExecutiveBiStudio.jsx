@@ -50,7 +50,8 @@ ChartJS.register(
 export default function ExecutiveBiStudio({
   lang = 'th',
   theme = 'dark',
-  dbRecords = []
+  dbRecords = [],
+  latestUploadedFile = null
 }) {
   const isTh = lang === 'th';
   const tx = useCallback((thai, eng) => (isTh ? thai : eng), [isTh]);
@@ -452,13 +453,19 @@ export default function ExecutiveBiStudio({
               <PowerBiStudioIcon size={34} />
             </div>
             <div>
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
                   {tx('Executive BI Studio (สไตล์ Power BI)', 'Executive BI Studio (Power BI Canvas)')}
                 </h1>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 border border-amber-400/50 text-amber-500">
                   {tx('โหมดวิเคราะห์ข้ามมิติ', 'Cross-Filter Engine')}
                 </span>
+                {latestUploadedFile?.filename && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 border border-emerald-400/50 text-emerald-400 flex items-center gap-1.5 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>📂 {latestUploadedFile.filename} ({latestUploadedFile.rows?.toLocaleString?.() || dbRecords.length} {tx('แถวจากไฟล์ล่าสุด', 'rows from latest file')})</span>
+                  </span>
+                )}
               </div>
               <p className={`text-sm font-semibold mt-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'}`}>
                 {tx(
