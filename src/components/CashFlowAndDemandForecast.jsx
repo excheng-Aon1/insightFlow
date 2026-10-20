@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
-import { LuxuryIconBadge, LuxuryModuleIcon, ReorderPointControlIcon } from './LuxuryIcons';
+import { LuxuryIconBadge, ReorderPointControlIcon } from './LuxuryIcons';
 
 export function CashFlowAndDemandForecast({
   lang = 'th',

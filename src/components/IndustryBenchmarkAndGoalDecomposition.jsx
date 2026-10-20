@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { LuxuryIconBadge, LuxuryModuleIcon, MarketPositionRadarIcon } from './LuxuryIcons';
+import { LuxuryIconBadge, MarketPositionRadarIcon } from './LuxuryIcons';
 
 export function IndustryBenchmarkAndGoalDecomposition({
   lang = 'th',
