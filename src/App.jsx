@@ -27,6 +27,7 @@ import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
 import ExecutiveBiStudio from './components/ExecutiveBiStudio';
+import ErrorBoundary from './components/ErrorBoundary';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
   BasketballHoopZone,
@@ -7129,7 +7130,7 @@ export function InsightsTab({
                   🏢 {tx('ชื่อองค์กร / หัวเอกสาร (Company / Entity)', 'Company / Store Entity')}
                 </div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#f8fafc' : '#0f172a', marginTop: '0.2rem' }}>
-                  {activeSelectedFile.paperHeader?.companyName || bizProfile.companyName || tx('ไม่ระบุชื่อองค์กร', 'Not Specified')}
+                  {activeSelectedFile?.paperHeader?.companyName || bizProfile.companyName || tx('ไม่ระบุชื่อองค์กร', 'Not Specified')}
                 </div>
               </div>
 
@@ -7138,7 +7139,7 @@ export function InsightsTab({
                   📑 {tx('ชื่อรายงาน / ประเภทเอกสาร (Report Title)', 'Report / Document Title')}
                 </div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#fbbf24' : '#b45309', marginTop: '0.2rem' }}>
-                  {activeSelectedFile.paperHeader?.reportTitle || activeSelectedFile.filename || tx('รายงานข้อมูลธุรกิจ', 'Business Report')}
+                  {activeSelectedFile?.paperHeader?.reportTitle || activeSelectedFile?.filename || tx('รายงานข้อมูลธุรกิจ', 'Business Report')}
                 </div>
               </div>
 
@@ -7147,7 +7148,7 @@ export function InsightsTab({
                   📅 {tx('งวดวันที่ / ช่วงเวลา (Document Period)', 'Date Period / Timestamp')}
                 </div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#34d399' : '#047857', marginTop: '0.2rem' }}>
-                  {activeSelectedFile.paperHeader?.docDate || activeSelectedFile.updatedAtTh || tx('งวดปัจจุบัน 2026', 'Current Period')}
+                  {activeSelectedFile?.paperHeader?.docDate || activeSelectedFile?.updatedAtTh || tx('งวดปัจจุบัน 2026', 'Current Period')}
                 </div>
               </div>
 
@@ -7156,18 +7157,18 @@ export function InsightsTab({
                   📍 {tx('สาขา / ข้อมูลอ้างอิง (Branch / Reference)', 'Branch / Reference ID')}
                 </div>
                 <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#e2e8f0' : '#0f172a', marginTop: '0.2rem' }}>
-                  {activeSelectedFile.paperHeader?.branchName || activeSelectedFile.paperHeader?.taxIdOrDocNo || tx('ทุกสาขา / สำนักงานใหญ่', 'HQ / Multi-Branch')}
+                  {activeSelectedFile?.paperHeader?.branchName || activeSelectedFile?.paperHeader?.taxIdOrDocNo || tx('ทุกสาขา / สำนักงานใหญ่', 'HQ / Multi-Branch')}
                 </div>
               </div>
             </div>
 
             {/* Raw Letterhead Lines Toggle Display */}
-            {showHeaderRawDetails && activeSelectedFile.paperHeader?.rawLines && activeSelectedFile.paperHeader.rawLines.length > 0 && (
+            {showHeaderRawDetails && activeSelectedFile?.paperHeader?.rawLines && activeSelectedFile?.paperHeader?.rawLines?.length > 0 && (
               <div style={{ padding: '0.75rem', borderRadius: '10px', background: isDark ? '#020617' : '#f8fafc', border: isDark ? '1px dashed rgba(56, 189, 248, 0.35)' : '1px dashed #cbd5e1', fontSize: '0.78rem', color: isDark ? '#cbd5e1' : '#334155', lineHeight: 1.6 }}>
                 <div style={{ fontWeight: 800, color: isDark ? '#38bdf8' : '#0284c7', marginBottom: '0.3rem' }}>
                   📝 {tx('ข้อความหัวกระดาษที่อ่านได้จากบรรทัดต้นไฟล์:', 'Raw Header Lines Read From File Header:')}
                 </div>
-                {activeSelectedFile.paperHeader.rawLines.map((line, lIdx) => (
+                {activeSelectedFile?.paperHeader?.rawLines?.map((line, lIdx) => (
                   <div key={lIdx} style={{ fontFamily: 'monospace' }}>
                     <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>[{lIdx + 1}]</span> {line}
                   </div>
@@ -7179,7 +7180,7 @@ export function InsightsTab({
             <div style={{ borderTop: isDark ? '1px solid rgba(148, 163, 184, 0.15)' : '1px solid #e2e8f0', paddingTop: '0.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                 <span style={{ fontSize: '0.76rem', fontWeight: 900, color: isDark ? '#cbd5e1' : '#1e293b', textTransform: 'uppercase' }}>
-                  🏷️ {tx(`หัวคอลัมน์ตารางที่อ่านได้ละเอียด (${(activeSelectedFile.headers || []).length} คอลัมน์):`, `Parsed Table Column Headers (${(activeSelectedFile.headers || []).length} cols):`)}
+                  🏷️ {tx(`หัวคอลัมน์ตารางที่อ่านได้ละเอียด (${(activeSelectedFile?.headers || []).length} คอลัมน์):`, `Parsed Table Column Headers (${(activeSelectedFile?.headers || []).length} cols):`)}
                 </span>
                 <span style={{ fontSize: '0.7rem', color: isDark ? '#34d399' : '#047857', fontWeight: 800 }}>
                   ✓ {tx('จับคู่ประเภทข้อมูลเข้าสู่ระบบ AI ครบ 100%', '100% Mapped to AI Analytics')}
@@ -7187,12 +7188,12 @@ export function InsightsTab({
               </div>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-                {(activeSelectedFile.columnMappingDetails || (activeSelectedFile.headers || []).map((h, i) => ({
+                {(activeSelectedFile?.columnMappingDetails || (activeSelectedFile?.headers || []).map((h, i) => ({
                   name: h,
                   roleTh: 'คอลัมน์ข้อมูล',
                   roleEn: 'Data Field',
                   match: '100%',
-                  sample: activeSelectedFile.previewRows?.[0]?.[i] || '-'
+                  sample: activeSelectedFile?.previewRows?.[0]?.[i] || '-'
                 }))).map((col, cIdx) => (
                   <div
                     key={cIdx}
@@ -17202,7 +17203,7 @@ function App() {
               </div>
             </div>
           ) : (
-            <>
+            <ErrorBoundary theme={theme}>
               {/* Active Page Content (Unlocked by Current Subscription Plan) */}
               {activeTab === 'overview' && (
                 <OverviewTab
@@ -17403,7 +17404,7 @@ function App() {
                   onUpdateUserContact={handleUpdateUserContact}
                 />
               )}
-            </>
+            </ErrorBoundary>
           )}
 
           {/* Uploaded Files Inspector Modal (หน้าดูไฟล์ที่อัปโหลดเข้าไปแล้วทั้งหมด พร้อมตารางข้อมูลจริงในไฟล์) */}

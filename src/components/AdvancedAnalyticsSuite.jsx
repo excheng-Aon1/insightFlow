@@ -5,7 +5,7 @@
 //              RFM Customer Segmentation, Market Basket, and A/B Testing
 // ==============================================================================
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { Line } from 'react-chartjs-2';
 import { LuxuryModuleIcon, DailyAverageDemandIcon } from './LuxuryIcons';
@@ -18,7 +18,7 @@ export default function AdvancedAnalyticsSuite({
   dbRecords = []
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (isEn ? en : th), [isEn]);
 
   const [activeModule, setActiveModule] = useState('forecasting'); // 'forecasting' | 'rfm_basket' | 'ab_testing'
 
@@ -76,10 +76,11 @@ export default function AdvancedAnalyticsSuite({
     return { velocity, daysSpan };
   }, [dbRecords]);
 
-  const buildRopFromInventory = (inv) => {
-    if (!inv || inv.length === 0) return [];
+  // Derived Dynamic ROP items: fully memoized without cascading setState
+  const ropItems = useMemo(() => {
+    if (!inventoryList || inventoryList.length === 0) return [];
     const { velocity, daysSpan } = productSalesMap;
-    return inv.map(item => {
+    return inventoryList.map(item => {
       const stockVal = Number(item.stock ?? item.qty ?? item.currentStock ?? 0);
       const nameVal = (isEn ? item.en?.name : item.th?.name) || item.name || item.title || tx('สินค้า', 'Product');
       const skuVal = item.sku || item.code || 'SKU';
@@ -105,9 +106,7 @@ export default function AdvancedAnalyticsSuite({
         unit: item.unit || tx('ชิ้น', 'units'),
       };
     });
-  };
-
-  const [ropItems, setRopItems] = useState(() => (inventoryList.length > 0 ? buildRopFromInventory(inventoryList) : []));
+  }, [inventoryList, productSalesMap, isEn, tx]);
 
   // ----------------------------------------------------------------------------
   // 2. STATE: RFM & MARKET BASKET
@@ -228,8 +227,8 @@ export default function AdvancedAnalyticsSuite({
     },
   ];
 
-  // Dynamic RFM Segments calculation from real customer database
-  const computedRfmSegments = useMemo(() => {
+  // Dynamic RFM Segments calculation from real customer database: fully memoized
+  const rfmSegments = useMemo(() => {
     if (!customersList || customersList.length === 0) {
       return currentRevenueVal > 0 ? defaultRfmSegments : zeroRfmSegments;
     }
@@ -313,9 +312,7 @@ export default function AdvancedAnalyticsSuite({
         color: 'from-slate-500/20 to-slate-700/10 border-slate-500/30 text-slate-300'
       }
     ];
-  }, [customersList, currentRevenueVal, isEn, tx]);
-
-  const [rfmSegments, setRfmSegments] = useState(() => (customersList.length > 0 ? computedRfmSegments : (currentRevenueVal > 0 ? defaultRfmSegments : zeroRfmSegments)));
+  }, [customersList, currentRevenueVal, isEn, tx, defaultRfmSegments, zeroRfmSegments]);
 
   const defaultMarketBasketRules = [
     {
@@ -350,8 +347,8 @@ export default function AdvancedAnalyticsSuite({
     },
   ];
 
-  // Dynamic Market Basket Rules from real transaction co-occurrences
-  const computedMarketBasketRules = useMemo(() => {
+  // Dynamic Market Basket Rules from real transaction co-occurrences: fully memoized
+  const marketBasketRules = useMemo(() => {
     if (!dbRecords || dbRecords.length === 0) {
       return currentRevenueVal > 0 ? defaultMarketBasketRules : [];
     }
@@ -432,9 +429,7 @@ export default function AdvancedAnalyticsSuite({
     }
 
     return currentRevenueVal > 0 ? defaultMarketBasketRules : [];
-  }, [dbRecords, currentRevenueVal, isEn, tx]);
-
-  const [marketBasketRules, setMarketBasketRules] = useState(() => (currentRevenueVal > 0 ? computedMarketBasketRules : []));
+  }, [dbRecords, currentRevenueVal, isEn, tx, defaultMarketBasketRules]);
 
   // ----------------------------------------------------------------------------
   // 3. STATE: A/B TESTING CALCULATOR
@@ -492,31 +487,6 @@ export default function AdvancedAnalyticsSuite({
   const [abInputs, setAbInputs] = useState(() => (currentRevenueVal > 0 ? defaultAbInputs : zeroAbInputs));
   const [abResult, setAbResult] = useState(() => (currentRevenueVal > 0 ? defaultAbResult : zeroAbResult));
 
-  // Sync state when props change
-  useEffect(() => {
-    if (customersList && customersList.length > 0) {
-      setRfmSegments(computedRfmSegments);
-    } else if (currentRevenueVal === 0) {
-      setRfmSegments(zeroRfmSegments);
-    } else {
-      setRfmSegments(defaultRfmSegments);
-    }
-  }, [customersList, computedRfmSegments, currentRevenueVal]);
-
-  useEffect(() => {
-    if (dbRecords && dbRecords.length > 0) {
-      setMarketBasketRules(computedMarketBasketRules);
-    } else if (currentRevenueVal === 0) {
-      setMarketBasketRules([]);
-    } else {
-      setMarketBasketRules(defaultMarketBasketRules);
-    }
-  }, [dbRecords, computedMarketBasketRules, currentRevenueVal]);
-
-  useEffect(() => {
-    setRopItems(inventoryList && inventoryList.length > 0 ? buildRopFromInventory(inventoryList) : []);
-  }, [inventoryList, productSalesMap]);
-
   useEffect(() => {
     if (currentRevenueVal === 0) {
       setForecastData(zeroForecastData);
@@ -527,7 +497,7 @@ export default function AdvancedAnalyticsSuite({
       setAbInputs(defaultAbInputs);
       setAbResult(defaultAbResult);
     }
-  }, [currentRevenueVal]);
+  }, [currentRevenueVal, zeroForecastData, defaultForecastData, zeroAbInputs, defaultAbInputs, zeroAbResult, defaultAbResult]);
 
   // Calculate A/B Test Live
   const runLiveAbCalculation = (inputs) => {

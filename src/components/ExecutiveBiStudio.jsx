@@ -216,6 +216,7 @@ export default function ExecutiveBiStudio({
         opexAmount: 0,
         netOperatingProfit: 0,
         netMarginPercent: '0.0',
+        hasRealCogs: false,
         averageOrderValue: 0,
         ordersCount: 0
       };
@@ -346,7 +347,7 @@ export default function ExecutiveBiStudio({
   const waterfallLabels = [
     tx('รายได้รวม', 'Gross Revenue'),
     metrics.hasRealCogs
-      ? tx(`ต้นทุนสินค้า CoGS (จากไฟล์จริง ฿${metrics.cogsAmount.toLocaleString()})`, `CoGS (From Actual File ฿${metrics.cogsAmount.toLocaleString()})`)
+      ? tx(`ต้นทุนสินค้า CoGS (จากไฟล์จริง ฿${(metrics.cogsAmount || 0).toLocaleString()})`, `CoGS (From Actual File ฿${(metrics.cogsAmount || 0).toLocaleString()})`)
       : tx(`ต้นทุนสินค้า CoGS (-${costAssumptions.cogsPct}%)`, `CoGS (-${costAssumptions.cogsPct}%)`),
     tx(`ค่าการตลาด & แพลตฟอร์ม (-${costAssumptions.marketingPct}%)`, `Ads & Fees (-${costAssumptions.marketingPct}%)`),
     tx(`ค่าใช้จ่ายสาขา OPEX (-${costAssumptions.opexPct}%)`, `Store OPEX (-${costAssumptions.opexPct}%)`),

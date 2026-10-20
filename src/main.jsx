@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './index.css'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { Toaster } from 'react-hot-toast'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 // Auto-update Service Worker & purge legacy caches on mobile browsers
 if ('serviceWorker' in navigator) {
@@ -28,9 +29,11 @@ if ('serviceWorker' in navigator) {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId="1087242818140-n8805mtsskl2sdbtepodirvudd0nj0tg.apps.googleusercontent.com">
-      <Toaster position="top-right" />
-      <App />
-    </GoogleOAuthProvider>
+    <ErrorBoundary>
+      <GoogleOAuthProvider clientId="1087242818140-n8805mtsskl2sdbtepodirvudd0nj0tg.apps.googleusercontent.com">
+        <Toaster position="top-right" />
+        <App />
+      </GoogleOAuthProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 )
