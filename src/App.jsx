@@ -8229,7 +8229,9 @@ export function DatabaseTab({
     procurement: { th: 'ซัพพลายเออร์และจัดซื้อรวมศูนย์', en: 'Suppliers & Central PO' },
     inventory: { th: 'คลังสินค้าอัจฉริยะ', en: 'Smart Inventory' },
     insights: { th: 'วิเคราะห์ข้อมูลด้วย AI', en: 'AI Data Analytics' },
-    database: { th: 'ฐานข้อมูลร้านค้ากลาง', en: 'Master Store Database' }
+    database: { th: 'ฐานข้อมูลร้านค้ากลาง', en: 'Master Store Database' },
+    bi_studio: { th: 'Executive BI Studio', en: 'Executive BI Studio' },
+    central: { th: '🏀 ไฟล์กลางจากชู้ตไฟล์ (Central Shoot Hub)', en: '🏀 Central Shoot Ingest File' }
   };
 
   return (
@@ -13064,7 +13066,7 @@ function App() {
 
   // Real File Upload & Universal Dynamic Content Parser for each page
   // Handles ANY file (English & Thai filenames, CSV, TSV, TXT, JSON), parses quoted numbers, and updates all pages instantly!
-  const handlePageFileUpload = (tabKey, pageTitle, file) => {
+  const handlePageFileUpload = (tabKey, pageTitle, file, options = {}) => {
     if (!file) return;
     setIsUploading(true);
     const reader = new FileReader();
@@ -13725,25 +13727,86 @@ function App() {
         }
       ]);
 
-      setPageUploadedFiles(prev => ({
-        ...prev,
-        [tabKey]: {
-          filename: file.name,
-          customTitle: pageTitle || file.name,
-          isUserAdded: true,
-          rows: parsedRowsCount,
-          fileSizeKb: Math.max(1, Math.round((file.size || 2048) / 1024)),
-          updatedAtTh: `อัปโหลดเมื่อ ${nowTime} น.`,
-          updatedAtEn: `Uploaded at ${nowTime}`,
-          isCustomUpload: true,
-          changeSummaryTh,
-          changeSummaryEn,
-          headers: detectedHeaders,
-          paperHeader,
-          columnMappingDetails,
-          previewRows: dataRows.slice(0, 50)
-        }
-      }));
+      // Multi-module sync from Shoot File (ไฟล์กลาง)
+      const headerStr = detectedHeaders.join(' ').toLowerCase();
+      const hasProductData = colProductIdx >= 0 || /sku|stock|product|item|goods|สินค้า|สต็อก|คงเหลือ/i.test(headerStr);
+      const hasCustomerData = colCustomerIdx >= 0 || /customer|client|phone|line|member|buyer|ลูกค้า|ผู้ซื้อ|สมาชิก/i.test(headerStr);
+      const hasStaffData = colStaffIdx >= 0 || /staff|cashier|employee|void|pos|พนักงาน|แคชเชียร์/i.test(headerStr);
+      const hasChannelData = colChannelIdx >= 0 || /channel|branch|store|platform|สาขา|ช่องทาง/i.test(headerStr);
+      const hasFinanceData = colAmountIdx >= 0 || colDateIdx >= 0 || /amount|sales|revenue|date|ยอด|ราคา|วันที่/i.test(headerStr);
+
+      const detectedModuleKeys = [
+        'database',
+        'central',
+        'overview',
+        'insights',
+        tabKey,
+        ...(options?.matchedKeys || [])
+      ];
+
+      if (hasProductData) {
+        detectedModuleKeys.push('inventory', 'procurement');
+      }
+      if (hasCustomerData) {
+        detectedModuleKeys.push('customers');
+      }
+      if (hasStaffData) {
+        detectedModuleKeys.push('staff_pos');
+      }
+      if (hasChannelData) {
+        detectedModuleKeys.push('multi_channel');
+      }
+      if (hasFinanceData) {
+        detectedModuleKeys.push('bi_studio');
+      }
+
+      // If it's a central shoot or central file upload, ALL 9 modules receive & connect to it!
+      const allTargetKeys = (options?.isCentralShoot || tabKey === 'central' || tabKey === 'database')
+        ? Array.from(new Set([
+            'central',
+            'database',
+            'overview',
+            'inventory',
+            'customers',
+            'staff_pos',
+            'multi_channel',
+            'procurement',
+            'bi_studio',
+            'insights',
+            ...detectedModuleKeys
+          ]))
+        : Array.from(new Set(detectedModuleKeys));
+
+      const fileDataEntry = {
+        filename: file.name,
+        customTitle: pageTitle || file.name,
+        isUserAdded: true,
+        rows: parsedRowsCount,
+        fileSizeKb: Math.max(1, Math.round((file.size || 2048) / 1024)),
+        updatedAtTh: `อัปโหลดเมื่อ ${nowTime} น.`,
+        updatedAtEn: `Uploaded at ${nowTime}`,
+        isCustomUpload: true,
+        isCentralShoot: Boolean(options?.isCentralShoot),
+        changeSummaryTh,
+        changeSummaryEn,
+        headers: detectedHeaders,
+        paperHeader,
+        columnMappingDetails,
+        previewRows: dataRows.slice(0, 50),
+        extractedAmount: totalExtractedAmount
+      };
+
+      setPageUploadedFiles(prev => {
+        const nextState = { ...prev };
+        allTargetKeys.forEach(k => {
+          nextState[k] = {
+            ...fileDataEntry,
+            sourceTab: k,
+            moduleKey: k
+          };
+        });
+        return nextState;
+      });
 
       setIsUploading(false);
       toast.success(
@@ -16489,11 +16552,11 @@ function App() {
               type="button"
               onClick={() => setIsBasketballModalOpen(true)}
               className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-emerald-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
-              title={tx('อัปโหลดไฟล์กลาง (ข้อมูลจะซิงก์และเชื่อมต่อทุกหน้า)', 'Upload Central File (Syncs across all pages)')}
+              title={tx('ชู้ตไฟล์ (อัปโหลดไฟล์กลาง ทุกหน้ามารับข้อมูลที่นี่)', 'Shoot File (Central Ingest Hub - All pages receive data here)')}
             >
               <span className="animate-bounce text-sm sm:text-base">🏀</span>
               <span className="font-black">
-                {tx('ชู้ตไฟล์', 'Shoot File')}
+                {tx('ชู้ตไฟล์ (อัปโหลดไฟล์กลาง)', 'Shoot File (Central)')}
               </span>
             </button>
 
@@ -17350,7 +17413,7 @@ function App() {
             onClose={() => setIsBasketballModalOpen(false)}
             lang={lang}
             theme={theme}
-            onFileDispatched={handlePageFileUpload}
+            onFileDispatched={(tabKey, pageTitle, file, options) => handlePageFileUpload(tabKey, pageTitle, file, options)}
             setActiveTab={setActiveTab}
           />
         </main>

@@ -47,17 +47,24 @@ export function classifyUploadedFile(fileName = '', detectedHeaders = [], firstF
 
   scores.sort((a, b) => b.score - a.score);
 
-  if (scores[0].score >= 2) {
-    return scores[0];
-  }
-
-  return {
+  const matchedModules = scores.filter(s => s.score > 0);
+  const primary = scores[0].score >= 2 ? scores[0] : {
     key: 'database',
     score: 1,
     labelTh: 'ฐานข้อมูลกลาง Master DB',
     labelEn: 'Master Database',
     icon: '🗄️',
     color: '#64748b'
+  };
+
+  const allTargetKeys = matchedModules.length > 0
+    ? Array.from(new Set([primary.key, ...matchedModules.map(m => m.key)]))
+    : [primary.key, 'database', 'overview'];
+
+  return {
+    ...primary,
+    matchedModules: matchedModules.length > 0 ? matchedModules : [primary],
+    allTargetKeys
   };
 }
 
@@ -510,18 +517,24 @@ export function BasketballCourtModal({
           file,
           classified,
           headersCount: headers.length,
-          rowsCount: Math.max(0, rawLines.length - 1)
+          rowsCount: Math.max(0, rawLines.length - 1),
+          matchedModules: classified.matchedModules || [classified],
+          allTargetKeys: classified.allTargetKeys || [classified.key]
         });
 
-        // 2. Dispatch to target module
+        // 2. Dispatch to target module and ALL matching modules via Central File Ingest Hub
         if (onFileDispatched) {
-          onFileDispatched(classified.key, classified.labelTh, file);
+          onFileDispatched(classified.key, classified.labelTh, file, {
+            isCentralShoot: true,
+            matchedKeys: classified.allTargetKeys,
+            matchedModules: classified.matchedModules
+          });
         }
 
         toast.success(
           tx(
-            `🏀 SWISH! สแลมดังก์ลงห่วงสำเร็จ! ตรวจพบข้อมูล [${classified.labelTh}] ระบบจัดส่งและเริ่มวิเคราะห์ AI ให้ทันที!`,
-            `🏀 SWISH! Slam Dunk! Detected [${classified.labelEn}] data. Automatically dispatched & analyzed with AI!`
+            `🏀 SWISH! ชู้ตไฟล์เข้าสู่ศูนย์กลางสำเร็จ! ตรวจพบข้อมูล [${classified.labelTh}] ทุกหน้าที่เกี่ยวข้องเชื่อมต่อข้อมูลแล้ว!`,
+            `🏀 SWISH! Central shoot complete! Detected [${classified.labelEn}]. All relevant pages connected!`
           ),
           { duration: 5500, icon: '🏀' }
         );
@@ -561,16 +574,16 @@ export function BasketballCourtModal({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-black text-base sm:text-lg">
-                  {tx('ศูนย์อัปโหลดบาสเก็ตบอลส่วนกลาง (Universal Basketball Hub)', 'Universal Basketball Ingest Hub')}
+                  {tx('ศูนย์อัปโหลดไฟล์กลาง (ชู้ตไฟล์บาสเก็ตบอล Universal Central Ingest Hub)', 'Universal Central File Ingest Hub (Basketball Shoot)')}
                 </h3>
-                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/40">
-                  AI Auto-Dispatch
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                  {tx('ศูนย์ไฟล์กลาง • ทุกหน้ามารับข้อมูลที่นี่', 'Central Hub • All Pages Ingest Here')}
                 </span>
               </div>
               <p className="text-xs text-slate-400">
                 {tx(
-                  'ชู้ตไฟล์อะไรก็ได้เข้าห่วงนี้ AI จะสแกนและส่งตรงไปยังหน้าที่ตรงที่สุดอัตโนมัติ',
-                  'Shoot any file into this hoop. AI will route it directly to the matching page.'
+                  'ชู้ตไฟล์เข้าห่วงนี้เป็นจุดอัปโหลดไฟล์กลาง ทุกหน้าในระบบ (จุดสั่งซื้อ ROP, ปฏิทินหวย/สิ้นเดือน, ระบบแนะนำ AI Playbooks, POS, คลังสินค้า) จะมารับและเชื่อมต่อข้อมูลจากชู้ตไฟล์ทันที',
+                  'Shoot any file into this central hoop. Every page (ROP Restock, Payday/Lottery Calendar, AI Playbooks, POS, Inventory) reads & connects to this central data.'
                 )}
               </p>
             </div>
@@ -659,51 +672,87 @@ export function BasketballCourtModal({
 
           {/* Result Card when a file was just dispatched */}
           {lastDispatched && (
-            <div className="w-full mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">{lastDispatched.classified.icon}</span>
-                <div>
-                  <div className="text-xs text-emerald-400 font-bold flex items-center gap-1.5">
-                    <span>✓ {tx('จัดส่งข้อมูลสำเร็จ', 'Successfully Dispatched')}</span>
-                    <span className="text-slate-400">•</span>
-                    <span>{lastDispatched.file.name}</span>
+            <div className="w-full mt-4 p-4 sm:p-5 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500/40 text-left flex flex-col gap-3.5 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-emerald-500/20 pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl sm:text-4xl">{lastDispatched.classified.icon}</span>
+                  <div>
+                    <div className="text-xs text-emerald-400 font-bold flex items-center gap-1.5">
+                      <span>✓ {tx('ชู้ตไฟล์เข้าสู่ศูนย์กลางสำเร็จ', 'Central Ingest Successful')}</span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-white font-mono">{lastDispatched.file.name}</span>
+                    </div>
+                    <div className="text-sm sm:text-base font-black text-white mt-0.5">
+                      {tx('เชื่อมต่อข้อมูลกลาง & กระจายสู่ทุกหน้าเรียบร้อยแล้ว', 'Connected to Central Hub & Synced Across All Pages')}
+                      <span className="text-xs text-emerald-300 font-normal ml-2">
+                        ({lastDispatched.rowsCount.toLocaleString()} {tx('แถว', 'rows')} • {lastDispatched.headersCount} {tx('คอลัมน์', 'cols')})
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-sm font-black text-white mt-0.5">
-                    {tx('ส่งเข้าสู่หน้า:', 'Sent to:')} {isEn ? lastDispatched.classified.labelEn : lastDispatched.classified.labelTh}
-                    <span className="text-xs text-slate-300 font-normal ml-2">
-                      ({lastDispatched.rowsCount.toLocaleString()} {tx('แถว', 'rows')} • {lastDispatched.headersCount} {tx('คอลัมน์', 'cols')})
-                    </span>
-                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  {setActiveTab && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(lastDispatched.classified.key);
+                        onClose();
+                      }}
+                      className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+                    >
+                      <span>🚀</span>
+                      <span>{tx('ไปดูหน้าที่ตรงที่สุด', 'Jump to Best Match')}</span>
+                    </button>
+                  )}
+                  {setActiveTab && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('insights');
+                        onClose();
+                      }}
+                      className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 border border-orange-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>🧠</span>
+                      <span>{tx('ดูบทวิเคราะห์ AI', 'View AI Analysis')}</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                {setActiveTab && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab(lastDispatched.classified.key);
-                      onClose();
-                    }}
-                    className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-md flex items-center justify-center gap-1.5"
-                  >
-                    <span>🚀</span>
-                    <span>{tx('ไปดูหน้านี้ทันที', 'Jump to Page')}</span>
-                  </button>
-                )}
-                {setActiveTab && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('insights');
-                      onClose();
-                    }}
-                    className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 border border-orange-500/40 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <span>🧠</span>
-                    <span>{tx('ดูบทวิเคราะห์ AI', 'View AI Analysis')}</span>
-                  </button>
-                )}
+              {/* Connected Pages Pill Badges */}
+              <div>
+                <div className="text-[11px] font-black text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <span className="text-emerald-400">⚡</span>
+                  <span>{tx('ทุกหน้าที่ดึงข้อมูลจากชู้ตไฟล์ไปวิเคราะห์ทันที:', 'Pages directly reading data from this shoot file:')}</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 text-xs">
+                  {[
+                    { key: 'inventory', icon: '📦', name: 'จุดสั่งซื้อสินค้า ROP' },
+                    { key: 'overview', icon: '🗓️', name: 'ปฏิทินวันหวยออกสิ้นเดือน' },
+                    { key: 'insights', icon: '🤖', name: 'ระบบแนะนำการกระทำ AI' },
+                    { key: 'staff_pos', icon: '💳', name: 'พนักงาน & POS' },
+                    { key: 'customers', icon: '👥', name: 'ลูกค้า CRM' },
+                    { key: 'multi_channel', icon: '🌐', name: 'สาขา & ออนไลน์' },
+                    { key: 'procurement', icon: '🏢', name: 'จัดซื้อรวมศูนย์' },
+                    { key: 'bi_studio', icon: '📈', name: 'Executive BI' },
+                    { key: 'database', icon: '🗄️', name: 'Master DB' }
+                  ].map(pill => (
+                    <button
+                      key={pill.key}
+                      type="button"
+                      onClick={() => {
+                        if (setActiveTab) setActiveTab(pill.key);
+                        onClose();
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-black/40 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-200 text-[11px] font-bold flex items-center gap-1 transition cursor-pointer"
+                    >
+                      <span>{pill.icon}</span>
+                      <span>{pill.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
