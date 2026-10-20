@@ -143,49 +143,74 @@ def calculate_dynamic_reorder_points() -> Dict[str, Any]:
     ROP = (d_seasonal * Lead_Time) + Safety_Stock
     Safety_Stock = Z * sigma_d * sqrt(Lead_Time)
     """
-    # รายการสินค้าหลักพร้อมตัวแปรห่วงโซ่อุปทาน (Supply Chain Parameters)
-    inventory_items = [
-        {
-            "sku": "SKU-001",
-            "name": "สินค้าและวัตถุดิบหลัก (Core Inventory Unit)",
-            "current_stock": 28,
-            "daily_demand": 14.5,
-            "daily_std": 3.8,
-            "lead_time_days": 3,
-            "seasonal_multiplier": 1.25,  # ช่วงความต้องการสูง ยอดขายพุ่งขึ้น 25%
-            "unit": "หน่วย",
-        },
-        {
-            "sku": "SKU-002",
-            "name": "วัตถุดิบนำเข้าเกรดพรีเมียม (Imported Core Material)",
-            "current_stock": 14,
-            "daily_demand": 4.2,
-            "daily_std": 1.5,
-            "lead_time_days": 5,
-            "seasonal_multiplier": 1.10,
-            "unit": "หน่วย",
-        },
-        {
-            "sku": "SKU-003",
-            "name": "วัสดุประกอบและส่วนผสมหลัก (Primary Assembly Unit)",
-            "current_stock": 18,
-            "daily_demand": 9.0,
-            "daily_std": 2.4,
-            "lead_time_days": 2,
-            "seasonal_multiplier": 1.40,  # ใกล้ช่วงรอบบิลขายดีมาก
-            "unit": "หน่วย",
-        },
-        {
-            "sku": "SKU-004",
-            "name": "บรรจุภัณฑ์และวัสดุป้องกัน (Protective Packaging)",
-            "current_stock": 42,
-            "daily_demand": 6.5,
-            "daily_std": 1.8,
-            "lead_time_days": 4,
-            "seasonal_multiplier": 1.15,
-            "unit": "กล่อง",
-        },
-    ]
+    db = SessionLocal()
+    products = []
+    try:
+        products = db.query(Product).all()
+    except Exception as e:
+        logger.warning(f"Could not load products from DB: {e}")
+    finally:
+        db.close()
+
+    if products and len(products) > 0:
+        inventory_items = []
+        for p in products:
+            curr_stock = p.stock_qty if p.stock_qty is not None else 25
+            est_daily = max(1.0, round(curr_stock / 15.0, 1))
+            inventory_items.append({
+                "sku": p.sku_code or f"SKU-{p.id}",
+                "name": p.name,
+                "current_stock": curr_stock,
+                "daily_demand": est_daily,
+                "daily_std": max(0.5, round(est_daily * 0.28, 1)),
+                "lead_time_days": 3,
+                "seasonal_multiplier": 1.15,
+                "unit": "หน่วย",
+            })
+    else:
+        # รายการสินค้าหลักพร้อมตัวแปรห่วงโซ่อุปทานมาตรฐาน (Baseline Parameters)
+        inventory_items = [
+            {
+                "sku": "SKU-001",
+                "name": "สินค้าและวัตถุดิบหลัก (Core Inventory Unit)",
+                "current_stock": 28,
+                "daily_demand": 14.5,
+                "daily_std": 3.8,
+                "lead_time_days": 3,
+                "seasonal_multiplier": 1.25,  # ช่วงความต้องการสูง ยอดขายพุ่งขึ้น 25%
+                "unit": "หน่วย",
+            },
+            {
+                "sku": "SKU-002",
+                "name": "วัตถุดิบนำเข้าเกรดพรีเมียม (Imported Core Material)",
+                "current_stock": 14,
+                "daily_demand": 4.2,
+                "daily_std": 1.5,
+                "lead_time_days": 5,
+                "seasonal_multiplier": 1.10,
+                "unit": "หน่วย",
+            },
+            {
+                "sku": "SKU-003",
+                "name": "วัสดุประกอบและส่วนผสมหลัก (Primary Assembly Unit)",
+                "current_stock": 18,
+                "daily_demand": 9.0,
+                "daily_std": 2.4,
+                "lead_time_days": 2,
+                "seasonal_multiplier": 1.40,  # ใกล้ช่วงรอบบิลขายดีมาก
+                "unit": "หน่วย",
+            },
+            {
+                "sku": "SKU-004",
+                "name": "บรรจุภัณฑ์และวัสดุป้องกัน (Protective Packaging)",
+                "current_stock": 42,
+                "daily_demand": 6.5,
+                "daily_std": 1.8,
+                "lead_time_days": 4,
+                "seasonal_multiplier": 1.15,
+                "unit": "กล่อง",
+            },
+        ]
 
     z_score_95 = 1.645  # 95% Service Level
     evaluated_items = []
@@ -240,7 +265,130 @@ def calculate_rfm_segmentation() -> Dict[str, Any]:
     แยกกลุ่ม Champions, Loyal, Potential, At-Risk และ Churn
     พร้อมระบุความเสี่ยงรายได้หลุดลอย (Revenue at Risk)
     """
-    segments_summary = [
+    db = SessionLocal()
+    orders = []
+    try:
+        orders = db.query(PosOrder).all()
+    except Exception as e:
+        logger.warning(f"Could not load PosOrders from DB: {e}")
+    finally:
+        db.close()
+
+    if orders and len(orders) >= 5:
+        now = datetime.utcnow()
+        cust_map = {}
+        for ord_row in orders:
+            uid = ord_row.user_id or "GUEST"
+            amt = ord_row.total_amount or 0.0
+            dt = ord_row.created_at or now
+            if uid not in cust_map:
+                cust_map[uid] = {"orders": [], "total_spend": 0.0, "latest_date": dt}
+            cust_map[uid]["orders"].append(ord_row)
+            cust_map[uid]["total_spend"] += amt
+            if dt > cust_map[uid]["latest_date"]:
+                cust_map[uid]["latest_date"] = dt
+
+        total_users = len(cust_map)
+        buckets = {
+            "champions": {"count": 0, "revenue": 0.0, "avg_days": 0.0},
+            "loyal": {"count": 0, "revenue": 0.0, "avg_days": 0.0},
+            "potential": {"count": 0, "revenue": 0.0, "avg_days": 0.0},
+            "at_risk": {"count": 0, "revenue": 0.0, "avg_days": 0.0},
+            "churned": {"count": 0, "revenue": 0.0, "avg_days": 0.0},
+        }
+
+        for uid, data in cust_map.items():
+            freq = len(data["orders"])
+            spend = data["total_spend"]
+            days_since = max(1, (now - data["latest_date"]).days)
+
+            if freq >= 4 and days_since <= 14:
+                seg = "champions"
+            elif freq >= 2 and days_since <= 30:
+                seg = "loyal"
+            elif freq == 1 and days_since <= 21:
+                seg = "potential"
+            elif days_since >= 45:
+                seg = "at_risk"
+            else:
+                seg = "churned"
+
+            buckets[seg]["count"] += 1
+            buckets[seg]["revenue"] += spend
+            buckets[seg]["avg_days"] += days_since
+
+        segments_summary = [
+            {
+                "segment_id": "champions",
+                "name_th": "🏆 ลูกค้าชั้นยอด (Champions)",
+                "name_en": "Champions (VIP)",
+                "rfm_score": "5-5-5 / 5-5-4",
+                "count": buckets["champions"]["count"],
+                "percentage": round((buckets["champions"]["count"] / total_users) * 100, 1) if total_users > 0 else 0,
+                "avg_spend": round(buckets["champions"]["revenue"] / max(1, buckets["champions"]["count"]), 1),
+                "total_revenue": round(buckets["champions"]["revenue"], 1),
+                "churn_risk": "ต่ำมาก (< 5%)",
+                "recommended_action": "มอบสิทธิพิเศษ VIP & บริการระดับพรีเมียมก่อนใคร",
+                "color": "#fbbf24",
+            },
+            {
+                "segment_id": "loyal",
+                "name_th": "💎 ลูกค้าประจำเหนียวแน่น (Loyal Customers)",
+                "name_en": "Loyal Regulars",
+                "rfm_score": "4-4-4 / 3-4-4",
+                "count": buckets["loyal"]["count"],
+                "percentage": round((buckets["loyal"]["count"] / total_users) * 100, 1) if total_users > 0 else 0,
+                "avg_spend": round(buckets["loyal"]["revenue"] / max(1, buckets["loyal"]["count"]), 1),
+                "total_revenue": round(buckets["loyal"]["revenue"], 1),
+                "churn_risk": "ต่ำ (10 - 15%)",
+                "recommended_action": "เสนอโปร Cross-sell สินค้าเสริม และระบบสะสมแต้มแลกส่วนลด",
+                "color": "#38bdf8",
+            },
+            {
+                "segment_id": "potential",
+                "name_th": "🌱 ลูกค้ามีศักยภาพโต (Potential Loyalists)",
+                "name_en": "Potential Loyalists",
+                "rfm_score": "4-2-3 / 5-1-2",
+                "count": buckets["potential"]["count"],
+                "percentage": round((buckets["potential"]["count"] / total_users) * 100, 1) if total_users > 0 else 0,
+                "avg_spend": round(buckets["potential"]["revenue"] / max(1, buckets["potential"]["count"]), 1),
+                "total_revenue": round(buckets["potential"]["revenue"], 1),
+                "churn_risk": "ปานกลาง (25 - 35%)",
+                "recommended_action": "เสนอคูปองส่วนลดซื้อครั้งที่ 2 ภายใน 14 วัน เพื่อกระตุ้นให้กลายเป็นขาประจำ",
+                "color": "#34d399",
+            },
+            {
+                "segment_id": "at_risk",
+                "name_th": "⚠️ ลูกค้าประจำเริ่มหาย (At-Risk VIPs)",
+                "name_en": "At-Risk VIP Customers",
+                "rfm_score": "2-4-4 / 1-4-5",
+                "count": buckets["at_risk"]["count"],
+                "percentage": round((buckets["at_risk"]["count"] / total_users) * 100, 1) if total_users > 0 else 0,
+                "avg_spend": round(buckets["at_risk"]["revenue"] / max(1, buckets["at_risk"]["count"]), 1),
+                "total_revenue": round(buckets["at_risk"]["revenue"], 1),
+                "churn_risk": "สูงมาก (65 - 80%)",
+                "recommended_action": "ส่งคูปองพิเศษลด 15-20% ด่วนผ่าน LINE OA หรือโทรติดตามโดยตรง",
+                "color": "#fb7185",
+            },
+            {
+                "segment_id": "churned",
+                "name_th": "💤 ลูกค้าที่หยุดซื้อแล้ว (Hibernating / Churned)",
+                "name_en": "Hibernating / Churned",
+                "rfm_score": "1-1-1 / 1-2-1",
+                "count": buckets["churned"]["count"],
+                "percentage": round((buckets["churned"]["count"] / total_users) * 100, 1) if total_users > 0 else 0,
+                "avg_spend": round(buckets["churned"]["revenue"] / max(1, buckets["churned"]["count"]), 1),
+                "total_revenue": round(buckets["churned"]["revenue"], 1),
+                "churn_risk": "หลุดแล้ว (> 90%)",
+                "recommended_action": "แคมเปญกระตุ้น Re-engagement ช่วงเทศกาลใหญ่ หรือตัดงบโฆษณา",
+                "color": "#94a3b8",
+            },
+        ]
+        revenue_at_risk = round(buckets["at_risk"]["revenue"], 1)
+        at_risk_count = buckets["at_risk"]["count"]
+    else:
+        # Standard Baseline
+        segments_summary = [
         {
             "segment_id": "champions",
             "name_th": "🏆 ลูกค้าชั้นยอด (Champions)",
@@ -309,13 +457,12 @@ def calculate_rfm_segmentation() -> Dict[str, Any]:
     ]
 
     total_customers = sum(s["count"] for s in segments_summary)
-    revenue_at_risk = 1139200.0  # At-Risk group revenue
 
     return {
         "status": "success",
         "total_active_customers": total_customers,
         "revenue_at_risk_thb": revenue_at_risk,
-        "at_risk_vip_count": 89,
+        "at_risk_vip_count": at_risk_count,
         "segments": segments_summary,
     }
 

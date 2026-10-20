@@ -7587,6 +7587,8 @@ export function InsightsTab({
         lang={lang}
         currentRevenueVal={currentRevenueVal}
         inventoryList={inventoryList}
+        customersList={customersList}
+        dbRecords={dbRecords}
       />
 
       {/* Actionable Prescriptive AI Hub: Market Basket, Dead Stock, Pricing Simulator */}
@@ -13401,6 +13403,12 @@ function App() {
           qty = Math.max(1, Math.round(parseAmountFromCell(row[colQtyIdx])) || 1);
         }
 
+        let unitCost = 0;
+        if (colCostIdx >= 0 && row[colCostIdx]) {
+          unitCost = parseAmountFromCell(row[colCostIdx]);
+        }
+        const totalCost = unitCost > 0 ? unitCost * qty : 0;
+
         const dateVal = (colDateIdx >= 0 && row[colDateIdx]) || (row[0] && row[0].includes('-') ? row[0] : nowTime);
         const channelVal = (colChannelIdx >= 0 && row[colChannelIdx]) || cleanFileName;
         const customerVal = (colCustomerIdx >= 0 && row[colCustomerIdx]) || `Customer #${idx + 1}`;
@@ -13413,6 +13421,8 @@ function App() {
           date: dateVal,
           amount,
           itemsCount: qty,
+          cost: totalCost,
+          unitCost: unitCost,
           category: categoryVal,
           th: {
             channel: channelVal,

@@ -152,12 +152,14 @@ export default function ExecutiveBiStudio({
 
       const amount = Number(rec.amount) || 1500;
       const itemsCount = Number(rec.itemsCount) || 1;
+      const cost = Number(rec.cost) || (Number(rec.unitCost) * itemsCount) || 0;
 
       return {
         id: rec.id || `REC-${idx + 1}`,
         date: rec.date || '15/10/2026',
         amount,
         itemsCount,
+        cost,
         branch: isTh ? branch : branchEn,
         branchKey: branch,
         category: isTh ? category : categoryEn,
@@ -226,8 +228,10 @@ export default function ExecutiveBiStudio({
     const targetVariancePercent = targetRevenue > 0 ? (((grossRevenue - targetRevenue) / targetRevenue) * 100).toFixed(1) : '0.0';
     const achievementPercent = Math.min(100, Math.max(0, Math.round((grossRevenue / (targetRevenue || 1)) * 100)));
 
-    // Financial Waterfall components (Dynamic from Executive Cost Assumptions)
-    const cogsAmount = Math.round(grossRevenue * (costAssumptions.cogsPct / 100));
+    // Financial Waterfall components (Data-Driven with intelligent fallback)
+    const realCogsFromData = filteredData.reduce((acc, curr) => acc + (Number(curr.cost) || 0), 0);
+    const hasRealCogs = realCogsFromData > 0;
+    const cogsAmount = hasRealCogs ? Math.round(realCogsFromData) : Math.round(grossRevenue * (costAssumptions.cogsPct / 100));
     const marketingExpense = Math.round(grossRevenue * (costAssumptions.marketingPct / 100));
     const opexAmount = Math.round(grossRevenue * (costAssumptions.opexPct / 100));
     const netOperatingProfit = Math.max(0, grossRevenue - cogsAmount - marketingExpense - opexAmount);
@@ -240,6 +244,7 @@ export default function ExecutiveBiStudio({
       targetRevenue,
       targetVariancePercent,
       achievementPercent,
+      hasRealCogs,
       cogsAmount,
       marketingExpense,
       opexAmount,
@@ -340,7 +345,9 @@ export default function ExecutiveBiStudio({
   // -------------------------------------------------------------
   const waterfallLabels = [
     tx('รายได้รวม', 'Gross Revenue'),
-    tx(`ต้นทุนสินค้า CoGS (-${costAssumptions.cogsPct}%)`, `CoGS (-${costAssumptions.cogsPct}%)`),
+    metrics.hasRealCogs
+      ? tx(`ต้นทุนสินค้า CoGS (จากไฟล์จริง ฿${metrics.cogsAmount.toLocaleString()})`, `CoGS (From Actual File ฿${metrics.cogsAmount.toLocaleString()})`)
+      : tx(`ต้นทุนสินค้า CoGS (-${costAssumptions.cogsPct}%)`, `CoGS (-${costAssumptions.cogsPct}%)`),
     tx(`ค่าการตลาด & แพลตฟอร์ม (-${costAssumptions.marketingPct}%)`, `Ads & Fees (-${costAssumptions.marketingPct}%)`),
     tx(`ค่าใช้จ่ายสาขา OPEX (-${costAssumptions.opexPct}%)`, `Store OPEX (-${costAssumptions.opexPct}%)`),
     tx('กำไรสุทธิจากการดำเนินงาน', 'Net Operating Profit')
