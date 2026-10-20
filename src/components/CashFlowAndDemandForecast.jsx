@@ -114,7 +114,7 @@ export function CashFlowAndDemandForecast({
           safetyStock,
           unitCost: cost,
           suggestedOrderQty,
-          vendor: matchedVendor?.name || matchedVendor?.th?.name || 'บจก. สยาม ออร์แกนิค ซัพพลาย',
+          vendor: matchedVendor?.name || matchedVendor?.th?.name || 'พันธมิตรผู้จัดจำหน่ายหลัก (Primary Vendor)',
           daysUntilStockout,
           reorderPoint,
           isCritical,
@@ -178,16 +178,16 @@ export function CashFlowAndDemandForecast({
     if (items.length === 0 && !hasUserFiles) {
       items.push(
         {
-          sku: 'PKG-009',
-          thName: 'กล่องพัสดุกันกระแทก ขนาดกลาง',
-          enName: 'Shockproof Shipping Box (Medium)',
+          sku: 'PKG-001',
+          thName: 'บรรจุภัณฑ์และวัสดุจัดส่งมาตรฐาน',
+          enName: 'Standard Packaging & Dispatch Unit',
           currentStock: 12,
           runRatePerDay: 5.5,
           leadTimeDays: 5,
           safetyStock: 15,
           unitCost: 15,
           suggestedOrderQty: 250,
-          vendor: 'บจก. สยามบรรจุภัณฑ์ เอ็กซ์เพรส',
+          vendor: 'ผู้ผลิตบรรจุภัณฑ์และโลจิสติกส์หลัก',
           daysUntilStockout: 2.2,
           reorderPoint: 43,
           isCritical: true,
@@ -195,16 +195,16 @@ export function CashFlowAndDemandForecast({
           source: 'demo'
         },
         {
-          sku: 'SKU-A045',
-          thName: 'ครีมกันแดดสูตรกันน้ำ',
-          enName: 'Waterproof Sunscreen SPF50+',
+          sku: 'ITM-002',
+          thName: 'สินค้า/วัตถุดิบหมุนเวียนหลัก',
+          enName: 'Fast-Moving Core Inventory',
           currentStock: 48,
           runRatePerDay: 8.0,
           leadTimeDays: 7,
           safetyStock: 30,
           unitCost: 250,
           suggestedOrderQty: 180,
-          vendor: 'Cosmo Lab Innovation',
+          vendor: 'ซัพพลายเออร์วัตถุดิบและคู่ค้าหลัก',
           daysUntilStockout: 6.0,
           reorderPoint: 86,
           isCritical: true,
@@ -212,16 +212,16 @@ export function CashFlowAndDemandForecast({
           source: 'demo'
         },
         {
-          sku: 'SRM-001',
-          thName: 'เซรั่มบำรุงผิวสูตรเข้มข้นพิเศษ',
-          enName: 'Intensive Night Repair Serum',
+          sku: 'PRD-001',
+          thName: 'สินค้าและบริการเรือธง',
+          enName: 'Flagship Core Product',
           currentStock: 450,
           runRatePerDay: 18.0,
           leadTimeDays: 10,
           safetyStock: 60,
           unitCost: 450,
           suggestedOrderQty: 400,
-          vendor: 'Derma Scientific Laboratories',
+          vendor: 'ผู้ผลิต/พันธมิตรทางธุรกิจหลัก',
           daysUntilStockout: 25.0,
           reorderPoint: 240,
           isCritical: false,
@@ -394,9 +394,9 @@ export function CashFlowAndDemandForecast({
       bgColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5',
       borderColor: isDark ? 'rgba(16, 185, 129, 0.45)' : '#a7f3d0',
       descriptionTh:
-        'เป็นช่วงที่ผู้บริโภคมีกำลังซื้อสูงสุดหลังได้รับเงินเดือนและโบนัส อัตราการซื้อสินค้าชิ้นใหญ่และเซ็ตบำรุงผิวพรีเมียมเพิ่มขึ้น ตะกร้าเฉลี่ยต่อบิลขยายตัวสูงสุด',
+        'เป็นช่วงที่ผู้บริโภคหรือคู่ค้ามีสภาพคล่องและงบประมาณสูงสุด อัตราการซื้อสินค้าชิ้นใหญ่และคำสั่งซื้อมูลค่าสูงเพิ่มขึ้นอย่างมีนัยสำคัญ ตะกร้าเฉลี่ยต่อบิลขยายตัวสูงสุด',
       descriptionEn:
-        'Highest consumer purchasing power post-payday. Premium product bundles and bulk orders surge with peak basket size.',
+        'Highest purchasing power period. Core product bundles, high-value contracts, and bulk orders surge with peak transaction size.',
       strategyTh:
         'จัดเวรพนักงานแคชเชียร์และทีมแพ็กพัสดุเต็มกำลัง 2 กะ พร้อมล็อกสต็อกสินค้าขายดีล่วงหน้าอย่างน้อย 7 วัน',
       strategyEn:
@@ -420,9 +420,9 @@ export function CashFlowAndDemandForecast({
       bgColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5',
       borderColor: isDark ? 'rgba(16, 185, 129, 0.45)' : '#a7f3d0',
       descriptionTh:
-        'ช่วงบ่ายหลัง 16:00 น. ของวันหวยออก คนไทยมีพฤติกรรมจับจ่ายเพื่อเป็นรางวัลให้ตนเอง หรือฉลองความสุข ยอดขายกลุ่มเครื่องดื่ม คาเฟ่ อาหาร และของชิ้นเล็กจะพุ่งขึ้นทันที',
+        'ช่วงบ่ายหลัง 16:00 น. ของวันกลางงวดและต้นงวด พฤติกรรมผู้บริโภคตอบรับการตัดสินใจซื้อได้เร็ว ยอดขายสินค้าของรางวัล สินค้าเสริม และบริการทางเลือกจะขยายตัว',
       descriptionEn:
-        'Post-4 PM dopamine spending spike. Shoppers treat themselves to beauty items, cafes, dining, and reward gifts.',
+        'Mid-month and reward spending window. Customers actively treat themselves with impulse rewards, supplementary items, and fast-moving add-ons.',
       strategyTh:
         'ยิงแคมเปญ Flash Sale หรือคูปองฉลองรางวัลช่วง 16:00 - 20:00 น. ผ่าน LINE OA และจัดชุดของขวัญไซส์เล็กหน้าร้านเพื่อการตัดสินใจซื้อทันที',
       strategyEn:

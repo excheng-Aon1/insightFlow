@@ -146,38 +146,38 @@ def calculate_dynamic_reorder_points() -> Dict[str, Any]:
     # รายการสินค้าหลักพร้อมตัวแปรห่วงโซ่อุปทาน (Supply Chain Parameters)
     inventory_items = [
         {
-            "sku": "SKU-COF-01",
-            "name": "เมล็ดกาแฟ House Blend คั่วกลาง (1 กก.)",
+            "sku": "SKU-001",
+            "name": "สินค้าและวัตถุดิบหลัก (Core Inventory Unit)",
             "current_stock": 28,
             "daily_demand": 14.5,
             "daily_std": 3.8,
             "lead_time_days": 3,
-            "seasonal_multiplier": 1.25,  # ช่วงเทศกาล ยอดขายพุ่งขึ้น 25%
-            "unit": "ถุง",
+            "seasonal_multiplier": 1.25,  # ช่วงความต้องการสูง ยอดขายพุ่งขึ้น 25%
+            "unit": "หน่วย",
         },
         {
-            "sku": "SKU-COF-02",
-            "name": "ผงมัทฉะเกรดพิธีการ Ceremonial Matcha (500g)",
+            "sku": "SKU-002",
+            "name": "วัตถุดิบนำเข้าเกรดพรีเมียม (Imported Core Material)",
             "current_stock": 14,
             "daily_demand": 4.2,
             "daily_std": 1.5,
             "lead_time_days": 5,
             "seasonal_multiplier": 1.10,
-            "unit": "กระปุก",
+            "unit": "หน่วย",
         },
         {
-            "sku": "SKU-BAK-01",
-            "name": "เนยสดแท้ฝรั่งเศสพรีเมียม AOP (1 กก.)",
+            "sku": "SKU-003",
+            "name": "วัสดุประกอบและส่วนผสมหลัก (Primary Assembly Unit)",
             "current_stock": 18,
             "daily_demand": 9.0,
             "daily_std": 2.4,
             "lead_time_days": 2,
-            "seasonal_multiplier": 1.40,  # ใกล้สุดสัปดาห์เบเกอรี่ขายดีมาก
-            "unit": "ก้อน",
+            "seasonal_multiplier": 1.40,  # ใกล้ช่วงรอบบิลขายดีมาก
+            "unit": "หน่วย",
         },
         {
-            "sku": "SKU-DES-01",
-            "name": "ครีมชีสฟิลาเดลเฟียสำหรับหน้าไหม้ (2 กก.)",
+            "sku": "SKU-004",
+            "name": "บรรจุภัณฑ์และวัสดุป้องกัน (Protective Packaging)",
             "current_stock": 42,
             "daily_demand": 6.5,
             "daily_std": 1.8,
@@ -327,44 +327,44 @@ def calculate_market_basket_rules() -> Dict[str, Any]:
     """
     rules = [
         {
-            "antecedent": "Espresso Double Shot",
-            "consequent": "Almond Butter Croissant",
+            "antecedent": "สินค้าหรือบริการหลัก (Core Offering)",
+            "consequent": "สินค้าหรือบริการเสริม (Cross-Sell Supplementary)",
             "support": 0.185,      # 18.5% ของบิลทั้งหมดมี 2 ชิ้นนี้
-            "confidence": 0.742,   # เมื่อซื้อ Espresso 74.2% จะสั่ง Croissant ด้วย
+            "confidence": 0.742,   # เมื่อซื้อสินค้าหลัก 74.2% จะสั่งสินค้าเสริมด้วย
             "lift": 2.45,          # มีแรงดึงดูดส่งเสริมกันสูงกว่าปกติ 2.45 เท่า!
             "expected_uplift": "+34.5% Basket Value",
-            "bundle_idea": "Morning Boost Combo: กาแฟคู่ครัวซองต์ ลด 15 บาท",
+            "bundle_idea": "Power Value Combo: สั่งซื้อบริการหลักคู่สินค้าเสริม รับส่วนลดพิเศษ",
             "badge": "🔥 สินค้าขายดีคู่กันอันดับ 1",
         },
         {
-            "antecedent": "Matcha Ceremonial Latte",
-            "consequent": "Basque Burnt Cheesecake",
+            "antecedent": "แพ็กเกจพรีเมียม (Premium Tier Bundle)",
+            "consequent": "บริการเสริมพิเศษ (VIP Add-on Service)",
             "support": 0.142,
             "confidence": 0.615,
             "lift": 2.10,
             "expected_uplift": "+28.0% Basket Value",
-            "bundle_idea": "Kyoto Afternoon Tea: มัทฉะคู่ชีสเค้กหน้าไหม้ ฟรีท็อปปิ้ง",
+            "bundle_idea": "Executive Upsell: ซื้อแพ็กเกจพรีเมียมคู่บริการเสริม รับสิทธิ์ดูแลพิเศษ",
             "badge": "⭐ High Profit Margin",
         },
         {
-            "antecedent": "Truffle Sourdough Toast",
-            "consequent": "Sparkling Citrus Cold Brew",
+            "antecedent": "สินค้าหมวดมาตรฐาน (Standard Product)",
+            "consequent": "การรับประกัน/อุปกรณ์เสริม (Warranty & Accessories)",
             "support": 0.098,
             "confidence": 0.528,
             "lift": 1.88,
             "expected_uplift": "+22.4% Basket Value",
-            "bundle_idea": "Brunch Special: โทสต์ทรัฟเฟิลคู่โคลด์บรูว์ส้มยูซุ",
+            "bundle_idea": "Protection Bundle: ซื้อสินค้ามาตรฐานคู่อุปกรณ์สนับสนุน",
             "badge": "✨ พลัง Cross-Selling",
         },
         {
-            "antecedent": "Single Origin Drip Coffee",
-            "consequent": "Dark Chocolate Tart",
+            "antecedent": "ชุดสั่งซื้อประจำ (Regular Refill/Reorder)",
+            "consequent": "สินค้าล็อตทดลอง (Trial Add-on)",
             "support": 0.076,
             "confidence": 0.465,
             "lift": 1.72,
             "expected_uplift": "+18.2% Basket Value",
-            "bundle_idea": "Artisan Tasting Set: ดริปกาแฟจับคู่ทาร์ตช็อกโกแลต",
-            "badge": "☕ Gourmet Choice",
+            "bundle_idea": "Discovery Set: สั่งสินค้าปกติคู่ชุดทดลองหมวดใหม่ในราคาพิเศษ",
+            "badge": "💼 Strategic Choice",
         },
     ]
 

@@ -87,12 +87,12 @@ export default function ExecutiveBiStudio({
       const channelStr =
         (typeof rec.th?.channel === 'string' && rec.th.channel) ||
         (typeof rec.channel === 'string' && rec.channel) ||
-        (idx % 4 === 0 ? 'หน้าร้าน สาขาสยามพารากอน' : idx % 4 === 1 ? 'TikTok Shop Mall' : idx % 4 === 2 ? 'Shopee Mall Official' : 'Lazada Flagship Store');
+        (idx % 4 === 0 ? 'สำนักงาน/สาขาหลัก' : idx % 4 === 1 ? 'ช่องทางออนไลน์หลัก' : idx % 4 === 2 ? 'ระบบพันธมิตรจัดจำหน่าย' : 'ช่องทางบริการโดยตรง');
 
       const productStr =
         (typeof rec.th?.product === 'string' && rec.th.product) ||
         (typeof rec.product === 'string' && rec.product) ||
-        (idx % 3 === 0 ? 'เซรั่มบำรุงผิวสูตรเข้มข้นพิเศษ' : idx % 3 === 1 ? 'ชุดชาออร์แกนิกพรีเมียม' : 'หูฟังไร้สายตัดเสียงรบกวนรุ่นโปร');
+        (idx % 3 === 0 ? 'สินค้าและบริการหลัก A' : idx % 3 === 1 ? 'สินค้าและบริการ B' : 'โซลูชันสนับสนุน C');
 
       // 1. Dynamic Category: prioritize record category, then fallback to intelligent heuristic
       let category = rec.category || rec.th?.category || rec.en?.category;
@@ -108,8 +108,8 @@ export default function ExecutiveBiStudio({
           category = 'สกินแคร์และสุขภาพ';
           categoryEn = 'Skincare & Health';
         } else {
-          category = 'สินค้าทั่วไป';
-          categoryEn = 'General Merchandise';
+          category = 'สินค้าและบริการทั่วไป';
+          categoryEn = 'General Products & Services';
         }
       }
 
@@ -423,13 +423,13 @@ export default function ExecutiveBiStudio({
       let highlightMetric = '';
 
       if (q.includes('กำไร') || q.includes('profit') || q.includes('สุทธิ')) {
-        answerTh = `กำไรสุทธิจากการดำเนินงานอยู่ที่ ฿${metrics.netOperatingProfit.toLocaleString()} (คิดเป็น ${metrics.netMarginPercent}% ของยอดขายรวม) โดยต้นทุนสินค้าหลัก (CoGS) อยู่ที่ 48% และค่าใช้จ่ายการตลาดอยู่ที่ 15% อยู่ในเกณฑ์สุขภาพทางการเงินระดับดีเยี่ยม`;
-        answerEn = `Net operating profit stands at ฿${metrics.netOperatingProfit.toLocaleString()} (${metrics.netMarginPercent}% net margin). CoGS represents 48% and marketing spend 15%, maintaining robust financial health.`;
+        answerTh = `กำไรสุทธิจากการดำเนินงานอยู่ที่ ฿${metrics.netOperatingProfit.toLocaleString()} (คิดเป็น ${metrics.netMarginPercent}% ของยอดขายรวม) โดยต้นทุนสินค้าหลัก (CoGS) อยู่ที่ ${costAssumptions.cogsPct}% และค่าใช้จ่ายการตลาดอยู่ที่ ${costAssumptions.marketingPct}% อยู่ในเกณฑ์สุขภาพทางการเงินระดับดีเยี่ยม`;
+        answerEn = `Net operating profit stands at ฿${metrics.netOperatingProfit.toLocaleString()} (${metrics.netMarginPercent}% net margin). CoGS represents ${costAssumptions.cogsPct}% and marketing spend ${costAssumptions.marketingPct}%, maintaining robust financial health.`;
         highlightMetric = `฿${metrics.netOperatingProfit.toLocaleString()} (${metrics.netMarginPercent}%)`;
       } else if (q.includes('สาขา') || q.includes('branch') || q.includes('ดีที่สุด')) {
-        const topBranch = matrixTreeData.sort((a, b) => b.totalRevenue - a.totalRevenue)[0] || { name: 'สยามพารากอน', totalRevenue: metrics.grossRevenue };
-        answerTh = `สาขาที่สร้างรายได้สูงสุดในตัวกรองปัจจุบันคือ "${topBranch.name}" มียอดขายรวม ฿${topBranch.totalRevenue.toLocaleString()} (${topBranch.orders} คำสั่งซื้อ) แนะนำจัดสรรสต็อกกลุ่มสกินแคร์รองรับยอดช่วงสุดสัปดาห์`;
-        answerEn = `Top performing branch is "${topBranch.name}" generating ฿${topBranch.totalRevenue.toLocaleString()} across ${topBranch.orders} orders. Recommended to allocate beauty inventory for weekend surges.`;
+        const topBranch = matrixTreeData.sort((a, b) => b.totalRevenue - a.totalRevenue)[0] || { name: 'สาขา/ช่องทางหลัก', totalRevenue: metrics.grossRevenue };
+        answerTh = `สาขาที่สร้างรายได้สูงสุดในตัวกรองปัจจุบันคือ "${topBranch.name}" มียอดขายรวม ฿${topBranch.totalRevenue.toLocaleString()} (${topBranch.orders} คำสั่งซื้อ) แนะนำจัดสรรสต็อกสินค้าและทรัพยากรหลักให้เพียงพอเพื่อรองรับความต้องการที่เพิ่มขึ้น`;
+        answerEn = `Top performing branch is "${topBranch.name}" generating ฿${topBranch.totalRevenue.toLocaleString()} across ${topBranch.orders} orders. Recommended to allocate core inventory and capacity to support upcoming peak demand.`;
         highlightMetric = topBranch.name;
       } else if (q.includes('ช่องทาง') || q.includes('channel') || q.includes('tiktok') || q.includes('shopee')) {
         answerTh = `ช่องทางที่มีอัตราการหมุนเวียนบิลสูงสุดคือ "TikTok Shop" และ "หน้าร้าน POS" โดยมียอดเฉลี่ยต่อบิล (AOV) ฿${metrics.averageOrderValue.toLocaleString()} ควรดันโปรโมชัน Live Commerce เพิ่มเพื่อดันยอดต่อบิลให้แตะ ฿2,500`;
@@ -1304,7 +1304,7 @@ export default function ExecutiveBiStudio({
               type="text"
               value={copilotQuery}
               onChange={e => setCopilotQuery(e.target.value)}
-              placeholder={tx('พิมพ์คำถาม เช่น "ยอดขายสยามพารากอนคิดเป็นกี่เปอร์เซ็นต์ของทั้งหมด"...', 'Ask anything, e.g. "What percentage of sales comes from Siam Paragon?"...')}
+              placeholder={tx('พิมพ์คำถาม เช่น "ช่องทางใดสร้างกำไรสูงสุด" หรือ "วิเคราะห์แนวโน้มสาขา"...', 'Ask anything, e.g. "Which channel yields highest profit?" or "Analyze branch trends"...')}
               className={`w-full px-4 py-3 rounded-2xl text-xs font-bold border transition focus:outline-none focus:ring-2 focus:ring-purple-500 ${
                 theme === 'dark' ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-[#000000] placeholder-slate-400'
               }`}

@@ -106,7 +106,7 @@ def extract_pos_data(limit: int = 50) -> pd.DataFrame:
             "category": prod[2] if i % 7 != 0 else "",  # จำลอง category หาย
             "raw_amount": prod[3],
             "payment_method": "PromptPay" if i % 2 == 0 else "Credit Card / QR",
-            "branch": "สาขาหลัก สุขุมวิท 21" if i % 4 != 0 else "สาขา สยามพารากอน",
+            "branch": "สาขาหลัก (สำนักงานใหญ่)" if i % 4 != 0 else "สาขาภูมิภาคและศูนย์กระจายสินค้า",
         })
 
     logger.info(f"📥 Generated {len(raw_samples)} raw POS batch records (including intentional dirty patterns).")

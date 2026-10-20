@@ -3034,7 +3034,7 @@ export function OverviewTab({
       id: 'SL-101',
       time: tx('วันนี้ 15:30 น.', 'Today 15:30'),
       amount: 18500,
-      note: tx('ชุดเซรั่มบำรุงผิว 10 กล่อง (หน้าร้านสยาม)', 'Luxury Serum Set x10 (Siam Branch)')
+      note: tx('คำสั่งซื้อสินค้าและบริการหลัก (หน้าร้าน/จุดขาย)', 'Flagship Product/Service Order (Storefront/Hub)')
     },
     {
       id: 'SL-102',
@@ -3438,7 +3438,7 @@ export function OverviewTab({
                 type="text"
                 value={newSaleNote}
                 onChange={(e) => setNewSaleNote(e.target.value)}
-                placeholder={tx('หมายเหตุรายการขาย (เช่น ลูกค้าเหมาเซรั่ม 5 เซ็ต)', 'Sale note (e.g. Customer bought 5 serum sets)')}
+                placeholder={tx('หมายเหตุรายการขาย (เช่น ออร์เดอร์สินค้าล็อตใหญ่ หรือโครงการบริการ)', 'Sale note (e.g. Bulk order or service contract)')}
                 className={`w-full px-4 py-2.5 rounded-xl border text-sm font-medium focus:outline-none focus:border-emerald-400 ${
                   theme === 'dark' ? 'bg-[#050914] border-white/20 text-white' : 'bg-white border-slate-300 text-slate-900'
                 }`}
@@ -3867,7 +3867,7 @@ export function CustomersTab({
                 type="text"
                 value={newCustProduct}
                 onChange={(e) => setNewCustProduct(e.target.value)}
-                placeholder={tx('เช่น เซรั่มบำรุงผิว', 'e.g. Facial Serum')}
+                placeholder={tx('เช่น สินค้าหรือบริการหลักของลูกค้า', 'e.g. Core Product / Service')}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold"
               />
             </div>
@@ -4923,10 +4923,12 @@ export function MultiChannelTab({
         };
       })
     );
+    const targetBranchTh = branchesList[0]?.th?.branchName || branchesList[0]?.name || 'สาขาหลัก';
+    const targetBranchEn = branchesList[0]?.en?.branchName || branchesList[0]?.name || 'Primary Branch';
     toast.success(
       tx(
-        '🚚 สร้างใบโอนย้ายสินค้าค้างสต็อกไปยังสาขาสยามพารากอนเรียบร้อยแล้ว! อัตราหมุนเวียนสต็อกดีขึ้นทันที',
-        '🚚 Created stock transfer order to Siam Paragon Branch! Inventory turnover improved immediately.'
+        `🚚 สร้างใบโอนย้ายสินค้าค้างสต็อกไปยัง "${targetBranchTh}" เรียบร้อยแล้ว! อัตราหมุนเวียนสต็อกดีขึ้นทันที`,
+        `🚚 Created stock transfer order to "${targetBranchEn}"! Inventory turnover improved immediately.`
       )
     );
   };
@@ -5108,8 +5110,8 @@ export function MultiChannelTab({
                   </div>
                   <div style={{ color: '#e2e8f0', fontSize: '0.86rem' }}>
                     {tx(
-                      `ส่งการ์ด Flex Message ถึง LINE: ${userLineId} และ SMS (${userPhone}) • ยอดขายรวมทุกช่องทาง: ฿${(offlineRev + onlineRev).toLocaleString()} • กำไรสุทธิเข้ากระเป๋า: ฿${(offlineProfit + onlineProfit).toLocaleString()} • สาขาอันดับ 1: สาขาสยามพารากอน`,
-                      `Daily Closing Flex Message sent to LINE: ${userLineId} & SMS (${userPhone}) • Total Omnichannel Revenue: ฿${(offlineRev + onlineRev).toLocaleString()} • Net Profit: ฿${(offlineProfit + onlineProfit).toLocaleString()} • #1 Branch: Siam Paragon`
+                      `ส่งการ์ด Flex Message ถึง LINE: ${userLineId} และ SMS (${userPhone}) • ยอดขายรวมทุกช่องทาง: ฿${(offlineRev + onlineRev).toLocaleString()} • กำไรสุทธิเข้ากระเป๋า: ฿${(offlineProfit + onlineProfit).toLocaleString()} • สาขาอันดับ 1: ${branchesList[0]?.th?.branchName || branchesList[0]?.name || 'สาขาหลัก'}`,
+                      `Daily Closing Flex Message sent to LINE: ${userLineId} & SMS (${userPhone}) • Total Omnichannel Revenue: ฿${(offlineRev + onlineRev).toLocaleString()} • Net Profit: ฿${(offlineProfit + onlineProfit).toLocaleString()} • #1 Branch: ${branchesList[0]?.en?.branchName || branchesList[0]?.name || 'Primary Hub'}`
                     )}
                   </div>
                 </div>
@@ -5250,9 +5252,9 @@ export function MultiChannelTab({
                           is_profit: isProfit,
                           offline_rev: offlineRevStr,
                           online_rev: onlineRevStr,
-                          total_orders: '4,210 บิล',
-                          top_branch: 'สาขาสยามพารากอน (฿640,000)',
-                          low_stock_alert: 'เมล็ดกาแฟอาราบิก้า เหลือ 8 ถุง (ควรสั่งเพิ่ม)',
+                          total_orders: `${Array.isArray(dbRecords) && dbRecords.length > 0 ? dbRecords.length.toLocaleString() : '4,210'} บิล`,
+                          top_branch: `${branchesList[0]?.th?.branchName || branchesList[0]?.name || 'สาขาหลัก'} (฿${(branchesList[0]?.totalSales || 640000).toLocaleString()})`,
+                          low_stock_alert: `${lowStockItems[0]?.th?.name || lowStockItems[0]?.name || 'สินค้าหมุนเวียนหลัก'} เหลือ ${lowStockItems[0]?.stock || 8} หน่วย (ควรสั่งเพิ่ม)`,
                           report_time: `${lineNotifyTime} น.`
                         })
                       });
@@ -5400,14 +5402,14 @@ export function MultiChannelTab({
                 <div style={{ background: '#0f1a33', padding: '0.55rem 0.75rem', borderRadius: '8px', fontSize: '0.73rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
                     <span>🧾 {tx('บิลรวมวันนี้:', 'Orders Today:')}</span>
-                    <strong style={{ color: '#f8fafc' }}>4,210 {tx('บิล', 'bills')}</strong>
+                    <strong style={{ color: '#f8fafc' }}>{Array.isArray(dbRecords) && dbRecords.length > 0 ? dbRecords.length.toLocaleString() : '4,210'} {tx('บิล', 'bills')}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
                     <span>🏆 {tx('สาขาขายดีอันดับ 1:', 'Top Branch:')}</span>
-                    <strong style={{ color: '#fbbf24' }}>{tx('สยามพารากอน', 'Siam Paragon')}</strong>
+                    <strong style={{ color: '#fbbf24' }}>{branchesList[0]?.th?.branchName || branchesList[0]?.name || tx('สาขาหลัก', 'Primary Hub')}</strong>
                   </div>
                   <div style={{ color: '#fca5a5', fontSize: '0.7rem', marginTop: '0.15rem', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.25rem' }}>
-                    ⚠️ {tx('สต็อกใกล้หมด: เมล็ดกาแฟอาราบิก้า เหลือ 8 ถุง', 'Low Stock: Arabica Coffee Beans < 8 bags')}
+                    ⚠️ {tx(`สต็อกใกล้หมด: ${lowStockItems[0]?.th?.name || 'สินค้าหมุนเวียนหลัก'} เหลือ ${lowStockItems[0]?.stock || 8} หน่วย`, `Low Stock: ${lowStockItems[0]?.en?.name || 'Core SKU'} < ${lowStockItems[0]?.stock || 8} units`)}
                   </div>
                 </div>
               </div>
@@ -6213,7 +6215,7 @@ export function InventoryTab({
                 type="text"
                 value={newCategory}
                 onChange={e => setNewCategory(e.target.value)}
-                placeholder={tx('สกินแคร์', 'Skincare')}
+                placeholder={tx('เช่น ค้าส่ง, บริการ, อาหาร, อุตสาหกรรม', 'e.g. Wholesale, Services, Food, Industrial')}
                 style={{ width: '100%', padding: '0.55rem', borderRadius: '8px', background: '#0f172a', color: '#fff', border: '1px solid rgba(148,163,184,0.3)' }}
               />
             </div>
@@ -6725,10 +6727,10 @@ export function InsightsTab({
       ),
       desc: tx(
         currentRevenueVal > 0
-          ? 'จากการวิเคราะห์ตะกร้าสินค้าด้วย AI ลูกค้า 68% มักซื้อเซรั่มเพียงชิ้นเดียว การจัดโปรโมชั่นจับคู่เซรั่มวิตามินซี + ครีมกันแดดในราคาพิเศษหน้าจุดชำระเงิน จะช่วยดันยอดต่อบิลเพิ่มขึ้น 22% ทันที'
+          ? 'จากการวิเคราะห์ตะกร้าสินค้าด้วย AI พบสัดส่วนการซื้อสินค้าเพียงรายการเดียว การจัดโปรโมชันจับคู่สินค้าและบริการหลักคู่กับสินค้าเสริมที่จุดจำหน่าย จะช่วยดันยอดต่อบิล (AOV) เพิ่มขึ้น 22% ทันที'
           : 'ยังไม่มีข้อมูลตะกร้าสินค้าเพื่อวิเคราะห์การจับคู่สินค้า (อัปโหลดไฟล์ยอดขายเพื่อเริ่มวิเคราะห์)',
         currentRevenueVal > 0
-          ? 'AI basket analysis shows 68% single-item checkouts. Pairing Vitamin C Serum with Waterproof Sunscreen at checkout lifts average order value by +22%.'
+          ? 'AI basket analysis reveals high single-item checkouts. Packaging flagship offerings with complementary items at checkout lifts average order value by +22%.'
           : 'No basket data available for cross-sell analysis. Upload sales data to begin.'
       ),
       actionLabel: tx('ไปที่หน้าพนักงานและจุดขาย', 'Open Staff & POS'),
@@ -8796,7 +8798,7 @@ export function DatabaseTab({
             type="text"
             value={newProduct}
             onChange={e => setNewProduct(e.target.value)}
-            placeholder={tx('เช่น เซรั่มบำรุงผิว 2 กล่อง', 'e.g. Luxury Serum x2')}
+            placeholder={tx('เช่น สินค้าหรือบริการหลัก 2 รายการ', 'e.g. Core Product/Service x2')}
             style={{ width: '100%', padding: '0.6rem', borderRadius: '10px', background: '#0f172a', color: '#fff', border: '1px solid rgba(148,163,184,0.3)' }}
           />
         </div>
@@ -12756,10 +12758,10 @@ function App() {
 
   // Business AI Assistant State
   const [bizProfile, setBizProfile] = useState({
-    companyName: 'ร้านค้าปลีกและออนไลน์ครบวงจร',
+    companyName: 'ธุรกิจและการพาณิชย์ครบวงจร',
     grossMarginPct: 45,
-    mainProducts: 'เซรั่มบำรุงผิว และอุปกรณ์อิเล็กทรอนิกส์',
-    customRules: 'ห้ามลดราคาสินค้าหลักเกิน 15% เน้นแถมสินค้าขนาดทดลอง'
+    mainProducts: 'สินค้าและบริการหลักขององค์กร',
+    customRules: 'รักษาอัตรากำไรขั้นต่ำ 15% และเน้นเพิ่มมูลค่าคำสั่งซื้อเฉลี่ยต่อบิล'
   });
 
   const [aiChatMessages, setAiChatMessages] = useState([
@@ -14341,12 +14343,20 @@ function App() {
             ? [`Inactive Risk: ${atRiskCusts.length} Customers`, 'Win-Back Potential: ฿164,900']
             : [`ลูกค้าห่างหาย: ${atRiskCusts.length} ท่าน`, 'มูลค่าที่ดึงกลับได้: ฿164,900'];
         } else if (lower.includes('พนักงาน') || lower.includes('ยกเลิกบิล') || lower.includes('ทุจริต') || lower.includes('cashier') || lower.includes('cancel') || lower.includes('3.')) {
+          const topStaff = staffLeaderboard[0];
+          const topStaffTh = topStaff?.th?.name || topStaff?.name || 'หัวหน้าทีมขายและการบริการ';
+          const topStaffEn = topStaff?.en?.name || topStaff?.name || 'Lead Sales & Operations';
+          const topStaffSalesVal = topStaff?.sales ? `฿${topStaff.sales.toLocaleString()}` : '฿642,000';
+          const topStaffUpsellVal = topStaff?.upsellRate ? `${topStaff.upsellRate}%` : '38.6%';
+          const topStaffBranchTh = topStaff?.branch || branchesList[0]?.th?.branchName || 'สาขาหลัก';
+          const topStaffBranchEn = topStaff?.branch || branchesList[0]?.en?.branchName || 'Primary Hub';
+
           replyText = isEn
-            ? `Cashier & Register Audit Summary:\n• Top Performer: Mr. Phattharapol (Siam Paragon) leads with ฿642,000 in sales and a 38.6% upselling rate.\n• Fraud Alert: Detected ${unresolvedAudits.length} unresolved register anomalies, notably 14 post-cash bill cancellations on Register #4 (Central Ladprao).\n• Action: Open the Staff & Cashier page to view the security camera clip and require a Manager PIN before bill cancellations.`
-            : `สรุปผลการทำงานพนักงานและตรวจสอบเครื่องคิดเงิน:\n• พนักงานยอดเยี่ยมอันดับ 1: คุณภัทรพล (สาขาสยามพารากอน) ทำยอดขาย ฿642,000 และเชียร์สินค้าพ่วงสำเร็จถึง 38.6%\n• แจ้งเตือนความเสี่ยงทุจริต: พบรายการผิดปกติรอตรวจสอบ ${unresolvedAudits.length} รายการ โดยเฉพาะที่สาขาเซ็นทรัลลาดพร้าว (เครื่องที่ 4) มีการกดยกเลิกบิลหลังรับเงินสด 14 ครั้ง\n• แนวทางจัดการ: กดดูภาพกล้องวงจรปิดในหน้าพนักงานและจุดขาย และเปิดระบบบังคับใส่รหัสผู้จัดการก่อนยกเลิกบิลครับ`;
+            ? `Cashier & Register Audit Summary:\n• Top Performer: ${topStaffEn} (${topStaffBranchEn}) leads with ${topStaffSalesVal} in sales and a ${topStaffUpsellVal} cross-sell rate.\n• Operational Audit: Detected ${unresolvedAudits.length} unresolved register anomalies across checkpoints.\n• Action: Open the Staff & Cashier page to view security audit logs and enforce Manager PIN authorization for transaction cancellations.`
+            : `สรุปผลการทำงานพนักงานและตรวจสอบเครื่องคิดเงิน:\n• พนักงานยอดเยี่ยมอันดับ 1: ${topStaffTh} (${topStaffBranchTh}) ทำยอดขาย ${topStaffSalesVal} และเชียร์สินค้าพ่วงสำเร็จถึง ${topStaffUpsellVal}\n• แจ้งเตือนความเสี่ยงทุจริต/ข้อผิดพลาด: พบรายการผิดปกติรอตรวจสอบ ${unresolvedAudits.length} รายการ\n• แนวทางจัดการ: กดดูบันทึกการตรวจสอบในหน้าพนักงานและจุดขาย และเปิดระบบบังคับใส่รหัสผู้จัดการก่อนยกเลิกรายการครับ`;
           metrics = isEn
-            ? [`Pending Audits: ${unresolvedAudits.length} Cases`, 'Top Upsell Rate: 38.6%']
-            : [`รายการรอตรวจ: ${unresolvedAudits.length} เคส`, 'อัตราขายพ่วงสูงสุด: 38.6%'];
+            ? [`Pending Audits: ${unresolvedAudits.length} Cases`, `Top Upsell Rate: ${topStaffUpsellVal}`]
+            : [`รายการรอตรวจ: ${unresolvedAudits.length} เคส`, `อัตราขายพ่วงสูงสุด: ${topStaffUpsellVal}`];
         } else if (
           lower.includes('ซัพพลายเออร์') ||
           lower.includes('จัดซื้อ') ||
@@ -14360,27 +14370,39 @@ function App() {
           lower.includes('6.')
         ) {
           const topVendor = vendorsList[0];
+          const topVendorTh = topVendor?.th?.name || topVendor?.name || 'พันธมิตรซัพพลายเออร์หลัก';
+          const topVendorEn = topVendor?.en?.name || topVendor?.name || 'Primary Certified Supplier';
           const totalSavedPo = centralPosList.reduce((acc, p) => acc + p.savedAmount, 0);
           replyText = isEn
-            ? `Central Procurement & Vendor Scorecard Analysis (${vendorsList.length} active suppliers):\n• #1 Most Reliable Supplier: ${topVendor?.en.name || 'Siam Organic Supply'} with ${topVendor?.fillRate || 99.4}% Fill Rate and ${topVendor?.leadTimeDays || 1.8}-day Lead Time.\n• Economy of Scale Opportunity: Consolidating ${branchRequisitions.length} low-stock SKUs across all branches at HQ unlocks 12%–16% Volume Discounts, bringing cumulative PO savings to over ฿${totalSavedPo.toLocaleString()}.\n• Action: Go to the "Suppliers & Central PO" page and click "1-Click Generate Central PO" or "Receive & Restock Inventory".`
-            : `สรุปรายงานซัพพลายเออร์และการจัดซื้อรวมศูนย์ (${vendorsList.length} บริษัทคู่ค้า):\n• ซัพพลายเออร์ที่น่าเชื่อถืออันดับ 1: ${topVendor?.th.name || 'บจก. สยาม ออร์แกนิค ซัพพลาย'} ส่งของครบตามสั่ง (Fill Rate) สูงถึง ${topVendor?.fillRate || 99.4}% และใช้เวลาจัดส่ง (Lead Time) เพียง ${topVendor?.leadTimeDays || 1.8} วัน\n• โอกาสประหยัดต้นทุน (Economy of Scale): การรวมยอดสั่งซื้อของใกล้หมด ${branchRequisitions.length} รายการจากทุกสาขามาออกใบสั่งซื้อกลาง (Central PO) ที่สำนักงานใหญ่ ช่วยปลดล็อกส่วนลด Volume Discount 12%–16% ประหยัดเงินสะสมแล้วกว่า ฿${totalSavedPo.toLocaleString()}\n• แนวทางจัดการทันที: เข้าไปที่หน้า "ซัพพลายเออร์และจัดซื้อรวมศูนย์" แล้วกดปุ่ม "ออกใบสั่งซื้อรวมศูนย์ในคลิกเดียว" หรือกด "รับของเข้าคลัง & เติมสต็อก" ได้เลยครับ`;
+            ? `Central Procurement & Vendor Scorecard Analysis (${vendorsList.length} active suppliers):\n• #1 Most Reliable Supplier: ${topVendorEn} with ${topVendor?.fillRate || 99.4}% Fill Rate and ${topVendor?.leadTimeDays || 1.8}-day Lead Time.\n• Economy of Scale Opportunity: Consolidating ${branchRequisitions.length} low-stock SKUs across all branches at HQ unlocks 12%–16% Volume Discounts, bringing cumulative PO savings to over ฿${totalSavedPo.toLocaleString()}.\n• Action: Go to the "Suppliers & Central PO" page and click "1-Click Generate Central PO" or "Receive & Restock Inventory".`
+            : `สรุปรายงานซัพพลายเออร์และการจัดซื้อรวมศูนย์ (${vendorsList.length} บริษัทคู่ค้า):\n• ซัพพลายเออร์ที่น่าเชื่อถืออันดับ 1: ${topVendorTh} ส่งของครบตามสั่ง (Fill Rate) สูงถึง ${topVendor?.fillRate || 99.4}% และใช้เวลาจัดส่ง (Lead Time) เพียง ${topVendor?.leadTimeDays || 1.8} วัน\n• โอกาสประหยัดต้นทุน (Economy of Scale): การรวมยอดสั่งซื้อของใกล้หมด ${branchRequisitions.length} รายการจากทุกสาขามาออกใบสั่งซื้อกลาง (Central PO) ที่สำนักงานใหญ่ ช่วยปลดล็อกส่วนลด Volume Discount 12%–16% ประหยัดเงินสะสมแล้วกว่า ฿${totalSavedPo.toLocaleString()}\n• แนวทางจัดการทันที: เข้าไปที่หน้า "ซัพพลายเออร์และจัดซื้อรวมศูนย์" แล้วกดปุ่ม "ออกใบสั่งซื้อรวมศูนย์ในคลิกเดียว" หรือกด "รับของเข้าคลัง & เติมสต็อก" ได้เลยครับ`;
           metrics = isEn
             ? [`Top Fill Rate: ${topVendor?.fillRate || 99.4}%`, `Central PO Saved: ฿${totalSavedPo.toLocaleString()}`]
             : [`อัตราส่งของครบสูงสุด: ${topVendor?.fillRate || 99.4}%`, `ประหยัดจากใบสั่งซื้อรวม: ฿${totalSavedPo.toLocaleString()}`];
         } else if (lower.includes('สต็อก') || lower.includes('คลัง') || lower.includes('หมด') || lower.includes('stock') || lower.includes('inventory') || lower.includes('4.')) {
+          const sampleLowItem = lowStockItems[0];
+          const sampleLowTh = sampleLowItem?.th?.name || sampleLowItem?.name || 'สินค้าหมุนเวียนหลัก';
+          const sampleLowEn = sampleLowItem?.en?.name || sampleLowItem?.name || 'Core Fast-Moving SKU';
+          const sampleLowQty = sampleLowItem?.stock !== undefined ? sampleLowItem.stock : 12;
+
           replyText = isEn
-            ? `Live Inventory & Stock Analysis:\n• ${lowStockItems.length} items are critically low or out of stock (Shockproof Shipping Boxes have only 12 units left, and Holiday Gift Sets are at 0).\n• Slow-Moving Stock: Waterproof Sunscreen (280 units) has been stagnant.\n• Action: Go to the Smart Inventory page and click "+50 Restock" or "30% Clearance" to update stock in one click.`
-            : `สรุปสถานะคลังสินค้าอัจฉริยะของร้าน:\n• มีสินค้าใกล้หมดหรือหมดสต็อกจำนวน ${lowStockItems.length} รายการ (กล่องพัสดุกันกระแทกเหลือเพียง 12 ชิ้น และชุดของขวัญพรีเมียมเหลือ 0 ชิ้น)\n• สินค้าค้างสต็อกนาน: ครีมกันแดดล็อตก่อนหน้าค้างอยู่ 280 ชิ้น\n• แนวทางจัดการ: เข้าไปที่หน้าคลังสินค้าอัจฉริยะ แล้วกดปุ่ม "เติมสต็อก +50 ชิ้น" หรือ "จัดโปรลด 30%" ได้ทันทีครับ`;
+            ? `Live Inventory & Stock Analysis:\n• ${lowStockItems.length} items are critically low or out of stock (e.g. ${sampleLowEn} has only ${sampleLowQty} units remaining).\n• Action: Go to the Smart Inventory page and click "+50 Restock" or "Clearing Promotion" to rebalance stock in one click.`
+            : `สรุปสถานะคลังสินค้าอัจฉริยะ:\n• มีสินค้าใกล้หมดหรือหมดสต็อกจำนวน ${lowStockItems.length} รายการ (เช่น ${sampleLowTh} เหลือเพียง ${sampleLowQty} หน่วย)\n• แนวทางจัดการ: เข้าไปที่หน้าคลังสินค้าอัจฉริยะ แล้วกดปุ่ม "เติมสต็อก +50 ชิ้น" หรือ "จัดโปรโมชั่นระบายสต็อก" ได้ทันทีครับ`;
           metrics = isEn
-            ? [`Low/Out of Stock: ${lowStockItems.length} SKUs`, 'Slow-Moving: 280 Units']
-            : [`สินค้าใกล้หมด/หมด: ${lowStockItems.length} รายการ`, 'สินค้าค้างสต็อก: 280 ชิ้น'];
+            ? [`Low/Out of Stock: ${lowStockItems.length} SKUs`, 'Auto Replenish Ready']
+            : [`สินค้าใกล้หมด/หมด: ${lowStockItems.length} รายการ`, 'ระบบเติมสต็อกพร้อมสั่ง'];
         } else if (lower.includes('สาขา') || lower.includes('ช่องทาง') || lower.includes('กำไร') || lower.includes('channel') || lower.includes('profit') || lower.includes('5.')) {
+          const topBranch = branchesList[0];
+          const topBranchTh = topBranch?.th?.branchName || topBranch?.name || 'สาขา/ช่องทางหลัก';
+          const topBranchEn = topBranch?.en?.branchName || topBranch?.name || 'Primary Branch / Hub';
+          const topBranchSales = topBranch?.totalSales ? `฿${topBranch.totalSales.toLocaleString()}` : '฿985,000';
+
           replyText = isEn
-            ? `Multi-Channel & Branch Profitability Comparison:\n• Highest Net Margin Channel: Direct Store Chat & Website yields 52.4% net margin (only 5% fee), followed by Physical Storefronts at 46.8%.\n• #1 Branch: Siam Paragon leads with ฿985,000 monthly revenue and 8.4x inventory turnover.\n• Action: Transfer stagnant stock from Chiang Mai Branch to Siam Paragon to convert dead stock into cash.`
-            : `ผลการเปรียบเทียบกำไรรายช่องทางและสาขา:\n• ช่องทางที่ให้กำไรสุทธิสูงสุด: ช่องทางแชตร้านค้าและเว็บไซต์โดยตรง ให้กำไรสุทธิสูงถึง 52.4% (เสียค่าธรรมเนียมเพียง 5%) รองลงมาคือหน้าร้านจริง 46.8%\n• สาขาอันดับ 1: สาขาสยามพารากอน มียอดขาย ฿985,000 และหมุนเวียนสต็อกไวที่สุด (11 วันต่อรอบ)\n• แนวทางเพิ่มกำไร: โอนสินค้าค้างคลังจากสาขาเชียงใหม่มาขายที่สาขาสยามพารากอนได้ทันทีในหน้าเปรียบเทียบสาขาครับ`;
+            ? `Multi-Channel & Branch Profitability Comparison:\n• Highest Net Margin Channel: Direct Customer Chat & Official Portal yields up to 52.4% net margin (platform fee only 5%), followed by Physical Storefronts/Direct Sales at 46.8%.\n• #1 Branch / Channel: ${topBranchEn} leads with ${topBranchSales} monthly revenue.\n• Action: Transfer stagnant stock from slower distribution hubs to "${topBranchEn}" to unlock cash flow immediately.`
+            : `ผลการเปรียบเทียบกำไรรายช่องทางและสาขา:\n• ช่องทางที่ให้กำไรสุทธิสูงสุด: ช่องทางแชตร้านค้าและเว็บไซต์/พอร์ทัลโดยตรง ให้กำไรสุทธิสูงถึง 52.4% (ค่าธรรมเนียมเพียง 5%) รองลงมาคือหน้าร้านและจุดขายตรง 46.8%\n• สาขา/ช่องทางอันดับ 1: ${topBranchTh} มียอดขาย ${topBranchSales} และหมุนเวียนสต็อกได้เร็วที่สุด\n• แนวทางเพิ่มกำไร: โอนย้ายสินค้าหรือทรัพยากรคงค้างจากจุดที่หมุนเวียนช้าไปยัง "${topBranchTh}" เพื่อเร่งการระบายสต็อกและคืนสภาพคล่องทันทีครับ`;
           metrics = isEn
-            ? ['Best Net Margin: Direct Chat (52.4%)', '#1 Branch: Siam Paragon']
-            : ['กำไรสูงสุด: แชตร้านค้า (52.4%)', 'สาขาอันดับ 1: สยามพารากอน'];
+            ? ['Best Net Margin: Direct Chat (52.4%)', `#1 Branch: ${topBranchEn}`]
+            : ['กำไรสูงสุด: แชตร้านค้า (52.4%)', `สาขาอันดับ 1: ${topBranchTh}`];
         } else {
           replyText = isEn
             ? `Sales Target & Daily Pace Plan for "${bizProfile.companyName}":\n• Current Revenue: ฿${currentRevenueVal.toLocaleString()} vs. Target: ฿${targetRevenueVal.toLocaleString()} (Remaining gap: ฿${gap.toLocaleString()}).\n• To hit your goal within ${days} days, your store needs an average of ฿${dailyReq.toLocaleString()} per day.\n• Store Policy Applied: ${bizProfile.customRules}`

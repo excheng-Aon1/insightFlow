@@ -80,28 +80,38 @@ export function ActionablePlaybooks({
   // Fallback products if inventoryList and dbRecords are both empty
   const defaultItems = [
     {
-      sku: 'SRM-001',
+      sku: 'PRD-001',
       price: 1290,
       cost: 450,
       stock: 450,
       status: 'in_stock',
-      th: { name: 'เซรั่มบำรุงผิวสูตรเข้มข้นพิเศษ', category: 'สกินแคร์' },
-      en: { name: 'Intensive Night Repair Serum', category: 'Skincare' }
+      th: { name: 'สินค้าและบริการหลัก (Flagship Item)', category: 'สินค้าหลัก' },
+      en: { name: 'Core Enterprise Product (Flagship)', category: 'Core Products' }
     },
     {
-      sku: 'SKU-A045',
+      sku: 'PRD-002',
       price: 450,
       cost: 250,
       stock: 280,
       status: 'dead_stock',
-      th: { name: 'ครีมกันแดดสูตรกันน้ำ (ล็อตก่อนหน้า)', category: 'สกินแคร์' },
-      en: { name: 'Waterproof Sunscreen SPF50+ (Previous Lot)', category: 'Skincare' }
+      th: { name: 'สินค้าเสริมหรืออุปกรณ์เสริม (ค้างสต็อก)', category: 'สินค้าเสริม' },
+      en: { name: 'Complementary Accessory (Slow Moving)', category: 'Accessories' }
     }
   ];
 
   const currentInventory = (Array.isArray(inventoryList) && inventoryList.length > 0)
     ? inventoryList
     : (topProductsFromDb.length > 0 ? topProductsFromDb : defaultItems);
+
+  // Dynamic Flagship Product Detection from live user file or inventory
+  const flagshipProductName = useMemo(() => {
+    return (
+      topProductsFromDb[0]?.name ||
+      currentInventory[0]?.th?.name ||
+      currentInventory[0]?.name ||
+      tx('สินค้าหลักของธุรกิจ', 'Core Flagship Product')
+    );
+  }, [topProductsFromDb, currentInventory, tx]);
 
   const hasInventory = currentInventory.length > 0;
   const deadStockItems = currentInventory.filter(
@@ -285,8 +295,8 @@ export function ActionablePlaybooks({
     setAppliedGifts(prev => ({ ...prev, [sku]: true }));
     toast.success(
       tx(
-        `🎁 ตั้งค่า "${item.th?.name || item.sku}" เป็นของแถมพรีเมียมคู่กับเซรั่ม (ยอดครบ ฿2,500) สำเร็จ! ระบายสต็อกโดยกำไรเซรั่มครอบคลุมต้นทุน`,
-        `🎁 Configured "${item.sku}" as free VIP gift with Serum orders over ฿2,500! Clears stock while preserving gross margin.`
+        `🎁 ตั้งค่า "${item.th?.name || item.sku}" เป็นของแถมพรีเมียมคู่กับ${flagshipProductName} (ยอดครบ ฿2,500) สำเร็จ! ระบายสต็อกโดยกำไรสินค้าหลักครอบคลุมต้นทุน`,
+        `🎁 Configured "${item.sku}" as free VIP gift with ${flagshipProductName} orders over ฿2,500! Clears stock while preserving gross margin.`
       )
     );
   };
@@ -661,18 +671,18 @@ export function ActionablePlaybooks({
                 <div style={{ padding: '0.75rem', borderRadius: '12px', background: 'rgba(168, 85, 247, 0.12)', border: '1px solid rgba(168, 85, 247, 0.35)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                     <span style={{ fontSize: '0.82rem', fontWeight: 900, color: '#c084fc' }}>
-                      🎁 {tx('กลยุทธ์ B: ของแถมพรีเมียมคู่สินค้ากำไรสูง', 'Strategy B: Premium Gift with Flagship Serum')}
+                      🎁 {tx(`กลยุทธ์ B: ของแถมพรีเมียมคู่กับ${flagshipProductName}`, `Strategy B: Premium Gift with ${flagshipProductName}`)}
                     </span>
                     <span style={{ fontSize: '0.7rem', color: '#c084fc', fontWeight: 800 }}>
-                      {tx('กำไรเซรั่มแบกรับได้', 'Margin Protected')}
+                      {tx('กำไรสินค้าหลักแบกรับได้', 'Margin Protected')}
                     </span>
                   </div>
                   <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.5 }}>
                     {appliedGifts[deadStockTarget.sku]
-                      ? tx('✓ เปิดระบบแถมคู่เซรั่มยอดครบ ฿2,500 เรียบร้อยแล้ว', '✓ Configured as free gift on ฿2,500+ orders')
+                      ? tx(`✓ เปิดระบบแถมคู่กับ${flagshipProductName} ยอดครบ ฿2,500 เรียบร้อยแล้ว`, `✓ Configured as free gift on ฿2,500+ orders`)
                       : tx(
-                          'จัดเป็นของแถมเมื่อซื้อเซรั่มยอดครบ ฿2,500 กระตุ้นให้ลูกค้าสั่งซื้อเพิ่ม โดยกำไรจากเซรั่มครอบคลุมต้นทุนได้ทั้งหมด',
-                          'Bundle as complimentary gift for Serum purchases over ฿2,500. Flagship gross margin absorbs cost safely.'
+                          `จัดเป็นของแถมเมื่อซื้อ${flagshipProductName} ยอดครบ ฿2,500 กระตุ้นให้ลูกค้าสั่งซื้อเพิ่ม โดยกำไรจากสินค้าหลักครอบคลุมต้นทุนได้ทั้งหมด`,
+                          `Bundle as complimentary gift for ${flagshipProductName} purchases over ฿2,500. Flagship gross margin absorbs cost safely.`
                         )}
                   </div>
                 </div>
@@ -723,7 +733,7 @@ export function ActionablePlaybooks({
                   gap: '0.4rem'
                 }}
               >
-                🎁 {tx('ตั้งค่าเป็นของแถมพรีเมียมคู่กับเซรั่มทันที', 'Set as Free VIP Gift with Flagship Serum')}
+                🎁 {tx(`ตั้งค่าเป็นของแถมพรีเมียมคู่กับ${flagshipProductName}ทันที`, `Set as Free VIP Gift with ${flagshipProductName}`)}
               </button>
             </div>
           </div>

@@ -119,33 +119,33 @@ export default function ActionableAiCenter({
   const defaultAnomalies = [
     {
       id: 'ANOMALY-SALES-01',
-      title: tx('ยอดขายช่วงบ่ายตกผิดปกติ -38.4%', 'Afternoon Sales Flash Drop -38.4%'),
-      location: tx('สาขาสุขุมวิท 21 (หน้าร้าน)', 'Sukhumvit 21 Main Branch'),
+      title: tx('ยอดขายช่วงบ่ายชะลอตัวผิดปกติ -38.4%', 'Afternoon Sales Dip -38.4%'),
+      location: tx('สาขาหลัก / จุดขายหน้าร้าน', 'Main Operational Branch'),
       metric: '฿8,420 (ปกติเฉลี่ย ฿13,680)',
       sigma: '-2.68σ',
-      cause: tx('ยอดบิลช่วง 13:00-15:00 ลดลงอย่างมีนัยสำคัญ เครื่องชงกาแฟหัวจ่ายหลักปิดซ่อม 45 นาที', 'Coffee machine station #1 down for 45 min maintenance during lunch peak'),
-      action: tx('แจ้งแคชเชียร์เสนอเมนู Cold Brew หรือชาพรีเมียมทดแทน เพื่อกู้ยอดขายช่วงเย็น', 'Offer Cold Brew / Premium Matcha substitutes to recover evening sales'),
+      cause: tx('ยอดบิลช่วง 13:00-15:00 ลดลงอย่างมีนัยสำคัญ ระบบเครือข่ายรับชำระเงินขัดข้องชั่วคราว 45 นาที', 'Payment network gateway maintenance during peak hours'),
+      action: tx('แจ้งเจ้าหน้าที่สลับใช้ช่องทางสำรอง และเสนอบริการเสริมเพื่อกู้ยอดขายช่วงเย็น', 'Switch to backup checkout and offer loyalty rewards to recover sales'),
       time: tx('30 นาทีที่แล้ว', '30 mins ago'),
       severity: 'CRITICAL',
     },
     {
       id: 'ANOMALY-STOCK-02',
-      title: tx('เมล็ดกาแฟ House Blend เหลือต่ำกว่าจุดสั่งซื้อ ROP', 'House Blend Coffee Beans below Reorder Point'),
-      location: tx('คลังวัตถุดิบกลาง', 'Central Warehouse'),
-      metric: tx('คงเหลือ 28 ถุง (จุดสั่งซื้อ ROP คือ 65 ถุง)', '28 bags left (ROP is 65 bags)'),
+      title: tx('สต็อกสินค้าหลักเหลือต่ำกว่าจุดสั่งซื้อ ROP', 'Core Inventory below Reorder Point'),
+      location: tx('คลังสินค้ากลาง', 'Central Warehouse'),
+      metric: tx('คงเหลือ 28 หน่วย (จุดสั่งซื้อ ROP คือ 65 หน่วย)', '28 units left (ROP is 65 units)'),
       sigma: tx('ของหมดใน 2.8 วัน', 'Stockout in 2.8 days'),
-      cause: tx('ยอดขายเสาร์-อาทิตย์พุ่งขึ้น 1.55x ตามฤดูกาล ทำให้เมล็ดกาแฟถูกใช้เร็วกว่าคาดการณ์', 'Weekend surge (1.55x) depleted beans faster than forecasted baseline'),
-      action: tx('กดสั่งซื้อ PO เพิ่มด่วน 250 ถุง กับโรงคั่วเจ้าประจำ โดยมี Lead Time จัดส่ง 3 วัน', 'Issue PO for 250 bags immediately with 3-day supplier lead time'),
+      cause: tx('อุปสงค์ช่วงสุดสัปดาห์พุ่งขึ้น 1.55x ทำให้สต็อกสินค้าหลักถูกใช้เร็วกว่าคาดการณ์', 'Demand surge (1.55x) depleted inventory faster than forecasted baseline'),
+      action: tx('กดสั่งซื้อ PO เพิ่มด่วนกับซัพพลายเออร์เจ้าประจำ โดยมี Lead Time จัดส่ง 3 วัน', 'Issue express PO to supplier with 3-day lead time'),
       time: tx('2 ชั่วโมงที่แล้ว', '2 hours ago'),
       severity: 'HIGH',
     },
     {
       id: 'ANOMALY-AUDIT-03',
-      title: tx('พบการยกเลิกบิล (Void Receipts) สูงเกิน 12% ที่เคาน์เตอร์ 2', 'Unusual Void Receipts Spike (>12%) at POS #2'),
-      location: tx('เคาน์เตอร์แคชเชียร์ 2', 'Cashier Station 2'),
+      title: tx('พบการยกเลิกบิล (Void Receipts) สูงเกิน 12% ที่จุดจำหน่าย', 'Unusual Void Receipts Spike (>12%) at POS #2'),
+      location: tx('จุดแคชเชียร์ / เคาน์เตอร์จำหน่าย', 'Cashier Station 2'),
       metric: tx('ยกเลิก 6 บิลใน 2 ชั่วโมง (ปกติ ≤ 1 บิล)', '6 voids in 2 hours (normal <= 1)'),
       sigma: '+3.10σ',
-      cause: tx('พนักงานกดรหัสสินค้าผิดซ้ำกัน 4 ครั้ง หรือระบบสแกนบาร์โค้ดติดขัดชั่วคราว', 'Cashier scanning error or barcode scanner calibration issue'),
+      cause: tx('พนักงานคีย์รายการผิดซ้ำ หรืออุปกรณ์สแกนบาร์โค้ดติดขัดชั่วคราว', 'Staff keying error or barcode scanner calibration issue'),
       action: tx('เข้าตรวจสอบรายงานบิลยกเลิกในแท็บ "พนักงานและตรวจบิลแคชเชียร์"', 'Audit void log in Cashier tab and recalibrate scanner'),
       time: tx('4 ชั่วโมงที่แล้ว', '4 hours ago'),
       severity: 'MEDIUM',
@@ -290,31 +290,25 @@ export default function ActionableAiCenter({
       }
 
       if (!answerText) {
-        if (q.includes('กำไร') || q.includes('หมวด')) {
-          answerText = `📊 **จากการวิเคราะห์ต้นทุนและยอดขายหลังบ้าน (Text-to-SQL Analysis):**
+        const topProd = (inventoryList && inventoryList[0]?.th?.name) || 'สินค้าและบริการหลักของธุรกิจ';
+        const lowStockProds = (inventoryList || []).filter(i => i.status === 'low_stock' || i.stock <= 15).slice(0, 3);
+        const atRiskCount = (customersList || []).filter(c => c.segment === 'at_risk').length;
 
-เดือนนี้สินค้าที่กำไรหดตัวมากที่สุดคือ **"หมวดเบเกอรี่และของหวาน"** โดยมี Gross Margin ลดลงจาก **56.2% เหลือเพียง 42.0%** (หดตัวลง **-14.2%**)
-
-🔍 **2 สาเหตุหลักที่ AI ตรวจพบ:**
-1. **ต้นทุนวัตถุดิบพุ่งขึ้น:** เนยสดฝรั่งเศสพรีเมียม AOP ปรับขึ้นราคา 18% จากก้อนละ ฿205 เป็น ฿242
-2. **ราคาขายหน้าร้านยังคงเดิม:** ยังคงขายครัวซองต์ชิ้นละ ฿95 ทำให้กำไรต่อชิ้นบางลงจากเดิม ฿53 เหลือเพียง ฿39
-
-💡 **3 ทางเลือกเชิงกลยุทธ์ที่ AI แนะนำ:**
-• **ทางเลือกที่ 1:** ปรับราคาขายครัวซองต์เป็น ฿99 (+4 บาท) ลูกค้าไม่รู้สึกถึงความแตกต่าง
-• **ทางเลือกที่ 2:** จัดโปรโมชันคู่ (Market Basket) กาแฟคู่ครัวซองต์ในราคา ฿185 เพื่อเฉลี่ยกำไร
-• **ทางเลือกที่ 3:** สั่งซื้อเนยยกล็อต 50 กก. กับซัพพลายเออร์ใหม่เพื่อรับส่วนลดราคาส่ง 12%`;
+        if (q.includes('กำไร') || q.includes('หมวด') || q.includes('ต้นทุน')) {
+          answerText = isEn
+            ? `📊 **From Cross-Module Financial & Operational Analysis:**\n\n• Top tracked product line: **"${topProd}"** with healthy volume contribution.\n• Gross Profit Margin baseline tracks at ~45-52% across your recorded transactions.\n\n🔍 **AI Diagnostic Findings:**\n1. Margin optimization opportunity detected in highest velocity items.\n2. Cross-selling complementary services or bundling with high-margin items will expand overall net basket size.\n\n💡 **Prescriptive Actions:**\n• Bundle winning items with higher margin complementary products.\n• Leverage bulk procurement or renegotiate supplier terms to preserve unit economics.`
+            : `📊 **จากการวิเคราะห์ต้นทุนและยอดขายขององค์กร (Financial & Operational Analysis):**\n\n• กลุ่มผลิตภัณฑ์หลักที่ตรวจพบในระบบ: **"${topProd}"** ซึ่งมียอดธุรกรรมโดดเด่น\n• อัตรากำไรขั้นต้น (Gross Margin) เฉลี่ยของรายการในระบบอยู่ที่ประมาณ 45–52%\n\n🔍 **ข้อสังเกตจาก AI:**\n1. สินค้าที่มีปริมาณขายสูงสุดสามารถขยายมาร์จิ้นได้อีก 3-5% ผ่านการปรับราคาตามระดับอุปสงค์ (Dynamic Pricing)\n2. การจัดชุดสินค้าหรือบริการเสริมร่วมกันจะช่วยยกระดับขนาดตะกร้าต่อบิล (Basket Size) ได้ทันที\n\n💡 **แนวทางเชิงกลยุทธ์:**\n• จัดโปรโมชันชุดรวมเพื่อเฉลี่ยอัตรากำไรของสินค้าหลักและบริการเสริม\n• สั่งซื้อล็อตใหญ่หรือทำสัญญาจัดซื้อล่วงหน้าเพื่อลดต้นทุนต่อหน่วย`;
         } else if (q.includes('สต็อก') || q.includes('ของขาด') || q.includes('สั่ง')) {
-          answerText = `📦 **จากการประเมินจุดสั่งซื้อล่วงหน้า (Dynamic Reorder Point Intelligence):**
-
-สินค้าที่เข้าขั้นวิกฤติต้องสั่งซื้อด่วนมี **3 รายการ** เนื่องจากสต็อกเหลือน้อยกว่าจุดปลอดภัย:
-1. 🚨 **เมล็ดกาแฟ House Blend คั่วกลาง:** เหลือ 28 ถุง (จุดสั่งซื้อ ROP คือ 65 ถุง) — *ของจะหมดใน 2.8 วัน แนะนำให้สั่งเพิ่ม 250 ถุงทันที*
-2. 🚨 **เนยสดแท้ฝรั่งเศส AOP:** เหลือ 18 ก้อน (จุดสั่งซื้อ ROP คือ 32 ก้อน) — *แนะนำให้สั่งเพิ่ม 180 ก้อน*
-3. ⚠️ **ผงมัทฉะเกรดพิธีการ:** เหลือ 14 กระปุก (จุดสั่งซื้อ ROP คือ 29 กระปุก) — *แนะนำให้สั่งเพิ่ม 60 กระปุก*`;
+          if (lowStockProds.length > 0) {
+            const listText = lowStockProds.map((p, idx) => `${idx + 1}. 🚨 **${p.th?.name || p.sku}:** เหลือ ${p.stock} หน่วย — *แนะนำให้ออกใบสั่งซื้อ (PO) เติมสต็อกทันที*`).join('\n');
+            answerText = `📦 **จากการประเมินจุดสั่งซื้อล่วงหน้า (Dynamic Reorder Point Intelligence):**\n\nตรวจพบสินค้าที่สต็อกต่ำกว่าระดับปลอดภัย **${lowStockProds.length} รายการ**:\n${listText}`;
+          } else {
+            answerText = `📦 **จากการประเมินคลังสินค้า:**\n\nสถานะสต็อกสินค้าทุกรายการในระบบอยู่ในเกณฑ์ปลอดภัย (Healthy Stock) อัตราหมุนเวียนสินค้าสอดคล้องกับความต้องการของลูกค้าครับ`;
+          }
         } else {
-          answerText = `💼 **บทวิเคราะห์ภาพรวมสำหรับผู้บริหาร:**
-• ยอดขายสะสม 30 วัน: **฿8,920,000** (บรรลุ 89.2% ของเป้าหมายประจำเดือน)
-• กลุ่มลูกค้า VIP ทำยอดซื้อรวม **฿2,619,900** แต่มีลูกค้า At-Risk 89 ท่านที่เว้นช่วงซื้อเกิน 45 วัน
-• แนะนำให้รันแคมเปญกระตุ้นยอดซื้อซ้ำ และออกใบ PO เมล็ดกาแฟเพื่อป้องกันสินค้าขาดมือครับ`;
+          answerText = isEn
+            ? `💼 **Executive Performance Summary:**\n• Total extracted revenue: **฿${currentRevenueVal.toLocaleString()}**.\n• Identified **${atRiskCount} at-risk customer accounts** recommended for personalized retention re-engagement.\n• Inventory and cashier checkout flows are monitored live across all operational branches.`
+            : `💼 **บทวิเคราะห์ภาพรวมสำหรับผู้บริหาร:**\n• ยอดขายสะสมจากข้อมูลจริง: **฿${currentRevenueVal.toLocaleString()}**\n• ตรวจพบลูกค้ากลุ่มที่ต้องติดตาม (At-Risk): **${atRiskCount} ราย** แนะนำให้ส่งข้อความหรือมอบสิทธิพิเศษเพื่อดึงกลับมาซื้อซ้ำ\n• ระบบคลังสินค้าและช่องทางจำหน่ายทุกจุดเชื่อมโยงเข้าสู่ฐานข้อมูลกลางเรียบร้อยครับ`;
         }
       }
 
