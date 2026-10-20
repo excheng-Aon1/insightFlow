@@ -37,6 +37,7 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
       'BaselineTrajectoryIcon',       // แนวโน้มปกติเดิม
       'DailyAverageDemandIcon',       // ยอดขายเฉลี่ยรายวัน
       'EnterpriseStandardIcon',       // มาตรฐานองค์กร
+      'BusinessOverviewAndGoalIcon',  // ภาพรวมธุรกิจและเป้าหมาย
     ];
 
     for (const iconName of requiredIcons) {

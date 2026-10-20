@@ -56,6 +56,7 @@ import {
   BaselineTrajectoryIcon,
   EnterpriseStandardIcon,
   PowerBiStudioIcon,
+  BusinessOverviewAndGoalIcon,
 } from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
@@ -1902,6 +1903,7 @@ export const initialPageUploadedFiles = {
 // --- MODULE 2: WAYFINDING PICTOGRAM ICONS & BRAND EMBLEM ---
 // Re-export canonical Wayfinding Signage & Airport Pictogram icon suite
 export { LuxuryIconBadge, LuxuryModuleIcon } from './components/LuxuryIcons';
+export { BusinessOverviewAndGoalIcon } from './components/LuxuryIcons';
 
 /**
  * Ultra-Luxury 3D Brand Emblem Logo for InsightFlow
@@ -3162,7 +3164,7 @@ export function OverviewTab({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-white/10">
           <div className="flex items-start gap-4">
             <LuxuryIconBadge variant="gold" size="lg" active>
-              <LuxuryModuleIcon type="target" size={28} />
+              <LuxuryModuleIcon type="overview" size={28} />
             </LuxuryIconBadge>
             <div>
               <div className="flex items-center gap-2">
@@ -6112,7 +6114,7 @@ export function InventoryTab({
 }
 
 const moduleMetaMap = {
-  overview: { th: 'ภาพรวมธุรกิจ & เป้าหมาย', en: 'Overview & Goals', icon: '📊', color: '#38bdf8', analyticalRoleTh: 'วิเคราะห์ยอดขายรวม, กำไรสุทธิ, ช่องว่างเป้าหมาย', analyticalRoleEn: 'Total revenue, net margin & goal pacing' },
+  overview: { th: 'ภาพรวมธุรกิจ & เป้าหมาย', en: 'Overview & Goals', icon: '🎯', color: '#38bdf8', analyticalRoleTh: 'วิเคราะห์ยอดขายรวม, กำไรสุทธิ, ช่องว่างเป้าหมาย', analyticalRoleEn: 'Total revenue, net margin & goal pacing' },
   bi_studio: { th: 'BI Studio & รายงาน', en: 'BI Studio & Reports', icon: '📈', color: '#a855f7', analyticalRoleTh: 'วิเคราะห์เมทริกซ์หลายมิติ, ช่องทางขาย และ P&L', analyticalRoleEn: 'Multi-dimension matrix, sales channels & P&L' },
   customers: { th: 'ฐานข้อมูลลูกค้า CRM', en: 'Customer CRM', icon: '👥', color: '#ec4899', analyticalRoleTh: 'วิเคราะห์ลูกค้าประจำ VIP และลูกค้าเสี่ยงหาย', analyticalRoleEn: 'VIP loyalty & 45-day churn risk detection' },
   staff_pos: { th: 'พนักงาน & แคชเชียร์', en: 'Staff & POS Audit', icon: '💳', color: '#f59e0b', analyticalRoleTh: 'ตรวจจับทุจริตบิลยกเลิกหน้าเครื่อง POS และ KPI พนักงาน', analyticalRoleEn: 'Cashier fraud void detection & staff KPIs' },
@@ -15638,8 +15640,8 @@ function App() {
   const sidebarMenuItems = [
     {
       id: 'overview',
-      label: tx('ภาพรวมธุรกิจ', 'Business Overview'),
-      subLabel: tx('ยอดขายและเป้าหมายร้าน', 'Sales & Target Planner'),
+      label: tx('ภาพรวมธุรกิจและเป้าหมาย', 'Business Overview & Goals'),
+      subLabel: tx('ยอดขาย แผนงาน และเป้าหมายร้าน', 'Sales, Planning & Target Goal'),
       variant: 'gold',
       minPlan: 'starter'
     },

@@ -96,17 +96,40 @@ export function LuxuryIconBadge({
 export function LuxuryModuleIcon({ type = 'overview', size = 26 }) {
   switch (type) {
     case 'overview':
+    case 'business_overview':
       return (
         <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-          {/* แท่นฐานกราฟสากล */}
-          <rect x="4" y="26" width="24" height="2.5" rx="1.25" fill="currentColor" opacity="0.9" />
-          {/* กราฟแท่งเติบโต 3 ระดับ */}
-          <rect x="5.5" y="17.5" width="5" height="7.5" rx="1.5" fill="currentColor" />
-          <rect x="13.5" y="11.5" width="5" height="13.5" rx="1.5" fill="currentColor" />
-          <rect x="21.5" y="6" width="5" height="19" rx="1.5" fill="currentColor" />
-          {/* ลูกศรนำทางพุ่งทะยานเติบโต */}
-          <path d="M5.5 13L13.5 7.5L25 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M19.5 3H25V8.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          {/* 1. แท่นฐานรากธุรกิจมั่นคง (Solid Business Foundation) */}
+          <rect x="2.5" y="26.5" width="27" height="2.5" rx="1.25" fill="currentColor" opacity="0.95" />
+
+          {/* 2. กราฟแท่งการเติบโตของธุรกิจ 3 ระดับ (Ascending Business Growth Pillars) */}
+          <rect x="3.5" y="19" width="4.5" height="6.5" rx="1.2" fill="currentColor" />
+          <rect x="9.5" y="13.5" width="4.5" height="12" rx="1.2" fill="currentColor" />
+          <rect x="15.5" y="8" width="4.5" height="17.5" rx="1.2" fill="currentColor" opacity="0.9" />
+
+          {/* 3. วงแหวนเป้าหมายความสำเร็จ (Strategic Goal Bullseye Target Rings) */}
+          <circle cx="23.5" cy="8.5" r="7" stroke="currentColor" strokeWidth="2" strokeDasharray="3.5 2" />
+          <circle cx="23.5" cy="8.5" r="4.2" stroke="currentColor" strokeWidth="1.8" />
+          <circle cx="23.5" cy="8.5" r="1.8" fill="currentColor" />
+
+          {/* 4. ลูกศรนำทางทะยานสู่เป้าหมาย (Goal Trajectory & Piercing Arrow) */}
+          <path
+            d="M4 17.5C8 16 13 13 18.5 9.5"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+          <path
+            d="M23.5 3.5L28.5 8.5L23.5 13.5"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+
+          {/* 5. เส้นแกนเล็งเป้าหมาย (Target Crosshair Guides) */}
+          <line x1="23.5" y1="0.5" x2="23.5" y2="2.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="29.5" y1="8.5" x2="31.5" y2="8.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
       );
 
@@ -2015,5 +2038,99 @@ export function PresentationModeIcon({ size = 22, className = '' }) {
     </svg>
   );
 }
+
+/**
+ * BusinessOverviewAndGoalIcon: ไอคอนพรีเมียม 3 มิติ "ภาพรวมธุรกิจและเป้าหมาย" (Business Overview & Strategic Goals)
+ * - สัญลักษณ์: แท่นฐานธุรกิจมั่นคง + กราฟแท่งการเติบโต 3 ระดับสีทอง-ฟ้า
+ * - เป้าหมาย: วงแหวนเรดาร์เป้าหมายหลายมิติ (Concentric Bullseye Target Rings)
+ * - ลูกศรทะยานสู่เป้าหมาย (Goal Trajectory & Piercing Arrow)
+ * - ประกายดาวความสำเร็จ 100% (Pinnacle Achievement Star)
+ */
+export function BusinessOverviewAndGoalIcon({ size = 26, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`ovBaseFloor_${id}`} x1="2" y1="27" x2="30" y2="27" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.9" />
+          <stop offset="50%" stopColor="#FBBF24" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#10B981" stopOpacity="0.8" />
+        </linearGradient>
+        <linearGradient id={`ovBar1_${id}`} x1="3" y1="26" x2="8" y2="19" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#0284C7" />
+          <stop offset="100%" stopColor="#38BDF8" />
+        </linearGradient>
+        <linearGradient id={`ovBar2_${id}`} x1="9" y1="26" x2="14" y2="13" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#0369A1" />
+          <stop offset="50%" stopColor="#0EA5E9" />
+          <stop offset="100%" stopColor="#7DD3FC" />
+        </linearGradient>
+        <linearGradient id={`ovBar3_${id}`} x1="15" y1="26" x2="20" y2="8" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#D97706" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#FEF08A" />
+        </linearGradient>
+        <linearGradient id={`ovTargetGold_${id}`} x1="16" y1="1" x2="31" y2="16" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="45%" stopColor="#FBBF24" />
+          <stop offset="85%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`ovArrowLaser_${id}`} x1="4" y1="22" x2="25" y2="8" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38BDF8" />
+          <stop offset="60%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#FFFFFF" />
+        </linearGradient>
+        <filter id={`ovGlow_${id}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+
+      {/* 1. แท่นฐานรากธุรกิจ (Solid Enterprise Base) */}
+      <rect x="2.5" y="26" width="27" height="2.5" rx="1.25" fill={`url(#ovBaseFloor_${id})`} />
+
+      {/* 2. แท่งสถิติการเติบโตของธุรกิจ 3 ระดับ (Ascending Performance Pillars) */}
+      <rect x="3.5" y="19" width="4.5" height="6.5" rx="1.3" fill={`url(#ovBar1_${id})`} stroke="#E0F2FE" strokeWidth="0.6" />
+      <rect x="9.5" y="13.5" width="4.5" height="12" rx="1.3" fill={`url(#ovBar2_${id})`} stroke="#BAE6FD" strokeWidth="0.6" />
+      <rect x="15.5" y="8" width="4.5" height="17.5" rx="1.3" fill={`url(#ovBar3_${id})`} stroke="#FEF08A" strokeWidth="0.6" />
+
+      {/* 3. วงแหวนเป้าหมายกลยุทธ์ (Strategic Bullseye Target Rings) */}
+      <circle cx="23.5" cy="8.5" r="7.5" stroke={`url(#ovTargetGold_${id})`} strokeWidth="1.8" strokeDasharray="3.2 1.8" />
+      <circle cx="23.5" cy="8.5" r="4.6" stroke="#FEF08A" strokeWidth="1.6" />
+      <circle cx="23.5" cy="8.5" r="2" fill="#FFFFFF" filter={`url(#ovGlow_${id})`} />
+      <circle cx="23.5" cy="8.5" r="1.1" fill="#78350F" />
+
+      {/* เส้นแกนเล็งเป้าหมาย 4 ทิศ (Crosshair Reticle Marks) */}
+      <line x1="23.5" y1="0.5" x2="23.5" y2="2.5" stroke="#FBBF24" strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="23.5" y1="14.5" x2="23.5" y2="16.5" stroke="#FBBF24" strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="15.5" y1="8.5" x2="17.5" y2="8.5" stroke="#FBBF24" strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="29.5" y1="8.5" x2="31.5" y2="8.5" stroke="#FBBF24" strokeWidth="1.6" strokeLinecap="round" />
+
+      {/* 4. เส้นวิถีและลูกศรทะยานพุ่งเข้ากลางเป้าหมาย (Goal Trajectory & Piercing Arrow) */}
+      <path
+        d="M4 18C7.5 16 12 13 18 9.5"
+        stroke={`url(#ovArrowLaser_${id})`}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M23 4.5L27.5 8.5L23 12.5"
+        stroke="#FFFFFF"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        filter={`url(#ovGlow_${id})`}
+      />
+
+      {/* 5. ประกายดาวแห่งความสำเร็จสูงสุด (Pinnacle Spark) */}
+      <path
+        d="M29 2L29.7 0.8L30.4 2L31.6 2.7L30.4 3.4L29.7 4.6L29 3.4L27.8 2.7Z"
+        fill="#FEF08A"
+      />
+    </svg>
+  );
+}
+
 
 
