@@ -29,7 +29,8 @@ import DataGovernanceCenter from './components/DataGovernanceCenter';
 import ExecutiveBiStudio from './components/ExecutiveBiStudio';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
-  BasketballHoopZone
+  BasketballHoopZone,
+  BasketballCourtModal
 } from './components/BasketballUploadHub';
 import { HeroGoalTrajectoryBackground } from './components/HeroGoalTrajectoryBackground';
 import {
@@ -12163,6 +12164,7 @@ function App() {
   });
   const [rememberPassword, setRememberPassword] = useState(true);
   const [inspectingUploadTab, setInspectingUploadTab] = useState(null);
+  const [isBasketballModalOpen, setIsBasketballModalOpen] = useState(false);
 
   // OTP 2FA State & Handlers
   const [otpCode, setOtpCode] = useState('');
@@ -16482,6 +16484,19 @@ function App() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+            {/* Central File Upload — Basketball Shoot-In Hub */}
+            <button
+              type="button"
+              onClick={() => setIsBasketballModalOpen(true)}
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-emerald-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
+              title={tx('อัปโหลดไฟล์กลาง (ข้อมูลจะซิงก์และเชื่อมต่อทุกหน้า)', 'Upload Central File (Syncs across all pages)')}
+            >
+              <span className="animate-bounce text-sm sm:text-base">🏀</span>
+              <span className="font-black">
+                {tx('ชู้ตไฟล์', 'Shoot File')}
+              </span>
+            </button>
+
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
             {renderLanguageSwitcher()}
 
@@ -17329,6 +17344,15 @@ function App() {
             </div>
           )}
 
+          {/* Universal Central Basketball Shoot-in Modal Hub */}
+          <BasketballCourtModal
+            isOpen={isBasketballModalOpen}
+            onClose={() => setIsBasketballModalOpen(false)}
+            lang={lang}
+            theme={theme}
+            onFileDispatched={handlePageFileUpload}
+            setActiveTab={setActiveTab}
+          />
         </main>
 
         {/* Fixed Bottom App Navigation Dock for Smartphone & Tablet (< 1024px) */}
