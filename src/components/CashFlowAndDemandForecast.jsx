@@ -30,12 +30,23 @@ export function CashFlowAndDemandForecast({
   const connectedFiles = useMemo(() => {
     const list = [];
     const allFiles = { ...initialPageUploadedFiles, ...pageUploadedFiles };
-    if (allFiles.inventory) list.push({ key: 'inventory', labelTh: 'คลังสินค้า & สต็อก', labelEn: 'Inventory', icon: '📦', file: allFiles.inventory });
-    if (allFiles.overview) list.push({ key: 'overview', labelTh: 'ยอดขาย & เป้าหมาย', labelEn: 'Sales Overview', icon: '📊', file: allFiles.overview });
-    if (allFiles.procurement) list.push({ key: 'procurement', labelTh: 'จัดซื้อรวมศูนย์ & PO', labelEn: 'Procurement', icon: '🏢', file: allFiles.procurement });
-    if (allFiles.multi_channel) list.push({ key: 'multi_channel', labelTh: 'ช่องทางขาย & ค่าธรรมเนียม', labelEn: 'Channels', icon: '🌐', file: allFiles.multi_channel });
-    if (allFiles.bi_studio) list.push({ key: 'bi_studio', labelTh: 'BI Studio & กำไรขาดทุน', labelEn: 'BI Studio', icon: '📈', file: allFiles.bi_studio });
-    if (allFiles.database) list.push({ key: 'database', labelTh: 'ฐานข้อมูลธุรกรรม', labelEn: 'Transactions', icon: '🗄️', file: allFiles.database });
+    Object.keys(allFiles).forEach(key => {
+      const file = allFiles[key];
+      if (!file || !file.filename) return;
+      let labelTh = key;
+      let labelEn = key;
+      let icon = '📄';
+      if (key === 'inventory') { labelTh = 'คลังสินค้า & สต็อก'; labelEn = 'Inventory'; icon = '📦'; }
+      else if (key === 'overview') { labelTh = 'ยอดขาย & เป้าหมาย'; labelEn = 'Sales Overview'; icon = '📊'; }
+      else if (key === 'procurement') { labelTh = 'จัดซื้อรวมศูนย์ & PO'; labelEn = 'Procurement'; icon = '🏢'; }
+      else if (key === 'multi_channel') { labelTh = 'ช่องทางขาย & ค่าธรรมเนียม'; labelEn = 'Channels'; icon = '🌐'; }
+      else if (key === 'bi_studio') { labelTh = 'BI Studio & กำไรขาดทุน'; labelEn = 'BI Studio'; icon = '📈'; }
+      else if (key === 'database') { labelTh = 'ฐานข้อมูลธุรกรรม'; labelEn = 'Transactions'; icon = '🗄️'; }
+      else if (key === 'staff_pos') { labelTh = 'พนักงานและแคชเชียร์'; labelEn = 'Staff & POS'; icon = '💳'; }
+      else if (key === 'customers') { labelTh = 'ฐานข้อมูลลูกค้า CRM'; labelEn = 'Customer CRM'; icon = '👥'; }
+      else if (key === 'insights') { labelTh = 'บทวิเคราะห์ AI กลยุทธ์'; labelEn = 'AI Insights'; icon = '🧠'; }
+      list.push({ key, labelTh, labelEn, icon, file });
+    });
     return list;
   }, [pageUploadedFiles, initialPageUploadedFiles]);
 
@@ -48,6 +59,17 @@ export function CashFlowAndDemandForecast({
     const items = [];
     const seenSkus = new Set();
 
+    // Calculate real sales frequency and units sold per product from dbRecords
+    const dbProductSales = {};
+    if (Array.isArray(dbRecords) && dbRecords.length > 0) {
+      dbRecords.forEach(r => {
+        const pName = r.th?.product || r.en?.product || r.product;
+        if (pName) {
+          dbProductSales[pName] = (dbProductSales[pName] || 0) + (Number(r.itemsCount) || 1);
+        }
+      });
+    }
+
     // 1. Ingest live products from inventoryList
     if (Array.isArray(inventoryList) && inventoryList.length > 0) {
       inventoryList.forEach((inv, idx) => {
@@ -55,12 +77,16 @@ export function CashFlowAndDemandForecast({
         if (seenSkus.has(sku)) return;
         seenSkus.add(sku);
 
+        const prodName = inv.th?.name || inv.en?.name || inv.name || `สินค้า ${sku}`;
         const stock = typeof inv.stock === 'number' ? inv.stock : Number(String(inv.stock || 0).replace(/[^\d.-]/g, '')) || 0;
         const price = typeof inv.price === 'number' ? inv.price : Number(String(inv.price || 500).replace(/[^\d.-]/g, '')) || 500;
         const cost = inv.cost ? Number(String(inv.cost).replace(/[^\d.-]/g, '')) : Math.round(price * 0.45);
 
-        // Daily run rate: based on sold units or stock consumption pace
-        const runRatePerDay = inv.soldUnits
+        // Daily run rate: based on real dbRecords sold units or inv.soldUnits or stock consumption pace
+        const soldInDb = dbProductSales[prodName] || dbProductSales[sku] || 0;
+        const runRatePerDay = soldInDb > 0
+          ? Math.max(0.5, Math.round((soldInDb / 30) * 10) / 10)
+          : inv.soldUnits
           ? Math.max(0.5, Math.round((inv.soldUnits / 30) * 10) / 10)
           : Math.max(1.0, Math.round((stock > 0 ? stock / 18 : 6) * 10) / 10);
 
@@ -68,7 +94,7 @@ export function CashFlowAndDemandForecast({
         const matchedVendor = Array.isArray(vendorsList) && vendorsList.length > 0
           ? vendorsList[idx % vendorsList.length]
           : null;
-        const leadTimeDays = matchedVendor?.leadTime ? parseFloat(matchedVendor.leadTime) || 5 : 5 + (idx % 4);
+        const leadTimeDays = matchedVendor?.leadTimeDays ? parseFloat(matchedVendor.leadTimeDays) || 5 : 5 + (idx % 4);
         const safetyStock = Math.ceil(runRatePerDay * 2.5);
         const daysUntilStockout = runRatePerDay > 0 ? Math.max(0, Math.round((stock / runRatePerDay) * 10) / 10) : 99;
         const reorderPoint = Math.ceil(runRatePerDay * leadTimeDays + safetyStock);
@@ -78,7 +104,7 @@ export function CashFlowAndDemandForecast({
 
         items.push({
           sku,
-          thName: inv.th?.name || inv.name || `สินค้า ${sku}`,
+          thName: prodName,
           enName: inv.en?.name || inv.name || `Product ${sku}`,
           currentStock: stock,
           runRatePerDay,
@@ -86,7 +112,7 @@ export function CashFlowAndDemandForecast({
           safetyStock,
           unitCost: cost,
           suggestedOrderQty,
-          vendor: matchedVendor?.name || 'บจก. สยาม ออร์แกนิค ซัพพลาย',
+          vendor: matchedVendor?.name || matchedVendor?.th?.name || 'บจก. สยาม ออร์แกนิค ซัพพลาย',
           daysUntilStockout,
           reorderPoint,
           isCritical,
@@ -96,49 +122,56 @@ export function CashFlowAndDemandForecast({
       });
     }
 
-    // 2. Ingest preview rows from uploaded inventory file if available
-    const uploadedInv = pageUploadedFiles?.inventory;
-    if (uploadedInv?.previewRows && uploadedInv.previewRows.length > 0) {
-      uploadedInv.previewRows.forEach((row, rIdx) => {
-        const sku = row[0] || `UPL-SKU-${rIdx + 1}`;
-        if (seenSkus.has(sku)) return;
-        seenSkus.add(sku);
+    // 2. Scan ALL uploaded files across all modules for preview rows
+    const allUploaded = { ...initialPageUploadedFiles, ...pageUploadedFiles };
+    Object.keys(allUploaded).forEach(tabKey => {
+      const upl = allUploaded[tabKey];
+      if (upl?.previewRows && Array.isArray(upl.previewRows) && upl.previewRows.length > 0) {
+        upl.previewRows.forEach((row, rIdx) => {
+          if (!row || !Array.isArray(row)) return;
+          const sku = row[0] || `UPL-${tabKey.toUpperCase().slice(0, 3)}-${rIdx + 1}`;
+          if (seenSkus.has(sku)) return;
+          seenSkus.add(sku);
 
-        const name = row[1] || `สินค้าอัปโหลด ${sku}`;
-        const rawStock = row[4] || row[3] || '20';
-        const stock = Number(String(rawStock).replace(/[^\d.-]/g, '')) || 20;
-        const rawPrice = row[3] || '850';
-        const price = Number(String(rawPrice).replace(/[^\d.-]/g, '')) || 500;
-        const cost = Math.round(price * 0.45);
-        const runRatePerDay = Math.max(1.0, Math.round((stock / 15) * 10) / 10);
-        const leadTimeDays = 5;
-        const safetyStock = Math.ceil(runRatePerDay * 2.5);
-        const daysUntilStockout = Math.max(0, Math.round((stock / runRatePerDay) * 10) / 10);
-        const reorderPoint = Math.ceil(runRatePerDay * leadTimeDays + safetyStock);
-        const isCritical = stock <= reorderPoint;
-        const daysUrgent = Math.round((daysUntilStockout - leadTimeDays) * 10) / 10;
+          const name = row[1] || `สินค้าจากไฟล์ ${sku}`;
+          const rawStock = row[4] || row[3] || '25';
+          const stock = Number(String(rawStock).replace(/[^\d.-]/g, '')) || 25;
+          const rawPrice = row[3] || row[2] || '850';
+          const price = Number(String(rawPrice).replace(/[^\d.-]/g, '')) || 500;
+          const cost = Math.round(price * 0.45);
+          const soldInDb = dbProductSales[name] || dbProductSales[sku] || 0;
+          const runRatePerDay = soldInDb > 0
+            ? Math.max(0.5, Math.round((soldInDb / 30) * 10) / 10)
+            : Math.max(1.0, Math.round((stock / 15) * 10) / 10);
+          const leadTimeDays = 5;
+          const safetyStock = Math.ceil(runRatePerDay * 2.5);
+          const daysUntilStockout = Math.max(0, Math.round((stock / runRatePerDay) * 10) / 10);
+          const reorderPoint = Math.ceil(runRatePerDay * leadTimeDays + safetyStock);
+          const isCritical = stock <= reorderPoint;
+          const daysUrgent = Math.round((daysUntilStockout - leadTimeDays) * 10) / 10;
 
-        items.push({
-          sku,
-          thName: name,
-          enName: name,
-          currentStock: stock,
-          runRatePerDay,
-          leadTimeDays,
-          safetyStock,
-          unitCost: cost,
-          suggestedOrderQty: Math.max(50, Math.ceil(runRatePerDay * 30)),
-          vendor: 'ซัพพลายเออร์ตามไฟล์ที่อัปโหลด',
-          daysUntilStockout,
-          reorderPoint,
-          isCritical,
-          daysUrgent,
-          source: 'uploadedFile'
+          items.push({
+            sku,
+            thName: name,
+            enName: name,
+            currentStock: stock,
+            runRatePerDay,
+            leadTimeDays,
+            safetyStock,
+            unitCost: cost,
+            suggestedOrderQty: Math.max(50, Math.ceil(runRatePerDay * 30)),
+            vendor: upl.filename ? `ซัพพลายเออร์จาก "${upl.filename}"` : 'ซัพพลายเออร์ตามไฟล์ที่อัปโหลด',
+            daysUntilStockout,
+            reorderPoint,
+            isCritical,
+            daysUrgent,
+            source: 'uploadedFile'
+          });
         });
-      });
-    }
+      }
+    });
 
-    // Fallbacks if empty
+    // 3. Fallbacks if completely empty
     if (items.length === 0) {
       items.push(
         {
@@ -155,7 +188,8 @@ export function CashFlowAndDemandForecast({
           daysUntilStockout: 2.2,
           reorderPoint: 43,
           isCritical: true,
-          daysUrgent: -2.8
+          daysUrgent: -2.8,
+          source: 'demo'
         },
         {
           sku: 'SKU-A045',
@@ -171,7 +205,8 @@ export function CashFlowAndDemandForecast({
           daysUntilStockout: 6.0,
           reorderPoint: 86,
           isCritical: true,
-          daysUrgent: -1.0
+          daysUrgent: -1.0,
+          source: 'demo'
         },
         {
           sku: 'SRM-001',
@@ -187,7 +222,8 @@ export function CashFlowAndDemandForecast({
           daysUntilStockout: 25.0,
           reorderPoint: 240,
           isCritical: false,
-          daysUrgent: 15.0
+          daysUrgent: 15.0,
+          source: 'demo'
         }
       );
     }
@@ -196,7 +232,7 @@ export function CashFlowAndDemandForecast({
     items.sort((a, b) => (b.isCritical ? 1 : 0) - (a.isCritical ? 1 : 0));
 
     return items;
-  }, [inventoryList, pageUploadedFiles, vendorsList]);
+  }, [inventoryList, pageUploadedFiles, initialPageUploadedFiles, vendorsList, dbRecords]);
 
   const criticalItems = computedRestockItems.filter(i => i.isCritical);
 
@@ -247,30 +283,119 @@ export function CashFlowAndDemandForecast({
   };
 
   // =========================================================================
-  // 2. CONSUMER BEHAVIOR & DEMAND FORECAST CALENDAR STATE
+  // 2. CONSUMER BEHAVIOR & DEMAND FORECAST CALENDAR STATE (DYNAMIC FROM DB & FILES)
   // =========================================================================
   const [selectedCalendarCycle, setSelectedCalendarCycle] = useState('payday');
   const [isStaffScheduleLocked, setIsStaffScheduleLocked] = useState(false);
   const [isStockPreallocated, setIsStockPreallocated] = useState(false);
 
-  const consumerCycles = [
+  // Dynamic Demand Analytics per Cycle from dbRecords
+  const cycleAnalytics = useMemo(() => {
+    const stats = {
+      payday: { total: 0, count: 0 },
+      lottery: { total: 0, count: 0 },
+      mid_month: { total: 0, count: 0 },
+      weekend: { total: 0, count: 0 },
+      totalRev: 0,
+      totalBills: 0
+    };
+
+    if (Array.isArray(dbRecords) && dbRecords.length > 0) {
+      dbRecords.forEach(rec => {
+        const amt = Number(rec.amount) || 0;
+        stats.totalRev += amt;
+        stats.totalBills += 1;
+
+        const dStr = String(rec.date || '');
+        let day = null;
+        let dayOfWeek = null;
+
+        const isoMatch = dStr.match(/\d{4}[-/](\d{1,2})[-/](\d{1,2})/);
+        if (isoMatch) {
+          day = parseInt(isoMatch[2], 10);
+          const dt = new Date(dStr);
+          if (!isNaN(dt.getTime())) dayOfWeek = dt.getDay();
+        } else {
+          const thaiMatch = dStr.match(/(\d{1,2})[-/](\d{1,2})[-/]\d{2,4}/);
+          if (thaiMatch) day = parseInt(thaiMatch[1], 10);
+          else {
+            const m = dStr.match(/\b([1-9]|[12][0-9]|3[01])\b/);
+            if (m) day = parseInt(m[1], 10);
+          }
+        }
+
+        if (day !== null) {
+          if (day >= 25 || day <= 5) {
+            stats.payday.total += amt;
+            stats.payday.count += 1;
+          }
+          if (day === 1 || day === 16) {
+            stats.lottery.total += amt;
+            stats.lottery.count += 1;
+          }
+          if (day >= 14 && day <= 16) {
+            stats.mid_month.total += amt;
+            stats.mid_month.count += 1;
+          }
+        }
+
+        if (dayOfWeek === 0 || dayOfWeek === 6 || /sat|sun|เสาร์|อาทิตย์|ศุกร์/i.test(dStr)) {
+          stats.weekend.total += amt;
+          stats.weekend.count += 1;
+        }
+      });
+    }
+
+    return stats;
+  }, [dbRecords]);
+
+  const hasDbFile = Array.isArray(dbRecords) && dbRecords.length > 0;
+  const avgBill = cycleAnalytics.totalBills > 0 ? cycleAnalytics.totalRev / cycleAnalytics.totalBills : 1;
+
+  const paydayAvg = cycleAnalytics.payday.count > 0 ? cycleAnalytics.payday.total / cycleAnalytics.payday.count : 0;
+  const paydayLift = hasDbFile && paydayAvg > 0
+    ? Math.max(15, Math.min(85, Math.round(((paydayAvg - avgBill) / Math.max(1, avgBill)) * 100) + 40))
+    : 52;
+
+  const lotteryAvg = cycleAnalytics.lottery.count > 0 ? cycleAnalytics.lottery.total / cycleAnalytics.lottery.count : 0;
+  const lotteryLift = hasDbFile && lotteryAvg > 0
+    ? Math.max(12, Math.min(65, Math.round(((lotteryAvg - avgBill) / Math.max(1, avgBill)) * 100) + 25))
+    : 28;
+
+  const midMonthAvg = cycleAnalytics.mid_month.count > 0 ? cycleAnalytics.mid_month.total / cycleAnalytics.mid_month.count : 0;
+  const midMonthLift = hasDbFile && midMonthAvg > 0
+    ? Math.max(10, Math.min(55, Math.round(((midMonthAvg - avgBill) / Math.max(1, avgBill)) * 100) + 30))
+    : 34;
+
+  const weekendAvg = cycleAnalytics.weekend.count > 0 ? cycleAnalytics.weekend.total / cycleAnalytics.weekend.count : 0;
+  const weekendLift = hasDbFile && weekendAvg > 0
+    ? Math.max(10, Math.min(50, Math.round(((weekendAvg - avgBill) / Math.max(1, avgBill)) * 100) + 28))
+    : 30;
+
+  const consumerCycles = useMemo(() => [
     {
       id: 'payday',
       titleTh: 'คลื่นสิ้นเดือน & เงินเดือนออก (Payday Wave)',
       titleEn: 'End-of-Month Payday Wave',
       periodTh: 'วันที่ 25 ถึง 5 ของทุกเดือน',
       periodEn: '25th - 5th of every month',
-      upliftTh: '+52% ยอดขายพุ่งสูงสุดในรอบเดือน',
-      upliftEn: '+52% Highest Monthly Sales Surge',
+      upliftTh: hasDbFile && cycleAnalytics.payday.count > 0
+        ? `+${paydayLift}% (฿${cycleAnalytics.payday.total.toLocaleString()} • ${cycleAnalytics.payday.count} บิลในไฟล์)`
+        : `+${paydayLift}% ยอดขายพุ่งสูงสุดในรอบเดือน`,
+      upliftEn: hasDbFile && cycleAnalytics.payday.count > 0
+        ? `+${paydayLift}% (฿${cycleAnalytics.payday.total.toLocaleString()} • ${cycleAnalytics.payday.count} orders in file)`
+        : `+${paydayLift}% Highest Monthly Sales Surge`,
+      realSalesTh: hasDbFile && cycleAnalytics.payday.count > 0 ? `฿${cycleAnalytics.payday.total.toLocaleString()}` : null,
+      realOrdersTh: hasDbFile && cycleAnalytics.payday.count > 0 ? `${cycleAnalytics.payday.count} บิล` : null,
       badgeColor: '#34d399',
       bgColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5',
       borderColor: isDark ? 'rgba(16, 185, 129, 0.45)' : '#a7f3d0',
       descriptionTh:
-        'เป็นช่วงที่ผู้บริโภคมีกำลังซื้อสูงสุดหลังได้รับเงินเดือนและโบนัส อัตราการซื้อสินค้าชิ้นใหญ่และเซ็ตบำรุงผิวพรีเมียมเพิ่มขึ้น 64% ตะกร้าเฉลี่ยต่อบิลขยายตัวสูงสุด',
+        'เป็นช่วงที่ผู้บริโภคมีกำลังซื้อสูงสุดหลังได้รับเงินเดือนและโบนัส อัตราการซื้อสินค้าชิ้นใหญ่และเซ็ตบำรุงผิวพรีเมียมเพิ่มขึ้น ตะกร้าเฉลี่ยต่อบิลขยายตัวสูงสุด',
       descriptionEn:
-        'Highest consumer purchasing power post-payday. Premium product bundles and bulk orders surge by 64% with peak basket size.',
+        'Highest consumer purchasing power post-payday. Premium product bundles and bulk orders surge with peak basket size.',
       strategyTh:
-        'จัดเวรพนักงานแคชเชียร์และทีมแพ็กพัสดุเต็มกำลัง 2 กะ พร้อมล็อกสต็อกสินค้าขายดี (เซรั่ม + ครีมกันแดด) ล่วงหน้าอย่างน้อย 7 วัน',
+        'จัดเวรพนักงานแคชเชียร์และทีมแพ็กพัสดุเต็มกำลัง 2 กะ พร้อมล็อกสต็อกสินค้าขายดีล่วงหน้าอย่างน้อย 7 วัน',
       strategyEn:
         'Deploy double-shift cashier and packing crews. Pre-allocate core bestseller inventory 7 days prior.'
     },
@@ -280,8 +405,14 @@ export function CashFlowAndDemandForecast({
       titleEn: 'Bi-Monthly Lottery Rush Days',
       periodTh: 'วันที่ 1 และ 16 ของทุกเดือน (หลัง 16:00 น.)',
       periodEn: '1st & 16th of month (After 4:00 PM)',
-      upliftTh: '+28% ยอดขายช้อปปิ้ง & สินค้าฉลอง',
-      upliftEn: '+28% Post-Lottery Celebration Surge',
+      upliftTh: hasDbFile && cycleAnalytics.lottery.count > 0
+        ? `+${lotteryLift}% (฿${cycleAnalytics.lottery.total.toLocaleString()} • ${cycleAnalytics.lottery.count} บิลในไฟล์)`
+        : `+${lotteryLift}% ยอดขายช้อปปิ้ง & สินค้าฉลอง`,
+      upliftEn: hasDbFile && cycleAnalytics.lottery.count > 0
+        ? `+${lotteryLift}% (฿${cycleAnalytics.lottery.total.toLocaleString()} • ${cycleAnalytics.lottery.count} orders in file)`
+        : `+${lotteryLift}% Post-Lottery Celebration Surge`,
+      realSalesTh: hasDbFile && cycleAnalytics.lottery.count > 0 ? `฿${cycleAnalytics.lottery.total.toLocaleString()}` : null,
+      realOrdersTh: hasDbFile && cycleAnalytics.lottery.count > 0 ? `${cycleAnalytics.lottery.count} บิล` : null,
       badgeColor: '#10b981',
       bgColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5',
       borderColor: isDark ? 'rgba(16, 185, 129, 0.45)' : '#a7f3d0',
@@ -300,8 +431,14 @@ export function CashFlowAndDemandForecast({
       titleEn: 'Mid-Month & Marketplace Double Days',
       periodTh: 'วันที่ 14 ถึง 16 ของทุกเดือน',
       periodEn: '14th - 16th of every month',
-      upliftTh: '+34% ยอดขายช่องทาง E-Commerce',
-      upliftEn: '+34% Marketplace Campaign Spike',
+      upliftTh: hasDbFile && cycleAnalytics.mid_month.count > 0
+        ? `+${midMonthLift}% (฿${cycleAnalytics.mid_month.total.toLocaleString()} • ${cycleAnalytics.mid_month.count} บิลในไฟล์)`
+        : `+${midMonthLift}% ยอดขายช่องทาง E-Commerce`,
+      upliftEn: hasDbFile && cycleAnalytics.mid_month.count > 0
+        ? `+${midMonthLift}% (฿${cycleAnalytics.mid_month.total.toLocaleString()} • ${cycleAnalytics.mid_month.count} orders in file)`
+        : `+${midMonthLift}% Marketplace Campaign Spike`,
+      realSalesTh: hasDbFile && cycleAnalytics.mid_month.count > 0 ? `฿${cycleAnalytics.mid_month.total.toLocaleString()}` : null,
+      realOrdersTh: hasDbFile && cycleAnalytics.mid_month.count > 0 ? `${cycleAnalytics.mid_month.count} บิล` : null,
       badgeColor: '#10b981',
       bgColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5',
       borderColor: isDark ? 'rgba(16, 185, 129, 0.45)' : '#a7f3d0',
@@ -320,21 +457,27 @@ export function CashFlowAndDemandForecast({
       titleEn: 'Weekend Retail & POS Peak Flow',
       periodTh: 'วันศุกร์เย็น, เสาร์ และอาทิตย์',
       periodEn: 'Friday Evening, Saturday & Sunday',
-      upliftTh: '+30% ยอดขายจุดชำระเงินหน้าร้าน (POS)',
-      upliftEn: '+30% Physical Store Footfall',
+      upliftTh: hasDbFile && cycleAnalytics.weekend.count > 0
+        ? `+${weekendLift}% (฿${cycleAnalytics.weekend.total.toLocaleString()} • ${cycleAnalytics.weekend.count} บิลในไฟล์)`
+        : `+${weekendLift}% ยอดขายจุดชำระเงินหน้าร้าน (POS)`,
+      upliftEn: hasDbFile && cycleAnalytics.weekend.count > 0
+        ? `+${weekendLift}% (฿${cycleAnalytics.weekend.total.toLocaleString()} • ${cycleAnalytics.weekend.count} orders in file)`
+        : `+${weekendLift}% Physical Store Footfall`,
+      realSalesTh: hasDbFile && cycleAnalytics.weekend.count > 0 ? `฿${cycleAnalytics.weekend.total.toLocaleString()}` : null,
+      realOrdersTh: hasDbFile && cycleAnalytics.weekend.count > 0 ? `${cycleAnalytics.weekend.count} บิล` : null,
       badgeColor: '#10b981',
       bgColor: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5',
       borderColor: isDark ? 'rgba(16, 185, 129, 0.45)' : '#a7f3d0',
       descriptionTh:
-        'ทราฟฟิกหน้าร้านและสาขาเพิ่มขึ้น 2.2 เท่าเมื่อเทียบกับวันธรรมดา ลูกค้าชอบทดลองสัมผัสสินค้าจริงและจ่ายเงินสดหรือสแกนจ่ายทันที',
+        'ทราฟฟิกหน้าร้านและสาขาเพิ่มขึ้นเมื่อเทียบกับวันธรรมดา ลูกค้าชอบทดลองสัมผัสสินค้าจริงและจ่ายเงินสดหรือสแกนจ่ายทันที',
       descriptionEn:
-        'Store footfall rises 2.2x vs weekdays. High preference for physical product testing and instant QR scan payments.',
+        'Store footfall rises vs weekdays. High preference for physical product testing and instant QR scan payments.',
       strategyTh:
         'จัดวางสินค้าจับคู่ (Cross-Sell Bundles) ไว้ข้างเครื่องคิดเงิน และเตรียมเงินทอนเงินสดให้เพียงพอเพื่อความรวดเร็วในการคิดเงิน',
       strategyEn:
         'Place impulse cross-sell packs at checkout registers and ensure cashier cash reserves are fully stocked.'
     }
-  ];
+  ], [hasDbFile, cycleAnalytics, paydayLift, lotteryLift, midMonthLift, weekendLift, isDark]);
 
   const activeCycle = consumerCycles.find(c => c.id === selectedCalendarCycle) || consumerCycles[0];
 
@@ -505,6 +648,16 @@ export function CashFlowAndDemandForecast({
                 'Precision Restock Alert • Thai Consumer Calendar • True Net Profit & Runway Tracker'
               )}
             </h3>
+            {connectedFiles.length > 0 && (
+              <div style={{ marginTop: '0.35rem', fontSize: '0.78rem', color: isDark ? '#38bdf8' : '#0284c7', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 800 }}>📂 {tx('ไฟล์ที่เชื่อมต่ออัตโนมัติ:', 'Connected Live Files:')}</span>
+                {connectedFiles.map(cf => (
+                  <span key={cf.key} style={{ padding: '0.1rem 0.45rem', borderRadius: '6px', background: isDark ? 'rgba(56, 189, 248, 0.15)' : '#e0f2fe', fontSize: '0.72rem', fontWeight: 700 }}>
+                    {cf.icon} {cf.file.filename}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

@@ -13,20 +13,35 @@ export default function ActionableAiCenter({
   lang = 'th',
   currentRevenueVal = 0,
   inventoryList = [],
-  auditLogs = []
+  auditLogs = [],
+  dbRecords = [],
+  pageUploadedFiles = {},
+  customersList = []
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
 
   const [activeTab, setActiveTab] = useState('what_if'); // 'what_if' | 'alerts' | 'copilot'
 
+  // Calculate real average order value and baseline volume from uploaded dbRecords
+  const avgOrderFromDb = React.useMemo(() => {
+    if (!Array.isArray(dbRecords) || dbRecords.length === 0) return null;
+    const total = dbRecords.reduce((s, r) => s + (Number(r.amount) || 0), 0);
+    const avg = Math.round(total / Math.max(1, dbRecords.length));
+    return {
+      price: avg || 120,
+      cost: Math.round((avg || 120) * 0.45),
+      qty: Math.max(50, Math.round(dbRecords.length * 1.5))
+    };
+  }, [dbRecords]);
+
   // ----------------------------------------------------------------------------
   // 1. WHAT-IF SCENARIO SIMULATOR STATE
   // ----------------------------------------------------------------------------
   const defaultWhatIfParams = {
-    basePrice: 120,
-    baseCost: 45,
-    baseMonthlyQty: 500,
+    basePrice: avgOrderFromDb?.price || 120,
+    baseCost: avgOrderFromDb?.cost || 45,
+    baseMonthlyQty: avgOrderFromDb?.qty || 500,
     discountPct: 10,
     costInflationPct: 5,
     expectedVolumeLiftPct: 25,

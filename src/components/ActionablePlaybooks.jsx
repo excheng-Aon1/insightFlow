@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import { LuxuryIconBadge, LuxuryModuleIcon } from './LuxuryIcons';
 
@@ -6,7 +6,12 @@ export function ActionablePlaybooks({
   lang = 'th',
   inventoryList = [],
   setInventoryList,
-  setActiveTab
+  setActiveTab,
+  pageUploadedFiles = {},
+  initialPageUploadedFiles = {},
+  dbRecords = [],
+  currentRevenueVal = 0,
+  customersList = []
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
@@ -34,7 +39,39 @@ export function ActionablePlaybooks({
   const [simDiscountPct, setSimDiscountPct] = useState(15);
   const [simMonthlyBaseQty, setSimMonthlyBaseQty] = useState(120);
 
-  // Fallback products if inventoryList is empty
+  // Detect active uploaded file across any tab
+  const activeUploadedFile = useMemo(() => {
+    const all = { ...initialPageUploadedFiles, ...pageUploadedFiles };
+    return Object.values(all).find(f => f && f.filename && (f.isUserAdded || f.isCustomUpload)) || Object.values(all)[0] || null;
+  }, [pageUploadedFiles, initialPageUploadedFiles]);
+
+  // Derive products dynamically from dbRecords if available
+  const topProductsFromDb = useMemo(() => {
+    if (!Array.isArray(dbRecords) || dbRecords.length === 0) return [];
+    const counts = {};
+    const prices = {};
+    dbRecords.forEach(r => {
+      const name = r.th?.product || r.en?.product || r.product;
+      if (name) {
+        counts[name] = (counts[name] || 0) + (Number(r.itemsCount) || 1);
+        if (r.amount) prices[name] = r.amount;
+      }
+    });
+    return Object.keys(counts)
+      .sort((a, b) => counts[b] - counts[a])
+      .map((name, idx) => ({
+        sku: `SKU-${idx + 101}`,
+        price: prices[name] ? Math.round(prices[name] / Math.max(1, counts[name])) : 650,
+        cost: Math.round((prices[name] ? prices[name] / Math.max(1, counts[name]) : 650) * 0.45),
+        stock: 50 + (idx * 15) % 120,
+        status: idx === 1 ? 'dead_stock' : 'in_stock',
+        th: { name, category: 'สินค้าจากไฟล์นำเข้า' },
+        en: { name, category: 'Imported Item from File' },
+        soldUnits: counts[name]
+      }));
+  }, [dbRecords]);
+
+  // Fallback products if inventoryList and dbRecords are both empty
   const defaultItems = [
     {
       sku: 'SRM-001',
@@ -56,10 +93,13 @@ export function ActionablePlaybooks({
     }
   ];
 
-  const hasInventory = Boolean(inventoryList && inventoryList.length > 0);
-  const currentInventory = hasInventory ? inventoryList : [];
+  const currentInventory = (Array.isArray(inventoryList) && inventoryList.length > 0)
+    ? inventoryList
+    : (topProductsFromDb.length > 0 ? topProductsFromDb : defaultItems);
+
+  const hasInventory = currentInventory.length > 0;
   const deadStockItems = currentInventory.filter(
-    i => i.status === 'dead_stock' || i.sku === 'SKU-A045'
+    i => i.status === 'dead_stock' || i.sku === 'SKU-A045' || i.stock > 100
   );
   const fallbackDeadStock = {
     sku: 'SKU-NONE',
@@ -303,6 +343,14 @@ export function ActionablePlaybooks({
                 '🎯 3 Actionable Missions to Boost Revenue & Prevent Sunk Cost Losses'
               )}
             </h3>
+            {activeUploadedFile && (
+              <div style={{ marginTop: '0.35rem', fontSize: '0.78rem', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 800 }}>📂 {tx('วิเคราะห์จากไฟล์:', 'Analyzed from File:')}</span>
+                <span style={{ padding: '0.1rem 0.5rem', borderRadius: '6px', background: 'rgba(251, 191, 36, 0.15)', fontSize: '0.74rem', fontWeight: 700 }}>
+                  📄 {activeUploadedFile.filename} ({activeUploadedFile.rows || dbRecords.length || 0} รายการ • เชื่อมโยงระบบแนะนำอัตโนมัติ)
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
