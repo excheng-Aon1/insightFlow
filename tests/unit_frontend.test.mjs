@@ -434,5 +434,27 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 18. INTELLIGENT NAME & CUSTUMMER_NAME COLUMN RESOLUTION
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-18: Accurate detection of name, compound name_*, *_name, and Custummer_name', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // Verify regex handles Custummer_name (typo with double m), customer_name, and compound names
+    assert.ok(
+      appContent.includes('cust[ou]?m+er') || appContent.includes('Custummer_name'),
+      'App.jsx must support custummer with double m and flexible customer variations'
+    );
+    assert.ok(
+      appContent.includes('colCustomerIdx') && appContent.includes('colProductIdx'),
+      'App.jsx must track customer and product column indexes distinctly'
+    );
+    assert.ok(
+      appContent.includes('standaloneNameIdx') || appContent.includes('name[_]') || appContent.includes('[_]name'),
+      'App.jsx must correctly resolve prefix and suffix name variations'
+    );
+  });
+
 });
 

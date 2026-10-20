@@ -262,7 +262,8 @@ def _read_dataframe_from_bytes(contents: bytes, filename_lower: str) -> pd.DataF
     เพื่อป้องกันไม่ให้ข้อความหัวกระดาษ (ชื่อบริษัท/ชื่อรายงาน) ถูกเข้าใจผิดว่าเป็นคอลัมน์
     """
     header_keywords = [
-        "date", "time", "created", "branch", "channel", "store", "customer", 
+        "date", "time", "created", "branch", "channel", "store", "customer", "custummer",
+        "customer_name", "custummer_name", "name", "ชื่อ", "ชื่อลูกค้า", "product_name", "ชื่อสินค้า",
         "product", "item", "sku", "amount", "revenue", "price", "sales", "total", 
         "qty", "quantity", "status", "วันที่", "สาขา", "ช่องทาง", "ลูกค้า", 
         "สินค้า", "รายการ", "ยอด", "ราคา", "จำนวน", "สถานะ", "หมวด"
@@ -354,19 +355,22 @@ def process_inventory_upload_task(
                     }
                 )
         else:
-            for idx, row in enumerate(df.itertuples(index=False), start=1):
-                vals = [str(v).strip() for v in row]
-                if not any(vals):
-                    continue
-                sku = vals[0] if len(vals) > 0 and vals[0] else f"SKU-IMP-{idx:03d}"
-                name = vals[1] if len(vals) > 1 and vals[1] else f"สินค้าจากไฟล์ #{idx}"
-                cat = vals[2] if len(vals) > 2 and vals[2] else "software"
+            sku_col = next((c for c in df.columns if any(k in c for k in ["sku", "code", "รหัส"])), None)
+            name_col = next((c for c in df.columns if any(k in c for k in ["product_name", "name_product", "item_name", "name_item", "ชื่อสินค้า", "ชื่อ", "name"])), None)
+            cat_col = next((c for c in df.columns if any(k in c for k in ["category", "หมวด", "ประเภท", "dept", "group"])), None)
+            price_col = next((c for c in df.columns if any(k in c for k in ["price", "amount", "ราคา", "ยอด"])), None)
+            stock_col = next((c for c in df.columns if any(k in c for k in ["stock", "qty", "quantity", "คงเหลือ", "สต็อก", "remain"])), None)
+
+            for idx, row in enumerate(df.to_dict(orient="records"), start=1):
+                sku = str(row.get(sku_col) or f"SKU-IMP-{idx:03d}").strip() if sku_col else f"SKU-IMP-{idx:03d}"
+                name = str(row.get(name_col) or f"สินค้าจากไฟล์ #{idx}").strip() if name_col else f"สินค้าจากไฟล์ #{idx}"
+                cat = str(row.get(cat_col) or "general").strip() if cat_col else "general"
                 try:
-                    price = float(str(vals[3]).replace(",", "").replace("฿", "").strip()) if len(vals) > 3 and vals[3] else 0.0
+                    price = float(str(row.get(price_col) or 0).replace(",", "").replace("฿", "").strip()) if price_col else 0.0
                 except ValueError:
                     price = 0.0
                 try:
-                    stock = int(float(str(vals[4]).replace(",", "").strip())) if len(vals) > 4 and vals[4] else 0
+                    stock = int(float(str(row.get(stock_col) or 0).replace(",", "").strip())) if stock_col else 0
                 except ValueError:
                     stock = 0
                 records.append(

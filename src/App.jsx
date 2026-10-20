@@ -13328,19 +13328,75 @@ function App() {
         ];
       }
 
-      // 3. Intelligent Column Header Identification (English & Thai support)
-      const lowerHeaders = detectedHeaders.map(h => String(h || '').trim().toLowerCase());
-      const findCol = regex => lowerHeaders.findIndex(h => regex.test(h));
+      // 3. Intelligent Column Header Identification with Precise Hierarchy (English & Thai support)
+      // Handles: name=ชื่อ (prefix, suffix, standalone), Custummer_name / Customer_name = ชื่อลูกค้า
+      const cleanHeaderStrs = detectedHeaders.map(h =>
+        String(h || '').trim().toLowerCase().replace(/[\s_-]+/g, '_')
+      );
+      const findCol = regex => cleanHeaderStrs.findIndex(h => regex.test(h));
 
+      // 1. Precise Customer Name Resolver (Handles 'Custummer_name', 'Customer_name', 'name_customer', 'ชื่อลูกค้า', etc.)
+      let colCustomerIdx = cleanHeaderStrs.findIndex(h =>
+        /^(?:cust[ou]?m+er|client|buyer|member|user)[_]name$/i.test(h) ||
+        /^name[_](?:cust[ou]?m+er|client|buyer|member|user)$/i.test(h) ||
+        /^(?:cust[ou]?m+er_name|name_cust[ou]?m+er|client_name|name_client|buyer_name|name_buyer|member_name|name_member|ชื่อลูกค้า|ลูกค้า_ชื่อ|ชื่อ_ลูกค้า|ชื่อผู้ซื้อ|ชื่อสมาชิก)$/i.test(h)
+      );
+
+      // If not found by exact compound name, look for customer keywords
+      if (colCustomerIdx < 0) {
+        colCustomerIdx = cleanHeaderStrs.findIndex(h =>
+          /cust[ou]?m+er|client|buyer|member|ลูกค้า|ผู้ซื้อ|สมาชิก/i.test(h)
+        );
+      }
+
+      // 2. Precise Product / Item Name Resolver
+      // Handles 'product_name', 'name_product', 'item_name', 'name_item', 'ชื่อสินค้า', 'สินค้า_ชื่อ'
+      let colProductIdx = cleanHeaderStrs.findIndex(h =>
+        /^(?:product|item|sku|goods|merchandise)[_]name$/i.test(h) ||
+        /^name[_](?:product|item|sku|goods|merchandise)$/i.test(h) ||
+        /^(?:product_name|name_product|item_name|name_item|sku_name|name_sku|ชื่อสินค้า|สินค้า_ชื่อ|ชื่อรายการ|รายการ_ชื่อ)$/i.test(h)
+      );
+
+      // If not found by exact compound product name, look for standard product/item keywords
+      if (colProductIdx < 0) {
+        colProductIdx = cleanHeaderStrs.findIndex((h, idx) =>
+          idx !== colCustomerIdx && /product|item|sku|goods|merchandise|สินค้า|รายการ|รหัสสินค้า|ชื่อสินค้า/i.test(h)
+        );
+      }
+
+      // 3. Standalone 'name' or 'ชื่อ' Resolver (prefix, suffix, or standalone: 'name', 'ชื่อ', '*_name', 'name_*')
+      // Rule: name=ชื่อ ไม่ว่าจะอยู่ข้างหน้าหรือข้างหลัง
+      const standaloneNameIdx = cleanHeaderStrs.findIndex((h, idx) =>
+        idx !== colCustomerIdx &&
+        (h === 'name' || h === 'ชื่อ' || h === 'title' || /_name$|^name_|_ชื่อ$|^ชื่อ_/.test(h))
+      );
+
+      // If there's a standalone 'name' or 'ชื่อ':
+      if (standaloneNameIdx >= 0) {
+        if (colProductIdx < 0) {
+          colProductIdx = standaloneNameIdx;
+        } else if (colCustomerIdx < 0) {
+          colCustomerIdx = standaloneNameIdx;
+        }
+      }
+
+      // Standard Column resolvers for remaining business dimensions
       const colDateIdx = findCol(/date|time|timestamp|created|วันที่|เวลา|งวด|วันเวลา/i);
-      const colChannelIdx = findCol(/branch|store|channel|platform|source|outlet|location|สาขา|ช่องทาง|หน้าร้าน|จุดขาย/i);
-      const colCustomerIdx = findCol(/customer|client|buyer|user|name|member|contact|ชื่อ|ลูกค้า|ผู้ซื้อ|สมาชิก/i);
-      const colProductIdx = findCol(/product|item|sku|title|desc|goods|merchandise|สินค้า|รายการ|รหัสสินค้า|ชื่อสินค้า/i);
+      const colChannelIdx = cleanHeaderStrs.findIndex((h, idx) =>
+        idx !== colCustomerIdx && idx !== colProductIdx &&
+        /branch|store|channel|platform|source|outlet|location|สาขา|ช่องทาง|หน้าร้าน|จุดขาย/i.test(h)
+      );
       const colAmountIdx = findCol(/amount|price|revenue|sales|total|paid|net|value|ยอด|ราคา|จำนวนเงิน|สุทธิ|ยอดขาย|ยอดรวม/i);
       const colQtyIdx = findCol(/qty|quantity|units|count|items|จำนวน|ชิ้น|ออเดอร์|ปริมาณ/i);
       const colStatusIdx = findCol(/status|state|สถานะ|ชำระ/i);
-      const colStaffIdx = findCol(/staff|cashier|employee|seller|waiter|rep|พนักงาน|แคชเชียร์|ผู้ขาย|พนักงานขาย/i);
-      const colCategoryIdx = findCol(/category|group|type|dept|หมวด|ประเภท|กลุ่มสินค้า/i);
+      const colStaffIdx = cleanHeaderStrs.findIndex((h, idx) =>
+        idx !== colCustomerIdx && idx !== colProductIdx &&
+        /staff|cashier|employee|seller|waiter|rep|พนักงาน|แคชเชียร์|ผู้ขาย|พนักงานขาย/i.test(h)
+      );
+      const colCategoryIdx = cleanHeaderStrs.findIndex((h, idx) =>
+        idx !== colCustomerIdx && idx !== colProductIdx &&
+        /category|group|type|dept|หมวด|ประเภท|กลุ่มสินค้า/i.test(h)
+      );
       const colStockIdx = findCol(/stock|inventory|remain|onhand|balance|สต็อก|คงเหลือ/i);
       const colCostIdx = findCol(/cost|cogs|buyprice|ราคาทุน|ต้นทุน/i);
 
@@ -13348,10 +13404,25 @@ function App() {
       const columnMappingDetails = detectedHeaders.map((headerName, idx) => {
         let roleTh = 'ข้อมูลทั่วไป';
         let roleEn = 'General Attribute';
-        if (idx === colDateIdx) { roleTh = '📅 วันที่และเวลา'; roleEn = '📅 Date / Time'; }
+        const cleanH = String(headerName || '').trim().toLowerCase();
+
+        if (idx === colCustomerIdx) {
+          roleTh = '👤 ชื่อลูกค้า (Customer Name)';
+          roleEn = '👤 Customer Name';
+        } else if (idx === colProductIdx) {
+          if (/cust[ou]?m+er|client|buyer/i.test(cleanH)) {
+            roleTh = '👤 ชื่อลูกค้า (Customer Name)';
+            roleEn = '👤 Customer Name';
+          } else if (cleanH === 'name' || cleanH === 'ชื่อ' || cleanH.includes('name') || cleanH.includes('ชื่อ')) {
+            roleTh = '🛍️ ชื่อสินค้า / รายการ (Name)';
+            roleEn = '🛍️ Product / Item Name';
+          } else {
+            roleTh = '🛍️ รายการสินค้า / SKU';
+            roleEn = '🛍️ Product / SKU';
+          }
+        }
+        else if (idx === colDateIdx) { roleTh = '📅 วันที่และเวลา'; roleEn = '📅 Date / Time'; }
         else if (idx === colChannelIdx) { roleTh = '🏢 สาขา / ช่องทางจำหน่าย'; roleEn = '🏢 Branch / Channel'; }
-        else if (idx === colCustomerIdx) { roleTh = '👤 ลูกค้า / ผู้ซื้อ'; roleEn = '👤 Customer / Client'; }
-        else if (idx === colProductIdx) { roleTh = '🛍️ รายการสินค้า / SKU'; roleEn = '🛍️ Product / SKU'; }
         else if (idx === colAmountIdx) { roleTh = '💰 ยอดเงินรายได้ (บาท)'; roleEn = '💰 Revenue / Amount'; }
         else if (idx === colQtyIdx) { roleTh = '📦 จำนวนชิ้น / หน่วย'; roleEn = '📦 Quantity / Units'; }
         else if (idx === colStatusIdx) { roleTh = '⚡ สถานะรายการ'; roleEn = '⚡ Transaction Status'; }

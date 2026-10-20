@@ -17,7 +17,7 @@ export function classifyUploadedFile(fileName = '', detectedHeaders = [], firstF
   const inventoryKeywords = ['sku', 'stock', 'inventory', 'สต็อก', 'คงเหลือ', 'สินค้าคงคลัง', 'จำนวนชิ้น', 'ต้นทุน', 'จุดสั่งซื้อ', 'reorder', 'warehouse', 'คลังสินค้า', 'บาร์โค้ด', 'barcode'];
   const inventoryMatches = inventoryKeywords.filter(k => allText.includes(k)).length;
 
-  const customerKeywords = ['customer', 'client', 'phone', 'tel', 'เบอร์โทร', 'line', 'rfm', 'ยอดซื้อสะสม', 'ลูกค้า', 'ผู้ซื้อ', 'สมาชิก', 'member', 'churn', 'at_risk', 'loyalty'];
+  const customerKeywords = ['customer', 'custummer', 'custumer', 'customer_name', 'custummer_name', 'ชื่อลูกค้า', 'client', 'phone', 'tel', 'เบอร์โทร', 'line', 'rfm', 'ยอดซื้อสะสม', 'ลูกค้า', 'ผู้ซื้อ', 'สมาชิก', 'member', 'churn', 'at_risk', 'loyalty'];
   const customerMatches = customerKeywords.filter(k => allText.includes(k)).length;
 
   const staffPosKeywords = ['cashier', 'staff', 'employee', 'พนักงาน', 'void', 'ยกเลิกบิล', 'pos', 'เครื่องคิดเงิน', 'ลิ้นชัก', 'กะ', 'shift', 'แคชเชียร์', 'เคาน์เตอร์'];
