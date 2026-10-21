@@ -83,19 +83,19 @@ export default function ExecutiveBiStudio({
   // 2. Multi-Dimension Normalization & Data Extraction
   // -------------------------------------------------------------
   const normalizedRecords = useMemo(() => {
-    return (dbRecords && dbRecords.length > 0 ? dbRecords : []).map((rec, idx) => {
+    return (Array.isArray(dbRecords) ? dbRecords.filter(Boolean) : []).map((rec, idx) => {
       const channelStr =
-        (typeof rec.th?.channel === 'string' && rec.th.channel) ||
-        (typeof rec.channel === 'string' && rec.channel) ||
+        (typeof rec?.th?.channel === 'string' && rec.th.channel) ||
+        (typeof rec?.channel === 'string' && rec.channel) ||
         (idx % 4 === 0 ? 'สำนักงาน/สาขาหลัก' : idx % 4 === 1 ? 'ช่องทางออนไลน์หลัก' : idx % 4 === 2 ? 'ระบบพันธมิตรจัดจำหน่าย' : 'ช่องทางบริการโดยตรง');
 
       const productStr =
-        (typeof rec.th?.product === 'string' && rec.th.product) ||
-        (typeof rec.product === 'string' && rec.product) ||
+        (typeof rec?.th?.product === 'string' && rec.th.product) ||
+        (typeof rec?.product === 'string' && rec.product) ||
         (idx % 3 === 0 ? 'สินค้าและบริการหลัก A' : idx % 3 === 1 ? 'สินค้าและบริการ B' : 'โซลูชันสนับสนุน C');
 
       // 1. Dynamic Category: prioritize record category, then fallback to intelligent heuristic
-      let category = rec.category || rec.th?.category || rec.en?.category;
+      let category = rec?.category || rec?.th?.category || rec?.en?.category;
       let categoryEn = category;
       if (!category) {
         if (productStr.includes('ชา') || productStr.includes('กาแฟ') || productStr.includes('อาหาร') || productStr.includes('เครื่องดื่ม') || productStr.includes('ขนม')) {

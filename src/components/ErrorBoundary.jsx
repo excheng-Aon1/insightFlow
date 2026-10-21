@@ -8,11 +8,23 @@ import React from 'react';
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
+    this.state = { hasError: false, error: null, errorInfo: null, prevResetKey: props.resetKey };
   }
 
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.resetKey !== undefined && props.resetKey !== state.prevResetKey) {
+      return {
+        hasError: false,
+        error: null,
+        errorInfo: null,
+        prevResetKey: props.resetKey
+      };
+    }
+    return null;
   }
 
   componentDidCatch(error, errorInfo) {

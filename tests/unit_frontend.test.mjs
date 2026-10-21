@@ -456,5 +456,33 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 19. TAB RESILIENCE & ERROR BOUNDARY ACTIVE TAB ISOLATION
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-19: ErrorBoundary isolates active tab and tab components have safe fallback defaults', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // Verify ErrorBoundary uses key={activeTab} to prevent error propagation across tabs
+    assert.ok(
+      appContent.includes('<ErrorBoundary key={activeTab}') || appContent.includes('key={activeTab} resetKey={activeTab}'),
+      'App.jsx must isolate ErrorBoundary with key={activeTab}'
+    );
+
+    // Verify MultiChannelTab receives dbRecords and inventoryList
+    assert.ok(
+      appContent.includes('dbRecords={dbRecords}') && appContent.includes('inventoryList={inventoryList}'),
+      'App.jsx must pass dbRecords and inventoryList to MultiChannelTab'
+    );
+
+    // Verify ErrorBoundary handles resetKey to clear errors on prop changes
+    const ebPath = path.join(projectRoot, 'src', 'components', 'ErrorBoundary.jsx');
+    const ebContent = fs.readFileSync(ebPath, 'utf8');
+    assert.ok(
+      ebContent.includes('resetKey') && (ebContent.includes('getDerivedStateFromProps') || ebContent.includes('componentDidUpdate')),
+      'ErrorBoundary.jsx must clear error state when resetKey changes'
+    );
+  });
+
 });
 

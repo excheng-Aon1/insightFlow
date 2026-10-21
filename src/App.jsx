@@ -3005,28 +3005,33 @@ export function AnimatedSolutionsShowcase({ lang = 'th', t, onLaunchSolution }) 
 export function OverviewTab({
   lang,
   theme,
-  currentRevenueVal,
-  setCurrentRevenueVal,
-  targetRevenueVal,
-  setTargetRevenueVal,
-  targetTimelineVal,
-  setTargetTimelineVal,
-  clientGoalType,
-  setClientGoalType,
-  targetCategory,
-  setTargetCategory,
-  isPlanActive,
-  isGeneratingPlan,
-  handleDeployGoalPlan,
-  handleExportGoalPlan,
-  setActiveTab,
-  lineChartOptions,
-  barChartOptions,
+  currentRevenueVal = 0,
+  setCurrentRevenueVal = () => {},
+  targetRevenueVal = 0,
+  setTargetRevenueVal = () => {},
+  targetTimelineVal = '90',
+  setTargetTimelineVal = () => {},
+  clientGoalType = 'revenue',
+  setClientGoalType = () => {},
+  targetCategory = 'ecommerce',
+  setTargetCategory = () => {},
+  isPlanActive = false,
+  isGeneratingPlan = false,
+  handleDeployGoalPlan = () => {},
+  handleExportGoalPlan = () => {},
+  setActiveTab = () => {},
+  lineChartOptions = {},
+  barChartOptions = {},
   customersList = [],
   dbRecords = []
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
+
+  const curRevNum = Number(currentRevenueVal) || 0;
+  const targetRevNum = Number(targetRevenueVal) || 0;
+  const safeCustomers = Array.isArray(customersList) ? customersList.filter(Boolean) : [];
+  const safeDbRecords = Array.isArray(dbRecords) ? dbRecords.filter(Boolean) : [];
 
   const [newSaleAmount, setNewSaleAmount] = useState('');
   const [newSaleNote, setNewSaleNote] = useState('');
@@ -3047,21 +3052,21 @@ export function OverviewTab({
 
   // Derive recent recorded sales dynamically from the latest uploaded file
   const displayedRecentSales = useMemo(() => {
-    if (Array.isArray(dbRecords) && dbRecords.length > 0) {
-      return dbRecords.slice(0, 5).map((r, idx) => ({
-        id: r.id || `SL-${idx + 101}`,
-        time: r.date || tx('จากไฟล์ล่าสุด', 'Latest file'),
-        amount: r.amount || 0,
-        note: `${r.th?.product || r.product || tx('สินค้าจากไฟล์', 'Product from file')} (${r.th?.channel || r.channel || tx('ร้านค้า', 'Store')})`
+    if (safeDbRecords.length > 0) {
+      return safeDbRecords.slice(0, 5).map((r, idx) => ({
+        id: r?.id || `SL-${idx + 101}`,
+        time: r?.date || tx('จากไฟล์ล่าสุด', 'Latest file'),
+        amount: Number(r?.amount) || 0,
+        note: `${r?.th?.product || r?.product || tx('สินค้าจากไฟล์', 'Product from file')} (${r?.th?.channel || r?.channel || tx('ร้านค้า', 'Store')})`
       }));
     }
     return recentRecordedSales;
-  }, [dbRecords, recentRecordedSales, tx]);
+  }, [safeDbRecords, recentRecordedSales, tx]);
 
-  const gap = Math.max(0, targetRevenueVal - currentRevenueVal);
+  const gap = Math.max(0, targetRevNum - curRevNum);
   const days = Math.max(1, parseInt(targetTimelineVal, 10) || 90);
   const dailyRequired = Math.round(gap / days);
-  const progressPct = Math.min(100, Math.round((currentRevenueVal / Math.max(1, targetRevenueVal)) * 100));
+  const progressPct = Math.min(100, Math.round((curRevNum / Math.max(1, targetRevNum)) * 100));
 
   const handleAddQuickSale = (amountVal, customLabel) => {
     const amt = Number(amountVal);
@@ -3476,7 +3481,7 @@ export function OverviewTab({
             </LuxuryIconBadge>
           </div>
           <h3 className={`text-3xl font-black font-mono ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-            ฿ {currentRevenueVal.toLocaleString()}
+            ฿ {curRevNum.toLocaleString()}
           </h3>
           <p className="text-xs text-emerald-400 mt-1 font-bold">
             {tx(`↗ คิดเป็น ${progressPct}% ของเป้าหมายที่ตั้งไว้`, `↗ ${progressPct}% of your target goal`)}
@@ -3494,7 +3499,7 @@ export function OverviewTab({
             </LuxuryIconBadge>
           </div>
           <h3 className={`text-3xl font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-            {customersList.length.toLocaleString()} <span className="text-sm font-normal text-slate-400">{tx('ราย', 'buyers')}</span>
+            {safeCustomers.length.toLocaleString()} <span className="text-sm font-normal text-slate-400">{tx('ราย', 'buyers')}</span>
           </h3>
           <p className="text-xs text-amber-300 mt-1 font-bold">
             {tx('👉 คลิกเพื่อดูรายชื่อลูกค้าประจำ & คนหาย', '👉 Click to view VIP & inactive customers')}
@@ -3512,7 +3517,7 @@ export function OverviewTab({
             </LuxuryIconBadge>
           </div>
           <h3 className="text-3xl font-black text-sky-400">
-            ฿ {currentRevenueVal > 0 && dbRecords.length > 0 ? Math.round(currentRevenueVal / dbRecords.length).toLocaleString() : 0}
+            ฿ {curRevNum > 0 && safeDbRecords.length > 0 ? Math.round(curRevNum / safeDbRecords.length).toLocaleString() : 0}
           </h3>
           <p className="text-xs text-rose-300 mt-1 font-bold">
             {tx('👉 คลิกเพื่อดูผลงานพนักงาน & บิลที่ถูกยกเลิก', '👉 Click to inspect staff & cancelled bills')}
@@ -3620,11 +3625,13 @@ export function OverviewTab({
 export function CustomersTab({
   lang,
   theme,
-  customersList,
-  setCustomersList
+  customersList = [],
+  setCustomersList = () => {}
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
+
+  const safeCustomers = Array.isArray(customersList) ? customersList.filter(Boolean) : [];
 
   const [selectedRfmSegment, setSelectedRfmSegment] = useState('all');
   const [customerSearch, setCustomerSearch] = useState('');
@@ -3734,9 +3741,9 @@ export function CustomersTab({
     const headers = isEn
       ? ['Customer ID,Customer Name,Group,Last Purchase,Total Orders,Lifetime Value (THB),Phone,Chat ID,Favorite Product']
       : ['รหัสลูกค้า,ชื่อลูกค้า,กลุ่มลูกค้า,ซื้อครั้งล่าสุด,จำนวนครั้งที่ซื้อ,ยอดซื้อสะสมรวม (บาท),เบอร์โทรศัพท์,ไอดีแชต,สินค้าที่ชอบซื้อ'];
-    const rows = customersList.map(c => {
-      const loc = isEn ? c.en : c.th;
-      return `"${c.id}","${loc.name}","${loc.segmentLabel}","${loc.recencyText}",${c.frequency},${c.ltv},"${c.phone}","${c.lineId}","${loc.favoriteProduct}"`;
+    const rows = safeCustomers.map(c => {
+      const loc = (isEn ? c?.en : c?.th) || c || {};
+      return `"${c?.id || ''}","${loc.name || c?.name || ''}","${loc.segmentLabel || ''}","${loc.recencyText || ''}",${Number(c?.frequency) || 0},${Number(c?.ltv) || 0},"${c?.phone || ''}","${c?.lineId || ''}","${loc.favoriteProduct || ''}"`;
     });
     const csvContent = "\uFEFF" + [headers, ...rows].join("\n");
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -3750,25 +3757,30 @@ export function CustomersTab({
     toast.success(tx('📥 ดาวน์โหลดไฟล์ตารางข้อมูลลูกค้า (.csv) สำเร็จ!', '📥 Downloaded Customer Analysis Report (.csv)!'));
   };
 
-  const filteredCustomers = customersList.filter(c => {
-    const loc = isEn ? c.en : c.th;
-    const matchSegment = selectedRfmSegment === 'all' || c.segment === selectedRfmSegment;
+  const filteredCustomers = safeCustomers.filter(c => {
+    const loc = (isEn ? c?.en : c?.th) || c || {};
+    const matchSegment = selectedRfmSegment === 'all' || c?.segment === selectedRfmSegment;
     const q = customerSearch.trim().toLowerCase();
+    const nameStr = String(loc.name || c?.name || '').toLowerCase();
+    const idStr = String(c?.id || '').toLowerCase();
+    const phoneStr = String(c?.phone || '').toLowerCase();
+    const lineIdStr = String(c?.lineId || '').toLowerCase();
+    const favStr = String(loc.favoriteProduct || c?.favoriteProduct || '').toLowerCase();
     const matchSearch =
       !q ||
-      loc.name.toLowerCase().includes(q) ||
-      c.id.toLowerCase().includes(q) ||
-      c.phone.toLowerCase().includes(q) ||
-      c.lineId.toLowerCase().includes(q) ||
-      loc.favoriteProduct.toLowerCase().includes(q);
+      nameStr.includes(q) ||
+      idStr.includes(q) ||
+      phoneStr.includes(q) ||
+      lineIdStr.includes(q) ||
+      favStr.includes(q);
     return matchSegment && matchSearch;
   });
 
-  const selectedCustomerProfile = customersList.find(c => c.id === selectedCustomerId) || null;
+  const selectedCustomerProfile = safeCustomers.find(c => c?.id === selectedCustomerId) || null;
 
-  const countBySeg = (seg) => customersList.filter(c => c.segment === seg).length;
-  const totalLtvAll = customersList.reduce((acc, c) => acc + c.ltv, 0);
-  const avgLtv = Math.round(totalLtvAll / Math.max(1, customersList.length));
+  const countBySeg = (seg) => safeCustomers.filter(c => c?.segment === seg).length;
+  const totalLtvAll = safeCustomers.reduce((acc, c) => acc + (Number(c?.ltv) || 0), 0);
+  const avgLtv = Math.round(totalLtvAll / Math.max(1, safeCustomers.length));
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
@@ -4162,40 +4174,43 @@ export function CustomersTab({
 
 export function StaffPosTab({
   lang,
-  staffList,
-  setStaffList,
-  auditLogs,
-  setAuditLogs,
-  renderUploadZone,
-  barChartOptions
+  staffList = [],
+  setStaffList = () => {},
+  auditLogs = [],
+  setAuditLogs = () => {},
+  renderUploadZone = null,
+  barChartOptions = {}
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
+
+  const safeStaff = Array.isArray(staffList) ? staffList.filter(Boolean) : [];
+  const safeAuditLogs = Array.isArray(auditLogs) ? auditLogs.filter(Boolean) : [];
 
   const [staffBranchFilter, setStaffBranchFilter] = useState('all');
   const [auditFilterType, setAuditFilterType] = useState('all');
   const [selectedStaffForCoaching, setSelectedStaffForCoaching] = useState(null);
   const [showRecordPosModal, setShowRecordPosModal] = useState(false);
-  const [posFormStaffId, setPosFormStaffId] = useState(staffList[0]?.id || 'STF-101');
+  const [posFormStaffId, setPosFormStaffId] = useState(safeStaff[0]?.id || 'STF-101');
   const [posFormAmount, setPosFormAmount] = useState('2500');
   const [posFormUpsell, setPosFormUpsell] = useState(true);
 
-  const filteredStaff = staffList.filter(s => {
+  const filteredStaff = safeStaff.filter(s => {
     if (staffBranchFilter === 'all') return true;
-    return s.branchId === staffBranchFilter;
+    return s?.branchId === staffBranchFilter;
   });
 
-  const filteredAuditLogs = auditLogs.filter(log => {
+  const filteredAuditLogs = safeAuditLogs.filter(log => {
     if (auditFilterType === 'all') return true;
-    if (auditFilterType === 'unresolved') return !log.resolved;
-    return log.eventType === auditFilterType;
+    if (auditFilterType === 'unresolved') return !log?.resolved;
+    return log?.eventType === auditFilterType;
   });
 
-  const totalPosSales = filteredStaff.reduce((acc, s) => acc + s.totalSales, 0);
-  const totalPosBills = filteredStaff.reduce((acc, s) => acc + s.billsCount, 0);
+  const totalPosSales = filteredStaff.reduce((acc, s) => acc + (Number(s?.totalSales) || 0), 0);
+  const totalPosBills = filteredStaff.reduce((acc, s) => acc + (Number(s?.billsCount) || 0), 0);
   const avgBasketSize = totalPosBills > 0 ? Math.round(totalPosSales / totalPosBills) : 0;
-  const totalUpsellRev = filteredStaff.reduce((acc, s) => acc + s.upsellRevenue, 0);
-  const unresolvedCount = auditLogs.filter(l => !l.resolved).length;
+  const totalUpsellRev = filteredStaff.reduce((acc, s) => acc + (Number(s?.upsellRevenue) || 0), 0);
+  const unresolvedCount = safeAuditLogs.filter(l => !l?.resolved).length;
 
   const handleRecordStaffSale = e => {
     e.preventDefault();
@@ -4885,32 +4900,41 @@ export function StaffPosTab({
 
 export function MultiChannelTab({
   lang,
-  branchesList,
-  setBranchesList,
-  channelsList,
-  anomaliesList,
-  setAnomaliesList,
-  lineNotifyEnabled,
-  setLineNotifyEnabled,
-  lineNotifyTime,
-  setLineNotifyTime,
+  branchesList = [],
+  setBranchesList = () => {},
+  channelsList = [],
+  anomaliesList = [],
+  setAnomaliesList = () => {},
+  lineNotifyEnabled = true,
+  setLineNotifyEnabled = () => {},
+  lineNotifyTime = '22:00',
+  setLineNotifyTime = () => {},
   userPhone = '089-999-8888',
   userLineId = '@insightflow.vip',
-  onUpdateUserContact,
-  renderUploadZone,
-  barChartOptions
+  onUpdateUserContact = () => {},
+  renderUploadZone = null,
+  barChartOptions = {},
+  dbRecords = [],
+  inventoryList = []
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
   const [showLinePreview, setShowLinePreview] = useState(true);
 
-  const offlineChannels = channelsList.filter(c => c.type === 'offline');
-  const onlineChannels = channelsList.filter(c => c.type === 'online');
+  const safeChannels = Array.isArray(channelsList) ? channelsList.filter(Boolean) : [];
+  const safeBranches = Array.isArray(branchesList) ? branchesList.filter(Boolean) : [];
+  const safeDbRecords = Array.isArray(dbRecords) ? dbRecords.filter(Boolean) : [];
+  const lowStockItems = Array.isArray(inventoryList)
+    ? inventoryList.filter(i => i?.status === 'low_stock' || i?.status === 'out_of_stock' || (Number(i?.stock) || 0) <= 10)
+    : [];
 
-  const offlineRev = offlineChannels.reduce((acc, c) => acc + c.revenue, 0);
-  const onlineRev = onlineChannels.reduce((acc, c) => acc + c.revenue, 0);
-  const offlineProfit = offlineChannels.reduce((acc, c) => acc + c.netProfit, 0);
-  const onlineProfit = onlineChannels.reduce((acc, c) => acc + c.netProfit, 0);
+  const offlineChannels = safeChannels.filter(c => c?.type === 'offline');
+  const onlineChannels = safeChannels.filter(c => c?.type === 'online');
+
+  const offlineRev = offlineChannels.reduce((acc, c) => acc + (Number(c?.revenue) || 0), 0);
+  const onlineRev = onlineChannels.reduce((acc, c) => acc + (Number(c?.revenue) || 0), 0);
+  const offlineProfit = offlineChannels.reduce((acc, c) => acc + (Number(c?.netProfit) || 0), 0);
+  const onlineProfit = onlineChannels.reduce((acc, c) => acc + (Number(c?.netProfit) || 0), 0);
 
   const handleTransferDeadStock = branchId => {
     setBranchesList(prev =>
@@ -5716,15 +5740,18 @@ export function MultiChannelTab({
 
 export function InventoryTab({
   lang,
-  inventoryList,
-  setInventoryList,
-  renderUploadZone,
+  inventoryList = [],
+  setInventoryList = () => {},
+  renderUploadZone = null,
   dbRecords = [],
   pageUploadedFiles = {},
-  setActiveTab
+  setActiveTab = () => {}
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
+
+  const safeInventory = Array.isArray(inventoryList) ? inventoryList.filter(Boolean) : [];
+  const safeDbRecords = Array.isArray(dbRecords) ? dbRecords.filter(Boolean) : [];
 
   const [invFilter, setInvFilter] = useState('all');
   const [invSearch, setInvSearch] = useState('');
@@ -5739,21 +5766,19 @@ export function InventoryTab({
   // Calculate real daily run rate from dbRecords
   const dbSalesVelocity = useMemo(() => {
     const velocity = {};
-    if (Array.isArray(dbRecords)) {
-      dbRecords.forEach(r => {
-        const p = r.th?.product || r.en?.product;
-        if (p) velocity[p] = (velocity[p] || 0) + (Number(r.itemsCount) || 1);
-      });
-    }
+    safeDbRecords.forEach(r => {
+      const p = r?.th?.product || r?.en?.product || r?.product;
+      if (p) velocity[p] = (velocity[p] || 0) + (Number(r?.itemsCount) || 1);
+    });
     return velocity;
-  }, [dbRecords]);
+  }, [safeDbRecords]);
 
   // Compute reorder items for InventoryTab
   const reorderAnalysis = useMemo(() => {
-    return inventoryList.map((item, idx) => {
-      const info = item[isEn ? 'en' : 'th'] || {};
-      const stock = Number(item.stock) || 0;
-      const soldUnits = dbSalesVelocity[info.name] || item.soldUnits || 0;
+    return safeInventory.map((item, idx) => {
+      const info = (isEn ? item?.en : item?.th) || item || {};
+      const stock = Number(item?.stock) || 0;
+      const soldUnits = dbSalesVelocity[info.name] || item?.soldUnits || 0;
       const runRatePerDay = soldUnits > 0
         ? Math.max(0.5, Math.round((soldUnits / 30) * 10) / 10)
         : Math.max(1.0, Math.round((stock > 0 ? stock / 18 : 6) * 10) / 10);
@@ -6383,31 +6408,31 @@ const moduleMetaMap = {
 export function InsightsTab({
   lang,
   theme = 'dark',
-  bizProfile,
-  setBizProfile,
-  aiChatMessages,
-  setAiChatMessages,
-  aiQuestionInput,
-  setAiQuestionInput,
-  isAiThinking,
-  handleAskBusinessAi,
-  handleRetrainBusinessAi,
-  isTrainingAi,
-  chatEndRef,
-  renderUploadZone,
-  lineChartOptions,
+  bizProfile = {},
+  setBizProfile = () => {},
+  aiChatMessages = [],
+  setAiChatMessages = () => {},
+  aiQuestionInput = '',
+  setAiQuestionInput = () => {},
+  isAiThinking = false,
+  handleAskBusinessAi = () => {},
+  handleRetrainBusinessAi = () => {},
+  isTrainingAi = false,
+  chatEndRef = null,
+  renderUploadZone = null,
+  lineChartOptions = {},
   currentRevenueVal = 0,
   targetRevenueVal = 0,
-  setTargetRevenueVal,
+  setTargetRevenueVal = () => {},
   targetTimelineVal = '90',
-  setTargetTimelineVal,
+  setTargetTimelineVal = () => {},
   customersList = [],
   inventoryList = [],
-  setInventoryList,
+  setInventoryList = () => {},
   auditLogs = [],
   vendorsList = [],
   centralPosList = [],
-  setActiveTab,
+  setActiveTab = () => {},
   pageUploadedFiles = {},
   initialPageUploadedFiles = {},
   uploadedFileMeta = null,
@@ -7819,35 +7844,35 @@ export function InsightsTab({
             paddingRight: '0.4rem'
           }}
         >
-          {aiChatMessages.map(msg => (
+          {(aiChatMessages || []).map(msg => (
             <div
-              key={msg.id}
+              key={msg?.id || Math.random()}
               style={{
-                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                alignSelf: msg?.role === 'user' ? 'flex-end' : 'flex-start',
                 maxWidth: '88%',
                 padding: '1rem 1.2rem',
                 borderRadius: '16px',
                 background:
-                  msg.role === 'user'
+                  msg?.role === 'user'
                     ? 'linear-gradient(135deg, #0284c7, #2563eb)'
                     : 'rgba(15, 23, 42, 0.9)',
                 border:
-                  msg.role === 'user'
+                  msg?.role === 'user'
                     ? 'none'
                     : '1px solid rgba(56, 189, 248, 0.35)',
                 color: '#f8fafc'
               }}
             >
-              <div style={{ fontSize: '0.76rem', color: msg.role === 'user' ? '#bae6fd' : '#38bdf8', fontWeight: 800, marginBottom: '0.35rem' }}>
-                {msg.role === 'user'
+              <div style={{ fontSize: '0.76rem', color: msg?.role === 'user' ? '#bae6fd' : '#38bdf8', fontWeight: 800, marginBottom: '0.35rem' }}>
+                {msg?.role === 'user'
                   ? tx('👤 คำถามจากคุณ', '👤 Your Question')
                   : tx('🤖 ระบบวิเคราะห์ข้อมูลด้วย AI อัจฉริยะ', '🤖 InsightFlow AI Data Analyst')}{' '}
-                • {msg.timestamp}
+                • {msg?.timestamp || ''}
               </div>
-              <div style={{ whiteSpace: 'pre-line', lineHeight: 1.65, fontSize: '0.95rem' }}>{msg.text}</div>
-              {msg.metrics && msg.metrics.length > 0 && (
+              <div style={{ whiteSpace: 'pre-line', lineHeight: 1.65, fontSize: '0.95rem' }}>{msg?.text || ''}</div>
+              {msg?.metrics && msg.metrics.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.65rem' }}>
-                  {msg.metrics.map((m, i) => (
+                  {(msg.metrics || []).map((m, i) => (
                     <span
                       key={i}
                       style={{
@@ -7960,13 +7985,14 @@ export function InsightsTab({
 
 export function LiveTab({
   lang,
-  currentRevenueVal,
-  setCurrentRevenueVal,
-  dbRecords,
-  setDbRecords
+  currentRevenueVal = 0,
+  setCurrentRevenueVal = () => {},
+  dbRecords = [],
+  setDbRecords = () => {}
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
+  const curRevNum = Number(currentRevenueVal) || 0;
 
   const [streamActive, setStreamActive] = useState(true);
   const [liveFeed, setLiveFeed] = useState([
@@ -8150,7 +8176,7 @@ export function LiveTab({
             </LuxuryIconBadge>
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 900, color: '#34d399', marginTop: '0.35rem' }}>
-            ฿{currentRevenueVal.toLocaleString()}
+            ฿{curRevNum.toLocaleString()}
           </div>
         </div>
         <div className="glass-card" style={{ padding: '1.25rem', borderRadius: '16px', borderLeft: '4px solid #38bdf8' }}>
@@ -8188,10 +8214,10 @@ export function LiveTab({
         </h4>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {liveFeed.map(item => {
-            const info = item[isEn ? 'en' : 'th'];
+            const info = (item && item[isEn ? 'en' : 'th']) || {};
             return (
               <div
-                key={item.id}
+                key={item?.id || Math.random()}
                 style={{
                   padding: '1rem 1.15rem',
                   borderRadius: '14px',
@@ -8206,12 +8232,12 @@ export function LiveTab({
               >
                 <div>
                   <div style={{ fontSize: '0.8rem', color: '#38bdf8', fontWeight: 800 }}>
-                    {item.time} • {info.branch}
+                    {item?.time || ''} • {info.branch || ''}
                   </div>
-                  <div style={{ fontWeight: 800, color: '#f8fafc', marginTop: '0.2rem' }}>{info.detail}</div>
+                  <div style={{ fontWeight: 800, color: '#f8fafc', marginTop: '0.2rem' }}>{info.detail || ''}</div>
                 </div>
                 <div style={{ fontSize: '1.15rem', fontWeight: 900, color: '#34d399' }}>
-                  +฿{item.amount.toLocaleString()}
+                  +฿{(Number(item?.amount) || 0).toLocaleString()}
                 </div>
               </div>
             );
@@ -8224,21 +8250,23 @@ export function LiveTab({
 
 export function DatabaseTab({
   lang,
-  dbRecords,
-  setDbRecords,
+  dbRecords = [],
+  setDbRecords = () => {},
   pageUploadedFiles = {},
-  onInspectUploadedFile,
-  renderUploadZone,
-  onUploadFileForTab,
-  onAddCustomFile,
-  onDeleteUploadedFile,
-  onResetAllFiles,
-  onRestoreDemoFiles,
+  onInspectUploadedFile = () => {},
+  renderUploadZone = null,
+  onUploadFileForTab = () => {},
+  onAddCustomFile = () => {},
+  onDeleteUploadedFile = () => {},
+  onResetAllFiles = () => {},
+  onRestoreDemoFiles = () => {},
   isUploading = false,
   theme = 'dark'
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
+
+  const safeRecords = Array.isArray(dbRecords) ? dbRecords.filter(Boolean) : [];
 
   const [dbSearch, setDbSearch] = useState('');
   const [dbSubTab, setDbSubTab] = useState('pipeline');
@@ -8246,15 +8274,19 @@ export function DatabaseTab({
   const [newProduct, setNewProduct] = useState('');
   const [newAmount, setNewAmount] = useState('');
 
-  const filteredRecords = dbRecords.filter(rec => {
-    const info = rec[isEn ? 'en' : 'th'];
+  const filteredRecords = safeRecords.filter(rec => {
+    const info = (isEn ? rec?.en : rec?.th) || rec || {};
     const q = dbSearch.trim().toLowerCase();
     if (!q) return true;
+    const rId = String(rec?.id || '').toLowerCase();
+    const rCust = String(info.customer || rec?.customer || '').toLowerCase();
+    const rProd = String(info.product || rec?.product || '').toLowerCase();
+    const rChan = String(info.channel || rec?.channel || '').toLowerCase();
     return (
-      rec.id.toLowerCase().includes(q) ||
-      info.customer.toLowerCase().includes(q) ||
-      info.product.toLowerCase().includes(q) ||
-      info.channel.toLowerCase().includes(q)
+      rId.includes(q) ||
+      rCust.includes(q) ||
+      rProd.includes(q) ||
+      rChan.includes(q)
     );
   });
 
@@ -10360,20 +10392,24 @@ export function SettingsTab({
 
 export function ProcurementTab({
   lang,
-  vendorsList,
-  setVendorsList,
-  branchRequisitions,
-  setBranchRequisitions,
-  centralPosList,
-  setCentralPosList,
+  vendorsList = [],
+  setVendorsList = () => {},
+  branchRequisitions = [],
+  setBranchRequisitions = () => {},
+  centralPosList = [],
+  setCentralPosList = () => {},
   inventoryList = [],
-  setInventoryList,
-  setDbRecords,
-  renderUploadZone,
-  barChartOptions
+  setInventoryList = () => {},
+  setDbRecords = () => {},
+  renderUploadZone = null,
+  barChartOptions = {}
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
+
+  const safeVendors = Array.isArray(vendorsList) ? vendorsList.filter(Boolean) : [];
+  const safeReqs = Array.isArray(branchRequisitions) ? branchRequisitions.filter(Boolean) : [];
+  const safePos = Array.isArray(centralPosList) ? centralPosList.filter(Boolean) : [];
 
   const [vendorFilter, setVendorFilter] = useState('all');
   const [vendorSearch, setVendorSearch] = useState('');
@@ -10394,27 +10430,30 @@ export function ProcurementTab({
   const [activePoModal, setActivePoModal] = useState(null);
 
   // Filter vendors for scorecard
-  const filteredVendors = vendorsList.filter(v => {
-    const info = v[isEn ? 'en' : 'th'];
+  const filteredVendors = safeVendors.filter(v => {
+    const info = (isEn ? v?.en : v?.th) || v || {};
     const matchFilter =
       vendorFilter === 'all' ||
-      (vendorFilter === 'excellent' && v.status === 'excellent') ||
-      (vendorFilter === 'watch' && (v.status === 'watch' || v.status === 'risk'));
+      (vendorFilter === 'excellent' && v?.status === 'excellent') ||
+      (vendorFilter === 'watch' && (v?.status === 'watch' || v?.status === 'risk'));
     const q = vendorSearch.trim().toLowerCase();
+    const vId = String(v?.id || '').toLowerCase();
+    const vName = String(info.name || v?.name || '').toLowerCase();
+    const vCat = String(info.category || v?.category || '').toLowerCase();
     const matchSearch =
       !q ||
-      v.id.toLowerCase().includes(q) ||
-      info.name.toLowerCase().includes(q) ||
-      info.category.toLowerCase().includes(q);
+      vId.includes(q) ||
+      vName.includes(q) ||
+      vCat.includes(q);
     return matchFilter && matchSearch;
   });
 
   // Aggregate KPI metrics
   const avgFillRate = (
-    vendorsList.reduce((acc, v) => acc + v.fillRate, 0) / Math.max(1, vendorsList.length)
+    safeVendors.reduce((acc, v) => acc + (Number(v?.fillRate) || 0), 0) / Math.max(1, safeVendors.length)
   ).toFixed(1);
   const avgLeadTime = (
-    vendorsList.reduce((acc, v) => acc + v.leadTimeDays, 0) / Math.max(1, vendorsList.length)
+    safeVendors.reduce((acc, v) => acc + (Number(v?.leadTimeDays) || 0), 0) / Math.max(1, safeVendors.length)
   ).toFixed(1);
   const avgOnTimeRate = (
     vendorsList.reduce((acc, v) => acc + v.onTimeRate, 0) / Math.max(1, vendorsList.length)
@@ -17274,7 +17313,7 @@ function App() {
               </div>
             </div>
           ) : (
-            <ErrorBoundary theme={theme}>
+            <ErrorBoundary key={activeTab} resetKey={activeTab} theme={theme}>
               {/* Active Page Content (Unlocked by Current Subscription Plan) */}
               {activeTab === 'overview' && (
                 <OverviewTab
@@ -17329,6 +17368,7 @@ function App() {
                   setAuditLogs={setAuditLogs}
                   renderUploadZone={renderUploadZone}
                   barChartOptions={barChartOptions}
+                  dbRecords={dbRecords}
                 />
               )}
 
@@ -17349,6 +17389,8 @@ function App() {
                   onUpdateUserContact={handleUpdateUserContact}
                   renderUploadZone={renderUploadZone}
                   barChartOptions={barChartOptions}
+                  dbRecords={dbRecords}
+                  inventoryList={inventoryList}
                 />
               )}
 
@@ -17366,6 +17408,7 @@ function App() {
                   setDbRecords={setDbRecords}
                   renderUploadZone={renderUploadZone}
                   barChartOptions={barChartOptions}
+                  dbRecords={dbRecords}
                 />
               )}
 
