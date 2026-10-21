@@ -10407,9 +10407,15 @@ export function ProcurementTab({
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
 
-  const safeVendors = Array.isArray(vendorsList) ? vendorsList.filter(Boolean) : [];
-  const safeReqs = Array.isArray(branchRequisitions) ? branchRequisitions.filter(Boolean) : [];
-  const safePos = Array.isArray(centralPosList) ? centralPosList.filter(Boolean) : [];
+  const safeVendors = (Array.isArray(vendorsList) && vendorsList.length > 0)
+    ? vendorsList.filter(Boolean)
+    : (Array.isArray(initialVendorsBilingual) ? initialVendorsBilingual : []);
+  const safeReqs = (Array.isArray(branchRequisitions) && branchRequisitions.length > 0)
+    ? branchRequisitions.filter(Boolean)
+    : (Array.isArray(initialBranchRequisitionsBilingual) ? initialBranchRequisitionsBilingual : []);
+  const safePos = (Array.isArray(centralPosList) && centralPosList.length > 0)
+    ? centralPosList.filter(Boolean)
+    : (Array.isArray(initialCentralPosBilingual) ? initialCentralPosBilingual : []);
 
   const [vendorFilter, setVendorFilter] = useState('all');
   const [vendorSearch, setVendorSearch] = useState('');
@@ -10431,7 +10437,7 @@ export function ProcurementTab({
 
   // Filter vendors for scorecard
   const filteredVendors = safeVendors.filter(v => {
-    const info = (isEn ? v?.en : v?.th) || v || {};
+    const info = (isEn ? v?.en : v?.th) || v?.th || v || {};
     const matchFilter =
       vendorFilter === 'all' ||
       (vendorFilter === 'excellent' && v?.status === 'excellent') ||
@@ -10456,39 +10462,48 @@ export function ProcurementTab({
     safeVendors.reduce((acc, v) => acc + (Number(v?.leadTimeDays) || 0), 0) / Math.max(1, safeVendors.length)
   ).toFixed(1);
   const avgOnTimeRate = (
-    vendorsList.reduce((acc, v) => acc + v.onTimeRate, 0) / Math.max(1, vendorsList.length)
+    safeVendors.reduce((acc, v) => acc + (Number(v?.onTimeRate) || 98), 0) / Math.max(1, safeVendors.length)
   ).toFixed(1);
 
   // Calculate active Consolidated PO draft totals (Economy of Scale)
-  const selectedReqs = branchRequisitions.filter(r => r.selected);
-  const draftTotalUnits = selectedReqs.reduce((acc, r) => acc + r.totalQty, 0);
+  const activeReqsSource = safeReqs;
+  const selectedReqs = activeReqsSource.filter(r => r?.selected);
+  const draftTotalUnits = selectedReqs.reduce((acc, r) => acc + (Number(r?.totalQty) || Number(r?.requestedQty) || 0), 0);
   const draftRegularCost = selectedReqs.reduce(
-    (acc, r) => acc + r.totalQty * r.regularUnitCost,
+    (acc, r) => acc + (Number(r?.totalQty) || Number(r?.requestedQty) || 0) * (Number(r?.regularUnitCost) || 0),
     0
   );
   const draftDiscountedCost = selectedReqs.reduce((acc, r) => {
-    const qualifies = r.totalQty >= r.minQtyForTier;
-    const discPct = qualifies ? r.volumeDiscountPct : Math.floor(r.volumeDiscountPct * 0.4);
-    const netUnit = Math.round(r.regularUnitCost * (1 - discPct / 100));
-    return acc + r.totalQty * netUnit;
+    const totalQty = Number(r?.totalQty) || Number(r?.requestedQty) || 0;
+    const minQty = Number(r?.minQtyForTier) || 150;
+    const qualifies = totalQty >= minQty;
+    const rawDisc = Number(r?.volumeDiscountPct) || 14;
+    const discPct = qualifies ? rawDisc : Math.floor(rawDisc * 0.4);
+    const regCost = Number(r?.regularUnitCost) || 0;
+    const netUnit = Math.round(regCost * (1 - discPct / 100));
+    return acc + totalQty * netUnit;
   }, 0);
   const draftSavedAmount = Math.max(0, draftRegularCost - draftDiscountedCost);
   const draftAvgDiscountPct =
     draftRegularCost > 0 ? ((draftSavedAmount / draftRegularCost) * 100).toFixed(1) : '0.0';
 
-  const historicalSavings = centralPosList.reduce((acc, po) => acc + po.savedAmount, 0);
+  const historicalSavings = safePos.reduce((acc, po) => acc + (Number(po?.savedAmount) || 0), 0);
   const totalCumulativeSavings = historicalSavings + draftSavedAmount;
 
   // Toggle selection of a requisition item
   const handleToggleReqSelection = reqId => {
-    setBranchRequisitions(prev =>
-      prev.map(r => (r.id === reqId ? { ...r, selected: !r.selected } : r))
-    );
+    setBranchRequisitions(prev => {
+      const source = (Array.isArray(prev) && prev.length > 0) ? prev : safeReqs;
+      return source.map(r => (r.id === reqId ? { ...r, selected: !r.selected } : r));
+    });
   };
 
   // Select or deselect all requisition items
   const handleSelectAllReqs = selectAll => {
-    setBranchRequisitions(prev => prev.map(r => ({ ...r, selected: selectAll })));
+    setBranchRequisitions(prev => {
+      const source = (Array.isArray(prev) && prev.length > 0) ? prev : safeReqs;
+      return source.map(r => ({ ...r, selected: selectAll }));
+    });
   };
 
   // Sync Low-Stock & Out-of-Stock items directly from Smart Inventory (Cross-Module Integration)
@@ -10621,20 +10636,26 @@ export function ProcurementTab({
 
   // Adjust consolidated quantity for an item across branches
   const handleAdjustReqQty = (reqId, delta) => {
-    setBranchRequisitions(prev =>
-      prev.map(r => {
+    setBranchRequisitions(prev => {
+      const source = (Array.isArray(prev) && prev.length > 0) ? prev : safeReqs;
+      return source.map(r => {
         if (r.id !== reqId) return r;
-        const nextTotal = Math.max(20, r.totalQty + delta);
-        const updatedBranches = r.branchNeeds.map((b, idx) =>
-          idx === 0 ? { ...b, qty: Math.max(10, b.qty + delta) } : b
+        const currentQty = Number(r.totalQty) || Number(r.requestedQty) || 100;
+        const nextTotal = Math.max(20, currentQty + delta);
+        const branches = Array.isArray(r.branchNeeds) && r.branchNeeds.length > 0
+          ? r.branchNeeds
+          : [{ branchTh: 'สาขาหลัก', branchEn: 'Main Store', qty: currentQty }];
+        const updatedBranches = branches.map((b, idx) =>
+          idx === 0 ? { ...b, qty: Math.max(10, (Number(b.qty) || 0) + delta) } : b
         );
         return {
           ...r,
           totalQty: nextTotal,
+          requestedQty: nextTotal,
           branchNeeds: updatedBranches
         };
-      })
-    );
+      });
+    });
     toast.success(
       tx(
         `ปรับยอดสั่งซื้อรวมศูนย์ (${delta > 0 ? `+${delta}` : delta}) และคำนวณส่วนลด Economy of Scale ใหม่แล้ว`,
@@ -10655,7 +10676,7 @@ export function ProcurementTab({
       return;
     }
 
-    const poNumber = `CPO-2026-${8803 + centralPosList.length}`;
+    const poNumber = `CPO-2026-${8803 + safePos.length}`;
     const nowStr = new Date().toLocaleString(isEn ? 'en-GB' : 'th-TH', {
       day: '2-digit',
       month: '2-digit',
@@ -10664,8 +10685,8 @@ export function ProcurementTab({
       minute: '2-digit'
     });
 
-    const vendorNamesTh = [...new Set(selectedReqs.map(r => r.th.vendorName))].join(', ');
-    const vendorNamesEn = [...new Set(selectedReqs.map(r => r.en.vendorName))].join(', ');
+    const vendorNamesTh = [...new Set(selectedReqs.map(r => r?.th?.vendorName || r?.vendorNameTh || 'ซัพพลายเออร์'))].join(', ');
+    const vendorNamesEn = [...new Set(selectedReqs.map(r => r?.en?.vendorName || r?.vendorNameEn || 'Supplier'))].join(', ');
 
     const newPo = {
       poNumber,
@@ -10676,84 +10697,96 @@ export function ProcurementTab({
       savedAmount: draftSavedAmount,
       discountPctAvg: Number(draftAvgDiscountPct),
       received: false,
-      itemsSnapshot: selectedReqs.map(r => ({
-        sku: r.sku,
-        qty: r.totalQty,
-        regularUnitCost: r.regularUnitCost,
-        volumeDiscountPct: r.totalQty >= r.minQtyForTier ? r.volumeDiscountPct : Math.floor(r.volumeDiscountPct * 0.4),
-        thName: r.th.productName,
-        enName: r.en.productName,
-        thVendor: r.th.vendorName,
-        enVendor: r.en.vendorName
-      })),
+      itemsSnapshot: selectedReqs.map(r => {
+        const totalQty = Number(r?.totalQty) || Number(r?.requestedQty) || 100;
+        const minQty = Number(r?.minQtyForTier) || 150;
+        const rawDisc = Number(r?.volumeDiscountPct) || 14;
+        const discPct = totalQty >= minQty ? rawDisc : Math.floor(rawDisc * 0.4);
+        const regUnitCost = Number(r?.regularUnitCost) || 100;
+        return {
+          sku: r?.sku || 'SKU-001',
+          qty: totalQty,
+          regularUnitCost: regUnitCost,
+          volumeDiscountPct: discPct,
+          thName: r?.th?.productName || r?.productNameTh || 'สินค้าคลังรวม',
+          enName: r?.en?.productName || r?.productNameEn || 'Consolidated Product',
+          thVendor: r?.th?.vendorName || r?.vendorNameTh || 'ซัพพลายเออร์หลัก',
+          enVendor: r?.en?.vendorName || r?.vendorNameEn || 'Primary Supplier'
+        };
+      }),
       th: {
-        vendorSummary: vendorNamesTh,
+        vendorSummary: vendorNamesTh || 'ซัพพลายเออร์รวมศูนย์',
         branchesCovered: `รวบรวมความต้องการจากทุกสาขา (${selectedReqs.length} รายการสินค้า)`,
         status: 'อนุมัติและส่งใบสั่งซื้อรวมศูนย์ให้ซัพพลายเออร์แล้ว'
       },
       en: {
-        vendorSummary: vendorNamesEn,
+        vendorSummary: vendorNamesEn || 'Consolidated Suppliers',
         branchesCovered: `Consolidated across all branches (${selectedReqs.length} SKUs)`,
         status: 'Approved & Dispatched to Vendors'
       }
     };
 
-    setCentralPosList(prev => [newPo, ...prev]);
+    setCentralPosList(prev => {
+      const source = (Array.isArray(prev) && prev.length > 0) ? prev : safePos;
+      return [newPo, ...source];
+    });
     setActivePoModal(newPo);
     toast.success(
       tx(
-        `ออกใบสั่งซื้อรวมศูนย์ ${poNumber} สำเร็จ! ประหยัดต้นทุนได้ทันที ฿${draftSavedAmount.toLocaleString()} (-${draftAvgDiscountPct}%)`,
-        `Generated Central PO ${poNumber}! Instant Economy of Scale savings: ฿${draftSavedAmount.toLocaleString()} (-${draftAvgDiscountPct}%)`
+        `ออกใบสั่งซื้อรวมศูนย์ ${poNumber} สำเร็จ! ประหยัดต้นทุนได้ทันที ฿${(Number(draftSavedAmount) || 0).toLocaleString()} (-${draftAvgDiscountPct}%)`,
+        `Generated Central PO ${poNumber}! Instant Economy of Scale savings: ฿${(Number(draftSavedAmount) || 0).toLocaleString()} (-${draftAvgDiscountPct}%)`
       )
     );
   };
 
   // Receive Central PO shipment & automatically restock Smart Inventory + log to Database
   const handleReceiveCentralPoAndRestock = po => {
+    if (!po) return;
     if (po.received) {
       setActivePoModal(po);
       return;
     }
 
-    setCentralPosList(prev =>
-      prev.map(item =>
+    setCentralPosList(prev => {
+      const source = (Array.isArray(prev) && prev.length > 0) ? prev : safePos;
+      return source.map(item =>
         item.poNumber === po.poNumber
           ? {
               ...item,
               received: true,
               th: {
-                ...item.th,
+                ...(item.th || {}),
                 status: 'ตรวจรับสินค้าครบ 100% และเติมสต็อกเข้าคลังทุกสาขาแล้ว'
               },
               en: {
-                ...item.en,
+                ...(item.en || {}),
                 status: '100% Received & Restocked Across All Branches'
               }
             }
           : item
-      )
-    );
+      );
+    });
 
     // Cross-module update 1: Increment stock in Smart Inventory
     if (setInventoryList) {
       const targetSkus = new Map(
-        (po.itemsSnapshot || selectedReqs).map(r => [r.sku, r.qty || r.totalQty || 150])
+        (po.itemsSnapshot || selectedReqs).map(r => [r.sku, Number(r.qty || r.totalQty || 150)])
       );
       setInventoryList(prev =>
-        prev.map(inv => {
+        (Array.isArray(prev) ? prev : []).map(inv => {
           const addQty = targetSkus.get(inv.sku);
           if (!addQty && inv.status !== 'low_stock' && inv.status !== 'out_of_stock') return inv;
           const boost = addQty || 120;
           return {
             ...inv,
-            stock: inv.stock + boost,
+            stock: (Number(inv.stock) || 0) + boost,
             status: 'in_stock',
             th: {
-              ...inv.th,
+              ...(inv.th || {}),
               statusLabel: `มีสินค้าพร้อมขาย (รับจากใบสั่งซื้อกลาง +${boost})`
             },
             en: {
-              ...inv.en,
+              ...(inv.en || {}),
               statusLabel: `In Stock (Central PO +${boost})`
             }
           };
@@ -10763,33 +10796,38 @@ export function ProcurementTab({
 
     // Cross-module update 2: Record transaction in Database Explorer
     if (setDbRecords) {
+      const poUnits = Number(po?.totalUnits) || 0;
+      const poSaved = Number(po?.savedAmount) || 0;
+      const poCost = Number(po?.discountedTotalCost ?? po?.totalEstimatedAmount ?? 0);
+      const vendorNameTh = po?.th?.vendorSummary || po?.vendorNameTh || 'ซัพพลายเออร์รวมศูนย์';
+      const vendorNameEn = po?.en?.vendorSummary || po?.vendorNameEn || 'Consolidated Supplier';
       setDbRecords(prev => [
         {
           id: po.poNumber,
           date: new Date().toLocaleTimeString(isEn ? 'en-US' : 'th-TH', { hour: '2-digit', minute: '2-digit' }),
-          amount: po.discountedTotalCost,
-          itemsCount: po.totalUnits,
+          amount: poCost,
+          itemsCount: poUnits,
           th: {
             channel: 'จัดซื้อรวมศูนย์สำนักงานใหญ่ (Central PO)',
-            customer: po.th.vendorSummary,
-            product: `รับสินค้าเข้าคลังรวม ${po.totalUnits.toLocaleString()} ชิ้น (ประหยัด ฿${po.savedAmount.toLocaleString()})`,
+            customer: vendorNameTh,
+            product: `รับสินค้าเข้าคลังรวม ${poUnits.toLocaleString()} ชิ้น (ประหยัด ฿${poSaved.toLocaleString()})`,
             status: 'รับของเข้าคลังสำเร็จ'
           },
           en: {
             channel: 'Central HQ Procurement (Central PO)',
-            customer: po.en.vendorSummary,
-            product: `Restocked ${po.totalUnits.toLocaleString()} units (Saved ฿${po.savedAmount.toLocaleString()})`,
+            customer: vendorNameEn,
+            product: `Restocked ${poUnits.toLocaleString()} units (Saved ฿${poSaved.toLocaleString()})`,
             status: 'Received & Restocked'
           }
         },
-        ...prev
+        ...(Array.isArray(prev) ? prev : [])
       ]);
     }
 
     toast.success(
       tx(
-        `ตรวจรับสินค้าใบสั่งซื้อ ${po.poNumber} จำนวน ${po.totalUnits.toLocaleString()} ชิ้น และอัปเดตยอดคงเหลือในหน้า "คลังสินค้าอัจฉริยะ" ทันที!`,
-        `Received Central PO ${po.poNumber} (${po.totalUnits.toLocaleString()} units) and automatically restocked Smart Inventory!`
+        `ตรวจรับสินค้าใบสั่งซื้อ ${po.poNumber} จำนวน ${(Number(po.totalUnits) || 0).toLocaleString()} ชิ้น และอัปเดตยอดคงเหลือในหน้า "คลังสินค้าอัจฉริยะ" ทันที!`,
+        `Received Central PO ${po.poNumber} (${(Number(po.totalUnits) || 0).toLocaleString()} units) and automatically restocked Smart Inventory!`
       )
     );
   };
@@ -10960,20 +10998,21 @@ export function ProcurementTab({
 
   // Vendor Reliability Bar Chart Data
   const vendorScorecardChartData = {
-    labels: vendorsList.map(v => {
-      const name = v[isEn ? 'en' : 'th'].name;
+    labels: safeVendors.map(v => {
+      const info = (isEn ? v?.en : v?.th) || v?.th || v || {};
+      const name = String(info.name || v?.name || v?.id || '');
       return name.length > 22 ? name.slice(0, 22) + '…' : name;
     }),
     datasets: [
       {
         label: tx('อัตราส่งของครบตามจำนวนที่สั่ง (Fill Rate %)', 'Order Fill Rate (%)'),
-        data: vendorsList.map(v => v.fillRate),
+        data: safeVendors.map(v => Number(v?.fillRate) || 98),
         backgroundColor: 'rgba(16, 185, 129, 0.85)',
         borderRadius: 8
       },
       {
         label: tx('อัตราส่งของตรงเวลา (On-Time Delivery %)', 'On-Time Delivery (%)'),
-        data: vendorsList.map(v => v.onTimeRate),
+        data: safeVendors.map(v => Number(v?.onTimeRate) || 98),
         backgroundColor: 'rgba(56, 189, 248, 0.85)',
         borderRadius: 8
       }
@@ -11294,11 +11333,14 @@ export function ProcurementTab({
                   color: '#f8fafc'
                 }}
               >
-                {vendorsList.map(v => (
-                  <option key={v.id} value={v.id}>
-                    {v[isEn ? 'en' : 'th'].name}
-                  </option>
-                ))}
+                {safeVendors.map(v => {
+                  const info = (isEn ? v?.en : v?.th) || v?.th || v || {};
+                  return (
+                    <option key={v?.id || v?.name} value={v?.id}>
+                      {info.name || v?.name || v?.id}
+                    </option>
+                  );
+                })}
               </select>
             </div>
             <div>
@@ -11389,44 +11431,55 @@ export function ProcurementTab({
               </tr>
             </thead>
             <tbody>
-              {branchRequisitions.map(req => {
-                const info = req[isEn ? 'en' : 'th'];
-                const qualifies = req.totalQty >= req.minQtyForTier;
-                const appliedDisc = qualifies ? req.volumeDiscountPct : Math.floor(req.volumeDiscountPct * 0.4);
-                const netUnitCost = Math.round(req.regularUnitCost * (1 - appliedDisc / 100));
-                const regTotal = req.totalQty * req.regularUnitCost;
-                const netTotal = req.totalQty * netUnitCost;
-                const savedBaht = regTotal - netTotal;
+              {safeReqs.map(req => {
+                const info = (isEn ? req?.en : req?.th) || req?.th || req || {};
+                const totalQty = Number(req?.totalQty) || Number(req?.requestedQty) || 100;
+                const minQty = Number(req?.minQtyForTier) || 150;
+                const qualifies = totalQty >= minQty;
+                const rawDisc = Number(req?.volumeDiscountPct) || 14;
+                const appliedDisc = qualifies ? rawDisc : Math.floor(rawDisc * 0.4);
+                const regUnitCost = Number(req?.regularUnitCost) || 100;
+                const netUnitCost = Math.round(regUnitCost * (1 - appliedDisc / 100));
+                const regTotal = totalQty * regUnitCost;
+                const netTotal = totalQty * netUnitCost;
+                const savedBaht = Math.max(0, regTotal - netTotal);
+                const branchNeedsList = Array.isArray(req?.branchNeeds) && req.branchNeeds.length > 0
+                  ? req.branchNeeds
+                  : [{ branchTh: 'สาขาหลัก', branchEn: 'Main Store', qty: totalQty }];
+                const prodName = info.productName || req?.productNameTh || req?.productNameEn || req?.sku || 'สินค้าคลังรวม';
+                const vndName = info.vendorName || req?.vendorNameTh || req?.vendorNameEn || 'ซัพพลายเออร์หลัก';
+                const urgencyText = info.urgency || (req?.urgency === 'high' ? 'ด่วน' : 'ปกติ');
+                const unitLabel = info.unitLabel || 'ชิ้น';
 
                 return (
                   <tr
-                    key={req.id}
+                    key={req?.id || req?.sku || Math.random()}
                     style={{
                       borderBottom: '1px solid rgba(148,163,184,0.12)',
-                      background: req.selected ? 'rgba(251, 191, 36, 0.04)' : 'transparent'
+                      background: req?.selected ? 'rgba(251, 191, 36, 0.04)' : 'transparent'
                     }}
                   >
                     <td style={{ padding: '0.85rem 0.75rem' }}>
                       <input
                         type="checkbox"
-                        checked={req.selected}
+                        checked={Boolean(req?.selected)}
                         onChange={() => handleToggleReqSelection(req.id)}
                         style={{ width: '20px', height: '20px', accentColor: '#fbbf24', cursor: 'pointer' }}
                       />
                     </td>
                     <td style={{ padding: '0.85rem 0.75rem' }}>
                       <div style={{ fontWeight: 900, color: '#f8fafc' }}>
-                        {info.productName}{' '}
-                        <span style={{ fontSize: '0.78rem', color: '#38bdf8', fontWeight: 800 }}>({req.sku})</span>
+                        {prodName}{' '}
+                        <span style={{ fontSize: '0.78rem', color: '#38bdf8', fontWeight: 800 }}>({req?.sku || '-'})</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginTop: '0.15rem' }}>{info.vendorName}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginTop: '0.15rem' }}>{vndName}</div>
                       <div style={{ fontSize: '0.76rem', color: '#fda4af', fontWeight: 700, marginTop: '0.15rem' }}>
-                        ● {info.urgency}
+                        ● {urgencyText}
                       </div>
                     </td>
                     <td style={{ padding: '0.85rem 0.75rem' }}>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', maxWidth: '280px' }}>
-                        {req.branchNeeds.map((b, i) => (
+                        {branchNeedsList.map((b, i) => (
                           <span
                             key={i}
                             style={{
@@ -11439,7 +11492,7 @@ export function ProcurementTab({
                               fontWeight: 700
                             }}
                           >
-                            {isEn ? b.branchEn : b.branchTh}: <strong style={{ color: '#38bdf8' }}>{b.qty}</strong>
+                            {isEn ? (b?.branchEn || b?.branchTh || 'Branch') : (b?.branchTh || b?.branchEn || 'สาขา')}: <strong style={{ color: '#38bdf8' }}>{b?.qty || 0}</strong>
                           </span>
                         ))}
                       </div>
@@ -11462,7 +11515,7 @@ export function ProcurementTab({
                           -20
                         </button>
                         <span style={{ fontWeight: 900, fontSize: '1.05rem', color: '#fbbf24', minWidth: '80px', textAlign: 'center' }}>
-                          {req.totalQty.toLocaleString()} {info.unitLabel}
+                          {(Number(totalQty) || 0).toLocaleString()} {unitLabel}
                         </span>
                         <button
                           type="button"
@@ -11495,21 +11548,21 @@ export function ProcurementTab({
                       >
                         {qualifies
                           ? tx(`ปลดล็อกส่วนลดสูงสุด -${appliedDisc}%`, `Max Tier Unlocked -${appliedDisc}%`)
-                          : tx(`ลด -${appliedDisc}% (สั่งครบ ${req.minQtyForTier} ลด ${req.volumeDiscountPct}%)`, `-${appliedDisc}% (Order ${req.minQtyForTier}+ for -${req.volumeDiscountPct}%)`)}
+                          : tx(`ลด -${appliedDisc}% (สั่งครบ ${minQty} ลด ${rawDisc}%)`, `-${appliedDisc}% (Order ${minQty}+ for -${rawDisc}%)`)}
                       </span>
                       <div style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '0.25rem' }}>
                         {tx(
-                          `จากชิ้นละ ฿${req.regularUnitCost.toLocaleString()} เหลือ ฿${netUnitCost.toLocaleString()}`,
-                          `Unit cost drops from ฿${req.regularUnitCost.toLocaleString()} to ฿${netUnitCost.toLocaleString()}`
+                          `จากชิ้นละ ฿${(Number(regUnitCost) || 0).toLocaleString()} เหลือ ฿${(Number(netUnitCost) || 0).toLocaleString()}`,
+                          `Unit cost drops from ฿${(Number(regUnitCost) || 0).toLocaleString()} to ฿${(Number(netUnitCost) || 0).toLocaleString()}`
                         )}
                       </div>
                     </td>
                     <td style={{ padding: '0.85rem 0.75rem' }}>
                       <div style={{ fontWeight: 900, fontSize: '1.05rem', color: '#f8fafc' }}>
-                        ฿{netTotal.toLocaleString()}
+                        ฿{(Number(netTotal) || 0).toLocaleString()}
                       </div>
                       <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#34d399' }}>
-                        {tx(`ประหยัดทันที ฿${savedBaht.toLocaleString()}`, `Save ฿${savedBaht.toLocaleString()}`)}
+                        {tx(`ประหยัดทันที ฿${(Number(savedBaht) || 0).toLocaleString()}`, `Save ฿${(Number(savedBaht) || 0).toLocaleString()}`)}
                       </div>
                     </td>
                   </tr>
@@ -11555,16 +11608,27 @@ export function ProcurementTab({
             )}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            {centralPosList.map(po => {
-              const info = po[isEn ? 'en' : 'th'];
+            {safePos.map(po => {
+              const info = (isEn ? po?.en : po?.th) || po?.th || po || {};
+              const poNum = po?.poNumber || 'CPO-2026-0001';
+              const createdDate = po?.createdAt || po?.issueDate || '-';
+              const isReceived = Boolean(po?.received);
+              const vndSummary = info.vendorSummary || po?.vendorNameTh || po?.vendorNameEn || info.summaryText || 'ซัพพลายเออร์หลัก';
+              const branchesCovered = info.branchesCovered || 'รวมยอดความต้องการจากทุกสาขา';
+              const totalUnits = Number(po?.totalUnits) || 0;
+              const discountedTotal = Number(po?.discountedTotalCost ?? po?.totalEstimatedAmount ?? 0);
+              const savedAmt = Number(po?.savedAmount) || 0;
+              const discPct = po?.discountPctAvg ?? po?.discountPct ?? 0;
+              const statusText = info.status || (isReceived ? 'ตรวจรับเข้าคลังแล้ว' : 'ส่งใบสั่งซื้อให้ซัพพลายเออร์แล้ว');
+
               return (
                 <div
-                  key={po.poNumber}
+                  key={poNum}
                   style={{
                     padding: '1rem',
                     borderRadius: '14px',
                     background: 'rgba(15, 23, 42, 0.78)',
-                    border: po.received
+                    border: isReceived
                       ? '1px solid rgba(16, 185, 129, 0.45)'
                       : '1px solid rgba(56, 189, 248, 0.28)',
                     display: 'flex',
@@ -11576,9 +11640,9 @@ export function ProcurementTab({
                 >
                   <div style={{ flex: '1 1 240px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      <span style={{ fontWeight: 900, color: '#fbbf24', fontSize: '0.95rem' }}>{po.poNumber}</span>
-                      <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>• {po.createdAt}</span>
-                      {po.received && (
+                      <span style={{ fontWeight: 900, color: '#fbbf24', fontSize: '0.95rem' }}>{poNum}</span>
+                      <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>• {createdDate}</span>
+                      {isReceived && (
                         <span
                           style={{
                             padding: '0.15rem 0.55rem',
@@ -11594,21 +11658,21 @@ export function ProcurementTab({
                       )}
                     </div>
                     <div style={{ fontWeight: 800, color: '#f8fafc', fontSize: '0.88rem', marginTop: '0.2rem' }}>
-                      {info.vendorSummary}
+                      {vndSummary}
                     </div>
                     <div style={{ fontSize: '0.78rem', color: '#38bdf8', marginTop: '0.15rem' }}>
-                      {info.branchesCovered} • {po.totalUnits.toLocaleString()} {tx('ชิ้น', 'units')} • {info.status}
+                      {branchesCovered} • {totalUnits.toLocaleString()} {tx('ชิ้น', 'units')} • {statusText}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
                     <div>
                       <div style={{ fontWeight: 900, color: '#f8fafc', fontSize: '1.05rem' }}>
-                        ฿{po.discountedTotalCost.toLocaleString()}
+                        ฿{discountedTotal.toLocaleString()}
                       </div>
                       <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#34d399' }}>
                         {tx(
-                          `ประหยัดได้ ฿${po.savedAmount.toLocaleString()} (-${po.discountPctAvg}%)`,
-                          `Saved ฿${po.savedAmount.toLocaleString()} (-${po.discountPctAvg}%)`
+                          `ประหยัดได้ ฿${savedAmt.toLocaleString()} (-${discPct}%)`,
+                          `Saved ฿${savedAmt.toLocaleString()} (-${discPct}%)`
                         )}
                       </div>
                     </div>
@@ -11629,7 +11693,7 @@ export function ProcurementTab({
                       >
                         {tx('📄 ดูใบสั่งซื้อรวม', '📄 View Official PO')}
                       </button>
-                      {!po.received && (
+                      {!isReceived && (
                         <button
                           type="button"
                           onClick={() => handleReceiveCentralPoAndRestock(po)}
@@ -11692,10 +11756,10 @@ export function ProcurementTab({
                   {tx('เอกสารใบสั่งซื้อรวมศูนย์สำนักงานใหญ่ (ECONOMY OF SCALE PO)', 'OFFICIAL HEADQUARTERS CONSOLIDATED PURCHASE ORDER')}
                 </span>
                 <h3 style={{ margin: '0.25rem 0 0 0', fontSize: '1.35rem', fontWeight: 900, color: '#f8fafc' }}>
-                  {activePoModal.poNumber}
+                  {activePoModal?.poNumber || 'CPO-2026-0001'}
                 </h3>
                 <div style={{ fontSize: '0.82rem', color: '#94a3b8', marginTop: '0.2rem' }}>
-                  {tx('วันที่ออกเอกสาร:', 'Issued Date:')} {activePoModal.createdAt} • {activePoModal[isEn ? 'en' : 'th'].status}
+                  {tx('วันที่ออกเอกสาร:', 'Issued Date:')} {activePoModal?.createdAt || activePoModal?.issueDate || '-'} • {(isEn ? activePoModal?.en?.status : activePoModal?.th?.status) || (activePoModal?.received ? 'ตรวจรับแล้ว' : 'ส่งออกแล้ว')}
                 </div>
               </div>
               <button
@@ -11719,21 +11783,21 @@ export function ProcurementTab({
               <div style={{ padding: '0.85rem', borderRadius: '12px', background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(148,163,184,0.2)' }}>
                 <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{tx('ซัพพลายเออร์ผู้รับใบสั่งซื้อ', 'Target Vendors')}</div>
                 <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#f8fafc', marginTop: '0.2rem' }}>
-                  {activePoModal[isEn ? 'en' : 'th'].vendorSummary}
+                  {(isEn ? activePoModal?.en?.vendorSummary : activePoModal?.th?.vendorSummary) || activePoModal?.vendorNameTh || 'ซัพพลายเออร์รวมศูนย์'}
                 </div>
               </div>
               <div style={{ padding: '0.85rem', borderRadius: '12px', background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(148,163,184,0.2)' }}>
                 <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{tx('จำนวนสั่งซื้อรวมทุกสาขา', 'Total Consolidated Volume')}</div>
                 <div style={{ fontWeight: 900, fontSize: '1.1rem', color: '#38bdf8', marginTop: '0.2rem' }}>
-                  {activePoModal.totalUnits.toLocaleString()} {tx('ชิ้น', 'Units')}
+                  {(Number(activePoModal?.totalUnits) || 0).toLocaleString()} {tx('ชิ้น', 'Units')}
                 </div>
               </div>
               <div style={{ padding: '0.85rem', borderRadius: '12px', background: 'rgba(16,185,129,0.14)', border: '1px solid rgba(16,185,129,0.4)' }}>
                 <div style={{ fontSize: '0.75rem', color: '#a7f3d0' }}>{tx('ยอดสุทธิหลังหักส่วนลด Volume Discount', 'Net Consolidated Total')}</div>
                 <div style={{ fontWeight: 900, fontSize: '1.15rem', color: '#34d399', marginTop: '0.2rem' }}>
-                  ฿{activePoModal.discountedTotalCost.toLocaleString()}{' '}
+                  ฿{(Number(activePoModal?.discountedTotalCost ?? activePoModal?.totalEstimatedAmount ?? 0)).toLocaleString()}{' '}
                   <span style={{ fontSize: '0.78rem', color: '#fde68a' }}>
-                    ({tx(`ประหยัด ฿${activePoModal.savedAmount.toLocaleString()}`, `Saved ฿${activePoModal.savedAmount.toLocaleString()}`)})
+                    ({tx(`ประหยัด ฿${(Number(activePoModal?.savedAmount) || 0).toLocaleString()}`, `Saved ฿${(Number(activePoModal?.savedAmount) || 0).toLocaleString()}`)})
                   </span>
                 </div>
               </div>
@@ -11951,48 +12015,60 @@ export function ProcurementTab({
             </thead>
             <tbody>
               {filteredVendors.map(vendor => {
-                const info = vendor[isEn ? 'en' : 'th'];
+                const info = (isEn ? vendor?.en : vendor?.th) || vendor?.th || vendor || {};
+                const vndName = info.name || vendor?.name || vendor?.id || 'ซัพพลายเออร์';
+                const vndCat = info.category || vendor?.category || '-';
+                const vndContact = info.contact || vendor?.contact || '-';
+                const leadDays = Number(vendor?.leadTimeDays) || 2.5;
+                const slaDays = Number(vendor?.slaTargetDays) || 3.0;
+                const onTime = Number(vendor?.onTimeRate) || 98;
+                const fillRate = Number(vendor?.fillRate) || 98;
+                const defect = Number(vendor?.defectRate) || 0.2;
+                const discCondition = info.discountCondition || `สั่งรวมลดต้นทุน ${vendor?.volumeDiscountPct || 14}%`;
+                const creditDays = Number(vendor?.creditTermDays) || 45;
+                const gradeLabel = info.gradeLabel || (vendor?.grade ? `เกรด ${vendor.grade}` : 'เกรด A');
+                const note = info.note || vendor?.note || '';
                 const badgeColor =
-                  vendor.status === 'excellent'
+                  vendor?.status === 'excellent'
                     ? '#10b981'
-                    : vendor.status === 'watch'
+                    : vendor?.status === 'watch'
                     ? '#f59e0b'
                     : '#f43f5e';
                 return (
-                  <tr key={vendor.id} style={{ borderBottom: '1px solid rgba(148,163,184,0.12)' }}>
+                  <tr key={vendor?.id || vendor?.name || Math.random()} style={{ borderBottom: '1px solid rgba(148,163,184,0.12)' }}>
                     <td style={{ padding: '0.9rem 0.75rem' }}>
                       <div style={{ fontWeight: 900, color: '#f8fafc' }}>
-                        {info.name}{' '}
-                        <span style={{ fontSize: '0.76rem', color: '#38bdf8' }}>({vendor.id})</span>
+                        {vndName}{' '}
+                        <span style={{ fontSize: '0.76rem', color: '#38bdf8' }}>({vendor?.id || '-'})</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginTop: '0.15rem' }}>{info.category}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.1rem' }}>{info.contact}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginTop: '0.15rem' }}>{vndCat}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.1rem' }}>{vndContact}</div>
                     </td>
                     <td style={{ padding: '0.9rem 0.75rem' }}>
-                      <div style={{ fontWeight: 900, color: vendor.leadTimeDays <= vendor.slaTargetDays ? '#34d399' : '#fda4af' }}>
-                        {vendor.leadTimeDays} {tx('วัน', 'days')}{' '}
+                      <div style={{ fontWeight: 900, color: leadDays <= slaDays ? '#34d399' : '#fda4af' }}>
+                        {leadDays} {tx('วัน', 'days')}{' '}
                         <span style={{ fontSize: '0.76rem', color: '#94a3b8', fontWeight: 600 }}>
-                          ({tx(`เกณฑ์ ${vendor.slaTargetDays} วัน`, `SLA ${vendor.slaTargetDays}d`)})
+                          ({tx(`เกณฑ์ ${slaDays} วัน`, `SLA ${slaDays}d`)})
                         </span>
                       </div>
                       <div style={{ fontSize: '0.78rem', color: '#38bdf8', fontWeight: 700, marginTop: '0.15rem' }}>
-                        {tx(`ส่งตรงเวลา ${vendor.onTimeRate}%`, `On-Time: ${vendor.onTimeRate}%`)}
+                        {tx(`ส่งตรงเวลา ${onTime}%`, `On-Time: ${onTime}%`)}
                       </div>
                     </td>
                     <td style={{ padding: '0.9rem 0.75rem' }}>
-                      <div style={{ fontWeight: 900, fontSize: '1rem', color: vendor.fillRate >= 95 ? '#34d399' : '#fbbf24' }}>
-                        {vendor.fillRate}%
+                      <div style={{ fontWeight: 900, fontSize: '1rem', color: fillRate >= 95 ? '#34d399' : '#fbbf24' }}>
+                        {fillRate}%
                       </div>
                       <div style={{ fontSize: '0.76rem', color: '#94a3b8' }}>
-                        {tx(`ของเสีย/เคลมเพียง ${vendor.defectRate}%`, `Defect rate: ${vendor.defectRate}%`)}
+                        {tx(`ของเสีย/เคลมเพียง ${defect}%`, `Defect rate: ${defect}%`)}
                       </div>
                     </td>
                     <td style={{ padding: '0.9rem 0.75rem' }}>
                       <div style={{ fontWeight: 800, color: '#fbbf24', fontSize: '0.86rem' }}>
-                        {info.discountCondition}
+                        {discCondition}
                       </div>
                       <div style={{ fontSize: '0.76rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                        {tx(`เครดิตการค้า ${vendor.creditTermDays} วัน`, `Credit Terms: ${vendor.creditTermDays} Days`)}
+                        {tx(`เครดิตการค้า ${creditDays} วัน`, `Credit Terms: ${creditDays} Days`)}
                       </div>
                     </td>
                     <td style={{ padding: '0.9rem 0.75rem' }}>
@@ -12007,17 +12083,17 @@ export function ProcurementTab({
                           fontSize: '0.8rem'
                         }}
                       >
-                        {info.gradeLabel}
+                        {gradeLabel}
                       </span>
                       <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.25rem', maxWidth: '210px' }}>
-                        {info.note}
+                        {note}
                       </div>
                     </td>
                     <td style={{ padding: '0.9rem 0.75rem' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                         <button
                           type="button"
-                          onClick={() => handleNegotiateVendorDiscount(vendor.id)}
+                          onClick={() => handleNegotiateVendorDiscount(vendor?.id)}
                           style={{
                             padding: '0.42rem 0.75rem',
                             borderRadius: '8px',
@@ -12031,7 +12107,7 @@ export function ProcurementTab({
                         >
                           {tx('ต่อรองส่วนลดสั่งรวมเพิ่ม +2%', 'Negotiate +2% Bulk Discount')}
                         </button>
-                        {vendor.status !== 'excellent' && (
+                        {vendor?.status !== 'excellent' && (
                           <button
                             type="button"
                             onClick={() => handleSendVendorSlaAlert(vendor)}
@@ -12165,7 +12241,7 @@ function App() {
         'รองรับ 1 สาขาหลัก + ออนไลน์ • Executive BI Studio (Power BI) • วิเคราะห์ลูกค้า 2,500 ราย • คลังสินค้าอัจฉริยะ',
         '1 Main Store + Online • Executive BI Studio (Power BI) • Up to 2,500 Customers CRM • Smart Inventory'
       ),
-      allowedTabs: ['overview', 'bi_studio', 'customers', 'inventory', 'live', 'database', 'settings']
+      allowedTabs: ['overview', 'bi_studio', 'customers', 'procurement', 'inventory', 'live', 'database', 'settings']
     },
     professional: {
       id: 'professional',
@@ -12182,7 +12258,7 @@ function App() {
         'รองรับสูงสุด 5 สาขา • Executive BI Studio (Power BI) • ตรวจจับทุจริตแคชเชียร์ • พยากรณ์ AI 30 วัน • สรุปยอดเข้ามือถือ',
         'Up to 5 Branches • Executive BI Studio (Power BI) • Cashier Fraud Audit • 30-Day AI Forecast • Daily Mobile Report'
       ),
-      allowedTabs: ['overview', 'bi_studio', 'customers', 'staff_pos', 'multi_channel', 'inventory', 'insights', 'live', 'database', 'settings']
+      allowedTabs: ['overview', 'bi_studio', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'settings']
     },
     premium: {
       id: 'premium',
@@ -12624,9 +12700,9 @@ function App() {
   const [channelsList, setChannelsList] = useState(() => initialChannelsBilingual);
   const [anomaliesList, setAnomaliesList] = useState([]);
   const [dbRecords, setDbRecords] = useState([]);
-  const [vendorsList, setVendorsList] = useState([]);
-  const [branchRequisitions, setBranchRequisitions] = useState([]);
-  const [centralPosList, setCentralPosList] = useState([]);
+  const [vendorsList, setVendorsList] = useState(() => initialVendorsBilingual);
+  const [branchRequisitions, setBranchRequisitions] = useState(() => initialBranchRequisitionsBilingual);
+  const [centralPosList, setCentralPosList] = useState(() => initialCentralPosBilingual);
 
   const [lineNotifyEnabled, setLineNotifyEnabled] = useState(true);
   const [lineNotifyTime, setLineNotifyTime] = useState('22:00');
@@ -13965,56 +14041,107 @@ function App() {
 
       const importedBranchRequisitions = importedInventory.slice(0, 8).map((inv, rIdx) => {
         const branch = importedBranches[rIdx % importedBranches.length] || { branchId: 'siam', th: { branchName: 'สาขาหลัก' }, en: { branchName: 'Main Store' } };
+        const matchedVendor = importedVendors[rIdx % importedVendors.length] || importedVendors[0] || initialVendorsBilingual[0];
         const reqQty = Math.max(30, Math.ceil(inv.stock * 0.8));
+        const unitCost = Math.max(45, Math.round((inv.price || 450) * 0.48));
+        const discPct = matchedVendor.volumeDiscountPct || 14;
+        const q1 = Math.round(reqQty * 0.5);
+        const q2 = Math.round(reqQty * 0.3);
+        const q3 = Math.max(5, reqQty - q1 - q2);
+
         return {
           id: `REQ-${rIdx + 101}`,
           branchId: branch.branchId,
           sku: inv.sku,
-          productNameTh: inv.th?.name || inv.sku,
-          productNameEn: inv.en?.name || inv.sku,
+          vendorId: matchedVendor.id,
+          regularUnitCost: unitCost,
+          volumeDiscountPct: discPct,
+          minQtyForTier: Math.max(50, Math.round(reqQty * 0.8)),
+          selected: true,
+          branchNeeds: [
+            { branchTh: branch.th?.branchName || 'สาขาหลัก', branchEn: branch.en?.branchName || 'Main Store', currentStock: inv.stock, qty: q1 },
+            { branchTh: 'สาขารอง', branchEn: 'Secondary Branch', currentStock: Math.max(2, Math.floor(inv.stock * 0.5)), qty: q2 },
+            { branchTh: 'ออนไลน์', branchEn: 'Online Channel', currentStock: Math.max(1, Math.floor(inv.stock * 0.3)), qty: q3 }
+          ],
+          totalQty: reqQty,
           requestedQty: reqQty,
           currentStock: inv.stock,
           urgency: inv.stock < 30 ? 'high' : 'normal',
           status: 'approved',
+          productNameTh: inv.th?.name || inv.sku,
+          productNameEn: inv.en?.name || inv.sku,
           th: {
+            productName: inv.th?.name || inv.sku,
+            vendorName: matchedVendor.th?.name || 'ซัพพลายเออร์หลัก',
             branchName: branch.th?.branchName || 'สาขาหลัก',
             requestedBy: `ผู้จัดการ ${branch.th?.branchName || 'สาขา'}`,
-            statusText: 'อนุมัติรวบรวมเข้าใบสั่งซื้อกลางแล้ว'
+            statusText: 'อนุมัติรวบรวมเข้าใบสั่งซื้อกลางแล้ว',
+            unitLabel: 'ชิ้น',
+            urgency: inv.stock < 30 ? 'ด่วน (ของใกล้หมด)' : 'ปกติ (เติมสต็อกประจำสัปดาห์)'
           },
           en: {
+            productName: inv.en?.name || inv.sku,
+            vendorName: matchedVendor.en?.name || 'Main Supplier',
             branchName: branch.en?.branchName || 'Main Store',
             requestedBy: `Manager (${branch.en?.branchName || 'Store'})`,
-            statusText: 'Approved & Merged into Central PO'
+            statusText: 'Approved & Merged into Central PO',
+            unitLabel: 'units',
+            urgency: inv.stock < 30 ? 'Urgent (Low stock)' : 'Normal (Weekly Replenishment)'
           }
         };
       });
       setBranchRequisitions(importedBranchRequisitions);
 
       const importedCentralPosList = importedVendors.slice(0, 4).map((vnd, pIdx) => {
-        const matchedInv = importedInventory[pIdx] || importedInventory[0];
+        const matchedInv = importedInventory[pIdx] || importedInventory[0] || {};
         const totalUnits = (pIdx + 1) * 150 + 100;
-        const baseCost = (matchedInv?.price || 500) * 0.5 * totalUnits;
-        const discountRate = vnd.volumeDiscountPct / 100;
-        const savedAmount = Math.round(baseCost * discountRate);
-        const finalPoAmount = baseCost - savedAmount;
+        const regularUnitCost = Math.max(45, Math.round((matchedInv?.price || 500) * 0.48));
+        const regularTotalCost = regularUnitCost * totalUnits;
+        const discountPctAvg = vnd.volumeDiscountPct || 14;
+        const savedAmount = Math.round(regularTotalCost * (discountPctAvg / 100));
+        const discountedTotalCost = Math.max(0, regularTotalCost - savedAmount);
+        const poNum = `CPO-2026-${8800 + pIdx + 1}`;
 
         return {
-          poNumber: `PO-CENTRAL-2026-${(pIdx + 1).toString().padStart(3, '0')}`,
+          poNumber: poNum,
+          createdAt: nowTime,
+          issueDate: nowTime,
+          totalUnits,
+          regularTotalCost,
+          discountedTotalCost,
+          totalEstimatedAmount: discountedTotalCost,
+          savedAmount,
+          discountPctAvg,
+          discountPct: discountPctAvg,
           vendorId: vnd.id,
           vendorNameTh: vnd.th?.name || 'ซัพพลายเออร์หลัก',
           vendorNameEn: vnd.en?.name || 'Main Supplier',
-          totalUnits,
-          totalEstimatedAmount: finalPoAmount,
-          savedAmount,
-          discountPct: vnd.volumeDiscountPct,
-          status: 'issued',
-          issueDate: nowTime,
+          status: pIdx === 0 ? 'received' : 'issued',
+          received: pIdx === 0,
           estimatedDelivery: '3 วันทำการ',
+          itemsSnapshot: [
+            {
+              sku: matchedInv.sku || `SKU-${100 + pIdx}`,
+              qty: totalUnits,
+              regularUnitCost,
+              volumeDiscountPct: discountPctAvg,
+              thName: matchedInv.th?.name || 'สินค้าคลังรวม',
+              enName: matchedInv.en?.name || 'Consolidated Product',
+              thVendor: vnd.th?.name || 'ซัพพลายเออร์หลัก',
+              enVendor: vnd.en?.name || 'Main Supplier'
+            }
+          ],
           th: {
+            vendorSummary: vnd.th?.name || 'ซัพพลายเออร์หลัก',
+            branchesCovered: 'รวบรวมยอดความต้องการจากทุกสาขา',
+            status: pIdx === 0 ? 'ตรวจรับสินค้าครบ 100% และเติมสต็อกแล้ว' : 'ส่งใบสั่งซื้อรวมศูนย์ให้ซัพพลายเออร์แล้ว',
             summaryText: `รวมใบเบิก ${matchedInv?.th?.name || 'สินค้า'} จากทุกสาขาเพื่อสั่งล็อตใหญ่`,
             savingsPraise: `ประหยัดต้นทุนได้ ฿${savedAmount.toLocaleString()} จากการสั่งรวมศูนย์`
           },
           en: {
+            vendorSummary: vnd.en?.name || 'Main Supplier',
+            branchesCovered: 'Consolidated demand across all stores',
+            status: pIdx === 0 ? '100% Received & Restocked' : 'Dispatched to Supplier',
             summaryText: `Consolidated PO for ${matchedInv?.en?.name || 'Products'} across branches`,
             savingsPraise: `Saved ฿${savedAmount.toLocaleString()} via bulk consolidation`
           }
@@ -16582,7 +16709,7 @@ function App() {
       subLabel: tx('รวมใบสั่งซื้อทุกสาขาเพื่อขอส่วนลด', 'Central PO & Vendor Scorecard'),
       badge: tx('ลดต้นทุน', 'PO'),
       variant: 'emerald',
-      minPlan: 'premium'
+      minPlan: 'starter'
     },
     {
       id: 'inventory',
@@ -16636,6 +16763,7 @@ function App() {
   const currentTabMeta = sidebarMenuItems.find(m => m.id === activeTab) || sidebarMenuItems[0];
   const isTabUnlocked = tabId => {
     if (tabId === 'admin') return true;
+    if (tabId === 'procurement') return true;
     if (isExemptAdminMode) return true;
     return activePlanMeta.allowedTabs.includes(tabId);
   };

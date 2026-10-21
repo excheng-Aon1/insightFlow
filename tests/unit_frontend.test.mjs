@@ -484,5 +484,45 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 20. SUPPLIER & PROCUREMENT RESILIENCE AND SUBSCRIPTION UNLOCK
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-20: ProcurementTab is bulletproof, ungated across tiers, and has valid schemas', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // 1. Verify procurement tab is unlocked in isTabUnlocked
+    assert.ok(
+      appContent.includes("if (tabId === 'procurement') return true;"),
+      'App.jsx must allow procurement tab in isTabUnlocked'
+    );
+
+    // 2. Verify starter and professional allowedTabs include procurement
+    assert.ok(
+      appContent.includes("starter:") && appContent.includes("'procurement'"),
+      'Starter tier must allow procurement tab'
+    );
+
+    // 3. Verify ProcurementTab has safe fallbacks for vendors, requisitions, and centralPos
+    assert.ok(
+      appContent.includes('initialVendorsBilingual') &&
+      appContent.includes('initialBranchRequisitionsBilingual') &&
+      appContent.includes('initialCentralPosBilingual'),
+      'ProcurementTab must fall back to initial bilingual datasets when empty'
+    );
+
+    // 4. Verify importedBranchRequisitions has required fields for ProcurementTab
+    assert.ok(
+      appContent.includes('branchNeeds:') && appContent.includes('regularUnitCost: unitCost'),
+      'importedBranchRequisitions must include branchNeeds and regularUnitCost'
+    );
+
+    // 5. Verify importedCentralPosList includes regularTotalCost and discountedTotalCost
+    assert.ok(
+      appContent.includes('regularTotalCost,') && appContent.includes('discountedTotalCost,'),
+      'importedCentralPosList must include regularTotalCost and discountedTotalCost'
+    );
+  });
+
 });
 
