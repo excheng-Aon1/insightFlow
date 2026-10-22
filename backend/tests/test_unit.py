@@ -37,6 +37,11 @@ from analytics_modeling import (
     calculate_deep_dive_business_kpis,
     get_kpi_formulas_catalog,
 )
+from actionable_ai import (
+    generate_executive_secretary_briefing,
+    process_executive_secretary_chat,
+    get_executive_secretary_tasks,
+)
 from redis_cache import redis_client
 
 
@@ -221,6 +226,46 @@ class TestAnalyticsModelingUnit(unittest.TestCase):
             self.assertIn("formula_latex", item)
             self.assertIn("benchmark", item)
             self.assertIn("description_th", item)
+
+    def test_executive_secretary_briefing_generation(self):
+        """6. ตรวจสอบการสร้างบันทึกย่อผู้บริหารโดยเลขา AI (Executive Morning Memo)"""
+        briefing = generate_executive_secretary_briefing()
+        self.assertEqual(briefing["status"], "success")
+        self.assertIn("pulse", briefing)
+        self.assertGreater(briefing["pulse"]["gross_revenue"], 0)
+        self.assertGreater(briefing["pulse"]["net_operating_profit"], 0)
+        self.assertIn("critical_alerts", briefing)
+        self.assertGreater(len(briefing["critical_alerts"]), 0)
+        self.assertIn("proactive_actions", briefing)
+
+    def test_executive_secretary_chat_processing(self):
+        """7. ตรวจสอบการประมวลผลคำสั่งแชทและจำลอง Multi-Tool Agent"""
+        # Test sales query
+        res_sales = process_executive_secretary_chat("ช่วยสรุปยอดขายและกำไรหน่อย")
+        self.assertEqual(res_sales["status"], "success")
+        self.assertIn("Database Query Engine", res_sales["tools_used"])
+        self.assertIn("ยอดขายรวม", res_sales["reply"])
+
+        # Test inventory query
+        res_inv = process_executive_secretary_chat("มีสินค้าไหนสต็อกใกล้หมดบ้าง")
+        self.assertEqual(res_inv["status"], "success")
+        self.assertIn("Inventory Watchdog", res_inv["tools_used"])
+        self.assertIn("จุดสั่งซื้อ", res_inv["reply"])
+
+        # Test LINE broadcast drafting
+        res_line = process_executive_secretary_chat("ร่างข้อความบรอดแคสต์ LINE ให้หน่อย")
+        self.assertEqual(res_line["status"], "success")
+        self.assertIn("LINE Broadcast Drafter", res_line["tools_used"])
+
+    def test_executive_secretary_tasks_board(self):
+        """8. ตรวจสอบกระดานติดตามงานของเลขา AI (Action Items)"""
+        tasks = get_executive_secretary_tasks()
+        self.assertGreaterEqual(len(tasks), 3)
+        for t in tasks:
+            self.assertIn("title", t)
+            self.assertIn("assignee", t)
+            self.assertIn("priority", t)
+            self.assertIn("completed", t)
 
 
 class TestRedisTTLUnit(unittest.TestCase):

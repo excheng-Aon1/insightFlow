@@ -27,6 +27,7 @@ import AdvancedAnalyticsSuite from './components/AdvancedAnalyticsSuite';
 import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
 import ExecutiveBiStudio from './components/ExecutiveBiStudio';
+import ExecutiveSecretaryTab from './components/ExecutiveSecretaryTab';
 import ErrorBoundary from './components/ErrorBoundary';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
@@ -12222,7 +12223,7 @@ function App() {
       'บัญชีผู้ดูแลระบบสูงสุด (pongsatornnantakong88@gmail.com) • ยกเว้นข้อจำกัดแพ็กเกจทั้งหมด • ปลดล็อกครบ 12 ระบบรวม Power BI และหน้า Admin • ไม่จำกัดสาขาและลูกค้า',
       'Super Admin (pongsatornnantakong88@gmail.com) • Exempt from all package limits • All 12 modules unlocked including Power BI & Admin • Unlimited branches & customers'
     ),
-    allowedTabs: ['overview', 'bi_studio', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'admin', 'settings']
+    allowedTabs: ['overview', 'bi_studio', 'secretary', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'admin', 'settings']
   };
 
   const planTiersMap = {
@@ -12241,7 +12242,7 @@ function App() {
         'รองรับ 1 สาขาหลัก + ออนไลน์ • Executive BI Studio (Power BI) • วิเคราะห์ลูกค้า 2,500 ราย • คลังสินค้าอัจฉริยะ',
         '1 Main Store + Online • Executive BI Studio (Power BI) • Up to 2,500 Customers CRM • Smart Inventory'
       ),
-      allowedTabs: ['overview', 'bi_studio', 'customers', 'procurement', 'inventory', 'live', 'database', 'settings']
+      allowedTabs: ['overview', 'bi_studio', 'secretary', 'customers', 'procurement', 'inventory', 'live', 'database', 'settings']
     },
     professional: {
       id: 'professional',
@@ -12258,7 +12259,7 @@ function App() {
         'รองรับสูงสุด 5 สาขา • Executive BI Studio (Power BI) • ตรวจจับทุจริตแคชเชียร์ • พยากรณ์ AI 30 วัน • สรุปยอดเข้ามือถือ',
         'Up to 5 Branches • Executive BI Studio (Power BI) • Cashier Fraud Audit • 30-Day AI Forecast • Daily Mobile Report'
       ),
-      allowedTabs: ['overview', 'bi_studio', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'settings']
+      allowedTabs: ['overview', 'bi_studio', 'secretary', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'settings']
     },
     premium: {
       id: 'premium',
@@ -12275,7 +12276,7 @@ function App() {
         'ไม่จำกัดสาขา/โรงงาน/คลังสินค้า • Executive BI Studio (Power BI) • จัดซื้อรวมศูนย์ (Central PO) • สิทธิ์องค์กรครบถ้วน',
         'Unlimited Branches & Factories • Executive BI Studio (Power BI) • Central Procurement PO • All Enterprise Modules'
       ),
-      allowedTabs: ['overview', 'bi_studio', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'settings']
+      allowedTabs: ['overview', 'bi_studio', 'secretary', 'customers', 'staff_pos', 'multi_channel', 'procurement', 'inventory', 'insights', 'live', 'database', 'settings']
     }
   };
 
@@ -16680,6 +16681,14 @@ function App() {
       minPlan: 'starter'
     },
     {
+      id: 'secretary',
+      label: tx('เลขา AI อัจฉริยะ', 'AI Executive Secretary'),
+      subLabel: tx('ผู้ช่วยส่วนตัวผู้บริหาร รันสรุปงานรอบวันและงานด่วน', 'Autonomous Executive AI Agent & Daily Briefing'),
+      badge: 'AI AGENT',
+      variant: 'gold',
+      minPlan: 'starter'
+    },
+    {
       id: 'customers',
       label: tx('วิเคราะห์ลูกค้า', 'Customer Insights'),
       subLabel: tx('ลูกค้าชั้นดีและคนหาย', 'VIP & Inactive Buyers'),
@@ -16764,6 +16773,7 @@ function App() {
   const isTabUnlocked = tabId => {
     if (tabId === 'admin') return true;
     if (tabId === 'procurement') return true;
+    if (tabId === 'secretary') return true;
     if (isExemptAdminMode) return true;
     return activePlanMeta.allowedTabs.includes(tabId);
   };
@@ -17475,6 +17485,16 @@ function App() {
                   theme={theme}
                   dbRecords={dbRecords}
                   latestUploadedFile={pageUploadedFiles?.central || pageUploadedFiles?.bi_studio || Object.values(pageUploadedFiles || {}).find(f => f && f.filename)}
+                />
+              )}
+
+              {activeTab === 'secretary' && (
+                <ExecutiveSecretaryTab
+                  dbRecords={dbRecords}
+                  inventoryList={inventoryList}
+                  theme={theme}
+                  tx={tx}
+                  onNavigateTab={setActiveTab}
                 />
               )}
 

@@ -443,3 +443,151 @@ def calculate_what_if_simulation(
         },
     }
 
+
+# ==============================================================================
+# 4. AUTONOMOUS AI EXECUTIVE SECRETARY AGENT ENGINE
+# ==============================================================================
+
+def generate_executive_secretary_briefing() -> Dict[str, Any]:
+    """
+    จัดทำรายงานสรุปสถานการณ์และสุขภาพธุรกิจรอบวันสำหรับผู้บริหาร (Executive Morning Memo)
+    วิเคราะห์ยอดขาย อัตรากำไร สต็อกวิกฤติ และสิ่งสำคัญที่ผู้บริหารต้องตัดสินใจ
+    """
+    now = datetime.now()
+    return {
+        "status": "success",
+        "generated_at": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "memo_title": "บันทึกย่อสถานการณ์ประจำวันสำหรับผู้บริหาร (Executive Daily Memo)",
+        "agent_name": "InsightFlow Executive Secretary AI",
+        "pulse": {
+            "gross_revenue": 8920000,
+            "net_operating_profit": 2497600,
+            "net_margin_pct": 28.0,
+            "total_orders": 7430,
+            "aov": 1200,
+            "top_performer_branch": "สาขาเซ็นทรัลเวิลด์ (Central World)",
+            "top_performer_revenue": 3450000,
+            "top_product": "Premium Collagen Peptide 500g",
+            "top_product_units": 1840,
+        },
+        "critical_alerts": [
+            {
+                "level": "URGENT",
+                "title": "สินค้าใกล้หมดสต็อก 3 รายการถึงจุดสั่งซื้อ ROP",
+                "detail": "SKU-01, SKU-02, SKU-03 เหลือน้อยกว่า Safety Stock เสี่ยงของขาดใน 3-5 วัน แนะนำให้อนุมัติ PO ภายใน 16:00 น.",
+            },
+            {
+                "level": "OPPORTUNITY",
+                "title": "ยอดขายช่องทางออนไลน์ TikTok & Shopee มีอัตราการเติบโต +14.5%",
+                "detail": "อัตรากำไรต่อบิลออนไลน์สูงกว่าหน้าร้าน 4.2% แนะนำให้พิจารณาเพิ่มงบ Ad Spend อีก 10% เพื่อเร่งยอดขาย",
+            },
+        ],
+        "proactive_actions": [
+            "ร่างข้อความบรอดแคสต์สรุปยอดขายเข้ากลุ่ม LINE ผู้บริหารเรียบร้อยแล้ว",
+            "สร้าง Action Items มอบหมายฝ่ายจัดซื้อและผู้จัดการเขตสาขา 3 รายการ",
+            "ตรวจเช็คสมดุล P&L และความปลอดภัยของกระแสเงินสดหมุนเวียน",
+        ],
+    }
+
+
+def process_executive_secretary_chat(query: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    ประมวลผลข้อความแชทสั่งการเลขา AI ด้วยภาษาธรรมชาติ (Conversational Agent Terminal)
+    พร้อมจำลองการเรียกใช้ Multi-Tool Agent Workflows
+    """
+    q_clean = (query or "").strip()
+    q_lower = q_clean.lower()
+    tools_used: List[str] = []
+
+    if any(k in q_lower for k in ["ยอด", "ขาย", "กำไร", "revenue", "profit", "สรุป"]):
+        tools_used = ["Database Query Engine", "P&L Variance Calculator"]
+        reply = (
+            "📊 **รายงานสรุปยอดขายล่าสุดครับท่านผู้บริหาร:**\n\n"
+            "• **ยอดขายรวมสะสม:** ฿8,920,000 (บรรลุ 89.2% ของเป้าหมายประจำเดือน)\n"
+            "• **กำไรสุทธิจากการดำเนินงาน:** ฿2,497,600 (Net Margin 28.0% สุขภาพการเงินแข็งแรงดีเยี่ยม)\n"
+            "• **จำนวนออเดอร์ทั้งหมด:** 7,430 บิล (ยอดต่อบิล AOV เฉลี่ย ฿1,200)\n"
+            "• **สาขาผู้นำอันดับ 1:** สาขาเซ็นทรัลเวิลด์ (ทำยอดได้ ฿3,450,000 คิดเป็น 38.6% ของทั้งบริษัท)\n\n"
+            "💡 *เลขาขอแนะนำให้ผู้บริหารติดตามโปรโมชันสาขารองเพื่อเร่งยอดขายให้ถึงเป้าหมายสิ้นเดือนครับ*"
+        )
+    elif any(k in q_lower for k in ["สต็อก", "ของหมด", "rop", "คลัง", "สั่งซื้อ", "ขาด"]):
+        tools_used = ["Inventory Watchdog", "Central PO Scorecard"]
+        reply = (
+            "🚨 **รายงานตรวจสอบคลังสินค้าและจุดสั่งซื้อ (ROP Watchdog):**\n\n"
+            "เลขาพบว่ามีสินค้า **3 รายการ** ที่สต็อกเหลือน้อยกว่าระดับปลอดภัย:\n"
+            "1. **SKU-01 (วัตถุดิบหลัก):** เหลือ 28 หน่วย (จุดสั่งซื้อ 65) — ของจะหมดใน 2.8 วัน แนะนำให้สั่ง 250 หน่วย\n"
+            "2. **SKU-02 (สินค้ายอดนิยม):** เหลือ 18 หน่วย (จุดสั่งซื้อ 32) — แนะนำสั่ง 180 หน่วย\n"
+            "3. **SKU-03 (บรรจุภัณฑ์พรีเมียม):** เหลือ 14 หน่วย (จุดสั่งซื้อ 29) — แนะนำสั่ง 60 หน่วย\n\n"
+            "📋 *เลขาได้เพิ่มงานด่วนนี้ลงในกระดานของฝ่ายจัดซื้อเรียบร้อยแล้วครับ*"
+        )
+    elif any(k in q_lower for k in ["ไลน์", "line", "บรอดแคสต์", "broadcast", "แจ้ง", "ข้อความ"]):
+        tools_used = ["LINE Broadcast Drafter", "Executive Communication Suite"]
+        reply = (
+            "📱 **เลขาได้ร่างข้อความสำหรับบรอดแคสต์เข้ากลุ่ม LINE ให้แล้วครับ:**\n\n"
+            "────────────────────────\n"
+            "📢 **[InsightFlow Executive Update]**\n"
+            "เรียน ทีมงานทุกสาขาและฝ่ายปฏิบัติการ:\n\n"
+            "ขอขอบคุณทุกทีมที่ร่วมแรงร่วมใจ วันนี้ยอดขายรวมขององค์กรแตะ ฿8,920,000 เรียบร้อยแล้ว 🎉\n"
+            "ขอให้ผู้จัดการสาขาเน้นย้ำการจัดเรียงสินค้าขายดีหน้าร้าน และฝ่ายจัดซื้อเร่งประสาน PO สินค้าหมุนเวียนเร็ว\n\n"
+            "ขอบคุณสำหรับความทุ่มเทเพื่อเป้าหมายร่วมกันครับ\n"
+            "────────────────────────\n\n"
+            "👉 *ท่านผู้บริหารสามารถกดปุ่มคัดลอกเพื่อส่งเข้าแอป LINE ได้ทันทีครับ*"
+        )
+    elif any(k in q_lower for k in ["ประชุม", "วาระ", "meeting", "agenda"]):
+        tools_used = ["Executive Agenda Synthesizer"]
+        reply = (
+            "🗓️ **เลขาขอเสนอ 3 วาระการประชุมผู้บริหารประจำสัปดาห์ (Weekly Executive Agenda):**\n\n"
+            "1. **ทบทวนตัวเลขงบการเงินและ P&L สะพานรายได้:** สรุปกำไรสุทธิตามช่องทางและควบคุมต้นทุน OPEX\n"
+            "2. **รายงานการจัดซื้อรวมศูนย์ (Central Procurement):** ติดตามส่วนลดราคาส่งและแก้ปัญหาของขาดสต็อก\n"
+            "3. **การจัดสรรงบโฆษณาและการตลาด (Ad Spend Reallocation):** เพิ่มงบในช่องทางที่ LTV:CAC > 3.0x\n\n"
+            "⏱️ *ระยะเวลาที่แนะนำ: 45 นาที พร้อมเอกสารสรุปเตรียมพร้อมล่วงหน้าครับ*"
+        )
+    else:
+        tools_used = ["Autonomous Agent Reasoning Core"]
+        reply = (
+            f"💼 **รับทราบข้อความจากท่านผู้บริหาร:** *\"{q_clean}\"*\n\n"
+            "เลขา AI ได้ทำการวิเคราะห์คำสั่งกับคลังข้อมูลธุรกิจแล้ว หากท่านต้องการให้เลขาช่วยร่างเอกสาร, "
+            "ดึงตัวเลขเจาะลึกเฉพาะสาขา หรือมอบหมายงานไปยังทีมงาน สามารถสั่งการเพิ่มเติมได้ตลอดเวลาครับ"
+        )
+
+    return {
+        "status": "success",
+        "query": q_clean,
+        "reply": reply,
+        "tools_used": tools_used,
+        "confidence_score": 0.99,
+        "timestamp": datetime.now().strftime("%H:%M"),
+    }
+
+
+def get_executive_secretary_tasks() -> List[Dict[str, Any]]:
+    """ดึงรายการงานในกระดานติดตามของเลขา AI (Executive Task Board)"""
+    return [
+        {
+            "id": "tsk-1",
+            "title": "สั่งซื้อวัตถุดิบและสินค้าหมุนเวียนหลัก (SKU-01) เพิ่ม 250 ชิ้น",
+            "assignee": "ฝ่ายจัดซื้อรวมศูนย์",
+            "priority": "urgent",
+            "deadline": "วันนี้ 16:00",
+            "completed": False,
+            "auto_generated": True,
+        },
+        {
+            "id": "tsk-2",
+            "title": "ตรวจสอบสาขาที่ยอดต่อบิล (AOV) ต่ำกว่า ฿700 เพื่อปรับโปรโมชันหน้าร้าน",
+            "assignee": "ผู้จัดการเขตสาขา",
+            "priority": "medium",
+            "deadline": "พรุ่งนี้",
+            "completed": False,
+            "auto_generated": True,
+        },
+        {
+            "id": "tsk-3",
+            "title": "ส่งรายงานสรุปยอดขายประจำสัปดาห์เข้า LINE ผู้บริหาร",
+            "assignee": "เลขา AI อัตโนมัติ",
+            "priority": "normal",
+            "deadline": "ทุกวันศุกร์ 18:00",
+            "completed": True,
+            "auto_generated": True,
+        },
+    ]
+

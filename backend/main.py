@@ -79,6 +79,9 @@ from actionable_ai import (
     generate_executive_summary,
     query_ai_business_copilot,
     calculate_what_if_simulation,
+    generate_executive_secretary_briefing,
+    process_executive_secretary_chat,
+    get_executive_secretary_tasks,
 )
 from data_governance import (
     DataQualityGatekeeper,
@@ -326,6 +329,11 @@ class LineAlertRequest(BaseModel):
 
 class CopilotQueryRequest(BaseModel):
     question: str
+
+
+class SecretaryChatQueryRequest(BaseModel):
+    query: str
+    context: Optional[Dict[str, Any]] = None
 
 
 class WhatIfSimulationRequest(BaseModel):
@@ -625,6 +633,30 @@ def simulate_what_if_scenario(req: WhatIfSimulationRequest):
         cost_inflation_pct=req.cost_inflation_pct,
         expected_volume_lift_pct=req.expected_volume_lift_pct,
     )
+
+
+# ------------------------------------------------------------------------------
+# AUTONOMOUS AI EXECUTIVE SECRETARY AGENT ENDPOINTS
+# ------------------------------------------------------------------------------
+@app.get("/api/secretary/daily-briefing", status_code=status.HTTP_200_OK)
+def get_secretary_daily_briefing():
+    """รายงานสรุปสถานการณ์และสุขภาพธุรกิจรอบวันสำหรับผู้บริหาร (AI Secretary Daily Briefing)"""
+    return generate_executive_secretary_briefing()
+
+
+@app.post("/api/secretary/agent-chat", status_code=status.HTTP_200_OK)
+def chat_with_secretary_agent(req: SecretaryChatQueryRequest):
+    """แชทสั่งการเลขา AI และเรียกใช้เครื่องมือ Multi-Tool Agent อัตโนมัติ"""
+    return process_executive_secretary_chat(query=req.query, context=req.context)
+
+
+@app.get("/api/secretary/tasks", status_code=status.HTTP_200_OK)
+def get_secretary_action_tasks():
+    """ดึงรายการแผนงานที่เลขา AI ช่วยติดตามและมอบหมาย (Executive Action Board)"""
+    return {
+        "status": "success",
+        "tasks": get_executive_secretary_tasks(),
+    }
 
 
 # ------------------------------------------------------------------------------

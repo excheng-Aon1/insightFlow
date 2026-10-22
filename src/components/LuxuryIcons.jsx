@@ -247,6 +247,24 @@ export function LuxuryModuleIcon({ type = 'overview', size = 26 }) {
         </svg>
       );
 
+    case 'secretary':
+    case 'executive_secretary':
+      return (
+        <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+          {/* ศีรษะและชุดหูฟังอัจฉริยะของเลขา AI */}
+          <circle cx="15" cy="8" r="4" fill="currentColor" />
+          <path d="M10 7C10 4.8 11.8 3.2 15 3.2C18.2 3.2 20 4.8 20 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <circle cx="20.5" cy="8" r="1.5" fill="currentColor" />
+          {/* ลำตัวและสมาร์ทแท็บเล็ตผู้ช่วยผู้บริหาร */}
+          <path d="M7 26V20C7 16.5 9.5 14.5 13 14.5H17C17.8 14.5 18.5 14.7 19.2 15.1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <rect x="15" y="16" width="13" height="12" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+          <line x1="18" y1="20" x2="25" y2="20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="18" y1="23.5" x2="23" y2="23.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          {/* ประกายดาว AI Agent */}
+          <polygon points="25,9 26,11.5 28.5,12.5 26,13.5 25,16 24,13.5 21.5,12.5 24,11.5" fill="currentColor" />
+        </svg>
+      );
+
     case 'live':
       return (
         <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
@@ -2464,6 +2482,47 @@ export function BiSparklePromptIcon({ size = 16, className = '' }) {
       {/* ประกายดาว 4 แฉก */}
       <polygon points="12,5 13.5,10.5 19,12 13.5,13.5 12,19 10.5,13.5 5,12 10.5,10.5" fill="#C084FC" />
       <circle cx="12" cy="12" r="1.5" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
+/**
+ * 12. ExecutiveSecretaryIcon: ไอคอน 3 มิติ "เลขา AI อัจฉริยะ" (AI Executive Secretary 3D Jewel Icon)
+ */
+export function ExecutiveSecretaryIcon({ size = 26, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`secGold_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`secCyan_${id}`} x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#7DD3FC" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+        <linearGradient id={`secAmeth_${id}`} x1="16" y1="14" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#C084FC" />
+          <stop offset="100%" stopColor="#7C3AED" />
+        </linearGradient>
+      </defs>
+      {/* กรอบฐานคริสตัล 3 มิติ */}
+      <rect x="3" y="3" width="26" height="26" rx="8" fill="#0B132B" stroke={`url(#secGold_${id})`} strokeWidth="1.6" />
+      {/* ศีรษะเลขา AI พร้อมหูฟังอัจฉริยะโครเมียม */}
+      <circle cx="13" cy="10" r="4" fill={`url(#secCyan_${id})`} stroke="#E0F2FE" strokeWidth="0.8" />
+      <path d="M8 9.5C8 6.5 10 5 13 5C16 5 18 6.5 18 9.5" stroke="#FEF08A" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="18" cy="9.5" r="1.5" fill="#FEF08A" />
+      {/* ลำตัวชุดสูทผู้บริหาร */}
+      <path d="M6 24V20C6 16.5 8.5 14.5 12 14.5H15" stroke={`url(#secCyan_${id})`} strokeWidth="2.2" strokeLinecap="round" />
+      {/* แท็บเล็ตและกระดานสรุปงานอัจฉริยะ (AI Agent Executive Pad) */}
+      <rect x="15" y="14" width="13" height="13" rx="2.5" fill="#0F172A" stroke={`url(#secGold_${id})`} strokeWidth="1.5" />
+      <line x1="18" y1="18" x2="25" y2="18" stroke="#38BDF8" strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="18" y1="21.5" x2="23" y2="21.5" stroke="#FEF08A" strokeWidth="1.6" strokeLinecap="round" />
+      {/* ประกายดาวควอนตัม AI Agent ประจำตัว */}
+      <polygon points="26,7 27,9.5 29.5,10.5 27,11.5 26,14 25,11.5 22.5,10.5 25,9.5" fill="#FEF08A" />
     </svg>
   );
 }

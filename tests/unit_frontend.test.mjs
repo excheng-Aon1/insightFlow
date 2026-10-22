@@ -614,5 +614,69 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 22. AUTONOMOUS AI EXECUTIVE SECRETARY TAB INTEGRATION & CAPABILITIES
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-22: Autonomous AI Executive Secretary Tab integration and agent capabilities', () => {
+    // 1. Component existence and export
+    const secretaryPath = path.join(projectRoot, 'src', 'components', 'ExecutiveSecretaryTab.jsx');
+    assert.ok(fs.existsSync(secretaryPath), 'ExecutiveSecretaryTab.jsx must exist');
+    const secretaryContent = fs.readFileSync(secretaryPath, 'utf8');
+    assert.ok(
+      secretaryContent.includes('export default function ExecutiveSecretaryTab'),
+      'ExecutiveSecretaryTab.jsx must export default component'
+    );
+
+    // 2. Multi-feature capabilities
+    assert.ok(
+      secretaryContent.includes("activeSubTab") &&
+      secretaryContent.includes("'briefing'") &&
+      secretaryContent.includes("'chat'") &&
+      secretaryContent.includes("'tasks'") &&
+      secretaryContent.includes("'skills'"),
+      'ExecutiveSecretaryTab must support briefing, chat, tasks, and skills sub-tabs'
+    );
+    assert.ok(
+      secretaryContent.includes('handleCopyExecutiveBriefing') && secretaryContent.includes('handleTriggerAgentBriefing'),
+      'ExecutiveSecretaryTab must support briefing export and agent trigger'
+    );
+    assert.ok(
+      secretaryContent.includes('handleSendChat') && secretaryContent.includes('chatMessages'),
+      'ExecutiveSecretaryTab must include conversational agent chat terminal'
+    );
+    assert.ok(
+      secretaryContent.includes('tasks') && secretaryContent.includes('handleToggleTask'),
+      'ExecutiveSecretaryTab must include action items and task management'
+    );
+
+    // 3. App.jsx integration
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(
+      appContent.includes("import ExecutiveSecretaryTab from './components/ExecutiveSecretaryTab'"),
+      'App.jsx must import ExecutiveSecretaryTab'
+    );
+    assert.ok(
+      appContent.includes("activeTab === 'secretary'"),
+      'App.jsx must render ExecutiveSecretaryTab on secretary tab'
+    );
+    assert.ok(
+      appContent.includes("id: 'secretary'") && appContent.includes("tabId === 'secretary'"),
+      'App.jsx must configure secretary in sidebar and unlock it'
+    );
+
+    // 4. Luxury Icons integration
+    const iconsPath = path.join(projectRoot, 'src', 'components', 'LuxuryIcons.jsx');
+    const iconsContent = fs.readFileSync(iconsPath, 'utf8');
+    assert.ok(
+      iconsContent.includes('export function ExecutiveSecretaryIcon'),
+      'LuxuryIcons must export ExecutiveSecretaryIcon'
+    );
+    assert.ok(
+      iconsContent.includes("case 'secretary':"),
+      'LuxuryIcons must handle secretary case in LuxuryModuleIcon'
+    );
+  });
+
 });
 
