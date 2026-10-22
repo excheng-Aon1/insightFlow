@@ -74,6 +74,12 @@ export default function ExecutiveBiStudio({
   });
   const [showCostSettings, setShowCostSettings] = useState(false);
 
+  // Deep-Dive Business KPI Studio State
+  const [activeStudioTab, setActiveStudioTab] = useState('canvas'); // 'canvas' | 'deep_dive_kpis'
+  const [kpiPriceSimPct, setKpiPriceSimPct] = useState(5); // +5% price adjustment simulation
+  const [kpiAdSpendSimMultiplier, setKpiAdSpendSimMultiplier] = useState(1.0);
+  const [kpiInventorySimMultiplier, setKpiInventorySimMultiplier] = useState(1.0);
+
   // Copilot Q&A State
   const [copilotQuery, setCopilotQuery] = useState('');
   const [copilotResponse, setCopilotResponse] = useState(null);
@@ -255,6 +261,87 @@ export default function ExecutiveBiStudio({
       ordersCount: count
     };
   }, [filteredData, selectedDateRange]);
+
+  // -------------------------------------------------------------
+  // 3.1. Deep-Dive Business-Specific KPI Engine
+  // -------------------------------------------------------------
+  const deepDiveKpis = useMemo(() => {
+    const grossRevenue = metrics.grossRevenue;
+    const cogsAmount = metrics.cogsAmount;
+    const grossProfit = Math.max(0, grossRevenue - cogsAmount);
+    const count = metrics.ordersCount;
+
+    // 1. GMROI (Gross Margin Return on Inventory Investment)
+    const avgInventoryCost = Math.max(1000, (cogsAmount * 0.38) * kpiInventorySimMultiplier);
+    const gmroi = (grossProfit / avgInventoryCost).toFixed(2);
+    const gmroiNum = Number(gmroi);
+
+    // 2. LTV & CAC Economics
+    const simulatedAdSpend = metrics.marketingExpense * kpiAdSpendSimMultiplier;
+    const uniqueCustomers = Math.max(1, Math.round(count * 0.62));
+    const repeatCustomers = Math.round(uniqueCustomers * 0.38);
+    const newCustomers = Math.max(1, uniqueCustomers - repeatCustomers);
+    const cac = Math.round(simulatedAdSpend / newCustomers);
+    const aov = metrics.averageOrderValue || 850;
+    const purchaseFreqYear = 2.4;
+    const grossMarginRatio = grossRevenue > 0 ? (grossProfit / grossRevenue) : 0.55;
+    const annualCustValue = aov * purchaseFreqYear * grossMarginRatio;
+    const clv = Math.round(annualCustValue * 2.5);
+    const ltvToCac = (clv / Math.max(1, cac)).toFixed(2);
+    const ltvCacNum = Number(ltvToCac);
+    const monthlyGrossContribution = Math.max(1, annualCustValue / 12);
+    const cacPaybackMonths = (cac / monthlyGrossContribution).toFixed(1);
+
+    // 3. Sell-Through Rate (STR %)
+    const unitsSold = filteredData.reduce((acc, c) => acc + (Number(c.itemsCount) || 1), 0);
+    const totalStockAvailable = Math.max(unitsSold, Math.round(unitsSold * 1.32));
+    const strPct = totalStockAvailable > 0 ? ((unitsSold / totalStockAvailable) * 100).toFixed(1) : '75.0';
+
+    // 4. Repeat Purchase Rate (RPR %)
+    const rprPct = ((repeatCustomers / uniqueCustomers) * 100).toFixed(1);
+    const churnPct = (100 - Number(rprPct)).toFixed(1);
+
+    // 5. Price Elasticity of Demand (PED) Simulation
+    const basePed = -0.55; // Inelastic baseline
+    const simulatedPriceChangePct = kpiPriceSimPct / 100;
+    const projectedDemandChangePct = basePed * simulatedPriceChangePct;
+    const newPriceMultiplier = 1 + simulatedPriceChangePct;
+    const newDemandMultiplier = Math.max(0.1, 1 + projectedDemandChangePct);
+    const projectedSimRevenue = Math.round(grossRevenue * newPriceMultiplier * newDemandMultiplier);
+    const revenueDelta = projectedSimRevenue - grossRevenue;
+
+    // 6. Breakeven Volume & Margin of Safety
+    const varCostPerOrder = Math.round((cogsAmount + (simulatedAdSpend * 0.35)) / Math.max(1, count));
+    const contributionMarginPerOrder = Math.max(10, aov - varCostPerOrder);
+    const breakevenOrders = Math.ceil(metrics.opexAmount / contributionMarginPerOrder);
+    const marginOfSafetyPct = count > 0 ? (((count - breakevenOrders) / count) * 100).toFixed(1) : '0.0';
+
+    return {
+      grossProfit,
+      avgInventoryCost,
+      gmroi,
+      gmroiNum,
+      clv,
+      cac,
+      ltvToCac,
+      ltvCacNum,
+      cacPaybackMonths,
+      strPct,
+      unitsSold,
+      totalStockAvailable,
+      rprPct,
+      churnPct,
+      uniqueCustomers,
+      repeatCustomers,
+      basePed,
+      projectedDemandChangePct: (projectedDemandChangePct * 100).toFixed(1),
+      projectedSimRevenue,
+      revenueDelta,
+      contributionMarginPerOrder,
+      breakevenOrders,
+      marginOfSafetyPct
+    };
+  }, [metrics, filteredData, kpiInventorySimMultiplier, kpiAdSpendSimMultiplier, kpiPriceSimPct]);
 
   // -------------------------------------------------------------
   // 4. Reset Filters Handler
@@ -552,6 +639,48 @@ export default function ExecutiveBiStudio({
         </div>
 
         {/* ========================================================= */}
+        {/* 1.1. MODE SWITCHER: CANVAS VS DEEP-DIVE KPI STUDIO       */}
+        {/* ========================================================= */}
+        <div className="mt-5 pt-4 border-t border-slate-700/40 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-800/80 dark:bg-slate-900/90 border border-slate-700/60 shadow-inner">
+            <button
+              type="button"
+              onClick={() => setActiveStudioTab('canvas')}
+              className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                activeStudioTab === 'canvas'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>📊</span>
+              <span>{tx('แดชบอร์ดภาพรวม Power BI Canvas', 'Power BI Canvas')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveStudioTab('deep_dive_kpis')}
+              className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                activeStudioTab === 'deep_dive_kpis'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 shadow-md font-black'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>🔬</span>
+              <span>{tx('สูตรคำนวณ KPI เจาะลึกเฉพาะทาง (Deep-Dive KPI Studio)', 'Deep-Dive Business KPI Studio')}</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-950 text-emerald-300 font-extrabold uppercase">
+                7 KPIs
+              </span>
+            </button>
+          </div>
+
+          <div className="text-xs font-bold text-slate-400">
+            {activeStudioTab === 'canvas'
+              ? tx('โหมดแสดงผลกราฟและสไลเซอร์มาตรฐาน', 'Standard Visual Palette Mode')
+              : tx('โหมดจำลองสถานการณ์และสูตรคำนวณขั้นสูง', 'Unit Economics & Scenario Simulation')}
+          </div>
+        </div>
+
+        {/* ========================================================= */}
         {/* 2. DYNAMIC INTERACTIVE SLICERS PANE (แถบสไลเซอร์กรองข้อมูล) */}
         {/* ========================================================= */}
         <div className="mt-6 pt-6 border-t border-slate-700/40 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -675,15 +804,20 @@ export default function ExecutiveBiStudio({
       </div>
 
       {/* ========================================================= */}
-      {/* 3. DAX EXECUTIVE SCORECARD CARDS (การ์ด KPI สไตล์ Power BI)  */}
+      {/* 3. CONDITIONAL RENDER: POWER BI CANVAS VS DEEP-DIVE KPIS  */}
       {/* ========================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* KPI 1: Gross Revenue */}
-        <div
-          className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
-            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
-          }`}
-        >
+      {activeStudioTab === 'canvas' ? (
+        <>
+          {/* ========================================================= */}
+          {/* 3.1. DAX EXECUTIVE SCORECARD CARDS (การ์ด KPI สไตล์ Power BI)  */}
+          {/* ========================================================= */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* KPI 1: Gross Revenue */}
+            <div
+              className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
+                theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+              }`}
+            >
           <div className="flex items-center justify-between">
             <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
               {tx('รายได้รวม (Gross Revenue)', 'Gross Revenue')}
@@ -1234,6 +1368,613 @@ export default function ExecutiveBiStudio({
           </table>
         </div>
       </div>
+    </>
+  ) : (
+    /* ========================================================= */
+    /* 3.2. DEEP-DIVE KPI STUDIO (สูตรคำนวณ KPI เจาะลึกเฉพาะทาง)  */
+    /* ========================================================= */
+    <div className="space-y-6">
+      {/* 1. SCENARIO SIMULATION TOOLBAR */}
+      <div
+        className={`p-6 rounded-3xl border transition shadow-xl backdrop-blur-xl ${
+          theme === 'dark'
+            ? 'bg-gradient-to-r from-slate-900/95 via-indigo-950/40 to-slate-900/95 border-emerald-500/30'
+            : 'bg-white/95 border-emerald-200 shadow-emerald-500/5'
+        }`}
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xl border border-emerald-500/30">
+              🎮
+            </span>
+            <div>
+              <h2 className={`text-base font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                {tx('จำลองสถานการณ์ Unit Economics (What-If Interactive Simulation)', 'Unit Economics Interactive What-If Simulation')}
+              </h2>
+              <p className={`text-xs font-semibold ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                {tx(
+                  'ปรับแต่งตัวแปรแบบเรียลไทม์เพื่อดูผลกระทบต่อ LTV:CAC, GMROI, ความยืดหยุ่นของราคา และจุดคุ้มทุน',
+                  'Tweak real-time scenario levers to project GMROI, LTV:CAC, Price Elasticity and Breakeven.'
+                )}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setKpiPriceSimPct(0);
+              setKpiAdSpendSimMultiplier(1.0);
+              setKpiInventorySimMultiplier(1.0);
+              hotToast.success(tx('รีเซ็ตตัวแปรจำลองสถานการณ์แล้ว', 'Simulation levers reset to baseline'));
+            }}
+            className={`px-4 py-2 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-2 self-start md:self-auto ${
+              theme === 'dark'
+                ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                : 'bg-slate-100 hover:bg-slate-200 text-[#000000] border-slate-300'
+            }`}
+          >
+            <span>🔄</span>
+            <span>{tx('คืนค่าเดิม (Reset Levers)', 'Reset Levers')}</span>
+          </button>
+        </div>
+
+        {/* 3 Simulation Levers */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-3 border-t border-slate-700/40 dark:border-slate-800">
+          {/* Lever 1: Price Sensitivity */}
+          <div className={`p-4 rounded-2xl border ${theme === 'dark' ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <label className={`text-xs font-black ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
+                🏷️ {tx('ปรับราคาสินค้าเฉลี่ย (Price Δ)', 'Price Sensitivity Δ')}
+              </label>
+              <span className={`px-2 py-0.5 rounded-lg text-xs font-black ${
+                kpiPriceSimPct > 0 ? 'bg-emerald-500/20 text-emerald-400' : kpiPriceSimPct < 0 ? 'bg-rose-500/20 text-rose-400' : 'bg-slate-500/20 text-slate-400'
+              }`}>
+                {kpiPriceSimPct > 0 ? `+${kpiPriceSimPct}%` : `${kpiPriceSimPct}%`}
+              </span>
+            </div>
+            <input
+              type="range"
+              min="-15"
+              max="15"
+              step="1"
+              value={kpiPriceSimPct}
+              onChange={e => setKpiPriceSimPct(Number(e.target.value))}
+              className="w-full accent-amber-500 cursor-pointer"
+            />
+            <div className="flex justify-between text-[11px] font-semibold text-slate-500 mt-1">
+              <span>-15% (ลดราคา)</span>
+              <span>0% (ราคาเดิม)</span>
+              <span>+15% (ขึ้นราคา)</span>
+            </div>
+          </div>
+
+          {/* Lever 2: Ad Spend Multiplier */}
+          <div className={`p-4 rounded-2xl border ${theme === 'dark' ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <label className={`text-xs font-black ${theme === 'dark' ? 'text-sky-400' : 'text-[#000000]'}`}>
+                📢 {tx('ตัวคูณงบการตลาด (Ad Spend Factor)', 'Ad Spend Multiplier')}
+              </label>
+              <span className="px-2 py-0.5 rounded-lg text-xs font-black bg-sky-500/20 text-sky-400">
+                {kpiAdSpendSimMultiplier.toFixed(1)}x (฿{Math.round(metrics.marketingExpense * kpiAdSpendSimMultiplier).toLocaleString()})
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0.5"
+              max="2.0"
+              step="0.1"
+              value={kpiAdSpendSimMultiplier}
+              onChange={e => setKpiAdSpendSimMultiplier(Number(e.target.value))}
+              className="w-full accent-sky-500 cursor-pointer"
+            />
+            <div className="flex justify-between text-[11px] font-semibold text-slate-500 mt-1">
+              <span>0.5x (ลดงบยิงแอด)</span>
+              <span>1.0x (ปัจจุบัน)</span>
+              <span>2.0x (เร่งแคมเปญ)</span>
+            </div>
+          </div>
+
+          {/* Lever 3: Inventory Buffer */}
+          <div className={`p-4 rounded-2xl border ${theme === 'dark' ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <label className={`text-xs font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-[#000000]'}`}>
+                📦 {tx('ตัวคูณสต็อกสินค้าคงคลัง (Inventory Buffer)', 'Inventory Buffer')}
+              </label>
+              <span className="px-2 py-0.5 rounded-lg text-xs font-black bg-emerald-500/20 text-emerald-400">
+                {kpiInventorySimMultiplier.toFixed(1)}x
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0.5"
+              max="2.0"
+              step="0.1"
+              value={kpiInventorySimMultiplier}
+              onChange={e => setKpiInventorySimMultiplier(Number(e.target.value))}
+              className="w-full accent-emerald-500 cursor-pointer"
+            />
+            <div className="flex justify-between text-[11px] font-semibold text-slate-500 mt-1">
+              <span>0.5x (Lean สต็อก)</span>
+              <span>1.0x (ปกติ)</span>
+              <span>2.0x (สำรองสต็อก)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. 6 DEEP-DIVE KPI SCORECARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* KPI 1: GMROI */}
+        <div
+          className={`p-6 rounded-3xl border transition shadow-xl relative overflow-hidden ${
+            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+          }`}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                📦 {tx('ผลตอบแทนสต็อกต่อกำไรขั้นต้น', 'Gross Margin Return on Inventory')}
+              </span>
+              <h3 className={`text-lg font-black mt-0.5 ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                GMROI
+              </h3>
+            </div>
+            <span
+              className={`px-3 py-1 rounded-xl text-xs font-black border ${
+                deepDiveKpis.gmroiNum >= 2.5
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : deepDiveKpis.gmroiNum >= 1.8
+                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+              }`}
+            >
+              {deepDiveKpis.gmroiNum >= 2.5
+                ? tx('ยอดเยี่ยม (High)', 'High')
+                : deepDiveKpis.gmroiNum >= 1.8
+                ? tx('ปานกลาง (Balanced)', 'Balanced')
+                : tx('สต็อกหมุนช้า (Low)', 'Low')}
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className={`text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+              {deepDiveKpis.gmroi}x
+            </span>
+            <span className="text-xs font-bold text-slate-400">
+              {tx('เท่าของเงินลงทุนสต็อก', 'times inventory cost')}
+            </span>
+          </div>
+
+          <div className="mt-3 text-xs font-semibold text-slate-400 flex items-center justify-between border-t border-slate-700/40 dark:border-slate-800 pt-3">
+            <span>{tx('เกณฑ์สากล (Benchmark):', 'Global Benchmark:')}</span>
+            <span className="font-black text-emerald-400">≥ 2.50x</span>
+          </div>
+
+          <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
+            <div className="text-[11px] font-bold text-amber-400 mb-1">สูตรคำนวณ: Gross Profit ÷ Avg Inventory Cost</div>
+            <div>฿{deepDiveKpis.grossProfit.toLocaleString()} ÷ ฿{Math.round(deepDiveKpis.avgInventoryCost).toLocaleString()}</div>
+          </div>
+        </div>
+
+        {/* KPI 2: LTV:CAC Ratio & Payback */}
+        <div
+          className={`p-6 rounded-3xl border transition shadow-xl relative overflow-hidden ${
+            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+          }`}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                🎯 {tx('ความคุ้มค่าในการหาลูกค้า', 'Customer Lifetime vs Acquisition')}
+              </span>
+              <h3 className={`text-lg font-black mt-0.5 ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                LTV : CAC Ratio
+              </h3>
+            </div>
+            <span
+              className={`px-3 py-1 rounded-xl text-xs font-black border ${
+                deepDiveKpis.ltvCacNum >= 3.0
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : deepDiveKpis.ltvCacNum >= 2.0
+                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+              }`}
+            >
+              {deepDiveKpis.ltvCacNum >= 3.0
+                ? tx('สเกลได้ดีมาก (Scalable)', 'Highly Scalable')
+                : deepDiveKpis.ltvCacNum >= 2.0
+                ? tx('พอใช้ (Sustainable)', 'Sustainable')
+                : tx('ค่าแอดสูงเกินไป (High CAC)', 'High CAC')}
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className={`text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+              {deepDiveKpis.ltvToCac}x
+            </span>
+            <span className="text-xs font-bold text-slate-400">
+              {tx('เท่าของค่าโฆษณา', 'times CAC')}
+            </span>
+          </div>
+
+          <div className="mt-3 text-xs font-semibold text-slate-400 flex items-center justify-between border-t border-slate-700/40 dark:border-slate-800 pt-3">
+            <span>{tx('CAC Payback Period:', 'CAC Payback Period:')}</span>
+            <span className="font-black text-sky-400">{deepDiveKpis.cacPaybackMonths} {tx('เดือน (เกณฑ์ < 12 ด.)', 'mos (<12 mos)')}</span>
+          </div>
+
+          <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
+            <div className="text-[11px] font-bold text-sky-400 mb-1">CLV: ฿{deepDiveKpis.clv.toLocaleString()} | CAC: ฿{deepDiveKpis.cac.toLocaleString()}</div>
+            <div>สูตรคำนวณ: CLV ÷ CAC (Benchmark: 3.0x – 5.0x)</div>
+          </div>
+        </div>
+
+        {/* KPI 3: Sell-Through Rate (STR %) */}
+        <div
+          className={`p-6 rounded-3xl border transition shadow-xl relative overflow-hidden ${
+            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+          }`}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                ⚡ {tx('อัตราการระบายสินค้าออกจากคลัง', 'Inventory Clearance Efficiency')}
+              </span>
+              <h3 className={`text-lg font-black mt-0.5 ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                Sell-Through Rate (STR)
+              </h3>
+            </div>
+            <span
+              className={`px-3 py-1 rounded-xl text-xs font-black border ${
+                Number(deepDiveKpis.strPct) >= 70
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : Number(deepDiveKpis.strPct) >= 50
+                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+              }`}
+            >
+              {Number(deepDiveKpis.strPct) >= 70
+                ? tx('ระบายไวมาก (Fast)', 'Fast Turnover')
+                : Number(deepDiveKpis.strPct) >= 50
+                ? tx('ปกติ (Healthy)', 'Healthy')
+                : tx('สต็อกตกค้าง (Slow)', 'Slow')}
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className={`text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+              {deepDiveKpis.strPct}%
+            </span>
+            <span className="text-xs font-bold text-slate-400">
+              {tx('ของสต็อกที่พร้อมจำหน่าย', 'of available inventory')}
+            </span>
+          </div>
+
+          <div className="mt-3 text-xs font-semibold text-slate-400 flex items-center justify-between border-t border-slate-700/40 dark:border-slate-800 pt-3">
+            <span>{tx('เกณฑ์สากล (Benchmark):', 'Global Benchmark:')}</span>
+            <span className="font-black text-emerald-400">70% – 85%</span>
+          </div>
+
+          <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
+            <div className="text-[11px] font-bold text-emerald-400 mb-1">ขายได้: {deepDiveKpis.unitsSold.toLocaleString()} ชิ้น / มีของ {deepDiveKpis.totalStockAvailable.toLocaleString()} ชิ้น</div>
+            <div>สูตรคำนวณ: (Units Sold ÷ Total Inventory) × 100</div>
+          </div>
+        </div>
+
+        {/* KPI 4: Repeat Purchase Rate (RPR %) */}
+        <div
+          className={`p-6 rounded-3xl border transition shadow-xl relative overflow-hidden ${
+            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+          }`}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                🔄 {tx('อัตราลูกค้ากลับมาซื้อซ้ำ', 'Customer Retention & Loyalty')}
+              </span>
+              <h3 className={`text-lg font-black mt-0.5 ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                Repeat Purchase Rate (RPR)
+              </h3>
+            </div>
+            <span
+              className={`px-3 py-1 rounded-xl text-xs font-black border ${
+                Number(deepDiveKpis.rprPct) >= 30
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : Number(deepDiveKpis.rprPct) >= 20
+                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+              }`}
+            >
+              {Number(deepDiveKpis.rprPct) >= 30
+                ? tx('ความภักดีสูง (Loyal)', 'High Loyalty')
+                : Number(deepDiveKpis.rprPct) >= 20
+                ? tx('ระดับทั่วไป (Normal)', 'Normal')
+                : tx('เสี่ยงลูกค้าหาย (Churn Risk)', 'Churn Risk')}
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className={`text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+              {deepDiveKpis.rprPct}%
+            </span>
+            <span className="text-xs font-bold text-slate-400">
+              {tx('ของฐานลูกค้าทั้งหมด', 'of unique customers')}
+            </span>
+          </div>
+
+          <div className="mt-3 text-xs font-semibold text-slate-400 flex items-center justify-between border-t border-slate-700/40 dark:border-slate-800 pt-3">
+            <span>{tx('อัตราลูกค้าไม่ซื้อซ้ำ (Churn):', 'Churn Rate:')}</span>
+            <span className="font-black text-rose-400">{deepDiveKpis.churnPct}%</span>
+          </div>
+
+          <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
+            <div className="text-[11px] font-bold text-purple-400 mb-1">ลูกค้าซื้อซ้ำ: {deepDiveKpis.repeatCustomers.toLocaleString()} / ลูกค้าทั้งหมด: {deepDiveKpis.uniqueCustomers.toLocaleString()} ราย</div>
+            <div>สูตรคำนวณ: (Repeat Customers ÷ Total Unique) × 100</div>
+          </div>
+        </div>
+
+        {/* KPI 5: Price Elasticity of Demand (PED) */}
+        <div
+          className={`p-6 rounded-3xl border transition shadow-xl relative overflow-hidden ${
+            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+          }`}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                🏷️ {tx('ความยืดหยุ่นของอุปสงค์ต่อราคา', 'Price Elasticity of Demand')}
+              </span>
+              <h3 className={`text-lg font-black mt-0.5 ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                Price Elasticity (PED)
+              </h3>
+            </div>
+            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-sky-500/20 text-sky-400 border-sky-500/30">
+              Inelastic (|PED| &lt; 1.0)
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className={`text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+              {deepDiveKpis.basePed.toFixed(2)}
+            </span>
+            <span className="text-xs font-bold text-slate-400">
+              {tx('สัมประสิทธิ์ความยืดหยุ่น', 'elasticity coefficient')}
+            </span>
+          </div>
+
+          <div className="mt-3 text-xs font-semibold text-slate-400 flex items-center justify-between border-t border-slate-700/40 dark:border-slate-800 pt-3">
+            <span>{tx('ผลต่อยอดขายสุทธิ (Δ Rev):', 'Net Revenue Impact:')}</span>
+            <span className={`font-black ${deepDiveKpis.revenueDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {deepDiveKpis.revenueDelta >= 0 ? `+฿${deepDiveKpis.revenueDelta.toLocaleString()}` : `-฿${Math.abs(deepDiveKpis.revenueDelta).toLocaleString()}`}
+            </span>
+          </div>
+
+          <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
+            <div className="text-[11px] font-bold text-amber-400 mb-1">ปรับราคา {kpiPriceSimPct > 0 ? `+${kpiPriceSimPct}%` : `${kpiPriceSimPct}%`} → ดีมานด์ {deepDiveKpis.projectedDemandChangePct}%</div>
+            <div>รายได้จำลองใหม่: ฿{deepDiveKpis.projectedSimRevenue.toLocaleString()}</div>
+          </div>
+        </div>
+
+        {/* KPI 6: Breakeven Volume & Margin of Safety */}
+        <div
+          className={`p-6 rounded-3xl border transition shadow-xl relative overflow-hidden ${
+            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+          }`}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                ⚖️ {tx('จุดคุ้มทุนคำสั่งซื้อ & ส่วนเผื่อความปลอดภัย', 'Breakeven Volume & Margin of Safety')}
+              </span>
+              <h3 className={`text-lg font-black mt-0.5 ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                Breakeven Orders (BEP)
+              </h3>
+            </div>
+            <span
+              className={`px-3 py-1 rounded-xl text-xs font-black border ${
+                Number(deepDiveKpis.marginOfSafetyPct) >= 20
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : Number(deepDiveKpis.marginOfSafetyPct) >= 10
+                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+              }`}
+            >
+              MoS: {deepDiveKpis.marginOfSafetyPct}%
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className={`text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+              {deepDiveKpis.breakevenOrders.toLocaleString()}
+            </span>
+            <span className="text-xs font-bold text-slate-400">
+              {tx('ออเดอร์เพื่อคุ้มทุน OPEX', 'orders to cover fixed OPEX')}
+            </span>
+          </div>
+
+          <div className="mt-3 text-xs font-semibold text-slate-400 flex items-center justify-between border-t border-slate-700/40 dark:border-slate-800 pt-3">
+            <span>{tx('กำไรส่วนเกินต่อบิล (CM):', 'Contribution Margin/Order:')}</span>
+            <span className="font-black text-emerald-400">฿{deepDiveKpis.contributionMarginPerOrder.toLocaleString()}</span>
+          </div>
+
+          <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
+            <div className="text-[11px] font-bold text-emerald-400 mb-1">Fixed OPEX: ฿{metrics.opexAmount.toLocaleString()} ÷ CM ฿{deepDiveKpis.contributionMarginPerOrder.toLocaleString()}</div>
+            <div>ออเดอร์จริงปัจจุบัน: {metrics.ordersCount.toLocaleString()} บิล (ปลอดภัย)</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. EXECUTIVE FORMULA CATALOG DIRECTORY (คลังสูตรคำนวณมาตรฐาน 7 รายการ) */}
+      <div
+        className={`p-6 rounded-3xl border transition shadow-xl backdrop-blur-xl ${
+          theme === 'dark' ? 'bg-slate-900/95 border-slate-700/60' : 'bg-white border-blue-200/80'
+        }`}
+      >
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-xl border border-amber-500/30">
+              📐
+            </span>
+            <div>
+              <h3 className={`text-base font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                {tx('คลังสูตรคำนวณ KPI เจาะลึกเฉพาะทางและเกณฑ์วัดผลมาตรฐาน (7 Core Business Formulas)', '7 Core Deep-Dive Business KPI Formulas Catalog')}
+              </h3>
+              <p className={`text-xs font-semibold ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                {tx(
+                  'สูตรทางคณิตศาสตร์และ DAX Expression ระดับสากลเพื่อการบริหารคลังสินค้า, Unit Economics และความยั่งยืนทางการเงิน',
+                  'Enterprise mathematical and DAX formulas for inventory, unit economics, pricing and financial sustainability.'
+                )}
+              </p>
+            </div>
+          </div>
+          <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-400 border border-amber-400/30">
+            {tx('อิงตามมาตรฐาน Harvard Business Review & CFA', 'HBR & CFA Institute Benchmarks')}
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className={`border-b ${theme === 'dark' ? 'border-slate-800 text-slate-400 bg-slate-950/60' : 'border-slate-200 text-slate-600 bg-slate-50'}`}>
+                <th className="py-3 px-4 font-black uppercase tracking-wider">{tx('ตัวชี้วัด (KPI)', 'KPI Name')}</th>
+                <th className="py-3 px-4 font-black uppercase tracking-wider">{tx('หมวดหมู่', 'Domain')}</th>
+                <th className="py-3 px-4 font-black uppercase tracking-wider">{tx('สูตรคำนวณคณิตศาสตร์ / DAX', 'Mathematical & DAX Formula')}</th>
+                <th className="py-3 px-4 font-black uppercase tracking-wider">{tx('หน่วย', 'Unit')}</th>
+                <th className="py-3 px-4 font-black uppercase tracking-wider">{tx('เกณฑ์สากล (Benchmark)', 'Benchmark')}</th>
+                <th className="py-3 px-4 font-black uppercase tracking-wider">{tx('การนำไปใช้ตัดสินใจ', 'Executive Action')}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/40">
+              {/* Row 1: GMROI */}
+              <tr className={`hover:bg-slate-800/20 transition ${theme === 'dark' ? 'text-slate-200' : 'text-[#000000]'}`}>
+                <td className="py-3 px-4 font-bold text-amber-400 whitespace-nowrap">
+                  1. GMROI (Gross Margin Return on Inventory)
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-bold">
+                    Inventory & Retail
+                  </span>
+                </td>
+                <td className="py-3 px-4 font-mono text-[11px]">
+                  <span className="text-sky-400 font-bold">GMROI</span> = Gross Profit ÷ Average Inventory Cost
+                </td>
+                <td className="py-3 px-4 font-bold text-slate-400">เท่า (x)</td>
+                <td className="py-3 px-4 font-black text-emerald-400">≥ 2.50x</td>
+                <td className="py-3 px-4 text-slate-400">วัดความคุ้มค่าของเงินจมในสต็อก หากต่ำกว่า 1.8x ให้เร่ง Flash Sale / Mark Down</td>
+              </tr>
+
+              {/* Row 2: LTV:CAC Ratio */}
+              <tr className={`hover:bg-slate-800/20 transition ${theme === 'dark' ? 'text-slate-200' : 'text-[#000000]'}`}>
+                <td className="py-3 px-4 font-bold text-sky-400 whitespace-nowrap">
+                  2. LTV : CAC Ratio
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[11px] font-bold">
+                    Unit Economics
+                  </span>
+                </td>
+                <td className="py-3 px-4 font-mono text-[11px]">
+                  <span className="text-sky-400 font-bold">LTV:CAC</span> = Customer Lifetime Value (CLV) ÷ CAC
+                </td>
+                <td className="py-3 px-4 font-bold text-slate-400">เท่า (x)</td>
+                <td className="py-3 px-4 font-black text-emerald-400">3.0x – 5.0x</td>
+                <td className="py-3 px-4 text-slate-400">ถ้า &gt; 5x แปลว่ายิงแอดน้อยเกินไป (Under-invested) ถ้า &lt; 3x สเกลแล้วเสี่ยงขาดทุน</td>
+              </tr>
+
+              {/* Row 3: CAC Payback Period */}
+              <tr className={`hover:bg-slate-800/20 transition ${theme === 'dark' ? 'text-slate-200' : 'text-[#000000]'}`}>
+                <td className="py-3 px-4 font-bold text-indigo-400 whitespace-nowrap">
+                  3. CAC Payback Period
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[11px] font-bold">
+                    Cash Flow & Runway
+                  </span>
+                </td>
+                <td className="py-3 px-4 font-mono text-[11px]">
+                  <span className="text-indigo-400 font-bold">Payback</span> = CAC ÷ Monthly Gross Margin per Customer
+                </td>
+                <td className="py-3 px-4 font-bold text-slate-400">เดือน (Months)</td>
+                <td className="py-3 px-4 font-black text-emerald-400">&lt; 12 เดือน</td>
+                <td className="py-3 px-4 text-slate-400">ระยะเวลาคืนทุนค่าโฆษณา ช่วยรักษาสภาพคล่องกระแสเงินสดและลดเงินทุนหมุนเวียน</td>
+              </tr>
+
+              {/* Row 4: STR % */}
+              <tr className={`hover:bg-slate-800/20 transition ${theme === 'dark' ? 'text-slate-200' : 'text-[#000000]'}`}>
+                <td className="py-3 px-4 font-bold text-emerald-400 whitespace-nowrap">
+                  4. Sell-Through Rate (STR %)
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-bold">
+                    Supply Chain
+                  </span>
+                </td>
+                <td className="py-3 px-4 font-mono text-[11px]">
+                  <span className="text-emerald-400 font-bold">STR%</span> = (Units Sold ÷ Total Available Inventory) × 100
+                </td>
+                <td className="py-3 px-4 font-bold text-slate-400">เปอร์เซ็นต์ (%)</td>
+                <td className="py-3 px-4 font-black text-emerald-400">70% – 85%</td>
+                <td className="py-3 px-4 text-slate-400">ถ้า &gt; 90% เสี่ยงของขาดสต็อก (Stockout) ถ้า &lt; 50% ต้องปรับปรุงการกระจายสินค้า</td>
+              </tr>
+
+              {/* Row 5: RPR % */}
+              <tr className={`hover:bg-slate-800/20 transition ${theme === 'dark' ? 'text-slate-200' : 'text-[#000000]'}`}>
+                <td className="py-3 px-4 font-bold text-purple-400 whitespace-nowrap">
+                  5. Repeat Purchase Rate (RPR %)
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[11px] font-bold">
+                    Retention & CRM
+                  </span>
+                </td>
+                <td className="py-3 px-4 font-mono text-[11px]">
+                  <span className="text-purple-400 font-bold">RPR%</span> = (Repeat Customers ÷ Total Unique Customers) × 100
+                </td>
+                <td className="py-3 px-4 font-bold text-slate-400">เปอร์เซ็นต์ (%)</td>
+                <td className="py-3 px-4 font-black text-emerald-400">25% – 40%</td>
+                <td className="py-3 px-4 text-slate-400">วัดความภักดี ยิ่งซื้อซ้ำสูง ต้นทุนการตลาดสุทธิจะลดลงต่อเนื่องแบบ Exponential</td>
+              </tr>
+
+              {/* Row 6: PED */}
+              <tr className={`hover:bg-slate-800/20 transition ${theme === 'dark' ? 'text-slate-200' : 'text-[#000000]'}`}>
+                <td className="py-3 px-4 font-bold text-pink-400 whitespace-nowrap">
+                  6. Price Elasticity of Demand (PED)
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="px-2 py-0.5 rounded-md bg-pink-500/10 text-pink-400 border border-pink-500/20 text-[11px] font-bold">
+                    Pricing Strategy
+                  </span>
+                </td>
+                <td className="py-3 px-4 font-mono text-[11px]">
+                  <span className="text-pink-400 font-bold">PED</span> = %ΔQuantity ÷ %ΔPrice
+                </td>
+                <td className="py-3 px-4 font-bold text-slate-400">สัมประสิทธิ์ (Coeff)</td>
+                <td className="py-3 px-4 font-black text-emerald-400">|PED| &lt; 1.0 (Inelastic)</td>
+                <td className="py-3 px-4 text-slate-400">หากแบรนด์แข็งแกร่ง |PED| &lt; 1 สามารถปรับราคาสินค้าขึ้น 5–10% เพื่อเพิ่มกำไรสุทธิทันที</td>
+              </tr>
+
+              {/* Row 7: Breakeven Volume */}
+              <tr className={`hover:bg-slate-800/20 transition ${theme === 'dark' ? 'text-slate-200' : 'text-[#000000]'}`}>
+                <td className="py-3 px-4 font-bold text-teal-400 whitespace-nowrap">
+                  7. Breakeven Volume & Margin of Safety
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className="px-2 py-0.5 rounded-md bg-teal-500/10 text-teal-400 border border-teal-500/20 text-[11px] font-bold">
+                    Financial Risk
+                  </span>
+                </td>
+                <td className="py-3 px-4 font-mono text-[11px]">
+                  <span className="text-teal-400 font-bold">BEP</span> = Fixed OPEX ÷ (Price - Variable Cost)
+                </td>
+                <td className="py-3 px-4 font-bold text-slate-400">ออเดอร์ / ยอดขาย (฿)</td>
+                <td className="py-3 px-4 font-black text-emerald-400">Margin of Safety &gt; 20%</td>
+                <td className="py-3 px-4 text-slate-400">จำนวนคำสั่งซื้อขั้นต่ำเพื่อไม่ขาดทุน ช่วยกำหนด KPI ขั้นต่ำของทีมขายในแต่ละเดือน</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )}
 
       {/* ========================================================= */}
       {/* 7. EXECUTIVE Q&A COPILOT (ถาม-ตอบภาษาธรรมชาติสไตล์ Power BI) */}

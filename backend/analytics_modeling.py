@@ -618,3 +618,286 @@ def calculate_ab_testing_significance(
         "action_th": action_th,
     }
 
+
+# ------------------------------------------------------------------------------
+# 4. DEEP-DIVE BUSINESS-SPECIFIC KPI CALCULATION ENGINE
+# ------------------------------------------------------------------------------
+
+def get_kpi_formulas_catalog() -> List[Dict[str, Any]]:
+    """
+    แคตตาล็อกสูตรคำนวณ KPI เจาะลึกเฉพาะทางระดับผู้บริหาร (Executive KPI Directory)
+    ครอบคลุมทั้ง ค้าปลีก, ค้าส่ง, คลินิก, คาเฟ่, อีคอมเมิร์ซ และ Omni-Channel
+    """
+    return [
+        {
+            "id": "gmroi",
+            "name_th": "ผลตอบแทนกำไรขั้นต้นจากสต็อก (GMROI)",
+            "name_en": "Gross Margin Return on Inventory Investment (GMROI)",
+            "formula_latex": r"\text{GMROI} = \frac{\text{Gross Profit (฿)}}{\text{Average Inventory Cost (฿)}}",
+            "formula_plain": "กำไรขั้นต้น (Gross Profit) ÷ ต้นทุนสต็อกเฉลี่ย (Average Inventory Cost)",
+            "category": "inventory_profitability",
+            "benchmark": "≥ 2.50x (เกณฑ์มาตรฐานค้าปลีกชั้นนำ)",
+            "unit": "เท่า (x)",
+            "description_th": "ชี้วัดว่าเงิน 1 บาทที่นำไปจมในสต็อกสินค้า สามารถผลิตกำไรขั้นต้นกลับคืนมาให้กิจการได้กี่บาท ยิ่งสูงแปลว่าหมุนสต็อกได้คุ้มค่าเงินทุน",
+            "description_en": "Measures how much gross profit is generated for every 1 THB invested in inventory stock.",
+        },
+        {
+            "id": "ltv_cac_ratio",
+            "name_th": "อัตราส่วนมูลค่าตลอดชีพลูกค้าต่อต้นทุนหาลูกค้า (LTV:CAC Ratio)",
+            "name_en": "Customer Lifetime Value to CAC Ratio (LTV:CAC)",
+            "formula_latex": r"\text{Ratio} = \frac{\text{Customer Lifetime Value (LTV)}}{\text{Customer Acquisition Cost (CAC)}}",
+            "formula_plain": "มูลค่าตลอดชีพลูกค้า (LTV) ÷ ต้นทุนในการหาลูกค้าใหม่ (CAC)",
+            "category": "marketing_economics",
+            "benchmark": "3.0x – 5.0x (Golden Standard of Growth)",
+            "unit": "เท่า (:1)",
+            "description_th": "วัดความคุ้มค่าของการยิงแอดและการตลาด หากต่ำกว่า 1.0x คือยิงแอดขาดทุน หากอยู่ช่วง 3.0x–5.0x คือธุรกิจเติบโตอย่างมั่นคง",
+            "description_en": "Assesses ROI of marketing spend. Below 1x means acquiring customers at a loss; 3x-5x is sustainable growth.",
+        },
+        {
+            "id": "cac_payback_months",
+            "name_th": "ระยะเวลาคืนทุนค่าหาลูกค้า (CAC Payback Period)",
+            "name_en": "CAC Payback Period (Months)",
+            "formula_latex": r"\text{Payback (Months)} = \frac{\text{CAC}}{\text{Monthly Gross Profit Contribution per Customer}}",
+            "formula_plain": "ต้นทุนค่าแอดต่อลูกค้า (CAC) ÷ กำไรขั้นต้นเฉลี่ยต่อเดือนต่อคน",
+            "category": "marketing_economics",
+            "benchmark": "≤ 6 เดือน (ยิ่งสั้นยิ่งสภาพคล่องดี)",
+            "unit": "เดือน (Months)",
+            "description_th": "บอกว่าหลังจากยิงแอดหาลูกค้าคนใหม่เข้ามา ต้องใช้เวลากี่เดือนถึงจะได้เงินค่าแอดก้อนนั้นกลับคืนมาทั้งหมด",
+            "description_en": "The number of months required for a customer to generate enough gross margin to repay their acquisition cost.",
+        },
+        {
+            "id": "sell_through_rate",
+            "name_th": "อัตราการขายออกของสต็อก (Sell-Through Rate - STR %)",
+            "name_en": "Sell-Through Rate (STR %)",
+            "formula_latex": r"\text{STR \%} = \frac{\text{Units Sold}}{\text{Beginning Inventory} + \text{Received Inflow}} \times 100",
+            "formula_plain": "(จำนวนชิ้นที่ขายได้ ÷ [สต็อกต้นงวด + สต็อกรับเข้า]) × 100",
+            "category": "inventory_velocity",
+            "benchmark": "60% – 80% ต่อรอบการขาย",
+            "unit": "%",
+            "description_th": "ชี้วัดความเร็วในการระบายสินค้าออกจากชั้นวาง หากต่ำกว่า 40% มีความเสี่ยงสินค้าค้างสต็อก (Dead Stock)",
+            "description_en": "Percentage of available inventory sold during a given timeframe.",
+        },
+        {
+            "id": "repeat_purchase_rate",
+            "name_th": "อัตราการซื้อซ้ำของลูกค้า (Repeat Purchase Rate - RPR %)",
+            "name_en": "Repeat Purchase Rate (RPR %)",
+            "formula_latex": r"\text{RPR \%} = \frac{\text{Unique Customers with } \ge 2 \text{ Orders}}{\text{Total Unique Customers}} \times 100",
+            "formula_plain": "(จำนวนลูกค้าที่ซื้อตั้งแต่ 2 ครั้งขึ้นไป ÷ จำนวนลูกค้าทั้งหมด) × 100",
+            "category": "customer_loyalty",
+            "benchmark": "≥ 30.0% (ธุรกิจสุขภาพ/ความงาม/คาเฟ่ ควรแตะ 40%+)",
+            "unit": "%",
+            "description_th": "วัดความภักดีต่อแบรนด์ (Loyalty) การเพิ่มอัตราซื้อซ้ำ 5% สามารถดันกำไรสุทธิรวมของกิจการได้สูงถึง 25%–95%",
+            "description_en": "The percentage of customers that have made more than one purchase.",
+        },
+        {
+            "id": "price_elasticity",
+            "name_th": "ความยืดหยุ่นของอุปสงค์ต่อราคา (Price Elasticity of Demand - PED)",
+            "name_en": "Price Elasticity of Demand (PED)",
+            "formula_latex": r"\text{PED} = \frac{\% \Delta \text{ Quantity}}{\% \Delta \text{ Price}} = \frac{(Q_2 - Q_1) / Q_1}{(P_2 - P_1) / P_1}",
+            "formula_plain": "% การเปลี่ยนแปลงของจำนวนชิ้นที่ขายได้ ÷ % การเปลี่ยนแปลงของราคาขาย",
+            "category": "pricing_power",
+            "benchmark": "|PED| < 1.0 (Inelastic: สินค้ามีอำนาจต่อรองราคา ปรับขึ้นราคาแล้วกำไรเพิ่ม)",
+            "unit": "ค่าสัมประสิทธิ์ (Coefficient)",
+            "description_th": "ทดสอบว่าหากปรับขึ้นราคา 5%–10% ยอดขายจะตกฮวบหรือไม่ หาก |PED| < 1 แปลว่าลูกค้าติดแบรนด์ สามารถขยับราคาเพื่อดันกำไรได้",
+            "description_en": "Measures customer demand sensitivity to pricing shifts.",
+        },
+        {
+            "id": "breakeven_orders",
+            "name_th": "จุดคุ้มทุนจำนวนออเดอร์ (Breakeven Orders Volume)",
+            "name_en": "Breakeven Transaction Volume",
+            "formula_latex": r"\text{Breakeven Orders} = \frac{\text{Fixed OPEX}}{\text{Contribution Margin per Order}}",
+            "formula_plain": "ค่าใช้จ่ายคงที่ (Fixed OPEX) ÷ กำไรส่วนเกินต่อบิล (Contribution Margin)",
+            "category": "financial_safety",
+            "benchmark": "ต่ำกว่ายอดสั่งซื้อจริงอย่างน้อย 30% (Margin of Safety)",
+            "unit": "บิล / ออเดอร์",
+            "description_th": "จำนวนบิลขั้นต่ำในรอบเดือนที่ต้องขายให้ได้เพื่อครอบคลุมค่าเช่า ค่าจ้าง และค่าน้ำไฟทั้งหมด ก่อนเริ่มรับรู้กำไรสุทธิ",
+            "description_en": "Minimum number of orders needed to cover all fixed operating expenses.",
+        },
+    ]
+
+
+def calculate_deep_dive_business_kpis(
+    gross_revenue: float = 4829000.0,
+    cogs: float = 2317920.0,
+    marketing_expense: float = 579480.0,
+    opex: float = 724350.0,
+    avg_inventory_cost: float = 950000.0,
+    total_orders: int = 4250,
+    unique_customers: int = 2480,
+    repeat_customers: int = 940,
+    new_customers_acquired: int = 1540,
+    beginning_inventory_units: int = 12500,
+    received_inventory_units: int = 8000,
+    units_sold: int = 14200,
+    avg_customer_lifespan_years: float = 2.5,
+    sample_price_old: float = 450.0,
+    sample_price_new: float = 495.0,
+    sample_demand_old: float = 1200.0,
+    sample_demand_new: float = 1110.0,
+) -> Dict[str, Any]:
+    """
+    คำนวณชุดตัวชี้วัดประสิทธิภาพธุรกิจเจาะลึก 7 หมวด (Executive Deep-Dive KPI Engine)
+    พร้อมวิเคราะห์สถานะเทียบเกณฑ์สากล (Benchmark Evaluation) และข้อเสนอแนะเชิงกลยุทธ์
+    """
+    # Defensive Numeric Sanitization
+    gross_revenue = max(0.0, float(gross_revenue))
+    cogs = max(0.0, float(cogs))
+    marketing_expense = max(0.0, float(marketing_expense))
+    opex = max(0.0, float(opex))
+    avg_inventory_cost = max(1.0, float(avg_inventory_cost))
+    total_orders = max(1, int(total_orders))
+    unique_customers = max(1, int(unique_customers))
+    repeat_customers = max(0, min(int(repeat_customers), unique_customers))
+    new_customers_acquired = max(1, int(new_customers_acquired))
+    beginning_inventory_units = max(0, int(beginning_inventory_units))
+    received_inventory_units = max(0, int(received_inventory_units))
+    units_sold = max(0, int(units_sold))
+    avg_customer_lifespan_years = max(0.5, float(avg_customer_lifespan_years))
+
+    # 1. Financial Waterfall
+    gross_profit = max(0.0, gross_revenue - cogs)
+    gross_margin_pct = round((gross_profit / max(1.0, gross_revenue)) * 100.0, 2)
+    net_operating_profit = max(0.0, gross_profit - marketing_expense - opex)
+    net_margin_pct = round((net_operating_profit / max(1.0, gross_revenue)) * 100.0, 2)
+
+    # 2. GMROI (Gross Margin Return on Inventory Investment)
+    gmroi = round(gross_profit / avg_inventory_cost, 2)
+    if gmroi >= 2.5:
+        gmroi_grade = "EXCELLENT"
+        gmroi_badge = "🟢 ยอดเยี่ยม (ทุนสต็อกหมุนคืนกำไรสูง)"
+        gmroi_verdict = f"เงินสต็อก 1 บาท สร้างกำไรขั้นต้นกลับมาได้ถึง {gmroi} บาท สต็อกไม่จม"
+    elif gmroi >= 1.5:
+        gmroi_grade = "HEALTHY"
+        gmroi_badge = "🟡 ดีตามเกณฑ์มาตรฐาน"
+        gmroi_verdict = f"GMROI อยู่ที่ {gmroi} เท่า สอดคล้องกับเกณฑ์เฉลี่ยค้าปลีกทั่วไป"
+    else:
+        gmroi_grade = "RISK"
+        gmroi_badge = "🔴 ต่ำกว่าเกณฑ์ (สต็อกจมเงินทุน)"
+        gmroi_verdict = f"GMROI เพียง {gmroi} เท่า แนะนำเร่งระบาย Slow-Moving SKUs เพื่อดึงสภาพคล่อง"
+
+    # 3. Unit Economics & Basket Metrics
+    aov = round(gross_revenue / total_orders, 2)
+    items_per_order = round(units_sold / total_orders, 2) if total_orders > 0 else 1.0
+
+    # 4. Customer Marketing Economics (LTV & CAC)
+    purchase_frequency_per_year = round(total_orders / unique_customers, 2)
+    annual_customer_value = aov * purchase_frequency_per_year * (gross_margin_pct / 100.0)
+    clv = round(annual_customer_value * avg_customer_lifespan_years, 2)
+    cac = round(marketing_expense / new_customers_acquired, 2)
+    ltv_to_cac = round(clv / max(1.0, cac), 2)
+    monthly_profit_per_customer = max(1.0, annual_customer_value / 12.0)
+    cac_payback_months = round(cac / monthly_profit_per_customer, 1)
+
+    if ltv_to_cac >= 3.0:
+        ltv_cac_grade = "HEALTHY"
+        ltv_cac_badge = "🟢 เติบโตอย่างยั่งยืน (Golden Ratio)"
+        ltv_cac_verdict = f"LTV:CAC สูงถึง {ltv_to_cac}:1 คุ้มค่าค่าแอด สามารถเพิ่มงบการตลาดเพื่อขยายฐานลูกค้าได้"
+    elif ltv_to_cac >= 1.5:
+        ltv_cac_grade = "MODERATE"
+        ltv_cac_badge = "🟡 พอใช้ แต่ควรลดค่าแอดหรือเพิ่ม AOV"
+        ltv_cac_verdict = f"LTV:CAC อยู่ที่ {ltv_to_cac}:1 ควรโฟกัส Up-selling และการซื้อซ้ำเพื่อดัน LTV ให้สูงขึ้น"
+    else:
+        ltv_cac_grade = "WARNING"
+        ltv_cac_badge = "🔴 อันตราย (ค่าแอดกินกำไรลูกค้า)"
+        ltv_cac_verdict = f"LTV:CAC เพียง {ltv_to_cac}:1 ต้นทุนหาลูกค้าใหม่สูงเกินไปเมื่อเทียบกับกำไรที่ได้รับ"
+
+    # 5. Sell-Through Rate (STR %)
+    total_available_stock = beginning_inventory_units + received_inventory_units
+    str_pct = round((units_sold / max(1, total_available_stock)) * 100.0, 2)
+    if str_pct >= 75.0:
+        str_badge = "🟢 ขายออกเร็ว (ระวังของขาดสต็อก)"
+    elif str_pct >= 50.0:
+        str_badge = "🟢 อัตราขายออกสมดุลดี"
+    else:
+        str_badge = "🟡 ขายออกช้า แนะนำจัดโปรโมชันระบายสต็อก"
+
+    # 6. Repeat Purchase Rate (RPR %)
+    rpr_pct = round((repeat_customers / unique_customers) * 100.0, 2)
+    churn_rate_approx = round(max(0.0, 100.0 - rpr_pct), 2)
+
+    # 7. Price Elasticity of Demand (PED)
+    pct_p = ((sample_price_new - sample_price_old) / sample_price_old) if sample_price_old > 0 else 0.0
+    pct_q = ((sample_demand_new - sample_demand_old) / sample_demand_old) if sample_demand_old > 0 else 0.0
+    ped = round(pct_q / pct_p, 3) if pct_p != 0 else 0.0
+    is_inelastic = abs(ped) < 1.0
+
+    if is_inelastic:
+        ped_label = "ไร้ความยืดหยุ่น (Inelastic: ลูกค้าติดแบรนด์/สินค้าจำเป็น)"
+        ped_verdict = f"ค่า |PED| = {abs(ped):.2f} (< 1.0) หากปรับขึ้นราคา 10% ยอดขายชิ้นจะลดลงเพียง {abs(ped * 10):.1f}% รายรับรวมสุทธิจะเพิ่มขึ้น!"
+    else:
+        ped_label = "มีความยืดหยุ่นสูง (Elastic: ไวต่อราคา)"
+        ped_verdict = f"ค่า |PED| = {abs(ped):.2f} (> 1.0) หากปรับขึ้นราคา ยอดขายจะตกลงมากกว่าอัตราขึ้นราคา แนะนำให้คงราคาเดิมหรือทำ Bundle แทน"
+
+    # 8. Breakeven & Contribution Margin
+    variable_cost_per_order = (cogs + (marketing_expense * 0.4)) / max(1, total_orders)
+    contribution_margin_per_order = max(1.0, aov - variable_cost_per_order)
+    contribution_margin_ratio = round((contribution_margin_per_order / max(1.0, aov)) * 100.0, 2)
+    breakeven_orders = int(math.ceil(opex / contribution_margin_per_order))
+    margin_of_safety_pct = round(((total_orders - breakeven_orders) / total_orders) * 100.0, 2)
+
+    return {
+        "status": "success",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "kpis": {
+            "gmroi": {
+                "value": gmroi,
+                "unit": "x",
+                "grade": gmroi_grade,
+                "badge": gmroi_badge,
+                "verdict": gmroi_verdict,
+                "gross_profit_thb": gross_profit,
+                "avg_inventory_cost_thb": avg_inventory_cost,
+                "benchmark": "≥ 2.50x",
+            },
+            "ltv_cac": {
+                "ratio": ltv_to_cac,
+                "clv_thb": clv,
+                "cac_thb": cac,
+                "payback_months": cac_payback_months,
+                "grade": ltv_cac_grade,
+                "badge": ltv_cac_badge,
+                "verdict": ltv_cac_verdict,
+                "benchmark": "3.0x – 5.0x",
+            },
+            "sell_through_rate": {
+                "str_pct": str_pct,
+                "badge": str_badge,
+                "units_sold": units_sold,
+                "total_available_stock": total_available_stock,
+                "benchmark": "60% – 80%",
+            },
+            "repeat_purchase_rate": {
+                "rpr_pct": rpr_pct,
+                "repeat_customers_count": repeat_customers,
+                "unique_customers_count": unique_customers,
+                "estimated_churn_pct": churn_rate_approx,
+                "benchmark": "≥ 30.0%",
+            },
+            "price_elasticity": {
+                "ped_coefficient": ped,
+                "is_inelastic": is_inelastic,
+                "label": ped_label,
+                "verdict": ped_verdict,
+                "sample_test": {
+                    "price_change": f"฿{sample_price_old} ➔ ฿{sample_price_new} ({round(pct_p * 100, 1)}%)",
+                    "demand_change": f"{sample_demand_old} ➔ {sample_demand_new} ชิ้น ({round(pct_q * 100, 1)}%)",
+                },
+            },
+            "unit_economics": {
+                "aov_thb": aov,
+                "items_per_order": items_per_order,
+                "gross_margin_pct": gross_margin_pct,
+                "net_margin_pct": net_margin_pct,
+                "contribution_margin_per_order_thb": round(contribution_margin_per_order, 2),
+                "contribution_margin_ratio_pct": contribution_margin_ratio,
+            },
+            "breakeven_analysis": {
+                "breakeven_orders_count": breakeven_orders,
+                "actual_orders_count": total_orders,
+                "margin_of_safety_pct": margin_of_safety_pct,
+                "fixed_opex_thb": opex,
+            },
+        },
+    }
+
+

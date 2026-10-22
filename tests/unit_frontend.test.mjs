@@ -524,5 +524,86 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 21. DEEP-DIVE BUSINESS-SPECIFIC KPI ENGINE & UNIT ECONOMICS SIMULATION
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-21: ExecutiveBiStudio includes 7-KPI deep dive engine and scenario simulation', () => {
+    const biStudioPath = path.join(projectRoot, 'src', 'components', 'ExecutiveBiStudio.jsx');
+    assert.ok(fs.existsSync(biStudioPath), 'ExecutiveBiStudio.jsx must exist');
+    const biContent = fs.readFileSync(biStudioPath, 'utf8');
+
+    // 1. State for Mode Switcher & Simulation Levers
+    assert.ok(
+      biContent.includes("activeStudioTab") && biContent.includes("'deep_dive_kpis'"),
+      'ExecutiveBiStudio must support activeStudioTab with deep_dive_kpis mode'
+    );
+    assert.ok(
+      biContent.includes('kpiPriceSimPct') &&
+      biContent.includes('kpiAdSpendSimMultiplier') &&
+      biContent.includes('kpiInventorySimMultiplier'),
+      'ExecutiveBiStudio must define interactive simulation levers for Price, Ad Spend, and Inventory Buffer'
+    );
+
+    // 2. Deep-Dive KPI Calculation Memo (GMROI, LTV:CAC, STR, RPR, PED, Breakeven)
+    assert.ok(
+      biContent.includes('const deepDiveKpis = useMemo('),
+      'ExecutiveBiStudio must compute deepDiveKpis'
+    );
+    assert.ok(
+      biContent.includes('gmroi') && biContent.includes('avgInventoryCost'),
+      'deepDiveKpis must calculate GMROI based on gross profit and inventory cost'
+    );
+    assert.ok(
+      biContent.includes('ltvToCac') && biContent.includes('cacPaybackMonths'),
+      'deepDiveKpis must compute LTV:CAC ratio and CAC Payback period'
+    );
+    assert.ok(
+      biContent.includes('strPct') && biContent.includes('totalStockAvailable'),
+      'deepDiveKpis must compute Sell-Through Rate (STR %)'
+    );
+    assert.ok(
+      biContent.includes('rprPct') && biContent.includes('churnPct'),
+      'deepDiveKpis must compute Repeat Purchase Rate (RPR %) and Churn'
+    );
+    assert.ok(
+      biContent.includes('basePed') && biContent.includes('projectedSimRevenue'),
+      'deepDiveKpis must project Price Elasticity of Demand (PED) and new simulated revenue'
+    );
+    assert.ok(
+      biContent.includes('breakevenOrders') && biContent.includes('marginOfSafetyPct'),
+      'deepDiveKpis must compute Breakeven Orders and Margin of Safety'
+    );
+
+    // 3. UI Component Scorecards & Formula Catalog Table
+    assert.ok(
+      biContent.includes('GMROI (ผลตอบแทนสต็อกต่อกำไรขั้นต้น)') || biContent.includes('GMROI'),
+      'ExecutiveBiStudio must render GMROI card'
+    );
+    assert.ok(
+      biContent.includes('LTV : CAC Ratio') && biContent.includes('CAC Payback Period'),
+      'ExecutiveBiStudio must render LTV:CAC and Payback Period scorecard'
+    );
+    assert.ok(
+      biContent.includes('Sell-Through Rate (STR)') || biContent.includes('Sell-Through Rate'),
+      'ExecutiveBiStudio must render Sell-Through Rate scorecard'
+    );
+    assert.ok(
+      biContent.includes('Repeat Purchase Rate (RPR)') || biContent.includes('Repeat Purchase Rate'),
+      'ExecutiveBiStudio must render Repeat Purchase Rate scorecard'
+    );
+    assert.ok(
+      biContent.includes('Price Elasticity (PED)') || biContent.includes('Price Elasticity of Demand'),
+      'ExecutiveBiStudio must render Price Elasticity scorecard'
+    );
+    assert.ok(
+      biContent.includes('Breakeven Orders (BEP)') || biContent.includes('Breakeven Volume'),
+      'ExecutiveBiStudio must render Breakeven scorecard'
+    );
+    assert.ok(
+      biContent.includes('7 Core Business Formulas') || biContent.includes('7 Core Deep-Dive Business KPI Formulas Catalog'),
+      'ExecutiveBiStudio must render the 7-KPI Formula Catalog directory table'
+    );
+  });
+
 });
 

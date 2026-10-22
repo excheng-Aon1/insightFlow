@@ -34,6 +34,8 @@ from analytics_modeling import (
     norm_p_value,
     calculate_ab_testing_significance,
     calculate_dynamic_reorder_points,
+    calculate_deep_dive_business_kpis,
+    get_kpi_formulas_catalog,
 )
 from redis_cache import redis_client
 
@@ -157,6 +159,68 @@ class TestAnalyticsModelingUnit(unittest.TestCase):
         self.assertIn("p_value", res["statistics"])
         self.assertIn("is_statistically_significant", res["statistics"])
         self.assertTrue(res["statistics"]["is_statistically_significant"], "ความต่าง 10% vs 15% ใน 1,000 ตัวอย่างต้องมีนัยสำคัญทางสถิติ")
+
+    def test_deep_dive_business_kpis_calculation(self):
+        """4. ตรวจสอบสูตรคำนวณ KPI เฉพาะทาง (GMROI, LTV:CAC, STR%, RPR%, PED, Breakeven)"""
+        kpis_res = calculate_deep_dive_business_kpis(
+            gross_revenue=5000000.0,
+            cogs=2500000.0,
+            marketing_expense=500000.0,
+            opex=750000.0,
+            avg_inventory_cost=1000000.0,
+            total_orders=5000,
+            unique_customers=2500,
+            repeat_customers=1000,
+            new_customers_acquired=1500,
+            beginning_inventory_units=10000,
+            received_inventory_units=5000,
+            units_sold=12000,
+            avg_customer_lifespan_years=2.0,
+            sample_price_old=100.0,
+            sample_price_new=110.0,
+            sample_demand_old=1000.0,
+            sample_demand_new=950.0,
+        )
+        self.assertEqual(kpis_res["status"], "success")
+        kpis = kpis_res["kpis"]
+        
+        # 1. GMROI = 2,500,000 / 1,000,000 = 2.50
+        self.assertAlmostEqual(kpis["gmroi"]["value"], 2.50, places=2)
+        self.assertEqual(kpis["gmroi"]["grade"], "EXCELLENT")
+        
+        # 2. Sell-Through Rate = 12,000 / 15,000 = 80.0%
+        self.assertAlmostEqual(kpis["sell_through_rate"]["str_pct"], 80.0, places=1)
+        
+        # 3. Repeat Purchase Rate = 1,000 / 2,500 = 40.0%
+        self.assertAlmostEqual(kpis["repeat_purchase_rate"]["rpr_pct"], 40.0, places=1)
+        
+        # 4. Price Elasticity: Delta P = +10%, Delta Q = -5% -> PED = -0.5 (Inelastic)
+        self.assertAlmostEqual(kpis["price_elasticity"]["ped_coefficient"], -0.5, places=2)
+        self.assertTrue(kpis["price_elasticity"]["is_inelastic"])
+        
+        # 5. LTV:CAC Ratio check
+        self.assertGreater(kpis["ltv_cac"]["ratio"], 1.0)
+        self.assertIn("payback_months", kpis["ltv_cac"])
+        
+        # 6. Breakeven orders check
+        self.assertGreater(kpis["breakeven_analysis"]["breakeven_orders_count"], 0)
+        self.assertGreater(kpis["breakeven_analysis"]["margin_of_safety_pct"], 0.0)
+
+    def test_kpi_formulas_catalog_integrity(self):
+        """5. ตรวจสอบความถูกต้องและครบถ้วนของแคตตาล็อกสูตรคำนวณ KPI"""
+        catalog = get_kpi_formulas_catalog()
+        self.assertGreaterEqual(len(catalog), 6)
+        ids = [item["id"] for item in catalog]
+        self.assertIn("gmroi", ids)
+        self.assertIn("ltv_cac_ratio", ids)
+        self.assertIn("sell_through_rate", ids)
+        self.assertIn("repeat_purchase_rate", ids)
+        self.assertIn("price_elasticity", ids)
+        self.assertIn("breakeven_orders", ids)
+        for item in catalog:
+            self.assertIn("formula_latex", item)
+            self.assertIn("benchmark", item)
+            self.assertIn("description_th", item)
 
 
 class TestRedisTTLUnit(unittest.TestCase):

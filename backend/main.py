@@ -70,6 +70,8 @@ from analytics_modeling import (
     calculate_rfm_segmentation,
     calculate_market_basket_rules,
     calculate_ab_testing_significance,
+    calculate_deep_dive_business_kpis,
+    get_kpi_formulas_catalog,
 )
 from actionable_ai import (
     scan_business_anomalies,
@@ -295,6 +297,26 @@ class ABTestRequest(BaseModel):
     conversions_b: int = 102
     campaign_a_name: Optional[str] = "แคมเปญเดิม A (Control)"
     campaign_b_name: Optional[str] = "แคมเปญใหม่ B (Variation)"
+
+
+class DeepDiveKpiRequest(BaseModel):
+    gross_revenue: Optional[float] = 4829000.0
+    cogs: Optional[float] = 2317920.0
+    marketing_expense: Optional[float] = 579480.0
+    opex: Optional[float] = 724350.0
+    avg_inventory_cost: Optional[float] = 950000.0
+    total_orders: Optional[int] = 4250
+    unique_customers: Optional[int] = 2480
+    repeat_customers: Optional[int] = 940
+    new_customers_acquired: Optional[int] = 1540
+    beginning_inventory_units: Optional[int] = 12500
+    received_inventory_units: Optional[int] = 8000
+    units_sold: Optional[int] = 14200
+    avg_customer_lifespan_years: Optional[float] = 2.5
+    sample_price_old: Optional[float] = 450.0
+    sample_price_new: Optional[float] = 495.0
+    sample_demand_old: Optional[float] = 1200.0
+    sample_demand_new: Optional[float] = 1110.0
 
 
 class LineAlertRequest(BaseModel):
@@ -542,6 +564,24 @@ def run_ab_test_significance(req: ABTestRequest):
         campaign_a_name=req.campaign_a_name or "Campaign A",
         campaign_b_name=req.campaign_b_name or "Campaign B",
     )
+
+
+@app.get("/api/analytics/business-kpis/catalog", status_code=status.HTTP_200_OK)
+def get_business_kpi_catalog():
+    """แคตตาล็อกสูตรคำนวณ KPI เจาะลึกเฉพาะทางระดับผู้บริหาร (Executive KPI Directory)"""
+    catalog = get_kpi_formulas_catalog()
+    return {
+        "status": "success",
+        "total_kpis": len(catalog),
+        "catalog": catalog,
+    }
+
+
+@app.post("/api/analytics/business-kpis", status_code=status.HTTP_200_OK)
+def run_deep_dive_business_kpis(req: Optional[DeepDiveKpiRequest] = None):
+    """คำนวณสูตร KPI เจาะลึกเฉพาะทาง (GMROI, LTV:CAC, STR%, RPR%, PED, Breakeven)"""
+    params = req.dict() if req else {}
+    return calculate_deep_dive_business_kpis(**params)
 
 
 # ------------------------------------------------------------------------------
