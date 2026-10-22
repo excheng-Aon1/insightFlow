@@ -304,13 +304,22 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(appContent.includes('import ExecutiveBiStudio'), 'App.jsx must import ExecutiveBiStudio');
     assert.ok(appContent.includes("activeTab === 'bi_studio'"), 'App.jsx must render ExecutiveBiStudio on bi_studio tab');
 
-    // Luxury Icons
+    // Luxury Icons & Modern Power BI Suite Iconography
     const iconsPath = path.join(projectRoot, 'src', 'components', 'LuxuryIcons.jsx');
     const iconsContent = fs.readFileSync(iconsPath, 'utf8');
     assert.ok(iconsContent.includes('export function PowerBiStudioIcon'), 'LuxuryIcons must export PowerBiStudioIcon');
     assert.ok(iconsContent.includes('export function SlicerFilterIcon'), 'LuxuryIcons must export SlicerFilterIcon');
     assert.ok(iconsContent.includes('export function WaterfallChartIcon'), 'LuxuryIcons must export WaterfallChartIcon');
     assert.ok(iconsContent.includes('export function MatrixTableIcon'), 'LuxuryIcons must export MatrixTableIcon');
+    assert.ok(iconsContent.includes('export function BiRevenueIcon'), 'LuxuryIcons must export BiRevenueIcon');
+    assert.ok(iconsContent.includes('export function BiNetProfitIcon'), 'LuxuryIcons must export BiNetProfitIcon');
+    assert.ok(iconsContent.includes('export function BiAovCartIcon'), 'LuxuryIcons must export BiAovCartIcon');
+    assert.ok(iconsContent.includes('export function BiOrdersReceiptIcon'), 'LuxuryIcons must export BiOrdersReceiptIcon');
+    assert.ok(iconsContent.includes('export function BiChannelDonutIcon'), 'LuxuryIcons must export BiChannelDonutIcon');
+    assert.ok(iconsContent.includes('export function BiCalendarIcon'), 'LuxuryIcons must export BiCalendarIcon');
+    assert.ok(iconsContent.includes('export function BiBranchIcon'), 'LuxuryIcons must export BiBranchIcon');
+    assert.ok(iconsContent.includes('export function BiChannelIcon'), 'LuxuryIcons must export BiChannelIcon');
+    assert.ok(iconsContent.includes('export function BiCategoryIcon'), 'LuxuryIcons must export BiCategoryIcon');
   });
 
   // ----------------------------------------------------------------------------

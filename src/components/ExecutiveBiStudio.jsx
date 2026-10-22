@@ -21,7 +21,18 @@ import {
   MatrixTableIcon,
   GaugeMeterIcon,
   ExecutiveCopilotIcon,
-  PresentationModeIcon
+  PresentationModeIcon,
+  BiRevenueIcon,
+  BiNetProfitIcon,
+  BiAovCartIcon,
+  BiOrdersReceiptIcon,
+  BiChannelDonutIcon,
+  BiCalendarIcon,
+  BiBranchIcon,
+  BiChannelIcon,
+  BiCategoryIcon,
+  BiSettingsGearIcon,
+  BiSparklePromptIcon
 } from './LuxuryIcons';
 
 ChartJS.register(
@@ -652,7 +663,7 @@ export default function ExecutiveBiStudio({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <span>📊</span>
+              <PowerBiStudioIcon size={18} />
               <span>{tx('แดชบอร์ดภาพรวม Power BI Canvas', 'Power BI Canvas')}</span>
             </button>
 
@@ -665,7 +676,7 @@ export default function ExecutiveBiStudio({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <span>🔬</span>
+              <GaugeMeterIcon size={18} />
               <span>{tx('สูตรคำนวณ KPI เจาะลึกเฉพาะทาง (Deep-Dive KPI Studio)', 'Deep-Dive Business KPI Studio')}</span>
               <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-950 text-emerald-300 font-extrabold uppercase">
                 7 KPIs
@@ -686,8 +697,9 @@ export default function ExecutiveBiStudio({
         <div className="mt-6 pt-6 border-t border-slate-700/40 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Slicer 1: ช่วงเวลา (Time Period Slicer) */}
           <div>
-            <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
-              📅 {tx('ช่วงเวลา (Time Period)', 'Time Period')}
+            <label className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
+              <BiCalendarIcon size={16} />
+              <span>{tx('ช่วงเวลา (Time Period)', 'Time Period')}</span>
             </label>
             <select
               value={selectedDateRange}
@@ -708,8 +720,9 @@ export default function ExecutiveBiStudio({
 
           {/* Slicer 2: สาขา (Branch Slicer) */}
           <div>
-            <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
-              🏢 {tx('สาขา (Branch Slicer)', 'Branch Slicer')}
+            <label className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
+              <BiBranchIcon size={16} />
+              <span>{tx('สาขา (Branch Slicer)', 'Branch Slicer')}</span>
             </label>
             <select
               value={selectedBranch}
@@ -731,8 +744,9 @@ export default function ExecutiveBiStudio({
 
           {/* Slicer 3: ช่องทางการขาย (Platform Slicer) */}
           <div>
-            <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
-              🛍️ {tx('ช่องทางการขาย (Sales Channel)', 'Sales Channel')}
+            <label className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
+              <BiChannelIcon size={16} />
+              <span>{tx('ช่องทางการขาย (Sales Channel)', 'Sales Channel')}</span>
             </label>
             <select
               value={selectedChannel}
@@ -754,8 +768,9 @@ export default function ExecutiveBiStudio({
 
           {/* Slicer 4: หมวดหมู่สินค้า (Category Slicer) */}
           <div>
-            <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
-              🏷️ {tx('หมวดสินค้า (Product Category)', 'Product Category')}
+            <label className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-amber-400' : 'text-[#000000]'}`}>
+              <BiCategoryIcon size={16} />
+              <span>{tx('หมวดสินค้า (Product Category)', 'Product Category')}</span>
             </label>
             <select
               value={selectedCategory}
@@ -781,19 +796,22 @@ export default function ExecutiveBiStudio({
           <span className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>{tx('ตัวกรองที่ใช้งานอยู่:', 'Active Filters:')}</span>
           {selectedBranch !== 'all' && (
             <span className="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-400/40 flex items-center gap-1.5">
-              <span>🏢 {selectedBranch}</span>
+              <BiBranchIcon size={13} />
+              <span>{selectedBranch}</span>
               <button type="button" onClick={() => setSelectedBranch('all')} className="hover:text-white cursor-pointer font-bold">×</button>
             </span>
           )}
           {selectedChannel !== 'all' && (
             <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center gap-1.5">
-              <span>🛍️ {selectedChannel}</span>
+              <BiChannelIcon size={13} />
+              <span>{selectedChannel}</span>
               <button type="button" onClick={() => setSelectedChannel('all')} className="hover:text-white cursor-pointer font-bold">×</button>
             </span>
           )}
           {selectedCategory !== 'all' && (
             <span className="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-400 border border-purple-400/40 flex items-center gap-1.5">
-              <span>🏷️ {selectedCategory}</span>
+              <BiCategoryIcon size={13} />
+              <span>{selectedCategory}</span>
               <button type="button" onClick={() => setSelectedCategory('all')} className="hover:text-white cursor-pointer font-bold">×</button>
             </span>
           )}
@@ -818,115 +836,107 @@ export default function ExecutiveBiStudio({
                 theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
               }`}
             >
-          <div className="flex items-center justify-between">
-            <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-              {tx('รายได้รวม (Gross Revenue)', 'Gross Revenue')}
-            </span>
-            <span className="w-8 h-8 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-400 font-black text-sm">
-              ฿
-            </span>
-          </div>
-          <div className="mt-3">
-            <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-              ฿{metrics.grossRevenue.toLocaleString()}
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                  {tx('รายได้รวม (Gross Revenue)', 'Gross Revenue')}
+                </span>
+                <BiRevenueIcon size={32} />
+              </div>
+              <div className="mt-3">
+                <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                  ฿{metrics.grossRevenue.toLocaleString()}
+                </div>
+                <div className="mt-1 flex items-center gap-2 text-xs font-bold">
+                  <span className={`px-2 py-0.5 rounded-md ${Number(metrics.targetVariancePercent) >= 0 ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500'}`}>
+                    {Number(metrics.targetVariancePercent) >= 0 ? `▲ +${metrics.targetVariancePercent}%` : `▼ ${metrics.targetVariancePercent}%`}
+                  </span>
+                  <span className={theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}>
+                    {tx('เทียบเป้าหมาย', 'vs Target')}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="mt-1 flex items-center gap-2 text-xs font-bold">
-              <span className={`px-2 py-0.5 rounded-md ${Number(metrics.targetVariancePercent) >= 0 ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500'}`}>
-                {Number(metrics.targetVariancePercent) >= 0 ? `▲ +${metrics.targetVariancePercent}%` : `▼ ${metrics.targetVariancePercent}%`}
-              </span>
-              <span className={theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}>
-                {tx('เทียบเป้าหมาย', 'vs Target')}
-              </span>
-            </div>
-          </div>
-        </div>
 
-        {/* KPI 2: Net Operating Profit */}
-        <div
-          className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
-            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-              {tx('กำไรสุทธิ (Net Profit)', 'Net Profit')}
-            </span>
-            <span className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-black text-sm">
-              💎
-            </span>
-          </div>
-          <div className="mt-3">
-            <div className={`text-2xl font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-700'}`}>
-              ฿{metrics.netOperatingProfit.toLocaleString()}
+            {/* KPI 2: Net Operating Profit */}
+            <div
+              className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
+                theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                  {tx('กำไรสุทธิ (Net Profit)', 'Net Profit')}
+                </span>
+                <BiNetProfitIcon size={32} />
+              </div>
+              <div className="mt-3">
+                <div className={`text-2xl font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-700'}`}>
+                  ฿{metrics.netOperatingProfit.toLocaleString()}
+                </div>
+                <div className="mt-1 flex items-center gap-2 text-xs font-bold">
+                  <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-500">
+                    {metrics.netMarginPercent}% {tx('อัตรากำไร', 'Net Margin')}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="mt-1 flex items-center gap-2 text-xs font-bold">
-              <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-500">
-                {metrics.netMarginPercent}% {tx('อัตรากำไร', 'Net Margin')}
-              </span>
-            </div>
-          </div>
-        </div>
 
-        {/* KPI 3: Average Order Value (AOV) */}
-        <div
-          className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
-            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-              {tx('ยอดต่อบิล (AOV)', 'Avg Basket Size')}
-            </span>
-            <span className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-black text-sm">
-              🛒
-            </span>
-          </div>
-          <div className="mt-3">
-            <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-              ฿{metrics.averageOrderValue.toLocaleString()}
+            {/* KPI 3: Average Order Value (AOV) */}
+            <div
+              className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
+                theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                  {tx('ยอดต่อบิล (AOV)', 'Avg Basket Size')}
+                </span>
+                <BiAovCartIcon size={32} />
+              </div>
+              <div className="mt-3">
+                <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                  ฿{metrics.averageOrderValue.toLocaleString()}
+                </div>
+                <div className="mt-1 text-xs font-semibold text-slate-400">
+                  {tx('คำนวณจากทุกคำสั่งซื้อ', 'Calculated across all orders')}
+                </div>
+              </div>
             </div>
-            <div className="mt-1 text-xs font-semibold text-slate-400">
-              {tx('คำนวณจากทุกคำสั่งซื้อ', 'Calculated across all orders')}
-            </div>
-          </div>
-        </div>
 
-        {/* KPI 4: Total Orders */}
-        <div
-          className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
-            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-              {tx('จำนวนออเดอร์', 'Total Transactions')}
-            </span>
-            <span className="w-8 h-8 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 font-black text-sm">
-              🧾
-            </span>
-          </div>
-          <div className="mt-3">
-            <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-              {metrics.ordersCount.toLocaleString()} {tx('รายการ', 'orders')}
+            {/* KPI 4: Total Orders */}
+            <div
+              className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
+                theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                  {tx('จำนวนออเดอร์', 'Total Transactions')}
+                </span>
+                <BiOrdersReceiptIcon size={32} />
+              </div>
+              <div className="mt-3">
+                <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
+                  {metrics.ordersCount.toLocaleString()} {tx('รายการ', 'orders')}
+                </div>
+                <div className="mt-1 text-xs font-semibold text-slate-400">
+                  {tx('ผ่านเกณฑ์ตัวกรอง', 'Matches current filter')}
+                </div>
+              </div>
             </div>
-            <div className="mt-1 text-xs font-semibold text-slate-400">
-              {tx('ผ่านเกณฑ์ตัวกรอง', 'Matches current filter')}
-            </div>
-          </div>
-        </div>
 
-        {/* KPI 5: Target Achievement Gauge */}
-        <div
-          className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
-            theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-              {tx('ความสำเร็จเป้าหมาย', 'Target Meter')}
-            </span>
-            <GaugeMeterIcon size={20} />
-          </div>
+            {/* KPI 5: Target Achievement Gauge */}
+            <div
+              className={`p-5 rounded-3xl border transition shadow-lg backdrop-blur-md relative overflow-hidden ${
+                theme === 'dark' ? 'bg-slate-900/90 border-slate-700/60' : 'bg-white border-blue-200/80'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                  {tx('ความสำเร็จเป้าหมาย', 'Target Meter')}
+                </span>
+                <GaugeMeterIcon size={26} />
+              </div>
           <div className="mt-3">
             <div className="flex items-baseline gap-1">
               <span className={`text-2xl font-black ${metrics.achievementPercent >= 80 ? 'text-emerald-500' : metrics.achievementPercent >= 60 ? 'text-amber-500' : 'text-rose-500'}`}>
@@ -1034,7 +1044,7 @@ export default function ExecutiveBiStudio({
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-              <SlicerFilterIcon size={22} />
+              <BiChannelDonutIcon size={26} />
             </div>
             <div>
               <h3 className={`text-base font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
@@ -1121,7 +1131,7 @@ export default function ExecutiveBiStudio({
             onClick={() => setShowCostSettings(prev => !prev)}
             className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-400/30 hover:bg-amber-500/25 transition cursor-pointer self-start sm:self-center flex items-center gap-1.5"
           >
-            <span>⚙️</span>
+            <BiSettingsGearIcon size={15} />
             <span>{showCostSettings ? tx('ซ่อนตัวปรับต้นทุน', 'Hide Cost Controls') : tx('ปรับสมมติฐานต้นทุน %', 'Adjust Cost %')}</span>
           </button>
         </div>
@@ -2008,35 +2018,38 @@ export default function ExecutiveBiStudio({
           <button
             type="button"
             onClick={() => handleRunCopilotQuery('สาขาไหนทำกำไรสุทธิสูงสุด')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5 ${
               theme === 'dark'
                 ? 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
             }`}
           >
-            📌 {tx('สาขาไหนทำกำไรสุทธิสูงสุด?', 'Which branch has highest profit?')}
+            <BiSparklePromptIcon size={14} />
+            <span>{tx('สาขาไหนทำกำไรสุทธิสูงสุด?', 'Which branch has highest profit?')}</span>
           </button>
           <button
             type="button"
             onClick={() => handleRunCopilotQuery('ช่องทางไหนโตเร็วที่สุดและ AOV เท่าไหร่')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5 ${
               theme === 'dark'
                 ? 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
             }`}
           >
-            📌 {tx('วิเคราะห์ยอดต่อบิล AOV แยกตามช่องทาง', 'Analyze AOV by channel')}
+            <BiSparklePromptIcon size={14} />
+            <span>{tx('วิเคราะห์ยอดต่อบิล AOV แยกตามช่องทาง', 'Analyze AOV by channel')}</span>
           </button>
           <button
             type="button"
             onClick={() => handleRunCopilotQuery('สรุปสุขภาพงบกำไรขาดทุน P&L')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5 ${
               theme === 'dark'
                 ? 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
             }`}
           >
-            📌 {tx('สรุปสุขภาพงบกำไรขาดทุน P&L', 'P&L Health Summary')}
+            <BiSparklePromptIcon size={14} />
+            <span>{tx('สรุปสุขภาพงบกำไรขาดทุน P&L', 'P&L Health Summary')}</span>
           </button>
         </div>
 
@@ -2069,7 +2082,7 @@ export default function ExecutiveBiStudio({
             ) : (
               <>
                 <span>{tx('ถาม Copilot', 'Ask Copilot')}</span>
-                <span>✨</span>
+                <BiSparklePromptIcon size={15} />
               </>
             )}
           </button>
@@ -2081,7 +2094,10 @@ export default function ExecutiveBiStudio({
             theme === 'dark' ? 'bg-slate-900/95 border-purple-500/40 text-slate-200' : 'bg-purple-50/90 border-purple-200 text-slate-900'
           }`}>
             <div className="flex items-center justify-between text-xs font-bold text-purple-400 mb-1">
-              <span>💡 คำตอบจาก InsightFlow Executive Copilot</span>
+              <span className="flex items-center gap-1.5">
+                <BiSparklePromptIcon size={14} />
+                <span>คำตอบจาก InsightFlow Executive Copilot</span>
+              </span>
               <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300">
                 {copilotResponse.highlight}
               </span>

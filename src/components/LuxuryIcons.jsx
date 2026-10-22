@@ -2132,5 +2132,342 @@ export function BusinessOverviewAndGoalIcon({ size = 26, className = '' }) {
   );
 }
 
+/**
+ * =========================================================================
+ * POWER BI CANVAS EXECUTIVE MODERN 3D ICONS SUITE
+ * =========================================================================
+ */
+
+/**
+ * 1. BiRevenueIcon: ไอคอน 3 มิติ "รายได้รวม" (Gross Revenue 3D Jewel Shield & Baht Coin)
+ */
+export function BiRevenueIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`revGrad_${id}`} x1="3" y1="3" x2="29" y2="29" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38BDF8" />
+          <stop offset="50%" stopColor="#0284C7" />
+          <stop offset="100%" stopColor="#0369A1" />
+        </linearGradient>
+        <linearGradient id={`revCoin_${id}`} x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="45%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
+      {/* ฐานเกราะคริสตัล 3 มิติ */}
+      <rect x="3" y="3" width="26" height="26" rx="8" fill="#0B132B" stroke={`url(#revGrad_${id})`} strokeWidth="1.6" />
+      {/* เหรียญทองคำลอยนูน */}
+      <circle cx="16" cy="16" r="9.5" fill={`url(#revCoin_${id})`} stroke="#FFFBEB" strokeWidth="1" />
+      <circle cx="16" cy="16" r="7.5" stroke="#78350F" strokeWidth="0.8" strokeDasharray="1.5 1.5" />
+      {/* สัญลักษณ์สกุลเงิน ฿ มีมิติ */}
+      <path
+        d="M13 10.5H17C18.4 10.5 19.5 11.4 19.5 12.8C19.5 13.9 18.7 14.8 17.6 15.1C19 15.4 20 16.5 20 18C20 19.6 18.6 20.8 17 20.8H13V10.5Z"
+        fill="#78350F"
+      />
+      <path
+        d="M14.5 12H16.8C17.6 12 18.2 12.4 18.2 13.2C18.2 14 17.6 14.5 16.8 14.5H14.5V12ZM14.5 16H17.2C18 16 18.7 16.6 18.7 17.5C18.7 18.4 18 19 17.2 19H14.5V16Z"
+        fill="#FEF08A"
+      />
+      <line x1="16" y1="9" x2="16" y2="22.5" stroke="#FEF08A" strokeWidth="1.5" strokeLinecap="round" />
+      {/* ประกายแสงดาวมุมขวาบน */}
+      <circle cx="23.5" cy="8.5" r="1.5" fill="#38BDF8" />
+    </svg>
+  );
+}
+
+/**
+ * 2. BiNetProfitIcon: ไอคอน 3 มิติ "กำไรสุทธิ" (Net Profit 3D Emerald Diamond)
+ */
+export function BiNetProfitIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`gemBase_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+        <linearGradient id={`gemFacet_${id}`} x1="8" y1="6" x2="24" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#E0F2FE" />
+          <stop offset="40%" stopColor="#A7F3D0" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+      </defs>
+      {/* ฐานรองกระจกดำ */}
+      <rect x="3" y="3" width="26" height="26" rx="8" fill="#0B132B" stroke="#059669" strokeWidth="1.4" />
+      {/* เพชรมรกตเหลี่ยม 3 มิติ (Faceted Emerald Jewel) */}
+      <polygon points="16,6 25,13 16,26 7,13" fill={`url(#gemBase_${id})`} stroke="#A7F3D0" strokeWidth="1" />
+      <polygon points="16,6 21,13 16,26 11,13" fill={`url(#gemFacet_${id})`} opacity="0.9" />
+      <polygon points="11,13 16,6 21,13 16,15" fill="#ECFDF5" opacity="0.8" />
+      <line x1="7" y1="13" x2="25" y2="13" stroke="#ECFDF5" strokeWidth="1" strokeLinecap="round" />
+      {/* ประกายดาวแสงเจิดจรัส */}
+      <path d="M16 8L16.6 9.5L18 10L16.6 10.5L16 12L15.4 10.5L14 10L15.4 9.5Z" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
+/**
+ * 3. BiAovCartIcon: ไอคอน 3 มิติ "ยอดต่อบิล AOV" (Average Order Value 3D Luxury Cart)
+ */
+export function BiAovCartIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`cartGold_${id}`} x1="3" y1="3" x2="29" y2="29" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+        <linearGradient id={`cartArrow_${id}`} x1="12" y1="20" x2="24" y2="7" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#FFFFFF" />
+        </linearGradient>
+      </defs>
+      {/* กล่องบรรจุภัณฑ์ฐานหลัง */}
+      <rect x="3" y="3" width="26" height="26" rx="8" fill="#0B132B" stroke="#D97706" strokeWidth="1.4" />
+      {/* ตะกร้ารถเข็นสีทองหรู */}
+      <path d="M6 9H9.5L12.5 19.5H23L25.5 12H11" stroke={`url(#cartGold_${id})`} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      {/* ล้อรถเข็น */}
+      <circle cx="13.5" cy="23" r="2" fill="#FEF08A" stroke="#78350F" strokeWidth="0.8" />
+      <circle cx="21.5" cy="23" r="2" fill="#FEF08A" stroke="#78350F" strokeWidth="0.8" />
+      {/* ลูกศรเติบโตของบิลชี้พุ่งขึ้นทางขวา (Basket Expansion Arrow) */}
+      <path d="M15 17L23 8" stroke={`url(#cartArrow_${id})`} strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M18.5 8H23V12.5" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 4. BiOrdersReceiptIcon: ไอคอน 3 มิติ "จำนวนออเดอร์" (Total Orders 3D Smart Receipt & Ledger)
+ */
+export function BiOrdersReceiptIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`rcpPurp_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#C084FC" />
+          <stop offset="60%" stopColor="#818CF8" />
+          <stop offset="100%" stopColor="#4F46E5" />
+        </linearGradient>
+      </defs>
+      {/* กรอบสี่เหลี่ยมหลัง */}
+      <rect x="3" y="3" width="26" height="26" rx="8" fill="#0B132B" stroke="#818CF8" strokeWidth="1.4" />
+      {/* ใบเสร็จรับเงินดิจิทัล (Digital Receipt Sheet) */}
+      <path
+        d="M8.5 7C8.5 6.2 9.2 5.5 10 5.5H22C22.8 5.5 23.5 6.2 23.5 7V25.5L20.5 24L18 25.5L16 24L14 25.5L11.5 24L8.5 25.5V7Z"
+        fill={`url(#rcpPurp_${id})`}
+        stroke="#E0E7FF"
+        strokeWidth="1"
+      />
+      {/* เส้นรายการสินค้าในบิล */}
+      <line x1="12" y1="10" x2="20" y2="10" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="12" y1="13.5" x2="18" y2="13.5" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
+      <line x1="12" y1="17" x2="16" y2="17" stroke="#FEF08A" strokeWidth="1.5" strokeLinecap="round" />
+      {/* ตรายางเช็กผ่านยืนยันออเดอร์สำเร็จ (Verified Badge) */}
+      <circle cx="19.5" cy="18.5" r="3.2" fill="#10B981" stroke="#ECFDF5" strokeWidth="0.8" />
+      <path d="M18.2 18.5L19.2 19.5L21 17.5" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 5. BiChannelDonutIcon: ไอคอน 3 มิติ "สัดส่วนรายได้แยกตามช่องทาง" (3D Donut Chart & Omnichannel Ring)
+ */
+export function BiChannelDonutIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`donGold_${id}`} x1="16" y1="4" x2="28" y2="16" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#F59E0B" />
+        </linearGradient>
+        <linearGradient id={`donCyan_${id}`} x1="16" y1="4" x2="4" y2="16" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#7DD3FC" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+        <linearGradient id={`donGreen_${id}`} x1="4" y1="16" x2="16" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+      </defs>
+      {/* วงแหวนเซกเตอร์ 3 สีแบ่งตามช่องทาง */}
+      <circle cx="16" cy="16" r="11" stroke="#1E293B" strokeWidth="5" />
+      {/* ส่วนแบ่งช่องทาง 1: ฟ้า (TikTok/Shopee) */}
+      <circle cx="16" cy="16" r="11" stroke={`url(#donCyan_${id})`} strokeWidth="5" strokeDasharray="24 69" strokeDashoffset="0" strokeLinecap="round" />
+      {/* ส่วนแบ่งช่องทาง 2: เขียว (หน้าร้าน POS) */}
+      <circle cx="16" cy="16" r="11" stroke={`url(#donGreen_${id})`} strokeWidth="5" strokeDasharray="20 69" strokeDashoffset="-28" strokeLinecap="round" />
+      {/* ส่วนแบ่งช่องทาง 3: ทอง (Lazada/Direct) */}
+      <circle cx="16" cy="16" r="11" stroke={`url(#donGold_${id})`} strokeWidth="5.5" strokeDasharray="18 69" strokeDashoffset="-52" strokeLinecap="round" />
+      {/* แกนกลางคริสตัล */}
+      <circle cx="16" cy="16" r="5" fill="#0B132B" stroke="#FEF08A" strokeWidth="1" />
+      <circle cx="16" cy="16" r="2.2" fill="#38BDF8" />
+    </svg>
+  );
+}
+
+/**
+ * 6. BiCalendarIcon: ไอคอน 3 มิติ "ช่วงเวลา" (Chrono Time Slicer Calendar)
+ */
+export function BiCalendarIcon({ size = 18, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`calGrad_${id}`} x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      <rect x="3" y="4" width="18" height="17" rx="3.5" fill="#0B132B" stroke={`url(#calGrad_${id})`} strokeWidth="1.6" />
+      {/* แถบด้านบนของปฏิทิน */}
+      <path d="M3 8.5H21" stroke={`url(#calGrad_${id})`} strokeWidth="1.6" strokeLinecap="round" />
+      {/* ห่วงแขวนปฏิทิน 2 ข้าง */}
+      <line x1="7" y1="2" x2="7" y2="5" stroke="#FEF08A" strokeWidth="2" strokeLinecap="round" />
+      <line x1="17" y1="2" x2="17" y2="5" stroke="#FEF08A" strokeWidth="2" strokeLinecap="round" />
+      {/* ตารางจุดวันที่เรืองแสง */}
+      <circle cx="7.5" cy="12" r="1" fill="#38BDF8" />
+      <circle cx="12" cy="12" r="1" fill="#FEF08A" />
+      <circle cx="16.5" cy="12" r="1" fill="#34D399" />
+      <circle cx="7.5" cy="16" r="1" fill="#FEF08A" />
+      <circle cx="12" cy="16" r="1.3" fill="#F59E0B" />
+      <circle cx="16.5" cy="16" r="1" fill="#38BDF8" />
+    </svg>
+  );
+}
+
+/**
+ * 7. BiBranchIcon: ไอคอน 3 มิติ "สาขา" (Branch Slicer Enterprise Architecture)
+ */
+export function BiBranchIcon({ size = 18, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`brGrad_${id}`} x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+      </defs>
+      {/* อาคารสาขาหลัก */}
+      <rect x="4" y="3" width="16" height="18" rx="2.5" fill="#0B132B" stroke={`url(#brGrad_${id})`} strokeWidth="1.6" />
+      {/* หน้าต่างกระจกเรืองแสง */}
+      <rect x="7" y="6" width="2.5" height="2.5" rx="0.6" fill="#7DD3FC" />
+      <rect x="11" y="6" width="2.5" height="2.5" rx="0.6" fill="#7DD3FC" />
+      <rect x="15" y="6" width="2.5" height="2.5" rx="0.6" fill="#7DD3FC" />
+      <rect x="7" y="10.5" width="2.5" height="2.5" rx="0.6" fill="#FEF08A" />
+      <rect x="11" y="10.5" width="2.5" height="2.5" rx="0.6" fill="#FEF08A" />
+      <rect x="15" y="10.5" width="2.5" height="2.5" rx="0.6" fill="#FEF08A" />
+      {/* ประตูทางเข้าสาขา */}
+      <path d="M10 21V16H14V21" stroke="#38BDF8" strokeWidth="1.5" fill="#0284C7" />
+    </svg>
+  );
+}
+
+/**
+ * 8. BiChannelIcon: ไอคอน 3 มิติ "ช่องทางการขาย" (Sales Channel Luxury Shopping Bag)
+ */
+export function BiChannelIcon({ size = 18, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`chnGrad_${id}`} x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+      </defs>
+      <rect x="4" y="7" width="16" height="14" rx="3" fill="#0B132B" stroke={`url(#chnGrad_${id})`} strokeWidth="1.6" />
+      {/* หูหิ้วถุงทองคำ */}
+      <path d="M8.5 8V5.5C8.5 4.1 9.6 3 11 3H13C14.4 3 15.5 4.1 15.5 5.5V8" stroke="#FEF08A" strokeWidth="1.6" strokeLinecap="round" />
+      {/* โลโก้ประกายดาวตรงกลางถุง */}
+      <polygon points="12,11.5 13,13.5 15,14 13,14.5 12,16.5 11,14.5 9,14 11,13.5" fill="#34D399" />
+    </svg>
+  );
+}
+
+/**
+ * 9. BiCategoryIcon: ไอคอน 3 มิติ "หมวดหมู่สินค้า" (Product Category 3D Diamond Tag)
+ */
+export function BiCategoryIcon({ size = 18, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`catGrad_${id}`} x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#C084FC" />
+          <stop offset="100%" stopColor="#7C3AED" />
+        </linearGradient>
+      </defs>
+      {/* ป้ายแท็กสินค้าหมุนเอียง 3 มิติ */}
+      <path
+        d="M3.5 12.5L12 4H19.5V11.5L11 20L3.5 12.5Z"
+        fill="#0B132B"
+        stroke={`url(#catGrad_${id})`}
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      {/* รูร้อยเชือกสีทอง */}
+      <circle cx="16.5" cy="7" r="1.5" fill="#FEF08A" stroke="#7C3AED" strokeWidth="0.8" />
+      {/* เส้นลายแท็ก */}
+      <line x1="9" y1="12" x2="13.5" y2="16.5" stroke="#E9D5FF" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 10. BiSettingsGearIcon: ไอคอน 3 มิติ "ปรับแต่งสมมติฐานต้นทุน" (Interactive Cost Settings Gear)
+ */
+export function BiSettingsGearIcon({ size = 16, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`gearGrad_${id}`} x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="12" r="3.5" fill="#0B132B" stroke={`url(#gearGrad_${id})`} strokeWidth="2" />
+      <path
+        d="M12 2V4M12 20V22M4 12H2M22 12H20M6.34 6.34L4.93 4.93M19.07 19.07L17.66 17.66M6.34 17.66L4.93 19.07M19.07 4.93L17.66 6.34"
+        stroke={`url(#gearGrad_${id})`}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="12" r="1.5" fill="#FEF08A" />
+    </svg>
+  );
+}
+
+/**
+ * 11. BiSparklePromptIcon: ไอคอน 3 มิติ "ปักหมุดคำถาม Copilot" (AI Sparkle Question Pin)
+ */
+export function BiSparklePromptIcon({ size = 16, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`spkGrad_${id}`} x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#C084FC" />
+          <stop offset="100%" stopColor="#818CF8" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="12" r="9" fill="#0B132B" stroke={`url(#spkGrad_${id})`} strokeWidth="1.5" />
+      {/* ประกายดาว 4 แฉก */}
+      <polygon points="12,5 13.5,10.5 19,12 13.5,13.5 12,19 10.5,13.5 5,12 10.5,10.5" fill="#C084FC" />
+      <circle cx="12" cy="12" r="1.5" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
+
 
 
