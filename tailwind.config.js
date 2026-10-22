@@ -7,6 +7,17 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        ultramarine: {
+          950: '#071039', // 1. Deepest Midnight Navy (Dark Canvas Background)
+          900: '#0F2270', // 2. Royal Ultramarine Navy (Sidebar, Surfaces)
+          800: '#1A3BB0', // 3. Deep Electric Ultramarine (Cards, Borders)
+          600: '#2E5DE6', // 4. Vibrant Ultramarine Blue (Primary Brand, Buttons)
+          400: '#6E92F2', // 5. Bright Ultramarine Sky (Hover, Highlights, Badges)
+          200: '#AFC5F8', // 6. Soft Ultramarine Ice (Light Borders, Subtle Tint)
+          50:  '#E6EDFD', // 7. Clean Frosted Ultramarine White (Light Canvas Background)
+        },
+      },
       fontFamily: {
         sans: [
           '"Prompt"',

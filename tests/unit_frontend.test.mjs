@@ -678,5 +678,36 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 23. OFFICIAL 7-SHADE ULTRAMARINE PALETTE & DESIGN SYSTEM
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-23: Official 7-shade Ultramarine Palette integrated across Tailwind, CSS & App', () => {
+    // 1. Tailwind configuration defines all 7 shades
+    const tailwindPath = path.join(projectRoot, 'tailwind.config.js');
+    const tailwindContent = fs.readFileSync(tailwindPath, 'utf8');
+    assert.ok(tailwindContent.includes('ultramarine:'), 'tailwind.config.js must define ultramarine palette');
+    assert.ok(tailwindContent.includes('#071039'), 'ultramarine must include #071039');
+    assert.ok(tailwindContent.includes('#0F2270'), 'ultramarine must include #0F2270');
+    assert.ok(tailwindContent.includes('#1A3BB0'), 'ultramarine must include #1A3BB0');
+    assert.ok(tailwindContent.includes('#2E5DE6'), 'ultramarine must include #2E5DE6');
+    assert.ok(tailwindContent.includes('#6E92F2'), 'ultramarine must include #6E92F2');
+    assert.ok(tailwindContent.includes('#AFC5F8'), 'ultramarine must include #AFC5F8');
+    assert.ok(tailwindContent.includes('#E6EDFD'), 'ultramarine must include #E6EDFD');
+
+    // 2. index.css root styles
+    const cssPath = path.join(projectRoot, 'src', 'index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+    assert.ok(cssContent.includes('#071039'), 'index.css must use #071039 for dark mode canvas');
+    assert.ok(cssContent.includes('#E6EDFD'), 'index.css must use #E6EDFD for light mode canvas');
+    assert.ok(cssContent.includes('#AFC5F8'), 'index.css must use #AFC5F8 for light mode borders');
+
+    // 3. App.jsx root background classes
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(appContent.includes('bg-[#071039]'), 'App.jsx must use #071039 in dark mode');
+    assert.ok(appContent.includes('bg-[#E6EDFD]'), 'App.jsx must use #E6EDFD in light mode');
+    assert.ok(appContent.includes('#1A3BB0'), 'App.jsx must use #1A3BB0 in dark headers');
+  });
+
 });
 

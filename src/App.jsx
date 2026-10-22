@@ -15464,7 +15464,7 @@ function App() {
         {/* Landing Header (Responsive & Compact for Smartphone, Tablet & Desktop) */}
         <header
           className={`border-b backdrop-blur-xl sticky top-0 z-40 px-3 sm:px-8 lg:px-16 py-2.5 sm:py-4 ${
-            theme === 'dark' ? 'border-white/10 bg-[#050814]/95' : 'border-slate-300 bg-white/95 shadow-sm'
+            theme === 'dark' ? 'border-[#1A3BB0]/40 bg-[#071039]/95' : 'border-[#AFC5F8] bg-white/95 shadow-sm'
           }`}
         >
           <div className="flex justify-between items-center gap-1.5 sm:gap-2">
@@ -16783,7 +16783,7 @@ function App() {
   return (
     <div
       className={`min-h-screen flex font-sans select-none transition-colors duration-300 ${
-        theme === 'dark' ? 'theme-dark bg-[#030712] text-slate-100' : 'theme-light bg-[#f1f5f9] text-slate-900'
+        theme === 'dark' ? 'theme-dark bg-[#071039] text-slate-100' : 'theme-light bg-[#E6EDFD] text-slate-900'
       }`}
     >
       <Toaster position="top-right" gutter={14} containerStyle={{ top: 18, right: 18, zIndex: 9999 }} />
@@ -16799,7 +16799,7 @@ function App() {
       {/* Sidebar Navigation (Slide-Over Drawer on Smartphone/Tablet, Collapsible Sidebar on Desktop) */}
       <aside
         className={`border-r ${
-          theme === 'dark' ? 'border-white/10 bg-[#050917]/98' : 'border-slate-300 bg-white/98 shadow-md'
+          theme === 'dark' ? 'border-[#1A3BB0]/50 bg-[#071039]/98' : 'border-[#AFC5F8] bg-white/98 shadow-md'
         } backdrop-blur-2xl flex flex-col justify-between transition-all duration-300 fixed inset-y-0 left-0 z-50 lg:static ${
           isMobileMenuOpen ? 'translate-x-0 w-80 max-w-[86vw]' : '-translate-x-full lg:translate-x-0'
         } ${isSidebarOpen ? 'lg:w-80' : 'lg:w-24'}`}
@@ -17046,7 +17046,7 @@ function App() {
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header
           className={`border-b ${
-            theme === 'dark' ? 'border-white/10 bg-[#040816]/95' : 'border-slate-300 bg-white/95 shadow-sm'
+            theme === 'dark' ? 'border-[#1A3BB0]/40 bg-[#071039]/95' : 'border-[#AFC5F8] bg-white/95 shadow-sm'
           } backdrop-blur-xl px-3 sm:px-8 py-2.5 sm:py-4 flex justify-between items-center gap-2 sticky top-0 z-20`}
         >
           <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1">
