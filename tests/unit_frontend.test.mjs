@@ -709,5 +709,39 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(appContent.includes('#1A3BB0'), 'App.jsx must use #1A3BB0 in dark headers');
   });
 
+  // ----------------------------------------------------------------------------
+  // 24. MODERN SPLIT-CARD AUTHENTICATION WITH ORGANIC WAVE ARCHITECTURE
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-24: Modern Split-Card Auth Modal with Organic Wave Architecture & Ultramarine Theme', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // 1. Split-card responsive container
+    assert.ok(
+      appContent.includes('max-w-4xl lg:max-w-5xl') && appContent.includes('flex flex-col md:flex-row'),
+      'Auth modal must have responsive split-card layout (desktop horizontal, mobile vertical)'
+    );
+
+    // 2. Multi-layered organic cloud/wave SVG dividers
+    assert.ok(
+      appContent.includes('viewBox="0 0 100 800"') && appContent.includes('viewBox="0 0 800 100"'),
+      'Auth modal must include multi-layered organic wave dividers for both desktop and mobile'
+    );
+
+    // 3. Dual pill action buttons
+    assert.ok(
+      appContent.includes('rounded-full bg-gradient-to-r from-[#2E5DE6] to-[#1A3BB0]') &&
+      appContent.includes('rounded-full border-2'),
+      'Auth modal must feature primary gradient pill button and secondary outline pill button'
+    );
+
+    // 4. Brand identity & circular glass badge
+    assert.ok(
+      appContent.includes('INSIGHTFLOW') && appContent.includes('AppLogo size={52}'),
+      'Brand showcase must feature circular glass badge with official AppLogo'
+    );
+  });
+
 });
+
 

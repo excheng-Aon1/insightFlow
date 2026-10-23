@@ -14823,505 +14823,628 @@ function App() {
     return (
       <div
         className={`min-h-screen flex flex-col font-sans select-none relative pb-20 md:pb-0 transition-colors duration-300 ${
-          theme === 'dark' ? 'theme-dark bg-[#050814] text-slate-100' : 'theme-light bg-[#f8fafc] text-slate-900'
+          theme === 'dark' ? 'theme-dark bg-[#071039] text-slate-100' : 'theme-light bg-[#E6EDFD] text-slate-900'
         }`}
       >
         <Toaster position="top-right" gutter={14} containerStyle={{ top: 14, right: 14, left: 14, zIndex: 9999 }} />
 
-        {/* Login Modal (Scrollable & Mobile-Optimized with 1-Tap Instant Access at Top) */}
+        {/* Modern Split-Card Auth Modal (Inspired by modern wave aesthetic & tailored to InsightFlow Ultramarine Design) */}
         {isLoginOpen && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-start sm:items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
-            <div className={`border rounded-3xl w-full max-w-md max-h-[92dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative my-auto ${
-              theme === 'light' ? 'bg-white border-blue-100 text-slate-900 shadow-blue-900/10' : 'bg-[#0c1222] border-white/15 text-white'
-            }`}>
-              <button
-                onClick={() => setIsLoginOpen(false)}
-                className={`sticky top-0 float-right w-9 h-9 rounded-full flex items-center justify-center transition text-base font-black z-10 cursor-pointer ${
-                  theme === 'light' ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white'
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-5 overflow-y-auto">
+            <div
+              className={`w-full max-w-4xl lg:max-w-5xl rounded-3xl lg:rounded-[36px] overflow-hidden shadow-2xl relative my-auto flex flex-col md:flex-row border transition-all duration-300 ${
+                theme === 'light'
+                  ? 'bg-white border-[#AFC5F8] text-slate-900 shadow-blue-900/15'
+                  : 'bg-[#071039] border-[#1A3BB0]/60 text-white shadow-black/60'
+              }`}
+            >
+              {/* ================= LEFT BRAND BANNER (DESKTOP LEFT / MOBILE TOP) ================= */}
+              <div className="w-full md:w-5/12 lg:w-[42%] relative flex flex-col justify-between p-6 sm:p-8 lg:p-10 text-white overflow-hidden bg-gradient-to-br from-[#071039] via-[#0F2270] to-[#2E5DE6]">
+                {/* Ambient glowing orbs */}
+                <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#6E92F2]/25 blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-[#1A3BB0]/40 blur-3xl pointer-events-none" />
+
+                {/* Multi-layered organic cloud/wave separator (Desktop - Right Edge) */}
+                <div className="hidden md:block absolute right-0 top-0 bottom-0 w-14 lg:w-16 pointer-events-none z-10 overflow-hidden">
+                  <svg
+                    viewBox="0 0 100 800"
+                    preserveAspectRatio="none"
+                    className="h-full w-full"
+                  >
+                    {/* Layer 1: Ambient sky wave */}
+                    <path
+                      d="M55 0 C25 80 85 160 45 240 C15 320 85 400 40 480 C0 560 80 640 50 720 C25 780 55 800 55 800 L100 800 L100 0 Z"
+                      fill="#6E92F2"
+                      fillOpacity="0.3"
+                    />
+                    {/* Layer 2: Soft Ultramarine Ice wave */}
+                    <path
+                      d="M70 0 C40 70 100 150 60 230 C30 310 100 390 55 470 C20 550 95 630 65 710 C40 770 70 800 70 800 L100 800 L100 0 Z"
+                      fill="#AFC5F8"
+                      fillOpacity="0.55"
+                    />
+                    {/* Layer 3: Foreground wave matching form side background */}
+                    <path
+                      d="M85 0 C60 60 105 140 75 220 C45 300 105 380 70 460 C40 540 105 620 80 700 C60 760 85 800 85 800 L100 800 L100 0 Z"
+                      fill={theme === 'light' ? '#ffffff' : '#071039'}
+                    />
+                  </svg>
+                </div>
+
+                {/* Multi-layered organic cloud/wave separator (Mobile - Bottom Edge) */}
+                <div className="md:hidden block absolute bottom-0 left-0 right-0 h-8 sm:h-10 pointer-events-none z-10 overflow-hidden">
+                  <svg
+                    viewBox="0 0 800 100"
+                    preserveAspectRatio="none"
+                    className="h-full w-full"
+                  >
+                    {/* Layer 1: Ambient sky wave */}
+                    <path
+                      d="M0 55 C80 25 160 85 240 45 C320 15 400 85 480 40 C560 0 640 80 720 50 C780 25 800 55 800 55 L800 100 L0 100 Z"
+                      fill="#6E92F2"
+                      fillOpacity="0.3"
+                    />
+                    {/* Layer 2: Soft Ultramarine Ice wave */}
+                    <path
+                      d="M0 70 C70 40 150 100 230 60 C310 30 390 100 470 55 C550 20 630 95 710 65 C770 40 800 70 800 70 L800 100 L0 100 Z"
+                      fill="#AFC5F8"
+                      fillOpacity="0.55"
+                    />
+                    {/* Layer 3: Foreground wave matching form side background */}
+                    <path
+                      d="M0 85 C60 60 140 105 220 75 C300 45 380 105 460 70 C540 40 620 105 700 80 C760 60 800 85 800 85 L800 100 L0 100 Z"
+                      fill={theme === 'light' ? '#ffffff' : '#071039'}
+                    />
+                  </svg>
+                </div>
+
+                {/* Top Section: Welcome Tag */}
+                <div className="relative z-0">
+                  <span className="text-[11px] font-black uppercase tracking-[0.25em] text-[#AFC5F8] block">
+                    {tx('ยินดีต้อนรับสู่', 'Welcome to')}
+                  </span>
+                </div>
+
+                {/* Center Section: Circular Glass Badge & Brand Identity */}
+                <div className="my-auto py-4 sm:py-6 relative z-0 flex flex-col items-center text-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/10 backdrop-blur-md border border-white/25 shadow-2xl flex items-center justify-center mb-3 group hover:scale-105 transition-transform duration-300">
+                    <AppLogo size={52} theme="dark" />
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white leading-tight">
+                    INSIGHTFLOW
+                  </h1>
+                  <p className="text-xs font-bold text-[#AFC5F8] tracking-widest uppercase mt-0.5 mb-3">
+                    {tx('ระบบบริหารข้อมูลระดับผู้บริหาร', 'Executive Intelligence')}
+                  </p>
+                  <p className="text-xs text-blue-100/90 leading-relaxed max-w-xs hidden sm:block">
+                    {tx(
+                      'เชื่อมต่อ Data Warehouse, ERP, สรุปยอดขายอัตโนมัติ และระบบเลขา AI Agent อัจฉริยะ',
+                      'Unified Data Warehouse, automated ETL pipelines, 22:00 sales alerts & Autonomous AI Secretary Agent.'
+                    )}
+                  </p>
+                </div>
+
+                {/* Bottom Section: Enterprise Security Badge */}
+                <div className="pt-3 border-t border-white/10 text-center relative z-0">
+                  <p className="text-[10px] tracking-widest text-[#AFC5F8]/80 font-black uppercase">
+                    🔒 {tx('ความปลอดภัยระดับสถาบันการเงิน | 256-BIT SSL', 'FINANCIAL SECURITY | 256-BIT SSL')}
+                  </p>
+                </div>
+              </div>
+
+              {/* ================= RIGHT FORM AREA (DESKTOP RIGHT / MOBILE BOTTOM) ================= */}
+              <div
+                className={`w-full md:w-7/12 lg:w-[58%] flex-1 p-5 sm:p-7 lg:p-9 flex flex-col justify-between relative max-h-[88dvh] md:max-h-[85dvh] overflow-y-auto ${
+                  theme === 'light' ? 'bg-white text-slate-900' : 'bg-[#071039] text-white'
                 }`}
-                aria-label="Close"
               >
-                ✕
-              </button>
-              <div className="flex flex-col items-center justify-center gap-2 mb-3 clear-both">
-                <AppLogo size={58} theme={theme} />
-                <span className={`text-xl font-black tracking-tight ${theme === 'light' ? 'text-slate-950' : 'text-white'}`}>
-                  INSIGHTFLOW
-                </span>
-                {renderLanguageSwitcher()}
-              </div>
-              <h2 className={`text-xl sm:text-2xl font-black text-center mb-1.5 ${theme === 'light' ? 'text-slate-950' : 'text-white'}`}>
-                {authMode === 'otp'
-                  ? tx('🔐 เข้าสู่ระบบด้วยรหัส OTP 2FA', 'Sign In with 2FA OTP Code')
-                  : authMode === 'login'
-                  ? tx('เข้าสู่ระบบจัดการร้านค้า', 'Sign In to Your Store Console')
-                  : tx('ลงทะเบียนเจ้าของร้านใหม่', 'Create New Store Account')}
-              </h2>
-              <p className={`text-center text-xs sm:text-sm mb-3 ${theme === 'light' ? 'text-slate-800 font-semibold' : 'text-slate-300'}`}>
-                {authMode === 'otp'
-                  ? tx('ระบบจะส่งรหัสยืนยัน 6 หลักไปยังอีเมลของคุณเพื่อความปลอดภัยสูงสุด', 'A 6-digit OTP code will be sent to your email address')
-                  : tx('เลือกวิธีเข้าสู่ระบบที่คุณสะดวก หรือกดทางลัด 1 คลิกด้านล่างครับ', 'Choose your preferred sign-in method or use 1-Tap access below.')}
-              </p>
+                {/* Top Utility Bar */}
+                <div className="flex items-center justify-between gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-white/10">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-[#2E5DE6]/10 text-[#2E5DE6] dark:text-[#6E92F2] border border-[#2E5DE6]/25">
+                      {authMode === 'login'
+                        ? tx('🔑 เข้าสู่ระบบ', '🔑 Sign In')
+                        : authMode === 'register'
+                        ? tx('📝 สร้างบัญชี', '📝 Sign Up')
+                        : tx('🔐 2FA OTP', '🔐 2FA OTP')}
+                    </span>
+                  </div>
 
-              {previewSelectedPlanId === 'starter' && (
-                <div className="mb-3 p-2.5 rounded-xl bg-amber-400/15 border border-amber-400/35 flex items-center justify-center gap-2 text-xs font-black text-amber-300">
-                  <span className="animate-bounce">🎉</span>
-                  <span>{tx('สิทธิ์พิเศษ: ทดลองใช้ฟรี 14 วัน (เฉพาะแพ็กเกจ Starter)', 'Special Privilege: 14-Day Free Trial (Starter Only)')}</span>
+                  <div className="flex items-center gap-2">
+                    {renderLanguageSwitcher()}
+                    <button
+                      type="button"
+                      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition cursor-pointer border ${
+                        theme === 'light'
+                          ? 'border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          : 'border-white/15 bg-white/10 text-amber-300 hover:bg-white/20'
+                      }`}
+                      title={tx('สลับธีม', 'Toggle Theme')}
+                    >
+                      {theme === 'dark' ? '☀️' : '🌙'}
+                    </button>
+                    <button
+                      onClick={() => setIsLoginOpen(false)}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-black transition cursor-pointer ${
+                        theme === 'light'
+                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                          : 'bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white'
+                      }`}
+                      aria-label="Close"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
-              )}
 
-              {/* Google Sign-In Quick 1-Tap Button */}
-              <button
-                type="button"
-                onClick={() => handleGoogleSignIn()}
-                disabled={isGoogleSigningIn}
-                className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm shadow-md border border-slate-200 flex items-center justify-center gap-3 transition-all hover:shadow-lg active:scale-[0.99] cursor-pointer mb-3"
-              >
-                <GoogleIcon size={20} />
-                <span>
-                  {isGoogleSigningIn
-                    ? tx('กำลังเชื่อมต่อ Google...', 'Connecting to Google...')
-                    : tx('เข้าสู่ระบบด้วยบัญชี Google', 'Continue with Google')}
-                </span>
-                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 ml-auto hidden sm:inline-block">
-                  ⚡ 1 คลิก
-                </span>
-              </button>
-
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-[1px] flex-1 bg-white/10" />
-                <span className="text-[11px] font-medium text-slate-400">
-                  {tx('หรือเลือกวิธีอื่นด้านล่าง', 'or choose sign-in method below')}
-                </span>
-                <div className="h-[1px] flex-1 bg-white/10" />
-              </div>
-
-              {/* Auth Mode Toggle Tabs (Password / OTP 2FA / Register) */}
-              <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-[#060a14] border border-white/10 mb-4">
-                <button
-                  type="button"
-                  onClick={() => setAuthMode('login')}
-                  className={`py-2 px-2 rounded-xl text-xs font-black transition cursor-pointer text-center ${
-                    authMode === 'login'
-                      ? 'bg-amber-400 text-slate-950 shadow-md'
-                      : 'text-slate-300 hover:text-white'
-                  }`}
-                >
-                  🔑 {tx('รหัสผ่าน', 'Password')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAuthMode('otp')}
-                  className={`py-2 px-2 rounded-xl text-xs font-black transition cursor-pointer text-center ${
-                    authMode === 'otp'
-                      ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 shadow-md'
-                      : 'text-emerald-300 hover:text-white'
-                  }`}
-                >
-                  🔐 {tx('รหัส OTP', '2FA OTP')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAuthMode('register')}
-                  className={`py-2 px-2 rounded-xl text-xs font-black transition cursor-pointer text-center ${
-                    authMode === 'register'
-                      ? 'bg-amber-400 text-slate-950 shadow-md'
-                      : 'text-slate-300 hover:text-white'
-                  }`}
-                >
-                  📝 {tx('ลงทะเบียน', 'Register')}
-                </button>
-              </div>
-
-              {/* 1-Tap Mobile & Desktop Quick Access Buttons */}
-              <div className="grid grid-cols-1 gap-2 mb-4 p-3 rounded-2xl bg-amber-400/10 border border-amber-400/35">
-                <div className="text-[11px] font-black uppercase text-amber-300 text-center">
-                  ⚡ {tx('ทางลัดเข้าใช้งานทันที (ไม่ต้องพิมพ์รหัสผ่าน)', '1-Tap Instant Access (No Typing Needed)')}
+                {/* Form Heading */}
+                <div className="mb-4">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+                    {authMode === 'otp'
+                      ? tx('ยืนยันรหัสความปลอดภัย OTP 2FA', 'Verify 2FA Security OTP')
+                      : authMode === 'login'
+                      ? tx('เข้าสู่ระบบบัญชีของคุณ', 'Sign In to your account')
+                      : tx('สร้างบัญชีของคุณ', 'Create your account')}
+                  </h2>
+                  <p
+                    className={`text-xs mt-0.5 ${
+                      theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                    }`}
+                  >
+                    {authMode === 'otp'
+                      ? tx('กรอกรหัส 6 หลักที่ระบบส่งไปยังอีเมลของคุณ', 'Enter 6-digit code sent to your email')
+                      : authMode === 'login'
+                      ? tx('กรอกข้อมูลเข้าสู่ระบบ หรือใช้ทางลัด 1 คลิกด้านล่าง', 'Enter credentials or use 1-Tap shortcut below')
+                      : tx('เริ่มต้นเปิดใช้งาน InsightFlow สำหรับธุรกิจของคุณ', 'Get started with InsightFlow for your business')}
+                  </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const cleanPhone = (authPhone || '089-999-8888').trim();
-                    const cleanLine = (authLineId || '@owner_insightflow').trim();
-                    const adminUser = {
-                      name: tx('ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin'),
-                      email: SUPER_ADMIN_EMAIL,
-                      phone: cleanPhone,
-                      lineId: cleanLine,
-                      sub: 'super-admin',
-                      role: 'admin',
-                      picture: 'https://ui-avatars.com/api/?name=Super+Admin&background=fbbf24&color=0f172a&bold=true'
-                    };
-                    setAuthEmail(SUPER_ADMIN_EMAIL);
-                    setAdminPreviewCustomerPlan(false);
-                    localStorage.setItem('insightflow_saved_phone', cleanPhone);
-                    localStorage.setItem('insightflow_saved_line_id', cleanLine);
-                    if (rememberPassword) {
-                      localStorage.setItem('insightflow_saved_user', JSON.stringify(adminUser));
-                    }
-                    setUser(adminUser);
-                    setIsLoginOpen(false);
-                    toast.success(
-                      tx(
-                        `👑 เข้าสู่ระบบ Super Admin (${SUPER_ADMIN_EMAIL}) เรียบร้อยแล้ว!`,
-                        `👑 Signed in as Super Admin (${SUPER_ADMIN_EMAIL})!`
-                      )
-                    );
-                  }}
-                  className="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition cursor-pointer"
-                >
-                  {tx(
-                    '👑 เข้าสู่ระบบ Admin สูงสุด (ปลดล็อกครบ 11 หน้า • 1 คลิก)',
-                    '👑 1-Click Super Admin Access (All 11 Modules Unlocked)'
-                  )}
-                </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    const chosenMeta = planTiersMap[subscriptionPlan] || planTiersMap.starter;
-                    const cleanPhone = (authPhone || '089-999-8888').trim();
-                    const cleanLine = (authLineId || '@owner_insightflow').trim();
-                    const cleanName =
-                      authName.trim() || tx(`ลูกค้าแพ็กเกจ ${chosenMeta.code}`, `${chosenMeta.code} Customer`);
-                    const customerUser = {
-                      name: cleanName,
-                      email: authEmail.trim() || 'customer@insightflow.app',
-                      phone: cleanPhone,
-                      lineId: cleanLine,
-                      sub: 'customer-account',
-                      role: 'customer',
-                      picture: 'https://ui-avatars.com/api/?name=Customer&background=38bdf8&color=0f172a&bold=true'
-                    };
-                    localStorage.setItem('insightflow_saved_phone', cleanPhone);
-                    localStorage.setItem('insightflow_saved_line_id', cleanLine);
-                    if (rememberPassword) {
-                      localStorage.setItem('insightflow_saved_user', JSON.stringify(customerUser));
-                    }
-                    registerOrUpdateWebCustomer({
-                      name: customerUser.name,
-                      email: customerUser.email,
-                      phone: cleanPhone,
-                      lineId: cleanLine,
-                      plan: subscriptionPlan
-                    });
-                    setUser(customerUser);
-                    setIsLoginOpen(false);
-                    toast.success(
-                      tx(
-                        `🛍️ เข้าสู่ระบบลูกค้า "${chosenMeta.name}" • บันทึกชื่อ เบอร์โทร และไลน์เข้าหน้าต่าง Admin แล้ว!`,
-                        `🛍️ Signed in on "${chosenMeta.name}" • Saved Name, Phone & LINE into Admin Registry!`
-                      )
-                    );
-                  }}
-                  className="w-full py-2.5 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/40 font-black text-xs transition cursor-pointer"
-                >
-                  {tx(
-                    `🛍️ ทดลองเข้าในฐานะลูกค้า (${(planTiersMap[subscriptionPlan] || planTiersMap.starter).code})`,
-                    `🛍️ 1-Click Customer Access (${(planTiersMap[subscriptionPlan] || planTiersMap.starter).code})`
-                  )}
-                </button>
-              </div>
+                {/* Free trial badge for starter */}
+                {authMode === 'register' && previewSelectedPlanId === 'starter' && (
+                  <div className="mb-3 p-2.5 rounded-xl bg-amber-400/15 border border-amber-400/35 flex items-center gap-2 text-xs font-black text-amber-400">
+                    <span className="animate-bounce">🎉</span>
+                    <span>{tx('สิทธิ์พิเศษ: ทดลองใช้ฟรี 14 วัน (เฉพาะแพ็กเกจ Starter)', 'Special Privilege: 14-Day Free Trial (Starter Only)')}</span>
+                  </div>
+                )}
 
-              {authMode === 'otp' ? (
-                /* ================= OTP 2FA LOGIN FORM ================= */
-                <form onSubmit={handleVerifyOtpAndLogin} className="flex flex-col gap-3.5 mb-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
-                      ✉️ {tx('อีเมลสำหรับรับรหัส OTP', 'Email Address for OTP')}
-                    </label>
-                    <div className="flex gap-2">
+                {/* ================= FORMS ================= */}
+                {authMode === 'otp' ? (
+                  /* ================= OTP FORM ================= */
+                  <form onSubmit={handleVerifyOtpAndLogin} className="space-y-3 mb-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className={`text-xs font-bold ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>
+                          ✉️ {tx('อีเมลสำหรับรับรหัส OTP', 'E-mail Address for OTP')}
+                        </label>
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="email"
+                          placeholder={tx('กรอกอีเมลของคุณ เช่น owner@yourstore.com', 'Enter your email')}
+                          value={authEmail}
+                          onChange={e => setAuthEmail(e.target.value)}
+                          className={`flex-1 px-4 py-2.5 rounded-xl text-sm transition outline-none border ${
+                            theme === 'light'
+                              ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-[#2E5DE6]'
+                              : 'bg-[#0B1536] border-[#1A3BB0]/50 text-white focus:border-[#6E92F2]'
+                          }`}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={handleRequestOtp}
+                          disabled={isSendingOtp || otpCountdown > 0}
+                          className={`px-4 py-2.5 rounded-xl text-xs font-black transition cursor-pointer whitespace-nowrap flex-shrink-0 ${
+                            otpCountdown > 0
+                              ? 'bg-slate-800 text-slate-400 border border-white/10 cursor-not-allowed'
+                              : 'bg-gradient-to-r from-[#2E5DE6] to-[#1A3BB0] text-white font-black shadow hover:brightness-105 active:scale-95'
+                          }`}
+                        >
+                          {isSendingOtp
+                            ? tx('กำลังส่ง...', 'Sending...')
+                            : otpCountdown > 0
+                            ? `${otpCountdown}s`
+                            : isOtpSent
+                            ? tx('🔄 ส่งใหม่', 'Resend')
+                            : tx('📨 ขอรหัส OTP', 'Get OTP')}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-[#080e1e] border-2 border-emerald-400/50 shadow-[0_0_25px_rgba(52,211,153,0.15)] space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-black text-emerald-300 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                          {tx('🔐 กรอกรหัส OTP 6 หลักที่ได้รับ:', '🔐 Enter 6-Digit OTP Code:')}
+                        </span>
+                        {isOtpSent && (
+                          <span className="text-[10px] text-amber-300 font-bold bg-amber-400/15 px-2 py-0.5 rounded-full border border-amber-400/30">
+                            {tx('อายุรหัส 180 วินาที', 'Valid 180s')}
+                          </span>
+                        )}
+                      </div>
                       <input
-                        type="email"
-                        placeholder={tx('กรอกอีเมลของคุณ', 'owner@yourstore.com')}
-                        value={authEmail}
-                        onChange={e => setAuthEmail(e.target.value)}
-                        className="flex-1 bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-emerald-400"
+                        type="text"
+                        maxLength={6}
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="• • • • • •"
+                        value={otpCode}
+                        onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        className="w-full tracking-[0.55em] text-center text-2xl font-black bg-[#050814] border border-emerald-400/60 rounded-xl py-3 text-emerald-300 outline-none focus:ring-2 focus:ring-emerald-400 shadow-inner"
                         required
                       />
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 pt-2">
+                      <button
+                        type="submit"
+                        disabled={isVerifyingOtp}
+                        className="flex-1 py-3 px-8 rounded-full bg-gradient-to-r from-[#2E5DE6] to-[#1A3BB0] text-white font-bold text-sm shadow-lg shadow-blue-600/35 hover:shadow-blue-600/50 hover:brightness-105 active:scale-95 transition cursor-pointer text-center"
+                      >
+                        {isVerifyingOtp ? tx('กำลังตรวจสอบ...', 'Verifying...') : tx('ยืนยันรหัส OTP (Verify)', 'Verify OTP')}
+                      </button>
                       <button
                         type="button"
-                        onClick={handleRequestOtp}
-                        disabled={isSendingOtp || otpCountdown > 0}
-                        className={`px-3.5 py-2.5 rounded-xl text-xs font-black transition cursor-pointer whitespace-nowrap flex-shrink-0 ${
-                          otpCountdown > 0
-                            ? 'bg-slate-800 text-slate-400 border border-white/10 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-black shadow-md hover:brightness-105 active:scale-95'
+                        onClick={() => setAuthMode('login')}
+                        className={`py-3 px-6 rounded-full border-2 font-bold text-sm transition cursor-pointer text-center ${
+                          theme === 'light'
+                            ? 'border-[#2E5DE6]/40 text-[#2E5DE6] hover:border-[#2E5DE6]'
+                            : 'border-[#6E92F2]/40 text-[#AFC5F8] hover:border-[#6E92F2]'
                         }`}
                       >
-                        {isSendingOtp
-                          ? tx('กำลังส่ง...', 'Sending...')
-                          : otpCountdown > 0
-                          ? `${otpCountdown}s`
-                          : isOtpSent
-                          ? tx('🔄 ส่งรหัสใหม่', 'Resend')
-                          : tx('📨 ขอรหัส OTP', 'Get OTP')}
+                        {tx('เข้าสู่ระบบปกติ', 'Password Login')}
                       </button>
                     </div>
-                  </div>
-
-                  {/* 6-Digit OTP Input Box with Cyber Glow */}
-                  <div className="p-3.5 rounded-2xl bg-[#080e1e] border-2 border-emerald-400/50 shadow-[0_0_25px_rgba(52,211,153,0.15)] space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-black text-emerald-300 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                        {tx('🔐 กรอกรหัส OTP 6 หลักที่ได้รับ:', '🔐 Enter 6-Digit OTP Code:')}
-                      </span>
-                      {isOtpSent && (
-                        <span className="text-[10px] text-amber-300 font-bold bg-amber-400/15 px-2 py-0.5 rounded-full border border-amber-400/30">
-                          {tx('อายุรหัส 180 วินาที', 'Valid 180s')}
-                        </span>
-                      )}
+                  </form>
+                ) : (
+                  /* ================= STANDARD PASSWORD / REGISTER FORM ================= */
+                  <form onSubmit={handleAuthSubmit} className="space-y-3 mb-4">
+                    {/* Name Field (Always available for personalization) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className={`text-xs font-bold ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>
+                          👤 {tx('ชื่อ - นามสกุล / ชื่อร้านค้า', 'Name')}
+                        </label>
+                        {authName.trim().length > 1 && (
+                          <span className="text-emerald-500 text-xs font-bold animate-in fade-in">✓</span>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        placeholder={tx('กรอกชื่อของคุณ เช่น คุณสมชาย เจริญกิจ', 'Enter your name')}
+                        value={authName}
+                        onChange={e => setAuthName(e.target.value)}
+                        className={`w-full px-4 py-2.5 rounded-xl text-sm transition outline-none border ${
+                          theme === 'light'
+                            ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-[#2E5DE6]'
+                            : 'bg-[#0B1536] border-[#1A3BB0]/50 text-white focus:border-[#6E92F2]'
+                        }`}
+                      />
                     </div>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="• • • • • •"
-                      value={otpCode}
-                      onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                      className="w-full tracking-[0.55em] text-center text-2xl font-black bg-[#050814] border border-emerald-400/60 rounded-xl py-3 text-emerald-300 outline-none focus:ring-2 focus:ring-emerald-400 shadow-inner"
-                      required
-                    />
-                    <p className="text-[11px] text-slate-400 text-center">
-                      {tx(
-                        '💡 หากยังไม่ได้เซ็ตอีเมล ระบบจำลองจะกรอกรหัสให้อัตโนมัติทันที',
-                        '💡 Simulated code is provided automatically for quick testing'
-                      )}
-                    </p>
-                  </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
-                      👤 {tx('ชื่อของคุณ / ชื่อร้านค้า (ไม่บังคับ)', 'Full Name / Store Name (Optional)')}
+                    {/* Email Field */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className={`text-xs font-bold ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>
+                          ✉️ {tx('อีเมลสำหรับเข้าใช้งาน (E-mail Address)', 'E-mail Address')}
+                        </label>
+                        {authEmail.includes('@') && authEmail.includes('.') && (
+                          <span className="text-emerald-500 text-xs font-bold animate-in fade-in">✓</span>
+                        )}
+                      </div>
+                      <input
+                        type="email"
+                        placeholder={tx('กรอกอีเมลของคุณ เช่น owner@yourstore.com', 'Enter your email')}
+                        value={authEmail}
+                        onChange={e => setAuthEmail(e.target.value)}
+                        required
+                        className={`w-full px-4 py-2.5 rounded-xl text-sm transition outline-none border ${
+                          theme === 'light'
+                            ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-[#2E5DE6]'
+                            : 'bg-[#0B1536] border-[#1A3BB0]/50 text-white focus:border-[#6E92F2]'
+                        }`}
+                      />
+                    </div>
+
+                    {/* Password Field */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className={`text-xs font-bold ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>
+                          🔑 {tx('รหัสผ่าน (Password)', 'Password')}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="text-xs font-bold text-[#2E5DE6] dark:text-[#6E92F2] hover:underline cursor-pointer"
+                        >
+                          {showPassword ? tx('ซ่อนรหัสผ่าน', 'Hide') : tx('แสดงรหัสผ่าน', 'Show')}
+                        </button>
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder={tx('กรอกรหัสผ่านของคุณ', 'Enter your password')}
+                        value={authPassword}
+                        onChange={e => setAuthPassword(e.target.value)}
+                        required
+                        className={`w-full px-4 py-2.5 rounded-xl text-sm transition outline-none border ${
+                          theme === 'light'
+                            ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-[#2E5DE6]'
+                            : 'bg-[#0B1536] border-[#1A3BB0]/50 text-white focus:border-[#6E92F2]'
+                        }`}
+                      />
+                    </div>
+
+                    {/* Register Mode Extra: Mobile Phone & LINE ID for Automated 22:00 Sales Alerts */}
+                    {authMode === 'register' && (
+                      <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/35 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-black text-emerald-500 dark:text-emerald-300">
+                            📲 {tx('เบอร์โทร & LINE ID รับสรุปยอดขายอัตโนมัติ (22:00 น.)', 'Phone & LINE ID for 22:00 Sales Alert')}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <input
+                            type="tel"
+                            placeholder={tx('เบอร์โทร เช่น 089-999-8888', 'Phone: 089-999-8888')}
+                            value={authPhone}
+                            onChange={e => setAuthPhone(e.target.value)}
+                            className={`w-full px-3 py-2 rounded-xl text-xs font-bold outline-none border ${
+                              theme === 'light'
+                                ? 'bg-white border-emerald-400/50 text-slate-900'
+                                : 'bg-[#050814] border-emerald-400/40 text-white'
+                            }`}
+                            required
+                          />
+                          <input
+                            type="text"
+                            placeholder={tx('ID LINE เช่น @owner_insightflow', 'LINE ID: @owner_store')}
+                            value={authLineId}
+                            onChange={e => setAuthLineId(e.target.value)}
+                            className={`w-full px-3 py-2 rounded-xl text-xs font-bold outline-none border ${
+                              theme === 'light'
+                                ? 'bg-white border-emerald-400/50 text-slate-900'
+                                : 'bg-[#050814] border-emerald-400/40 text-white'
+                            }`}
+                            required
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Register Mode Extra: Subscription Plan Selector */}
+                    {authMode === 'register' && (
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-xs font-black text-[#2E5DE6] dark:text-[#6E92F2]">
+                            🎁 {tx('เลือกแพ็กเกจที่ต้องการใช้งาน:', 'Choose Your Subscription Plan:')}
+                          </label>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            {
+                              id: 'starter',
+                              title: 'Starter',
+                              price: '1,990.-/m',
+                              emoji: '🚀',
+                              tag: tx('เริ่มต้นคุ้มค่า', 'Essential'),
+                              activeClass:
+                                'bg-gradient-to-b from-sky-500/30 to-sky-900/30 border-2 border-sky-400 text-sky-200 shadow-[0_10px_25px_-5px_rgba(56,189,248,0.45)]'
+                            },
+                            {
+                              id: 'professional',
+                              title: 'Professional',
+                              price: '2,900.-/m',
+                              emoji: '🏆',
+                              tag: tx('⭐ ยอดนิยม', '⭐ Popular'),
+                              activeClass:
+                                'bg-gradient-to-b from-blue-500/30 to-blue-900/30 border-2 border-[#2E5DE6] text-blue-200 shadow-[0_10px_25px_-5px_rgba(46,93,230,0.5)]'
+                            },
+                            {
+                              id: 'premium',
+                              title: 'Premium',
+                              price: '4,900.-/m',
+                              emoji: '👑',
+                              tag: tx('ครบวงจรสูงสุด', 'Enterprise'),
+                              activeClass:
+                                'bg-gradient-to-b from-purple-500/30 to-purple-900/30 border-2 border-purple-400 text-purple-200 shadow-[0_10px_25px_-5px_rgba(192,132,252,0.45)]'
+                            }
+                          ].map(pk => {
+                            const isSelected = subscriptionPlan === pk.id;
+                            return (
+                              <button
+                                key={pk.id}
+                                type="button"
+                                onClick={() => handleSelectSubscriptionPlan(pk.id)}
+                                className={`relative overflow-hidden p-2 rounded-2xl text-center transition-all duration-300 cursor-pointer active:scale-95 ${
+                                  isSelected
+                                    ? `${pk.activeClass} pkg-card-selected`
+                                    : theme === 'light'
+                                    ? 'bg-slate-50 border border-slate-200 text-slate-700 hover:border-[#2E5DE6]/40'
+                                    : 'bg-[#050814] border border-white/15 text-slate-300 hover:border-[#6E92F2]/40'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <span className="pkg-check-pop absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 text-slate-950 text-[9px] font-black flex items-center justify-center shadow">
+                                    ✓
+                                  </span>
+                                )}
+                                <div className="text-base mb-0.5">{pk.emoji}</div>
+                                <div className="text-[11px] font-black truncate">{pk.title}</div>
+                                <div className="text-[10px] font-bold text-[#2E5DE6] dark:text-amber-300">{pk.price}</div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Checkbox: Remember credentials & Terms & Conditions */}
+                    <label className="flex items-start gap-2.5 pt-1 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberPassword}
+                        onChange={e => setRememberPassword(e.target.checked)}
+                        className="w-4 h-4 mt-0.5 accent-[#2E5DE6] rounded cursor-pointer flex-shrink-0"
+                      />
+                      <span className={`text-xs leading-tight ${theme === 'light' ? 'text-slate-600' : 'text-slate-300'}`}>
+                        {tx(
+                          'จดจำการเข้าสู่ระบบในเครื่องนี้ • ยอมรับเงื่อนไขและข้อกำหนดการให้บริการ',
+                          'By signing in, I agree with Terms & Conditions and remember login.'
+                        )}
+                      </span>
                     </label>
-                    <input
-                      type="text"
-                      placeholder={tx('เช่น คุณสมชาย เจริญกิจ', 'e.g. Mr. Somchai')}
-                      value={authName}
-                      onChange={e => setAuthName(e.target.value)}
-                      className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2 text-white outline-none focus:border-emerald-400 text-sm"
-                    />
-                  </div>
 
-                  <button
-                    type="submit"
-                    disabled={isVerifyingOtp}
-                    className="w-full py-3.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 rounded-xl text-slate-950 font-black text-sm sm:text-base transition shadow-xl cursor-pointer hover:brightness-105 active:scale-95"
-                  >
-                    {isVerifyingOtp ? tx('กำลังตรวจสอบ...', 'Verifying...') : tx('✅ ยืนยันรหัส OTP และเข้าสู่ระบบ', '✅ Verify OTP & Enter System')}
-                  </button>
-                </form>
-              ) : (
-                /* ================= STANDARD PASSWORD / REGISTER FORM ================= */
-                <form onSubmit={handleAuthSubmit} className="flex flex-col gap-3.5 mb-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
-                      👤 {tx('ชื่อ - นามสกุล / ชื่อร้านค้าของคุณ (ซิงก์เข้าหน้า Admin อัตโนมัติ)', 'Your Full Name / Store Name (Synced to Admin)')}
-                    </label>
-                    <input
-                      type="text"
-                      placeholder={tx('เช่น คุณสมชาย เจริญกิจ', 'e.g. Mr. Somchai Charoenkit')}
-                      value={authName}
-                      onChange={e => setAuthName(e.target.value)}
-                      className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
-                    />
-                  </div>
+                    {/* Action Buttons: Sign Up & Sign In Pill Buttons (Matching Reference Image) */}
+                    <div className="flex flex-wrap items-center gap-3 pt-2">
+                      <button
+                        type="submit"
+                        className="flex-1 sm:flex-initial sm:min-w-[150px] py-3 px-8 rounded-full bg-gradient-to-r from-[#2E5DE6] to-[#1A3BB0] hover:from-[#6E92F2] hover:to-[#2E5DE6] text-white font-black text-sm shadow-lg shadow-blue-600/35 hover:shadow-blue-600/55 hover:brightness-105 active:scale-95 transition cursor-pointer text-center"
+                      >
+                        {authMode === 'login'
+                          ? tx('Sign In (เข้าสู่ระบบ)', 'Sign In')
+                          : tx('Sign Up (สร้างบัญชี)', 'Sign Up')}
+                      </button>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
-                      {tx('อีเมลสำหรับเข้าใช้งาน', 'Email Address')}
-                    </label>
-                    <input
-                      type="email"
-                      placeholder={tx('กรอกอีเมลของคุณ', 'owner@yourstore.com')}
-                      value={authEmail}
-                      onChange={e => setAuthEmail(e.target.value)}
-                      className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-bold text-slate-300">
-                        {tx('รหัสผ่านเข้าใช้งาน', 'Password')}
-                      </label>
                       <button
                         type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="text-xs font-bold text-amber-400 hover:text-amber-300 cursor-pointer"
+                        onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+                        className={`flex-1 sm:flex-initial sm:min-w-[140px] py-3 px-8 rounded-full border-2 font-black text-sm transition cursor-pointer text-center ${
+                          theme === 'light'
+                            ? 'border-[#2E5DE6]/40 text-[#2E5DE6] hover:border-[#2E5DE6] hover:bg-[#2E5DE6]/5'
+                            : 'border-[#6E92F2]/40 text-[#AFC5F8] hover:border-[#6E92F2] hover:bg-[#6E92F2]/10'
+                        }`}
                       >
-                        {showPassword
-                          ? tx('ซ่อนรหัสผ่าน', 'Hide Password')
-                          : tx('แสดงรหัสผ่านให้เห็นชัดๆ', 'Show Password')}
+                        {authMode === 'login'
+                          ? tx('Sign Up (สร้างบัญชี)', 'Sign Up')
+                          : tx('Sign In (เข้าสู่ระบบ)', 'Sign In')}
                       </button>
                     </div>
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder={tx('กรอกรหัสผ่าน', 'Enter your password')}
-                      value={authPassword}
-                      onChange={e => setAuthPassword(e.target.value)}
-                      className="w-full bg-[#050814] border border-white/15 rounded-xl px-4 py-2.5 text-white outline-none focus:border-amber-400"
-                      required
-                    />
-                  </div>
+                  </form>
+                )}
 
-                  {/* เบอร์โทรศัพท์ & ID LINE สำหรับส่งข้อความสรุปยอดขายอัตโนมัติ */}
-                  <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/35 space-y-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-black text-emerald-300">
-                        📲 {tx('เบอร์โทร & ID LINE รับสรุปยอดขายอัตโนมัติ (22:00 น.)', 'Phone & LINE ID for 22:00 Sales Alert')}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                          {tx('เบอร์โทรศัพท์มือถือ', 'Mobile Phone Number')}
-                        </label>
-                        <input
-                          type="tel"
-                          placeholder={tx('เช่น 089-999-8888', 'e.g. 089-999-8888')}
-                          value={authPhone}
-                          onChange={e => setAuthPhone(e.target.value)}
-                          className="w-full bg-[#050814] border border-emerald-400/40 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none focus:border-emerald-400"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                          {tx('ID LINE', 'LINE ID')}
-                        </label>
-                        <input
-                          type="text"
-                          placeholder={tx('เช่น @owner_insightflow', 'e.g. @owner_insightflow')}
-                          value={authLineId}
-                          onChange={e => setAuthLineId(e.target.value)}
-                          className="w-full bg-[#050814] border border-emerald-400/40 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none focus:border-emerald-400"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-xs font-black text-amber-300">
-                        {tx('🎁 เลือกแพ็กเกจที่ต้องการใช้งาน (กดเลือกได้เลย):', '🎁 Choose Your Subscription Plan (Tap to Select):')}
-                      </label>
-                      <span className="text-[11px] font-black text-emerald-400 animate-pulse">
-                        ✨ {tx('เปลี่ยนได้ตลอดเวลา', 'Switch anytime')}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        {
-                          id: 'starter',
-                          title: 'Starter',
-                          price: '1,990.-/m',
-                          emoji: '🚀',
-                          tag: tx('เริ่มต้นคุ้มค่า', 'Essential'),
-                          activeClass:
-                            'bg-gradient-to-b from-sky-500/30 to-sky-900/30 border-2 border-sky-400 text-sky-200 shadow-[0_10px_25px_-5px_rgba(56,189,248,0.45)]'
-                        },
-                        {
-                          id: 'professional',
-                          title: 'Professional',
-                          price: '2,900.-/m',
-                          emoji: '🏆',
-                          tag: tx('⭐ ขายดีที่สุด', '⭐ Popular'),
-                          activeClass:
-                            'bg-gradient-to-b from-amber-400/30 to-amber-900/30 border-2 border-amber-400 text-amber-200 shadow-[0_10px_25px_-5px_rgba(251,191,36,0.5)]'
-                        },
-                        {
-                          id: 'premium',
-                          title: 'Premium',
-                          price: '4,900.-/m',
-                          emoji: '👑',
-                          tag: tx('ครบวงจรสูงสุด', 'Enterprise'),
-                          activeClass:
-                            'bg-gradient-to-b from-purple-500/30 to-purple-900/30 border-2 border-purple-400 text-purple-200 shadow-[0_10px_25px_-5px_rgba(192,132,252,0.45)]'
-                        }
-                      ].map(pk => {
-                        const isSelected = subscriptionPlan === pk.id;
-                        return (
-                          <button
-                            key={pk.id}
-                            type="button"
-                            onClick={() => handleSelectSubscriptionPlan(pk.id)}
-                            className={`relative overflow-hidden p-2.5 rounded-2xl text-center transition-all duration-300 cursor-pointer active:scale-90 ${
-                              isSelected
-                                ? `${pk.activeClass} pkg-card-selected`
-                                : 'bg-[#050814] border border-white/15 text-slate-300 hover:border-amber-400/40 hover:-translate-y-0.5'
-                            }`}
-                          >
-                            {isSelected && (
-                              <>
-                                <span className="pkg-confetti-1 pointer-events-none absolute top-2 left-2 text-xs">
-                                  ✨
-                                </span>
-                                <span className="pkg-confetti-2 pointer-events-none absolute top-2 right-2 text-xs">
-                                  🎉
-                                </span>
-                                <span className="pkg-check-pop absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black flex items-center justify-center shadow">
-                                  ✓
-                                </span>
-                              </>
-                            )}
-                            <div
-                              className={`text-xl mb-0.5 inline-block ${
-                                isSelected ? 'pkg-cute-mascot' : ''
-                              }`}
-                            >
-                              {pk.emoji}
-                            </div>
-                            <div className="text-xs font-black truncate text-white">{pk.title}</div>
-                            <div className="text-[11px] font-bold text-amber-300">{pk.price}</div>
-                            <div className="text-[9px] font-black mt-0.5 px-1.5 py-0.5 rounded-full bg-white/10 text-slate-200 truncate">
-                              {pk.tag}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <label className="flex items-start gap-2.5 p-3 rounded-2xl bg-amber-400/10 border border-amber-400/30 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={rememberPassword}
-                      onChange={e => setRememberPassword(e.target.checked)}
-                      className="w-5 h-5 mt-0.5 accent-amber-400 rounded cursor-pointer flex-shrink-0"
-                    />
-                    <div>
-                      <span className="text-xs sm:text-sm font-bold text-amber-300 block">
-                        {tx('จดจำอีเมล เบอร์โทร ID LINE และรหัสผ่านไว้ในเครื่องนี้', 'Remember Email, Phone, LINE ID & Password')}
-                      </span>
-                    </div>
-                  </label>
-
+                {/* ================= ALTERNATIVE SIGN-IN METHODS ================= */}
+                <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-white/10">
+                  {/* Google 1-Tap Sign-In Button */}
                   <button
-                    type="submit"
-                    className="w-full py-3.5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl text-slate-950 font-black text-sm sm:text-base transition shadow-lg cursor-pointer"
+                    type="button"
+                    onClick={() => handleGoogleSignIn()}
+                    disabled={isGoogleSigningIn}
+                    className="w-full py-2.5 px-4 rounded-full bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm shadow-sm border border-slate-200 flex items-center justify-center gap-3 transition-all hover:shadow hover:scale-[1.005] cursor-pointer"
                   >
-                    {authMode === 'login'
-                      ? tx('เข้าสู่ระบบด้วยอีเมลและรหัสผ่าน', 'Sign In with Email & Password')
-                      : tx('สร้างบัญชีและเข้าใช้งาน', 'Create Account & Sign In')}
+                    <GoogleIcon size={18} />
+                    <span>
+                      {isGoogleSigningIn
+                        ? tx('กำลังเชื่อมต่อ Google...', 'Connecting to Google...')
+                        : tx('เข้าสู่ระบบด้วยบัญชี Google', 'Continue with Google')}
+                    </span>
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 ml-auto hidden sm:inline-block">
+                      ⚡ 1 คลิก
+                    </span>
                   </button>
-                </form>
-              )}
 
-              <div className="text-center text-xs text-slate-400 pb-1">
-                <button
-                  type="button"
-                  onClick={() => setAuthMode(authMode === 'otp' ? 'login' : 'otp')}
-                  className="text-emerald-400 hover:underline font-bold cursor-pointer"
-                >
-                  {authMode === 'otp'
-                    ? tx('🔄 เปลี่ยนไปเข้าสู่ระบบด้วยรหัสผ่านปกติ', 'Switch to standard Password sign-in')
-                    : tx('🔐 สลับไปเข้าสู่ระบบด้วยรหัส OTP 2FA (รวดเร็ว ปลอดภัย)', 'Switch to 2FA OTP login (Fast & Secure)')}
-                </button>
+                  {/* 1-Tap Instant Access Demo Buttons */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cleanPhone = (authPhone || '089-999-8888').trim();
+                        const cleanLine = (authLineId || '@owner_insightflow').trim();
+                        const adminUser = {
+                          name: tx('ผู้ดูแลระบบสูงสุด (Super Admin)', 'Super Admin'),
+                          email: SUPER_ADMIN_EMAIL,
+                          phone: cleanPhone,
+                          lineId: cleanLine,
+                          sub: 'super-admin',
+                          role: 'admin',
+                          picture: 'https://ui-avatars.com/api/?name=Super+Admin&background=fbbf24&color=0f172a&bold=true'
+                        };
+                        setAuthEmail(SUPER_ADMIN_EMAIL);
+                        setAdminPreviewCustomerPlan(false);
+                        localStorage.setItem('insightflow_saved_phone', cleanPhone);
+                        localStorage.setItem('insightflow_saved_line_id', cleanLine);
+                        if (rememberPassword) {
+                          localStorage.setItem('insightflow_saved_user', JSON.stringify(adminUser));
+                        }
+                        setUser(adminUser);
+                        setIsLoginOpen(false);
+                        toast.success(
+                          tx(
+                            `👑 เข้าสู่ระบบ Super Admin (${SUPER_ADMIN_EMAIL}) เรียบร้อยแล้ว!`,
+                            `👑 Signed in as Super Admin (${SUPER_ADMIN_EMAIL})!`
+                          )
+                        );
+                      }}
+                      className="py-2 px-3 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-500 dark:text-amber-300 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>👑</span>
+                      <span className="truncate">{tx('Super Admin (11 หน้า)', 'Super Admin (11 Pages)')}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const chosenMeta = planTiersMap[subscriptionPlan] || planTiersMap.starter;
+                        const cleanPhone = (authPhone || '089-999-8888').trim();
+                        const cleanLine = (authLineId || '@owner_insightflow').trim();
+                        const cleanName =
+                          authName.trim() || tx(`ลูกค้าแพ็กเกจ ${chosenMeta.code}`, `${chosenMeta.code} Customer`);
+                        const customerUser = {
+                          name: cleanName,
+                          email: authEmail.trim() || 'customer@insightflow.app',
+                          phone: cleanPhone,
+                          lineId: cleanLine,
+                          sub: 'customer-account',
+                          role: 'customer',
+                          picture: 'https://ui-avatars.com/api/?name=Customer&background=38bdf8&color=0f172a&bold=true'
+                        };
+                        localStorage.setItem('insightflow_saved_phone', cleanPhone);
+                        localStorage.setItem('insightflow_saved_line_id', cleanLine);
+                        if (rememberPassword) {
+                          localStorage.setItem('insightflow_saved_user', JSON.stringify(customerUser));
+                        }
+                        registerOrUpdateWebCustomer({
+                          name: customerUser.name,
+                          email: customerUser.email,
+                          phone: cleanPhone,
+                          lineId: cleanLine,
+                          plan: subscriptionPlan
+                        });
+                        setUser(customerUser);
+                        setIsLoginOpen(false);
+                        toast.success(
+                          tx(
+                            `🛍️ เข้าสู่ระบบลูกค้า "${chosenMeta.name}" • บันทึกชื่อ เบอร์โทร และไลน์เข้าหน้าต่าง Admin แล้ว!`,
+                            `🛍️ Signed in on "${chosenMeta.name}" • Saved Name, Phone & LINE into Admin Registry!`
+                          )
+                        );
+                      }}
+                      className="py-2 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-600 dark:text-emerald-300 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>🛍️</span>
+                      <span className="truncate">
+                        {tx(
+                          `ลูกค้า (${(planTiersMap[subscriptionPlan] || planTiersMap.starter).code})`,
+                          `Customer (${(planTiersMap[subscriptionPlan] || planTiersMap.starter).code})`
+                        )}
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* 2FA OTP Toggle Link */}
+                  <div className="text-center text-xs pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode(authMode === 'otp' ? 'login' : 'otp')}
+                      className="text-[#2E5DE6] dark:text-[#6E92F2] hover:underline font-bold cursor-pointer"
+                    >
+                      {authMode === 'otp'
+                        ? tx('🔄 เปลี่ยนไปเข้าสู่ระบบด้วยรหัสผ่านปกติ', 'Switch to standard Password sign-in')
+                        : tx('🔐 สลับไปเข้าสู่ระบบด้วยรหัส OTP 2FA (รวดเร็ว ปลอดภัย)', 'Switch to 2FA OTP login (Fast & Secure)')}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
