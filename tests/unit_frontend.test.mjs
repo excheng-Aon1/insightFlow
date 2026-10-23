@@ -742,6 +742,36 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 25. STATIC 4K METROPOLITAN NIGHT CITYSCAPE BACKGROUND (NO ANIMATION)
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-25: Static 4K Metropolitan Night Cityscape Background without Animation', () => {
+    // 1. Asset existence and file size (> 100KB)
+    const publicCityPath = path.join(projectRoot, 'public', 'hero-city-night-4k.jpg');
+    assert.ok(fs.existsSync(publicCityPath), 'public/hero-city-night-4k.jpg must exist');
+    const stats = fs.statSync(publicCityPath);
+    assert.ok(stats.size > 100000, '4K night city image must be high resolution (> 100KB)');
+
+    // 2. Component references 4K night city asset
+    const heroBgPath = path.join(projectRoot, 'src', 'components', 'HeroGoalTrajectoryBackground.jsx');
+    const heroBgContent = fs.readFileSync(heroBgPath, 'utf8');
+    assert.ok(
+      heroBgContent.includes('/hero-city-night-4k.jpg'),
+      'HeroGoalTrajectoryBackground.jsx must reference /hero-city-night-4k.jpg'
+    );
+
+    // 3. No animation in background (static 4K)
+    assert.ok(
+      !heroBgContent.includes('animate-goal-3d-breathe'),
+      'HeroGoalTrajectoryBackground.jsx must not have animate-goal-3d-breathe (clean static 4K)'
+    );
+    assert.ok(
+      !heroBgContent.includes('animate-goal-laser-flow'),
+      'HeroGoalTrajectoryBackground.jsx must not have laser animation (clean static 4K)'
+    );
+  });
+
 });
+
 
 
