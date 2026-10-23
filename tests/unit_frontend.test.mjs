@@ -771,7 +771,37 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     );
   });
 
+  // ----------------------------------------------------------------------------
+  // 26. COMPREHENSIVE ENTERPRISE SYSTEM SETTINGS CENTER
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-26: Enterprise System Settings Center with 6 Dedicated Core Modules', () => {
+    // 1. SettingsTab component file exists and exports SettingsTab
+    const settingsPath = path.join(projectRoot, 'src', 'components', 'SettingsTab.jsx');
+    assert.ok(fs.existsSync(settingsPath), 'SettingsTab.jsx must exist in components directory');
+    const content = fs.readFileSync(settingsPath, 'utf8');
+    assert.ok(content.includes('export function SettingsTab'), 'SettingsTab.jsx must export SettingsTab');
+
+    // 2. All 6 core modules supported
+    assert.ok(content.includes('general'), 'Settings must include general / organization sub-tab');
+    assert.ok(content.includes('notifications'), 'Settings must include smart notifications sub-tab');
+    assert.ok(content.includes('ai_secretary'), 'Settings must include AI secretary & copilot sub-tab');
+    assert.ok(content.includes('integrations'), 'Settings must include integrations & ETL sub-tab');
+    assert.ok(content.includes('appearance'), 'Settings must include appearance & theme sub-tab');
+    assert.ok(content.includes('security'), 'Settings must include security & backup vault sub-tab');
+
+    // 3. Automated LINE notification test trigger and backup JSON export
+    assert.ok(content.includes('handleTestLineAlert'), 'Settings must support test sending LINE summary alerts');
+    assert.ok(content.includes('handleDownloadBackup'), 'Settings must support exporting JSON configuration snapshot');
+
+    // 4. App.jsx integration
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(appContent.includes("import SettingsTab from './components/SettingsTab'"), 'App.jsx must import SettingsTab from component');
+    assert.ok(appContent.includes("export { SettingsTab }"), 'App.jsx must re-export SettingsTab');
+  });
+
 });
+
 
 
 

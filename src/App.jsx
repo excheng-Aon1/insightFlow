@@ -28,6 +28,7 @@ import ActionableAiCenter from './components/ActionableAiCenter';
 import DataGovernanceCenter from './components/DataGovernanceCenter';
 import ExecutiveBiStudio from './components/ExecutiveBiStudio';
 import ExecutiveSecretaryTab from './components/ExecutiveSecretaryTab';
+import SettingsTab from './components/SettingsTab';
 import ErrorBoundary from './components/ErrorBoundary';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
@@ -10130,266 +10131,8 @@ export function AdminTab({
   );
 }
 
-export function SettingsTab({
-  lang,
-  setLang,
-  theme,
-  setTheme,
-  fontScale,
-  setFontScale,
-  rememberCredentials,
-  setRememberCredentials,
-  userPhone = '089-999-8888',
-  userLineId = '@insightflow.vip',
-  onUpdateUserContact
-}) {
-  const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+export { SettingsTab };
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <div className="glass-card" style={{ padding: '1.5rem', borderRadius: '18px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.35rem' }}>
-          <LuxuryIconBadge variant="platinum" size="lg" active>
-            <LuxuryModuleIcon type="settings" size={30} />
-          </LuxuryIconBadge>
-          <div>
-            <h3 style={{ margin: '0 0 0.25rem 0', fontSize: '1.3rem', fontWeight: 900, color: '#f8fafc' }}>
-              {tx('ตั้งค่าภาษา ขนาดตัวหนังสือ และการแจ้งเตือนยอดขายอัตโนมัติ', 'Language, Text Size & Automated Sales Notification Settings')}
-            </h3>
-            <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.92rem' }}>
-              {tx(
-                'ปรับแต่งระบบให้อ่านง่าย สบายตา เลือกภาษา และตั้งค่าเบอร์โทรศัพท์ / ID LINE สำหรับรับข้อความสรุปยอดขายอัตโนมัติ',
-                'Customize language, senior-friendly font scaling, visual theme, and Phone / LINE ID for automated sales summary alerts.'
-              )}
-            </p>
-          </div>
-        </div>
-
-        {/* Phone & LINE ID Automated Sales Notification Settings */}
-        <div
-          style={{
-            padding: '1.25rem',
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(15, 23, 42, 0.9))',
-            border: '1.5px solid rgba(16, 185, 129, 0.45)',
-            marginBottom: '1.25rem'
-          }}
-        >
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginBottom: '0.9rem' }}>
-            <div>
-              <div style={{ fontWeight: 900, color: '#34d399', fontSize: '1.05rem' }}>
-                📲 {tx('เบอร์โทรศัพท์ & ID LINE สำหรับส่งข้อความสรุปยอดขายอัตโนมัติ (22:00 น.)', 'Phone Number & LINE ID for Automated Daily Sales Summary (22:00)')}
-              </div>
-              <div style={{ fontSize: '0.84rem', color: '#cbd5e1', marginTop: '0.2rem' }}>
-                {tx(
-                  'ระบบใช้ข้อมูลนี้จากตอนเข้าสู่ระบบ (Login) เพื่อส่งข้อความสรุปยอดขาย กำไรสุทธิ และแจ้งเตือนสต็อกเข้ามือถือของคุณอัตโนมัติ',
-                  'Saved during Login to automatically deliver daily closing sales, net profit, and low-stock alerts to your phone and LINE.'
-                )}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() =>
-                toast.success(
-                  tx(
-                    `📲 ทดสอบส่งข้อความสรุปยอดขายอัตโนมัติไปยัง LINE ID "${userLineId}" และเบอร์โทร "${userPhone}" สำเร็จ!`,
-                    `📲 Sent test automated sales summary to LINE ID "${userLineId}" and Phone "${userPhone}"!`
-                  )
-                )
-              }
-              style={{
-                padding: '0.6rem 1.05rem',
-                borderRadius: '10px',
-                border: 'none',
-                background: 'linear-gradient(135deg, #10b981, #059669)',
-                color: '#fff',
-                fontWeight: 900,
-                fontSize: '0.82rem',
-                cursor: 'pointer'
-              }}
-            >
-              🚀 {tx('ทดสอบส่งข้อความเข้า LINE / เบอร์โทรทันที', 'Send Test Sales Message Now')}
-            </button>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.9rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 800, color: '#94a3b8', marginBottom: '0.3rem' }}>
-                📱 {tx('เบอร์โทรศัพท์มือถือ (รับแจ้งเตือน SMS ด่วน)', 'Mobile Phone Number (SMS Alerts)')}
-              </label>
-              <input
-                type="tel"
-                value={userPhone}
-                onChange={e => onUpdateUserContact && onUpdateUserContact(e.target.value, userLineId)}
-                placeholder="081-234-5678"
-                style={{
-                  width: '100%',
-                  padding: '0.65rem 0.85rem',
-                  borderRadius: '10px',
-                  background: '#0f172a',
-                  color: '#fff',
-                  border: '1px solid rgba(56, 189, 248, 0.4)'
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 800, color: '#94a3b8', marginBottom: '0.3rem' }}>
-                💬 {tx('ไอดีไลน์ (LINE ID สำหรับรับสรุปยอดขายทุกวัน)', 'LINE ID (Daily Automated Sales Summary)')}
-              </label>
-              <input
-                type="text"
-                value={userLineId}
-                onChange={e => onUpdateUserContact && onUpdateUserContact(userPhone, e.target.value)}
-                placeholder="@myshop"
-                style={{
-                  width: '100%',
-                  padding: '0.65rem 0.85rem',
-                  borderRadius: '10px',
-                  background: '#0f172a',
-                  color: '#fff',
-                  border: '1px solid rgba(16, 185, 129, 0.4)'
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.2rem' }}>
-          {/* Language Selection */}
-          <div style={{ padding: '1.2rem', borderRadius: '14px', background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-            <div style={{ fontWeight: 900, color: '#38bdf8', marginBottom: '0.6rem' }}>
-              {tx('🌐 เลือกภาษาของระบบ (แยกภาษาชัดเจน)', '🌐 System Language (Strict Single-Language Mode)')}
-            </div>
-            <div style={{ display: 'flex', gap: '0.65rem' }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setLang('th');
-                  toast.success('เปลี่ยนเป็นโหมดภาษาไทยล้วนเรียบร้อยแล้ว');
-                }}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem',
-                  borderRadius: '10px',
-                  border: lang === 'th' ? '2px solid #38bdf8' : '1px solid rgba(148,163,184,0.3)',
-                  background: lang === 'th' ? 'rgba(56, 189, 248, 0.22)' : 'transparent',
-                  color: '#f8fafc',
-                  fontWeight: 900,
-                  cursor: 'pointer'
-                }}
-              >
-                🇹🇭 ภาษาไทยล้วน
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setLang('en');
-                  toast.success('Switched to 100% English Mode');
-                }}
-                style={{
-                  flex: 1,
-                  padding: '0.75rem',
-                  borderRadius: '10px',
-                  border: lang === 'en' ? '2px solid #38bdf8' : '1px solid rgba(148,163,184,0.3)',
-                  background: lang === 'en' ? 'rgba(56, 189, 248, 0.22)' : 'transparent',
-                  color: '#f8fafc',
-                  fontWeight: 900,
-                  cursor: 'pointer'
-                }}
-              >
-                🇬🇧 English Only
-              </button>
-            </div>
-          </div>
-
-          {/* Font Scale Selection */}
-          <div style={{ padding: '1.2rem', borderRadius: '14px', background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(251, 191, 36, 0.3)' }}>
-            <div style={{ fontWeight: 900, color: '#fbbf24', marginBottom: '0.6rem' }}>
-              {tx('🔎 ขนาดตัวหนังสือ (อ่านง่ายสำหรับผู้ใหญ่)', '🔎 Font Size (Senior-Friendly Readability)')}
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              {[
-                { id: 'normal', th: 'ขนาดปกติ', en: 'Standard' },
-                { id: 'large', th: 'ขนาดใหญ่', en: 'Large' },
-                { id: 'xlarge', th: 'ใหญ่พิเศษ', en: 'Extra Large' }
-              ].map(sz => (
-                <button
-                  key={sz.id}
-                  type="button"
-                  onClick={() => setFontScale(sz.id)}
-                  style={{
-                    flex: 1,
-                    padding: '0.7rem 0.5rem',
-                    borderRadius: '10px',
-                    border: fontScale === sz.id ? '2px solid #fbbf24' : '1px solid rgba(148,163,184,0.3)',
-                    background: fontScale === sz.id ? 'rgba(251, 191, 36, 0.2)' : 'transparent',
-                    color: '#f8fafc',
-                    fontWeight: 800,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {isEn ? sz.en : sz.th}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Theme & Password Remember */}
-          <div style={{ padding: '1.2rem', borderRadius: '14px', background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-            <div style={{ fontWeight: 900, color: '#34d399', marginBottom: '0.6rem' }}>
-              {tx('🎨 โทนสีหน้าจอ & การจดจำรหัสผ่าน', '🎨 Screen Theme & Password Memory')}
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <button
-                type="button"
-                onClick={() => setTheme('dark')}
-                style={{
-                  flex: 1,
-                  padding: '0.65rem',
-                  borderRadius: '10px',
-                  border: theme === 'dark' ? '2px solid #10b981' : '1px solid rgba(148,163,184,0.3)',
-                  background: theme === 'dark' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-                  color: '#f8fafc',
-                  fontWeight: 800,
-                  cursor: 'pointer'
-                }}
-              >
-                {tx('🌙 โหมดมืดถนอมสายตา', '🌙 Dark Mode')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTheme('light')}
-                style={{
-                  flex: 1,
-                  padding: '0.65rem',
-                  borderRadius: '10px',
-                  border: theme === 'light' ? '2px solid #10b981' : '1px solid rgba(148,163,184,0.3)',
-                  background: theme === 'light' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-                  color: '#f8fafc',
-                  fontWeight: 800,
-                  cursor: 'pointer'
-                }}
-              >
-                {tx('☀️ โหมดสว่างคมชัด', '☀️ Light Mode')}
-              </button>
-            </div>
-
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', color: '#e2e8f0', fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={rememberCredentials}
-                onChange={e => setRememberCredentials(e.target.checked)}
-                style={{ width: '18px', height: '18px' }}
-              />
-              {tx('จดจำอีเมลและรหัสผ่านไว้เข้าใช้งานครั้งถัดไปอัตโนมัติ', 'Remember my email and password for automatic sign-in')}
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function ProcurementTab({
   lang,
@@ -16885,8 +16628,8 @@ function App() {
     },
     {
       id: 'settings',
-      label: tx('ตั้งค่าระบบและภาษา', 'Language & Settings'),
-      subLabel: tx('เลือกภาษาและขนาดตัวหนังสือ', 'Language, Font Size & Theme'),
+      label: tx('ตั้งค่าระบบองค์กรและภาษา', 'System Settings & Language'),
+      subLabel: tx('ข้อมูลองค์กร, แจ้งเตือน LINE, เลขา AI, ETL, รูปลักษณ์ และความปลอดภัย', 'Organization, LINE Alerts, AI Agent, ETL, Theme & Security'),
       variant: 'platinum',
       minPlan: 'starter'
     }
@@ -17787,6 +17530,9 @@ function App() {
                   userPhone={user?.phone || authPhone}
                   userLineId={user?.lineId || authLineId}
                   onUpdateUserContact={handleUpdateUserContact}
+                  user={user}
+                  activePlan={subscriptionPlan}
+                  dbRecords={dbRecords}
                 />
               )}
             </ErrorBoundary>
