@@ -282,6 +282,33 @@ export default function ExecutiveBiStudio({
     const grossProfit = Math.max(0, grossRevenue - cogsAmount);
     const count = metrics.ordersCount;
 
+    // Zero-state clean slate rule: all metrics return 0 when no data is uploaded!
+    if (grossRevenue === 0 || count === 0) {
+      return {
+        grossProfit: 0,
+        avgInventoryCost: 0,
+        gmroi: '0.00',
+        gmroiNum: 0,
+        clv: 0,
+        cac: 0,
+        ltvToCac: '0.00',
+        ltvCacNum: 0,
+        cacPaybackMonths: '0.0',
+        strPct: '0.0',
+        rprPct: '0.0',
+        churnPct: '0.0',
+        uniqueCustomers: 0,
+        repeatCustomers: 0,
+        basePed: -0.55,
+        projectedDemandChangePct: '0.0',
+        projectedSimRevenue: 0,
+        revenueDelta: 0,
+        contributionMarginPerOrder: 0,
+        breakevenOrders: 0,
+        marginOfSafetyPct: '0.0'
+      };
+    }
+
     // 1. GMROI (Gross Margin Return on Inventory Investment)
     const avgInventoryCost = Math.max(1000, (cogsAmount * 0.38) * kpiInventorySimMultiplier);
     const gmroi = (grossProfit / avgInventoryCost).toFixed(2);
@@ -380,10 +407,10 @@ export default function ExecutiveBiStudio({
       }
     });
 
-    // Compute synthetic targets per branch
+    // Compute synthetic targets per branch (defaults to 0 if actual is 0)
     branchesList.forEach(b => {
       const act = branchMap[b]?.actual || 0;
-      branchMap[b].target = Math.round(act > 0 ? act * 1.15 : 120000);
+      branchMap[b].target = Math.round(act > 0 ? act * 1.15 : 0);
     });
 
     return {

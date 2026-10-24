@@ -30,7 +30,7 @@ export function CashFlowAndDemandForecast({
   const connectedFiles = useMemo(() => {
     const list = [];
     const hasUserFiles = pageUploadedFiles && Object.values(pageUploadedFiles).some(f => f && f.filename && (f.isUserAdded || f.isCustomUpload || f.paperHeader || f.rows));
-    const allFiles = hasUserFiles ? pageUploadedFiles : { ...initialPageUploadedFiles, ...pageUploadedFiles };
+    const allFiles = hasUserFiles ? pageUploadedFiles : {};
     Object.keys(allFiles).forEach(key => {
       const file = allFiles[key];
       if (!file || !file.filename) return;
@@ -126,7 +126,7 @@ export function CashFlowAndDemandForecast({
 
     // 2. Scan ALL uploaded files across all modules for preview rows
     const hasUserFiles = pageUploadedFiles && Object.values(pageUploadedFiles).some(f => f && f.filename && (f.isUserAdded || f.isCustomUpload || f.paperHeader || f.rows));
-    const allUploaded = hasUserFiles ? pageUploadedFiles : { ...initialPageUploadedFiles, ...pageUploadedFiles };
+    const allUploaded = hasUserFiles ? pageUploadedFiles : {};
     Object.keys(allUploaded).forEach(tabKey => {
       const upl = allUploaded[tabKey];
       if (upl?.previewRows && Array.isArray(upl.previewRows) && upl.previewRows.length > 0) {

@@ -168,35 +168,136 @@ export default function CohortRetentionHeatmap({
   const [hoveredCell, setHoveredCell] = useState(null);
   const [highlightCohort, setHighlightCohort] = useState('ม.ค. 2026');
 
-  // Filtered Cohort Data based on Channel multiplier
+  // Filtered Cohort Data dynamically calculated from uploaded transaction records
+  // Defaults to 0 / empty slate until a real transaction file is uploaded!
   const cohortData = useMemo(() => {
+    const hasRealRecords = Array.isArray(_dbRecords) && _dbRecords.length > 0;
+    const hasRealCustomers = Array.isArray(_customersList) && _customersList.length > 0;
+
+    // All sample data defaults to 0 when no file is uploaded!
+    if (!hasRealRecords && !hasRealCustomers) {
+      return [];
+    }
+
     const channelMultiplier =
       selectedChannel === 'online' ? 0.62 : selectedChannel === 'pos' ? 0.38 : 1.0;
-    const rateOffset =
-      selectedChannel === 'online' ? 1.5 : selectedChannel === 'pos' ? -1.8 : 0;
 
-    return DEFAULT_COHORT_DATA.map(item => {
-      const scaledCustomers = Math.round(item.newCustomers * channelMultiplier);
-      const scaledRetention = item.retention.map(r => {
-        if (r.month === 0) {
-          return { ...r, count: scaledCustomers, revenue: Math.round(r.revenue * channelMultiplier) };
+    // 1. If real transaction records exist, compute authentic retention matrix
+    if (hasRealRecords) {
+      const custOrders = new Map();
+      _dbRecords.forEach(r => {
+        const cName = r?.th?.customer || r?.en?.customer || r?.customer || r?.th?.name || 'Customer';
+        if (!custOrders.has(cName)) {
+          custOrders.set(cName, []);
         }
-        const adjustedRate = Math.max(12, Math.min(95, Math.round((r.rate + rateOffset) * 10) / 10));
-        const count = Math.round((scaledCustomers * adjustedRate) / 100);
+        custOrders.get(cName).push(r);
+      });
+
+      const monthNamesTh = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+      const monthNamesEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      const parseDateInfo = (dateStr) => {
+        const d = dateStr ? new Date(dateStr) : new Date();
+        const valid = !isNaN(d.getTime());
+        const y = valid ? d.getFullYear() : 2026;
+        const m = valid ? d.getMonth() : 0;
         return {
-          ...r,
-          rate: adjustedRate,
-          count,
-          revenue: Math.round(r.revenue * channelMultiplier)
+          year: y,
+          month: m,
+          key: `${y}-${String(m + 1).padStart(2, '0')}`,
+          th: `${monthNamesTh[m]} ${y}`,
+          en: `${monthNamesEn[m]} ${y}`
+        };
+      };
+
+      // Determine each customer's first acquisition month
+      const custAcquisition = new Map();
+      custOrders.forEach((orders, cName) => {
+        let earliestInfo = null;
+        let minTs = Infinity;
+        orders.forEach(o => {
+          const d = o.date ? new Date(o.date) : null;
+          const ts = d && !isNaN(d.getTime()) ? d.getTime() : 0;
+          if (ts < minTs) {
+            minTs = ts;
+            earliestInfo = parseDateInfo(o.date);
+          }
+        });
+        custAcquisition.set(cName, earliestInfo || parseDateInfo(orders[0]?.date));
+      });
+
+      // Group customers by cohort acquisition month
+      const cohortsMap = new Map();
+      custAcquisition.forEach((acq, cName) => {
+        if (!cohortsMap.has(acq.key)) {
+          cohortsMap.set(acq.key, {
+            key: acq.key,
+            th: acq.th,
+            en: acq.en,
+            customers: new Set(),
+            monthActivity: new Map() // relative month (0, 1, 2) => { custs: Set, revenue: number }
+          });
+        }
+        cohortsMap.get(acq.key).customers.add(cName);
+      });
+
+      // Map repeat orders into relative retention months (0, 1, 2, ...)
+      custOrders.forEach((orders, cName) => {
+        const acq = custAcquisition.get(cName);
+        if (!acq) return;
+        const group = cohortsMap.get(acq.key);
+        if (!group) return;
+
+        orders.forEach(o => {
+          const ordInfo = parseDateInfo(o.date);
+          const monthDiff = (ordInfo.year - acq.year) * 12 + (ordInfo.month - acq.month);
+          const relM = Math.max(0, monthDiff);
+
+          if (!group.monthActivity.has(relM)) {
+            group.monthActivity.set(relM, { custs: new Set(), revenue: 0 });
+          }
+          const act = group.monthActivity.get(relM);
+          act.custs.add(cName);
+          act.revenue += (Number(o.amount) || 0);
+        });
+      });
+
+      const sorted = Array.from(cohortsMap.values()).sort((a, b) => a.key.localeCompare(b.key));
+      return sorted.map((grp) => {
+        const cohortSize = Math.max(1, Math.round(grp.customers.size * channelMultiplier));
+        const retention = [];
+        for (let m = 0; m < 10; m++) {
+          if (grp.monthActivity.has(m)) {
+            const act = grp.monthActivity.get(m);
+            const count = Math.round(act.custs.size * channelMultiplier);
+            const rate = cohortSize > 0 ? Math.min(100, Math.round((count / cohortSize) * 1000) / 10) : 0;
+            retention.push({
+              month: m,
+              rate: m === 0 ? 100 : rate,
+              count: m === 0 ? cohortSize : count,
+              revenue: Math.round(act.revenue * channelMultiplier)
+            });
+          } else if (m === 0) {
+            retention.push({
+              month: 0,
+              rate: 100,
+              count: cohortSize,
+              revenue: Math.round(cohortSize * 1500 * channelMultiplier)
+            });
+          }
+        }
+        return {
+          id: grp.key,
+          cohort: grp.th,
+          cohortEn: grp.en,
+          newCustomers: cohortSize,
+          retention
         };
       });
-      return {
-        ...item,
-        newCustomers: scaledCustomers,
-        retention: scaledRetention
-      };
-    });
-  }, [selectedChannel]);
+    }
+
+    return [];
+  }, [_dbRecords, _customersList, selectedChannel]);
 
   // Max Retention Months columns (0 through 9)
   const maxRetentionMonths = 10;
@@ -232,22 +333,30 @@ export default function CohortRetentionHeatmap({
     return averages;
   }, [cohortData, maxRetentionMonths]);
 
-  // High-level KPI Scorecard
+  // High-level KPI Scorecard (Returns 0 when no cohorts exist)
   const kpiStats = useMemo(() => {
-    const m1Avg = averageRetentionCurve[1]?.avgRate || 51.6;
-    const m3Avg = averageRetentionCurve[3]?.avgRate || 33.4;
-    const dropOffM1toM2 = Math.round((m1Avg - (averageRetentionCurve[2]?.avgRate || 38.9)) * 10) / 10;
+    if (cohortData.length === 0) {
+      return {
+        m1Retention: 0,
+        m3Retention: 0,
+        dropOff: 0,
+        repeatRevenue: 0
+      };
+    }
+    const m1Avg = averageRetentionCurve[1]?.avgRate || 0;
+    const m3Avg = averageRetentionCurve[3]?.avgRate || 0;
+    const dropOffM1toM2 = Math.round((m1Avg - (averageRetentionCurve[2]?.avgRate || 0)) * 10) / 10;
     let totalRepeatRev = 0;
     cohortData.forEach(c => {
       c.retention.forEach(r => {
-        if (r.month > 0) totalRepeatRev += r.revenue;
+        if (r.month > 0) totalRepeatRev += (r.revenue || 0);
       });
     });
 
     return {
       m1Retention: m1Avg,
       m3Retention: m3Avg,
-      dropOff: dropOffM1toM2,
+      dropOff: Math.max(0, dropOffM1toM2),
       repeatRevenue: totalRepeatRev
     };
   }, [averageRetentionCurve, cohortData]);
@@ -507,7 +616,7 @@ export default function CohortRetentionHeatmap({
                 {kpiStats.m1Retention}%
               </span>
               <span className="text-[10px] text-emerald-400 font-bold">
-                ▲ +12.4% {tx('เหนือเกณฑ์มาตรฐาน', 'vs benchmark')}
+                {kpiStats.m1Retention > 0 ? `▲ +12.4% ${tx('เหนือเกณฑ์มาตรฐาน', 'vs benchmark')}` : tx('รอข้อมูลไฟล์', 'Pending File')}
               </span>
             </div>
             <p className="text-[11px] text-slate-400 mt-0.5">
@@ -527,7 +636,7 @@ export default function CohortRetentionHeatmap({
                 {kpiStats.m3Retention}%
               </span>
               <span className="text-[10px] text-blue-300 font-bold">
-                ● {tx('จุดตัดสิน LTV', 'LTV Determinant')}
+                {kpiStats.m3Retention > 0 ? `● ${tx('จุดตัดสิน LTV', 'LTV Determinant')}` : tx('รอข้อมูลไฟล์', 'Pending File')}
               </span>
             </div>
             <p className="text-[11px] text-slate-400 mt-0.5">
@@ -547,7 +656,7 @@ export default function CohortRetentionHeatmap({
                 -{kpiStats.dropOff}%
               </span>
               <span className="text-[10px] text-amber-300 font-bold">
-                {tx('โอกาสกู้ชีพสูงสุด', 'Golden Win-Back Window')}
+                {kpiStats.dropOff > 0 ? tx('โอกาสกู้ชีพสูงสุด', 'Golden Win-Back Window') : tx('ไม่มีความเสี่ยง', 'Zero Churn')}
               </span>
             </div>
             <p className="text-[11px] text-slate-400 mt-0.5">
@@ -564,10 +673,10 @@ export default function CohortRetentionHeatmap({
             </div>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-2xl font-black text-white font-mono">
-                ฿{(kpiStats.repeatRevenue / 1000000).toFixed(2)}M
+                ฿{kpiStats.repeatRevenue >= 1000000 ? `${(kpiStats.repeatRevenue / 1000000).toFixed(2)}M` : kpiStats.repeatRevenue.toLocaleString()}
               </span>
               <span className="text-[10px] text-emerald-400 font-bold">
-                54.8% {tx('ของยอดขายรวม', 'of total')}
+                {kpiStats.repeatRevenue > 0 ? `54.8% ${tx('ของยอดขายรวม', 'of total')}` : `0% ${tx('ของยอดขายรวม', 'of total')}`}
               </span>
             </div>
             <p className="text-[11px] text-slate-400 mt-0.5">
@@ -629,6 +738,25 @@ export default function CohortRetentionHeatmap({
             </thead>
 
             <tbody className="divide-y divide-white/5">
+              {cohortData.length === 0 && (
+                <tr>
+                  <td colSpan={12} className="py-14 px-4 text-center">
+                    <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-mono text-2xl font-black">
+                      0
+                    </div>
+                    <div className="text-sm font-black text-slate-200">
+                      {tx('ยังไม่มีข้อมูลการซื้อซ้ำในระบบ (ค่าตัวอย่างเริ่มต้นเป็น 0 ทั้งหมด)', 'No repeat purchase data yet (All default sample values return 0)')}
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1 max-w-lg mx-auto leading-relaxed">
+                      {tx(
+                        'เมื่ออัปโหลดไฟล์ยอดขาย ระบบจะดึงประวัติการสั่งซื้อของลูกค้าแต่ละราย และคำนวณ Customer Retention Rate รายเดือน (M+1, M+2, M+3...) ให้ทันทีตามข้อมูลจริงในไฟล์',
+                        'When a sales transaction file is uploaded, repeat purchase retention rates across months 2, 3, 4 will be calculated dynamically from your real file.'
+                      )}
+                    </p>
+                  </td>
+                </tr>
+              )}
+
               {cohortData.map((cohortRow) => {
                 const isSelectedCohort = highlightCohort === cohortRow.cohort;
                 return (
@@ -704,34 +832,36 @@ export default function CohortRetentionHeatmap({
               })}
 
               {/* =============================================================
-                  AVERAGE RETENTION ROW (BENCHMARK)
+                  AVERAGE RETENTION ROW (BENCHMARK) - Rendered only when real cohorts exist
                   ============================================================= */}
-              <tr className="border-t-2 border-white/20 bg-white/5 font-black">
-                <td className="py-3 px-3 text-left text-amber-300">
-                  {tx('เฉลี่ยทุก Cohort (Average)', 'All-Cohort Average')}
-                </td>
-                <td className="py-3 px-3 text-right font-mono text-amber-300 border-r border-white/10">
-                  -
-                </td>
-                {monthHeaders.map(mh => {
-                  const avg = averageRetentionCurve[mh.index]?.avgRate;
-                  const color = getCellColor(avg);
+              {cohortData.length > 0 && (
+                <tr className="border-t-2 border-white/20 bg-white/5 font-black">
+                  <td className="py-3 px-3 text-left text-amber-300">
+                    {tx('เฉลี่ยทุก Cohort (Average)', 'All-Cohort Average')}
+                  </td>
+                  <td className="py-3 px-3 text-right font-mono text-amber-300 border-r border-white/10">
+                    -
+                  </td>
+                  {monthHeaders.map(mh => {
+                    const avg = averageRetentionCurve[mh.index]?.avgRate;
+                    const color = getCellColor(avg);
 
-                  return (
-                    <td key={mh.index} className="p-1">
-                      {avg !== null ? (
-                        <div
-                          className={`py-2 px-1.5 rounded-lg border text-center font-mono text-[11px] leading-tight ${color.bg} ${color.text} ${color.border}`}
-                        >
-                          {avg}%
-                        </div>
-                      ) : (
-                        <div className="py-2 text-slate-600 font-mono text-[11px]">-</div>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
+                    return (
+                      <td key={mh.index} className="p-1">
+                        {avg !== null ? (
+                          <div
+                            className={`py-2 px-1.5 rounded-lg border text-center font-mono text-[11px] leading-tight ${color.bg} ${color.text} ${color.border}`}
+                          >
+                            {avg}%
+                          </div>
+                        ) : (
+                          <div className="py-2 text-slate-600 font-mono text-[11px]">-</div>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

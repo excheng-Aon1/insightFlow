@@ -3037,20 +3037,7 @@ export function OverviewTab({
 
   const [newSaleAmount, setNewSaleAmount] = useState('');
   const [newSaleNote, setNewSaleNote] = useState('');
-  const [recentRecordedSales, setRecentRecordedSales] = useState([
-    {
-      id: 'SL-101',
-      time: tx('วันนี้ 15:30 น.', 'Today 15:30'),
-      amount: 18500,
-      note: tx('คำสั่งซื้อสินค้าและบริการหลัก (หน้าร้าน/จุดขาย)', 'Flagship Product/Service Order (Storefront/Hub)')
-    },
-    {
-      id: 'SL-102',
-      time: tx('วันนี้ 14:15 น.', 'Today 14:15'),
-      amount: 32000,
-      note: tx('คำสั่งซื้อเหมาชุดอุปกรณ์สำนักงาน (ช่องทางแชตร้าน)', 'Corporate Office Supply Bundle (Direct Chat)')
-    }
-  ]);
+  const [recentRecordedSales, setRecentRecordedSales] = useState([]);
 
   // Derive recent recorded sales dynamically from the latest uploaded file
   const displayedRecentSales = useMemo(() => {
@@ -3211,7 +3198,7 @@ export function OverviewTab({
       datasets: [
         {
           label: tx('อัตราการซื้อสำเร็จ (%)', 'Conversion Rate (%)'),
-          data: [11.4, 9.2, 7.8, 6.4, 4.9],
+          data: currentRevenueVal > 0 ? [11.4, 9.2, 7.8, 6.4, 4.9] : [0, 0, 0, 0, 0],
           backgroundColor: 'rgba(251, 191, 36, 0.85)',
           hoverBackgroundColor: '#f59e0b',
           borderRadius: 8
@@ -5338,7 +5325,7 @@ export function MultiChannelTab({
                           is_profit: isProfit,
                           offline_rev: offlineRevStr,
                           online_rev: onlineRevStr,
-                          total_orders: `${Array.isArray(dbRecords) && dbRecords.length > 0 ? dbRecords.length.toLocaleString() : '4,210'} บิล`,
+                          total_orders: `${Array.isArray(dbRecords) && dbRecords.length > 0 ? dbRecords.length.toLocaleString() : '0'} บิล`,
                           top_branch: `${branchesList[0]?.th?.branchName || branchesList[0]?.name || 'สาขาหลัก'} (฿${(branchesList[0]?.totalSales || 640000).toLocaleString()})`,
                           low_stock_alert: `${lowStockItems[0]?.th?.name || lowStockItems[0]?.name || 'สินค้าหมุนเวียนหลัก'} เหลือ ${lowStockItems[0]?.stock || 8} หน่วย (ควรสั่งเพิ่ม)`,
                           report_time: `${lineNotifyTime} น.`
@@ -5488,7 +5475,7 @@ export function MultiChannelTab({
                 <div style={{ background: '#0f1a33', padding: '0.55rem 0.75rem', borderRadius: '8px', fontSize: '0.73rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
                     <span>🧾 {tx('บิลรวมวันนี้:', 'Orders Today:')}</span>
-                    <strong style={{ color: '#f8fafc' }}>{Array.isArray(dbRecords) && dbRecords.length > 0 ? dbRecords.length.toLocaleString() : '4,210'} {tx('บิล', 'bills')}</strong>
+                    <strong style={{ color: '#f8fafc' }}>{Array.isArray(dbRecords) && dbRecords.length > 0 ? dbRecords.length.toLocaleString() : '0'} {tx('บิล', 'bills')}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
                     <span>🏆 {tx('สาขาขายดีอันดับ 1:', 'Top Branch:')}</span>
@@ -10210,15 +10197,10 @@ export function ProcurementTab({
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
 
-  const safeVendors = (Array.isArray(vendorsList) && vendorsList.length > 0)
-    ? vendorsList.filter(Boolean)
-    : (Array.isArray(initialVendorsBilingual) ? initialVendorsBilingual : []);
-  const safeReqs = (Array.isArray(branchRequisitions) && branchRequisitions.length > 0)
-    ? branchRequisitions.filter(Boolean)
-    : (Array.isArray(initialBranchRequisitionsBilingual) ? initialBranchRequisitionsBilingual : []);
-  const safePos = (Array.isArray(centralPosList) && centralPosList.length > 0)
-    ? centralPosList.filter(Boolean)
-    : (Array.isArray(initialCentralPosBilingual) ? initialCentralPosBilingual : []);
+  // Zero-state clean slate rule: defaults to empty array / 0 when no file is uploaded
+  const safeVendors = Array.isArray(vendorsList) ? vendorsList.filter(Boolean) : [];
+  const safeReqs = Array.isArray(branchRequisitions) ? branchRequisitions.filter(Boolean) : [];
+  const safePos = Array.isArray(centralPosList) ? centralPosList.filter(Boolean) : [];
 
   const [vendorFilter, setVendorFilter] = useState('all');
   const [vendorSearch, setVendorSearch] = useState('');
@@ -12501,12 +12483,12 @@ function App() {
   const [auditLogs, setAuditLogs] = useState([]);
   const [inventoryList, setInventoryList] = useState([]);
   const [branchesList, setBranchesList] = useState([]);
-  const [channelsList, setChannelsList] = useState(() => initialChannelsBilingual);
+  const [channelsList, setChannelsList] = useState([]);
   const [anomaliesList, setAnomaliesList] = useState([]);
   const [dbRecords, setDbRecords] = useState([]);
-  const [vendorsList, setVendorsList] = useState(() => initialVendorsBilingual);
-  const [branchRequisitions, setBranchRequisitions] = useState(() => initialBranchRequisitionsBilingual);
-  const [centralPosList, setCentralPosList] = useState(() => initialCentralPosBilingual);
+  const [vendorsList, setVendorsList] = useState([]);
+  const [branchRequisitions, setBranchRequisitions] = useState([]);
+  const [centralPosList, setCentralPosList] = useState([]);
 
   const [lineNotifyEnabled, setLineNotifyEnabled] = useState(true);
   const [lineNotifyTime, setLineNotifyTime] = useState('22:00');
@@ -13636,8 +13618,11 @@ function App() {
       });
       setInventoryList(importedInventory);
 
-      // Populate Branches from file
-      const uniqueChannels = Array.from(new Set(importedDbRows.map(r => r.th.channel)));
+      // Populate Branches from file ONLY if a channel/branch column was found
+      const uniqueChannels = colChannelIdx >= 0
+        ? Array.from(new Set(importedDbRows.map(r => r.th.channel).filter(Boolean)))
+        : [];
+
       const importedBranches = uniqueChannels.slice(0, 10).map((chanName, idx) => {
         const chanRows = importedDbRows.filter(r => r.th.channel === chanName);
         const chanRev = chanRows.reduce((sum, r) => sum + r.amount, 0);
@@ -13714,19 +13699,14 @@ function App() {
       }));
       setAnomaliesList(importedAnomalies);
 
-      // Populate Staff & Cashier POS Audit from file
+      // Populate Staff & Cashier POS Audit from file ONLY if a staff column was found in the file
       const staffRawNames = colStaffIdx >= 0
         ? Array.from(new Set(dataRows.map(r => r[colStaffIdx]).filter(Boolean)))
         : [];
-      const staffCandidates = staffRawNames.length > 0 ? staffRawNames.slice(0, 8) : [
-        'คุณภัทรพล (หัวหน้าทีมขาย)',
-        'คุณชนากานต์ (แคชเชียร์หลัก)',
-        'คุณศิริพร (พนักงานขายหน้าร้าน)',
-        'คุณธนดล (แคชเชียร์กะบ่าย)'
-      ];
+      const staffCandidates = staffRawNames.slice(0, 8);
 
       const importedStaff = staffCandidates.map((stfName, sIdx) => {
-        const branch = importedBranches[sIdx % importedBranches.length] || { branchId: 'siam', th: { branchName: 'สาขาหลัก' }, en: { branchName: 'Main Store' } };
+        const branch = importedBranches[sIdx % Math.max(1, importedBranches.length)] || { branchId: 'main', th: { branchName: 'สาขาหลัก' }, en: { branchName: 'Main Store' } };
         const sliceRev = Math.max(1000, Math.round(totalExtractedAmount * (0.35 / (sIdx + 1))));
         const sliceBills = Math.max(1, Math.round(importedDbRows.length * (0.35 / (sIdx + 1))));
         const basket = Math.round(sliceRev / sliceBills);
@@ -13777,8 +13757,8 @@ function App() {
       });
       setStaffList(importedStaff);
 
-      // Populate POS Audit Logs from file
-      const importedAuditLogs = importedDbRows.slice(0, 10).map((row, lIdx) => {
+      // Populate POS Audit Logs from file ONLY if staff was found
+      const importedAuditLogs = importedStaff.length > 0 ? importedDbRows.slice(0, 10).map((row, lIdx) => {
         const isVoid = lIdx === 2 || lIdx === 6;
         const isHighValue = row.amount > (totalExtractedAmount / Math.max(1, importedDbRows.length)) * 1.5;
         return {
@@ -13803,11 +13783,11 @@ function App() {
             investigation: isVoid ? 'Under CCTV audit review' : 'Logged into system'
           }
         };
-      });
+      }) : [];
       setAuditLogs(importedAuditLogs);
 
-      // Populate Procurement, Vendors & Central POs from file
-      const importedVendors = importedInventory.slice(0, 6).map((inv, vIdx) => {
+      // Populate Procurement, Vendors & Central POs from file ONLY if inventory items exist
+      const importedVendors = importedInventory.length > 0 ? importedInventory.slice(0, 6).map((inv, vIdx) => {
         const catName = inv.th?.category || cleanFileName;
         const spend = inv.price * inv.stock * 8;
         return {
@@ -13840,15 +13820,15 @@ function App() {
             note: `Dynamically linked with product "${inv.en?.name}" in uploaded file`
           }
         };
-      });
+      }) : [];
       setVendorsList(importedVendors);
 
-      const importedBranchRequisitions = importedInventory.slice(0, 8).map((inv, rIdx) => {
-        const branch = importedBranches[rIdx % importedBranches.length] || { branchId: 'siam', th: { branchName: 'สาขาหลัก' }, en: { branchName: 'Main Store' } };
-        const matchedVendor = importedVendors[rIdx % importedVendors.length] || importedVendors[0] || initialVendorsBilingual[0];
+      const importedBranchRequisitions = importedInventory.length > 0 ? importedInventory.slice(0, 8).map((inv, rIdx) => {
+        const branch = importedBranches[rIdx % Math.max(1, importedBranches.length)] || { branchId: 'main', th: { branchName: 'สาขาหลัก' }, en: { branchName: 'Main Store' } };
+        const matchedVendor = importedVendors[rIdx % Math.max(1, importedVendors.length)] || importedVendors[0] || initialVendorsBilingual[0];
         const reqQty = Math.max(30, Math.ceil(inv.stock * 0.8));
         const unitCost = Math.max(45, Math.round((inv.price || 450) * 0.48));
-        const discPct = matchedVendor.volumeDiscountPct || 14;
+        const discPct = matchedVendor?.volumeDiscountPct || 14;
         const q1 = Math.round(reqQty * 0.5);
         const q2 = Math.round(reqQty * 0.3);
         const q3 = Math.max(5, reqQty - q1 - q2);
@@ -13857,7 +13837,7 @@ function App() {
           id: `REQ-${rIdx + 101}`,
           branchId: branch.branchId,
           sku: inv.sku,
-          vendorId: matchedVendor.id,
+          vendorId: matchedVendor?.id || 'VND-01',
           regularUnitCost: unitCost,
           volumeDiscountPct: discPct,
           minQtyForTier: Math.max(50, Math.round(reqQty * 0.8)),
@@ -13876,7 +13856,7 @@ function App() {
           productNameEn: inv.en?.name || inv.sku,
           th: {
             productName: inv.th?.name || inv.sku,
-            vendorName: matchedVendor.th?.name || 'ซัพพลายเออร์หลัก',
+            vendorName: matchedVendor?.th?.name || 'ซัพพลายเออร์หลัก',
             branchName: branch.th?.branchName || 'สาขาหลัก',
             requestedBy: `ผู้จัดการ ${branch.th?.branchName || 'สาขา'}`,
             statusText: 'อนุมัติรวบรวมเข้าใบสั่งซื้อกลางแล้ว',
@@ -13885,7 +13865,7 @@ function App() {
           },
           en: {
             productName: inv.en?.name || inv.sku,
-            vendorName: matchedVendor.en?.name || 'Main Supplier',
+            vendorName: matchedVendor?.en?.name || 'Main Supplier',
             branchName: branch.en?.branchName || 'Main Store',
             requestedBy: `Manager (${branch.en?.branchName || 'Store'})`,
             statusText: 'Approved & Merged into Central PO',
@@ -13893,10 +13873,10 @@ function App() {
             urgency: inv.stock < 30 ? 'Urgent (Low stock)' : 'Normal (Weekly Replenishment)'
           }
         };
-      });
+      }) : [];
       setBranchRequisitions(importedBranchRequisitions);
 
-      const importedCentralPosList = importedVendors.slice(0, 4).map((vnd, pIdx) => {
+      const importedCentralPosList = importedVendors.length > 0 ? importedVendors.slice(0, 4).map((vnd, pIdx) => {
         const matchedInv = importedInventory[pIdx] || importedInventory[0] || {};
         const totalUnits = (pIdx + 1) * 150 + 100;
         const regularUnitCost = Math.max(45, Math.round((matchedInv?.price || 500) * 0.48));
@@ -13950,7 +13930,7 @@ function App() {
             savingsPraise: `Saved ฿${savedAmount.toLocaleString()} via bulk consolidation`
           }
         };
-      });
+      }) : [];
       setCentralPosList(importedCentralPosList);
 
       const firstLabel = importedDbRows[0]?.th.customer || cleanFileName;
@@ -14029,43 +14009,84 @@ function App() {
         ...(options?.matchedKeys || [])
       ];
 
-      if (hasProductData) {
-        detectedModuleKeys.push('inventory', 'procurement');
-      }
-      if (hasCustomerData) {
-        detectedModuleKeys.push('customers');
-      }
-      if (hasStaffData) {
-        detectedModuleKeys.push('staff_pos');
-      }
-      if (hasChannelData) {
-        detectedModuleKeys.push('multi_channel');
-      }
-      if (hasFinanceData) {
-        detectedModuleKeys.push('bi_studio');
+      // Domain-Specific Suitability Detection & Target Page Routing
+      const hasRealProduct = colProductIdx >= 0 && importedInventory.length > 0;
+      const hasRealCustomer = colCustomerIdx >= 0 && importedCustomers.length > 0;
+      const hasRealStaff = colStaffIdx >= 0 && importedStaff.length > 0;
+      const hasRealStock = colStockIdx >= 0 && importedInventory.length > 0;
+      const hasRealChannel = colChannelIdx >= 0 && importedChannels.length > 0;
+
+      let primaryTargetTab = tabKey && tabKey !== 'central' ? tabKey : 'overview';
+      const suitedTabKeys = new Set(['database', 'insights']);
+      const suitedTabNamesTh = ['ฐานข้อมูลกลาง', 'บทวิเคราะห์ AI'];
+      const suitedTabNamesEn = ['Central Database', 'AI Insights'];
+
+      if (hasRealStock && !hasRealCustomer) {
+        // Inventory / Warehouse file
+        primaryTargetTab = 'inventory';
+        suitedTabKeys.add('inventory');
+        suitedTabKeys.add('procurement');
+        suitedTabNamesTh.push('คลังสินค้าอัจฉริยะ', 'จัดซื้อรวมศูนย์ & PO');
+        suitedTabNamesEn.push('Smart Inventory', 'Procurement & PO');
+      } else if (hasRealCustomer && !hasRealStock && !hasRealStaff && (/customer|client|member|vip|loyalty|crm|ลูกค้า|สมาชิก/i.test(file.name) || cleanHeaderStrs.some(h => /phone|email|line|point|member|tier|เบอร์|โทร|แต้ม|คะแนน/i.test(h)))) {
+        // Customer CRM file
+        primaryTargetTab = 'customers';
+        suitedTabKeys.add('customers');
+        suitedTabNamesTh.push('วิเคราะห์ลูกค้าประจำ & Cohort Retention');
+        suitedTabNamesEn.push('Customer Loyalty & Cohort Retention');
+      } else if (hasRealStaff || /staff|cashier|employee|แคชเชียร์|พนักงาน/i.test(file.name)) {
+        // Staff POS file
+        primaryTargetTab = 'staff_pos';
+        suitedTabKeys.add('staff_pos');
+        suitedTabNamesTh.push('พนักงานและจุดขาย POS');
+        suitedTabNamesEn.push('Staff Sales & POS Audits');
+      } else if (hasRealChannel && !hasRealProduct && !hasRealCustomer && /branch|channel|outlet|store|สาขา|ช่องทาง/i.test(file.name)) {
+        // Multi-Channel / Branch file
+        primaryTargetTab = 'multi_channel';
+        suitedTabKeys.add('multi_channel');
+        suitedTabNamesTh.push('สาขาและช่องทางจำหน่าย');
+        suitedTabNamesEn.push('Channels & Branches');
+      } else {
+        // Sales Transactions / Comprehensive Financial Ledger
+        primaryTargetTab = tabKey && tabKey !== 'central' ? tabKey : 'overview';
+        suitedTabKeys.add('overview');
+        suitedTabKeys.add('bi_studio');
+        suitedTabNamesTh.push('ภาพรวมธุรกิจและเป้าหมาย', 'Executive BI Studio');
+        suitedTabNamesEn.push('Business Overview', 'Executive BI Studio');
+
+        if (hasRealCustomer) {
+          suitedTabKeys.add('customers');
+          suitedTabNamesTh.push('วิเคราะห์ลูกค้า & Cohort');
+          suitedTabNamesEn.push('Customers & Cohort');
+        }
+        if (hasRealProduct) {
+          suitedTabKeys.add('inventory');
+          suitedTabKeys.add('procurement');
+          suitedTabNamesTh.push('คลังสินค้า', 'จัดซื้อรวมศูนย์');
+          suitedTabNamesEn.push('Inventory', 'Procurement');
+        }
+        if (hasRealChannel) {
+          suitedTabKeys.add('multi_channel');
+          suitedTabNamesTh.push('สาขาและช่องทาง');
+          suitedTabNamesEn.push('Channels');
+        }
+        if (hasRealStaff) {
+          suitedTabKeys.add('staff_pos');
+          suitedTabNamesTh.push('พนักงาน POS');
+          suitedTabNamesEn.push('Staff POS');
+        }
       }
 
-      // Every operational page and AI Insights must take data exclusively from the latest uploaded file
-      const operationalModuleKeys = [
-        'central',
-        'database',
-        'overview',
-        'inventory',
-        'customers',
-        'staff_pos',
-        'multi_channel',
-        'procurement',
-        'bi_studio',
-        'insights',
-        'cash_flow',
-        'playbooks',
-        'forecast'
-      ];
+      // Auto-switch to the primary matched tab so user immediately sees the analysis of their file!
+      if (options?.isCentralShoot || tabKey === 'central') {
+        setActiveTab(primaryTargetTab);
+      }
+
       const allTargetKeys = Array.from(new Set([
-        ...operationalModuleKeys,
-        tabKey,
-        ...detectedModuleKeys
-      ]));
+        ...Array.from(suitedTabKeys),
+        'central',
+        tabKey
+      ])).filter(Boolean);
 
       const fileDataEntry = {
         filename: file.name,
@@ -14121,11 +14142,14 @@ function App() {
       }
 
       setIsUploading(false);
+      const matchedSummaryTh = Array.from(new Set(suitedTabNamesTh)).join(', ');
+      const matchedSummaryEn = Array.from(new Set(suitedTabNamesEn)).join(', ');
       toast.success(
         tx(
-          `📂 อัปโหลดและอ่านไฟล์ "${file.name}" สำเร็จ! (${parsedRowsCount.toLocaleString()} แถว • ฿${totalExtractedAmount.toLocaleString()}) ข้อมูลจริงซิงก์ครบทุกหน้าแล้ว`,
-          `📂 Successfully read "${file.name}"! (${parsedRowsCount.toLocaleString()} rows • ฿${totalExtractedAmount.toLocaleString()}) Synced across all pages.`
-        )
+          `📂 อัปโหลดไฟล์ "${file.name}" สำเร็จ! (${parsedRowsCount.toLocaleString()} แถว) วิเคราะห์ข้อมูลเข้าสู่หน้า: ${matchedSummaryTh} เรียบร้อยแล้ว (หน้าอื่นที่ไม่เกี่ยวข้องคงค่าเป็น 0 ตามไฟล์จริง)`,
+          `📂 Analyzed "${file.name}" into: ${matchedSummaryEn} (Unrelated pages remain at 0).`
+        ),
+        { duration: 5500 }
       );
     };
     reader.onerror = () => {

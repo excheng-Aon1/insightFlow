@@ -891,6 +891,44 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(heatmapContent.includes('ExportCsvLuxuryIcon'), 'Must render ExportCsvLuxuryIcon');
   });
 
+  test('UNIT-FE-29: Zero-State Default (All samples return 0) & Intelligent File Domain Routing', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // 1. Initial state defaults to clean slate / 0 across channels, vendors, POs
+    assert.ok(appContent.includes('const [channelsList, setChannelsList] = useState([]);'), 'channelsList must default to []');
+    assert.ok(appContent.includes('const [vendorsList, setVendorsList] = useState([]);'), 'vendorsList must default to []');
+    assert.ok(appContent.includes('const [branchRequisitions, setBranchRequisitions] = useState([]);'), 'branchRequisitions must default to []');
+    assert.ok(appContent.includes('const [centralPosList, setCentralPosList] = useState([]);'), 'centralPosList must default to []');
+
+    // 2. OverviewTab defaults to 0
+    assert.ok(appContent.includes("const [recentRecordedSales, setRecentRecordedSales] = useState([]);"), 'recentRecordedSales must default to []');
+
+    // 3. Intelligent Domain Classification & Target Page Routing in handlePageFileUpload
+    assert.ok(appContent.includes('hasRealStock'), 'handlePageFileUpload must detect real inventory/stock');
+    assert.ok(appContent.includes('hasRealCustomer'), 'handlePageFileUpload must detect real customer data');
+    assert.ok(appContent.includes('hasRealStaff'), 'handlePageFileUpload must detect real staff/cashier data');
+    assert.ok(appContent.includes('primaryTargetTab'), 'handlePageFileUpload must resolve primaryTargetTab');
+    assert.ok(appContent.includes('suitedTabKeys'), 'handlePageFileUpload must determine suitedTabKeys');
+    assert.ok(appContent.includes('setActiveTab(primaryTargetTab)'), 'handlePageFileUpload must auto-route to the best matching tab');
+
+    // 4. Staff and Audit logs only populated if staff exists in file
+    assert.ok(appContent.includes('const staffCandidates = staffRawNames.slice(0, 8);'), 'Staff candidates must be derived solely from file without fake mock names');
+
+    // 5. CohortRetentionHeatmap live data calculation & zero state
+    const heatmapPath = path.join(projectRoot, 'src', 'components', 'CohortRetentionHeatmap.jsx');
+    const heatmapContent = fs.readFileSync(heatmapPath, 'utf8');
+    assert.ok(heatmapContent.includes('const hasRealRecords = Array.isArray(_dbRecords) && _dbRecords.length > 0;'), 'Heatmap must detect real _dbRecords');
+    assert.ok(heatmapContent.includes('if (!hasRealRecords && !hasRealCustomers)'), 'Heatmap must return 0 / empty array when no real file is uploaded');
+    assert.ok(heatmapContent.includes('custOrders'), 'Heatmap must compute real cohorts from uploaded transactions');
+    assert.ok(heatmapContent.includes('custAcquisition'), 'Heatmap must calculate customer first acquisition month');
+
+    // 6. ExecutiveBiStudio zero state
+    const biPath = path.join(projectRoot, 'src', 'components', 'ExecutiveBiStudio.jsx');
+    const biContent = fs.readFileSync(biPath, 'utf8');
+    assert.ok(biContent.includes('if (grossRevenue === 0 || count === 0)'), 'ExecutiveBiStudio must guard zero state in deepDiveKpis');
+  });
+
 });
 
 
