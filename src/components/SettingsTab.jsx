@@ -28,7 +28,8 @@ export function SettingsTab({
   onUpdateUserContact = () => {},
   user = null,
   activePlan = 'professional',
-  dbRecords = []
+  dbRecords = [],
+  onOpenExecutiveOnePager = null
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
@@ -617,6 +618,38 @@ export function SettingsTab({
                   <option value="low">{tx('ต่ำ (แจ้งเฉพาะเหตุการณ์วิกฤตเท่านั้น)', 'Low Sensitivity (Critical Events Only)')}</option>
                 </select>
               </div>
+            </div>
+
+            {/* One-Click Executive One-Pager (PDF) Board Briefing Panel */}
+            <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-emerald-500/10 border border-amber-500/30">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">📄</span>
+                  <span className="text-sm font-black text-amber-300">
+                    {tx('Executive One-Pager (PDF) Board Briefing', 'Executive One-Pager (PDF) Board Briefing')}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    {tx('พร้อมส่งบอร์ดบริหาร', 'C-Suite Ready')}
+                  </span>
+                </div>
+                <p className="text-xs opacity-75 max-w-xl">
+                  {tx(
+                    'กดปุ่มเดียวแล้ว Export กราฟและสรุปของเลขา AI ออกมาเป็นเอกสารสรุป 1-2 หน้า ดีไซน์เรียบหรู พร้อมส่งเข้าที่ประชุมบอร์ดบริหาร หรือส่งเข้าอีเมลผู้บริหารอัตโนมัติทุกเช้าวันจันทร์',
+                    'One-click export of AI Secretary briefing and charts into an elegant 1-2 page executive PDF briefing, ready for board meetings or Monday morning dispatch.'
+                  )}
+                </p>
+              </div>
+
+              {onOpenExecutiveOnePager && (
+                <button
+                  type="button"
+                  onClick={onOpenExecutiveOnePager}
+                  className="px-4 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md cursor-pointer transition flex items-center justify-center gap-2 flex-shrink-0"
+                >
+                  <span>⚡</span>
+                  <span>{tx('เปิด One-Pager PDF ตอนนี้', 'Open One-Pager PDF Now')}</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

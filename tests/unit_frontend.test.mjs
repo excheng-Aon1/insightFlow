@@ -800,6 +800,45 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(appContent.includes("export { SettingsTab }"), 'App.jsx must re-export SettingsTab');
   });
 
+  // ----------------------------------------------------------------------------
+  // 27. EXECUTIVE ONE-PAGER (PDF) EXPORT ENGINE & BOARD BRIEFING MODAL
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-27: Executive One-Pager (PDF) Export Engine & Board Briefing Modal Integration', () => {
+    // 1. ExecutiveOnePagerModal component file exists and exports default component
+    const modalPath = path.join(projectRoot, 'src', 'components', 'ExecutiveOnePagerModal.jsx');
+    assert.ok(fs.existsSync(modalPath), 'ExecutiveOnePagerModal.jsx must exist in components directory');
+    const modalContent = fs.readFileSync(modalPath, 'utf8');
+    assert.ok(modalContent.includes('export default function ExecutiveOnePagerModal'), 'ExecutiveOnePagerModal.jsx must export default function');
+
+    // 2. Executive KPIs and Board Briefing sections
+    assert.ok(modalContent.includes('grossRevenue'), 'Must compute gross revenue metric');
+    assert.ok(modalContent.includes('netProfit'), 'Must compute net profit metric');
+    assert.ok(modalContent.includes('aov'), 'Must compute average order value');
+    assert.ok(modalContent.includes('profitMargin'), 'Must compute profit margin percentage');
+    assert.ok(modalContent.includes('quarterlyBreakdown'), 'Must provide quarterly financial trajectory table');
+    assert.ok(modalContent.includes('topSkus'), 'Must provide top 5 SKU velocity rankings');
+    assert.ok(modalContent.includes('actionItems'), 'Must provide strategic board action items');
+
+    // 3. Print / PDF Export & Standalone Document download
+    assert.ok(modalContent.includes('window.print()'), 'Must trigger high-DPI browser print dialog');
+    assert.ok(modalContent.includes('handleDownloadHtmlDocument'), 'Must support standalone HTML/PDF document export');
+    assert.ok(modalContent.includes('handleDispatchToLineAndEmail'), 'Must support LINE & Email Monday briefing dispatch simulation');
+
+    // 4. Dedicated @media print styles in src/index.css
+    const cssPath = path.join(projectRoot, 'src', 'index.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+    assert.ok(cssContent.includes('@media print'), 'src/index.css must declare @media print rules');
+    assert.ok(cssContent.includes('.executive-one-pager-print'), 'src/index.css must style .executive-one-pager-print for A4 print');
+
+    // 5. App.jsx integration
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(appContent.includes("import ExecutiveOnePagerModal from './components/ExecutiveOnePagerModal'"), 'App.jsx must import ExecutiveOnePagerModal');
+    assert.ok(appContent.includes('isExecutiveOnePagerOpen'), 'App.jsx must declare isExecutiveOnePagerOpen state');
+    assert.ok(appContent.includes('<ExecutiveOnePagerModal'), 'App.jsx must render ExecutiveOnePagerModal');
+    assert.ok(appContent.includes('One-Pager (PDF)'), 'App.jsx must have One-Pager (PDF) button in top navigation');
+  });
+
 });
 
 

@@ -29,6 +29,7 @@ import DataGovernanceCenter from './components/DataGovernanceCenter';
 import ExecutiveBiStudio from './components/ExecutiveBiStudio';
 import ExecutiveSecretaryTab from './components/ExecutiveSecretaryTab';
 import SettingsTab from './components/SettingsTab';
+import ExecutiveOnePagerModal from './components/ExecutiveOnePagerModal';
 import ErrorBoundary from './components/ErrorBoundary';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
@@ -12101,6 +12102,7 @@ function App() {
   const [rememberPassword, setRememberPassword] = useState(true);
   const [inspectingUploadTab, setInspectingUploadTab] = useState(null);
   const [isBasketballModalOpen, setIsBasketballModalOpen] = useState(false);
+  const [isExecutiveOnePagerOpen, setIsExecutiveOnePagerOpen] = useState(false);
 
   // OTP 2FA State & Handlers
   const [otpCode, setOtpCode] = useState('');
@@ -16967,6 +16969,19 @@ function App() {
               </span>
             </button>
 
+            {/* Executive One-Pager (PDF) Instant Board Briefing Button */}
+            <button
+              type="button"
+              onClick={() => setIsExecutiveOnePagerOpen(true)}
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-amber-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
+              title={tx('ดาวน์โหลดเอกสารสรุปผู้บริหาร 1-2 หน้า (PDF/A4 พร้อมส่งที่ประชุมบอร์ด)', 'Download Executive One-Pager (PDF/A4 Board Briefing)')}
+            >
+              <span className="text-sm sm:text-base">📄</span>
+              <span className="font-black whitespace-nowrap">
+                {tx('One-Pager (PDF)', 'One-Pager (PDF)')}
+              </span>
+            </button>
+
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
             {renderLanguageSwitcher()}
 
@@ -17361,6 +17376,7 @@ function App() {
                   theme={theme}
                   tx={tx}
                   onNavigateTab={setActiveTab}
+                  onOpenExecutiveOnePager={() => setIsExecutiveOnePagerOpen(true)}
                 />
               )}
 
@@ -17533,6 +17549,7 @@ function App() {
                   user={user}
                   activePlan={subscriptionPlan}
                   dbRecords={dbRecords}
+                  onOpenExecutiveOnePager={() => setIsExecutiveOnePagerOpen(true)}
                 />
               )}
             </ErrorBoundary>
@@ -17840,6 +17857,17 @@ function App() {
             theme={theme}
             onFileDispatched={(tabKey, pageTitle, file, options) => handlePageFileUpload(tabKey, pageTitle, file, options)}
             setActiveTab={setActiveTab}
+          />
+
+          {/* Executive One-Pager (PDF) Board Briefing Modal Engine */}
+          <ExecutiveOnePagerModal
+            isOpen={isExecutiveOnePagerOpen}
+            onClose={() => setIsExecutiveOnePagerOpen(false)}
+            lang={lang}
+            theme={theme}
+            user={user}
+            businessName={user?.businessName || user?.business_name || 'Insight Enterprise Co., Ltd.'}
+            dbRecords={dbRecords}
           />
         </main>
 

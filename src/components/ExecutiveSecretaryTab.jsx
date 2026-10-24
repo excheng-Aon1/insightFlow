@@ -24,7 +24,8 @@ export default function ExecutiveSecretaryTab({
   inventoryList = [],
   theme = 'dark',
   tx = (th, en) => th,
-  onNavigateTab
+  onNavigateTab,
+  onOpenExecutiveOnePager
 }) {
   // -------------------------------------------------------------
   // State Variables
@@ -350,6 +351,17 @@ export default function ExecutiveSecretaryTab({
               <span>📋</span>
               <span>{tx('คัดลอกส่ง LINE / Email', 'Copy for LINE/Email')}</span>
             </button>
+
+            {onOpenExecutiveOnePager && (
+              <button
+                type="button"
+                onClick={onOpenExecutiveOnePager}
+                className="px-4 py-2.5 rounded-2xl text-xs font-black flex items-center gap-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 shadow-md border border-emerald-300 cursor-pointer transition hover:scale-[1.02]"
+              >
+                <span>📄</span>
+                <span>{tx('Download Executive One-Pager (PDF)', 'Download Executive One-Pager (PDF)')}</span>
+              </button>
+            )}
           </div>
         </div>
 

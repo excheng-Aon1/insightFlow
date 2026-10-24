@@ -2149,4 +2149,38 @@ html[data-theme="dark"] .minimal-card-surface {
   }
 }
 
+/* ==========================================================================
+   EXECUTIVE ONE-PAGER HIGH-RESOLUTION PRINT & PDF ENGINE
+   ========================================================================== */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .executive-one-pager-print,
+  .executive-one-pager-print * {
+    visibility: visible;
+  }
+  .executive-one-pager-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 10mm 15mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+
 
