@@ -5151,7 +5151,7 @@ export function MultiChannelTab({
             <div style={{ flex: '1 1 380px' }}>
               <div style={{ fontWeight: 900, color: '#34d399', marginBottom: '0.4rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem' }}>
                 <span>
-                  {tx('💬 ระบบ LINE Official Account (@InsightFlowAI) ส่งสรุปยอดขายอัตโนมัติเวลา', '💬 LINE OA (@InsightFlowAI) Automated Daily Sales Summary at')} {lineNotifyTime}
+                  {tx('💬 ระบบ LINE Official Account (@715ljuvj) ส่งสรุปยอดขายอัตโนมัติเวลา', '💬 LINE OA (@715ljuvj) Automated Daily Sales Summary at')} {lineNotifyTime}
                 </span>
                 <span style={{ fontSize: '0.78rem', padding: '0.15rem 0.65rem', borderRadius: '999px', background: 'rgba(56,189,248,0.18)', color: '#38bdf8' }}>
                   Channel ID: 2011977245 • 📱 {userPhone} • 💬 {userLineId}
@@ -5230,8 +5230,8 @@ export function MultiChannelTab({
                   if (!canUseBackendApi()) {
                     toast.success(
                       tx(
-                        `🔗 จับคู่เบอร์โทร ${userPhone} กับ LINE OA (@InsightFlowAI) สำเร็จเรียบร้อย!`,
-                        `🔗 Auto-matched phone ${userPhone} with LINE OA (@InsightFlowAI)!`
+                        `🔗 จับคู่เบอร์โทร ${userPhone} กับ LINE OA (@715ljuvj) สำเร็จเรียบร้อย!`,
+                        `🔗 Auto-matched phone ${userPhone} with LINE OA (@715ljuvj)!`
                       )
                     );
                     return;
@@ -5275,8 +5275,8 @@ export function MultiChannelTab({
                   } catch {
                     toast.success(
                       tx(
-                        `🔗 จับคู่เบอร์โทร ${userPhone} กับ LINE OA (@InsightFlowAI) สำเร็จเรียบร้อย!`,
-                        `🔗 Auto-matched phone ${userPhone} with LINE OA (@InsightFlowAI)!`
+                        `🔗 จับคู่เบอร์โทร ${userPhone} กับ LINE OA (@715ljuvj) สำเร็จเรียบร้อย!`,
+                        `🔗 Auto-matched phone ${userPhone} with LINE OA (@715ljuvj)!`
                       )
                     );
                   }
@@ -5402,14 +5402,14 @@ export function MultiChannelTab({
                 }}
               >
                 <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://line.me/R/ti/p/@InsightFlowAI"
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://line.me/R/ti/p/@715ljuvj"
                   alt="LINE OA QR Code"
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               </div>
               <div style={{ fontSize: '0.82rem', color: '#e2e8f0', lineHeight: 1.55 }}>
                 <div style={{ fontWeight: 900, color: '#34d399', marginBottom: '0.2rem' }}>
-                  📲 {tx('สแกนแอดเพื่อน @InsightFlowAI (เชื่อมใน 1 คลิก)', 'Scan to Add @InsightFlowAI (1-Step Link)')}
+                  📲 {tx('สแกนแอดเพื่อน @715ljuvj (เชื่อมใน 1 คลิก)', 'Scan to Add @715ljuvj (1-Step Link)')}
                 </div>
                 <div>
                   1. {tx('ลูกค้ากรอกเบอร์โทร', 'Enter phone')} <strong style={{ color: '#fbbf24' }}>{userPhone}</strong> {tx('ตอนสมัครใช้งาน', 'at sign-in')}

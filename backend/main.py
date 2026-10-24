@@ -2821,7 +2821,7 @@ async def register_customer_line_contact(req: LineContactRegisterRequest):
     return {
         "status": "success",
         "contact": registry[norm_phone],
-        "line_oa_id": os.getenv("LINE_OA_ID", "@InsightFlowAI"),
+        "line_oa_id": os.getenv("LINE_OA_ID", "@715ljuvj"),
         "channel_id": os.getenv("LINE_CHANNEL_ID", "2011977245"),
         "is_line_user_linked": bool(registry[norm_phone].get("line_user_id")),
         "message": f"บันทึกเบอร์โทร {req.phone} และ LINE ID {req.line_id} เข้าสู่ระบบแจ้งเตือนอัตโนมัติ (22:00 น.) เรียบร้อยแล้ว",
@@ -2835,7 +2835,7 @@ async def get_registered_line_contacts():
     token_ready = bool(get_line_channel_access_token())
     return {
         "status": "success",
-        "line_oa_id": os.getenv("LINE_OA_ID", "@InsightFlowAI"),
+        "line_oa_id": os.getenv("LINE_OA_ID", "@715ljuvj"),
         "channel_id": os.getenv("LINE_CHANNEL_ID", "2011977245"),
         "messaging_api_ready": token_ready,
         "daily_summary_time": os.getenv("LINE_DAILY_SUMMARY_TIME", "22:00"),
@@ -2846,7 +2846,7 @@ async def get_registered_line_contacts():
 @app.post("/api/line/webhook")
 async def line_messaging_api_webhook(request: Request):
     """
-    Webhook สำหรับรับข้อความจาก LINE Official Account (@InsightFlowAI)
+    Webhook สำหรับรับข้อความจาก LINE Official Account (@715ljuvj)
     เมื่อลูกค้าสแกน QR Code แอดเพื่อนแล้วพิมพ์เบอร์โทรศัพท์ส่งเข้าแชท 1 ครั้ง:
     - ระบบจะจับคู่เบอร์โทรเข้ากับ line_user_id ของลูกค้าโดยอัตโนมัติทันที
     - ตอบกลับด้วยข้อความยืนยันและการ์ดตัวอย่างสรุปยอดขายทันที
@@ -3018,7 +3018,7 @@ async def send_daily_sales_summary_to_line(req: LineSendDailySummaryRequest):
         "delivered_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "phone": req.phone,
         "line_id": req.line_id,
-        "line_user_id": target_line_user_id or "รอแอดเพื่อนและพิมพ์เบอร์โทรในแชท @InsightFlowAI",
+        "line_user_id": target_line_user_id or "รอแอดเพื่อนและพิมพ์เบอร์โทรในแชท @715ljuvj",
         "summary_text": summary_text,
         "flex_message": flex_card,
         "line_api_status": api_result,
