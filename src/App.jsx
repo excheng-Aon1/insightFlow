@@ -30,6 +30,7 @@ import ExecutiveBiStudio from './components/ExecutiveBiStudio';
 import ExecutiveSecretaryTab from './components/ExecutiveSecretaryTab';
 import SettingsTab from './components/SettingsTab';
 import ExecutiveOnePagerModal from './components/ExecutiveOnePagerModal';
+import CohortRetentionHeatmap from './components/CohortRetentionHeatmap';
 import ErrorBoundary from './components/ErrorBoundary';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
 import {
@@ -3629,13 +3630,15 @@ export function CustomersTab({
   lang,
   theme,
   customersList = [],
-  setCustomersList = () => {}
+  setCustomersList = () => {},
+  dbRecords = []
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
 
   const safeCustomers = Array.isArray(customersList) ? customersList.filter(Boolean) : [];
 
+  const [customerViewMode, setCustomerViewMode] = useState('cohort_heatmap'); // 'cohort_heatmap' | 'rfm_table' | 'all'
   const [selectedRfmSegment, setSelectedRfmSegment] = useState('all');
   const [customerSearch, setCustomerSearch] = useState('');
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -3828,6 +3831,48 @@ export function CustomersTab({
               {tx('📥 ดาวน์โหลดรายชื่อลูกค้า (.csv)', '📥 Export Customers (.csv)')}
             </button>
           </div>
+
+          {/* View Mode Switcher Pills */}
+          <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-white/10">
+            <button
+              type="button"
+              onClick={() => setCustomerViewMode('cohort_heatmap')}
+              className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                customerViewMode === 'cohort_heatmap'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white bg-white/5'
+              }`}
+            >
+              <span>📊</span>
+              <span>{tx('ตาราง Heatmap การซื้อซ้ำ (Cohort Retention)', 'Cohort Retention Heatmap')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCustomerViewMode('rfm_table')}
+              className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                customerViewMode === 'rfm_table'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white bg-white/5'
+              }`}
+            >
+              <span>👥</span>
+              <span>{tx('ทะเบียนลูกค้า & วิเคราะห์ RFM (Customer Directory)', 'Customer Directory & RFM')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCustomerViewMode('all')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 ${
+                customerViewMode === 'all'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
+                  : 'text-slate-400 hover:text-white bg-white/5'
+              }`}
+            >
+              <span>🌟</span>
+              <span>{tx('แสดงทั้งหมด (Full View)', 'Show All Views')}</span>
+            </button>
+          </div>
         </div>
 
         {/* ฟอร์มเพิ่มลูกค้าใหม่ (เปิดเมื่อกดปุ่ม) */}
@@ -3897,8 +3942,21 @@ export function CustomersTab({
         )}
       </div>
 
-      {/* 2. การ์ดสรุปมูลค่าลูกค้า 4 กล่อง */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* 2. COHORT RETENTION HEATMAP (SaaS / E-Commerce Customer Retention Rate) */}
+      {(customerViewMode === 'cohort_heatmap' || customerViewMode === 'all') && (
+        <CohortRetentionHeatmap
+          lang={lang}
+          theme={theme}
+          _customersList={safeCustomers}
+          _dbRecords={dbRecords}
+        />
+      )}
+
+      {/* 3. RFM SEGMENTATION CARDS & CUSTOMER DIRECTORY */}
+      {(customerViewMode === 'rfm_table' || customerViewMode === 'all') && (
+        <>
+          {/* การ์ดสรุปมูลค่าลูกค้า 4 กล่อง */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className={`p-6 rounded-3xl border shadow-xl ${theme === 'dark' ? 'bg-[#0b1020]/85 border-white/10' : 'bg-white border-slate-200'}`}>
           <span className="text-xs font-bold text-slate-300">{tx('ยอดซื้อสะสมเฉลี่ยต่อคน', 'Average Customer Lifetime Value')}</span>
           <h3 className={`text-3xl font-black mt-2 font-mono ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>฿ {avgLtv.toLocaleString()}</h3>
@@ -4168,8 +4226,10 @@ export function CustomersTab({
           );
         })()}
       </div>
-    </div>
-  );
+      </>
+    )}
+  </div>
+);
 }
 
 
@@ -17386,6 +17446,7 @@ function App() {
                   theme={theme}
                   customersList={customersList.slice(0, activePlanMeta.maxCustomers)}
                   setCustomersList={setCustomersList}
+                  dbRecords={dbRecords}
                 />
               )}
 

@@ -839,6 +839,48 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(appContent.includes('One-Pager (PDF)'), 'App.jsx must have One-Pager (PDF) button in top navigation');
   });
 
+  // ----------------------------------------------------------------------------
+  // 28. SAAS/E-COMMERCE COHORT RETENTION HEATMAP & CRM PRECISION ENGINE
+  // ----------------------------------------------------------------------------
+  test('UNIT-FE-28: SaaS/E-Commerce Cohort Retention Heatmap & CRM Precision Engine', () => {
+    // 1. CohortRetentionHeatmap component file exists and exports component
+    const heatmapPath = path.join(projectRoot, 'src', 'components', 'CohortRetentionHeatmap.jsx');
+    assert.ok(fs.existsSync(heatmapPath), 'src/components/CohortRetentionHeatmap.jsx must exist');
+    const heatmapContent = fs.readFileSync(heatmapPath, 'utf8');
+    assert.ok(
+      heatmapContent.includes('export default function CohortRetentionHeatmap') ||
+      heatmapContent.includes('export { CohortRetentionHeatmap }'),
+      'CohortRetentionHeatmap.jsx must export component'
+    );
+
+    // 2. January cohort retention data across months 1, 2, 3, 4
+    assert.ok(heatmapContent.includes('ม.ค. 2026'), 'Must include January cohort');
+    assert.ok(heatmapContent.includes('Jan 2026'), 'Must include Jan 2026 cohort in English');
+    assert.ok(heatmapContent.includes('retention'), 'Must track customer retention array');
+    assert.ok(heatmapContent.includes('newCustomers'), 'Must display new customers count');
+
+    // 3. Interactive display mode toggle (Percentage vs Customer Count)
+    assert.ok(heatmapContent.includes('displayMode'), 'Must support displayMode state');
+    assert.ok(heatmapContent.includes('percentage'), 'Must support percentage view');
+    assert.ok(heatmapContent.includes('count'), 'Must support customer count view');
+
+    // 4. Heatmap color shading & All-Cohort Average row
+    assert.ok(heatmapContent.includes('getCellColor'), 'Must compute color scales for retention percentage');
+    assert.ok(heatmapContent.includes('averageRetentionCurve'), 'Must calculate average retention benchmark curve');
+
+    // 5. CRM Win-Back triggers & CSV Export
+    assert.ok(heatmapContent.includes('handleExportCsv'), 'Must support CSV export of cohort table');
+    assert.ok(heatmapContent.includes('handleTriggerWinBackCampaign'), 'Must support triggering LINE win-back campaign');
+    assert.ok(heatmapContent.includes('45'), 'Must highlight day-45 critical drop-off CRM window');
+
+    // 6. Integration in App.jsx CustomersTab
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(appContent.includes("import CohortRetentionHeatmap from './components/CohortRetentionHeatmap'"), 'App.jsx must import CohortRetentionHeatmap');
+    assert.ok(appContent.includes('<CohortRetentionHeatmap'), 'CustomersTab must render CohortRetentionHeatmap');
+    assert.ok(appContent.includes('customerViewMode'), 'CustomersTab must provide view mode switcher for cohort heatmap');
+  });
+
 });
 
 
