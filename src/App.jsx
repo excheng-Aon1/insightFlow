@@ -6507,30 +6507,20 @@ export function InsightsTab({
     const userUploadedFiles = Object.entries(pageUploadedFiles || {}).filter(([_, f]) => f && f.filename && (f.isUserAdded || f.isCustomUpload || f.paperHeader || f.rows));
     const hasUserFiles = userUploadedFiles.length > 0;
 
-    const allSources = hasUserFiles
-      ? [
-          'central',
-          ...Object.keys(pageUploadedFiles || {})
-        ]
-      : [
-          'central',
-          'overview',
-          'bi_studio',
-          'customers',
-          'staff_pos',
-          'multi_channel',
-          'procurement',
-          'inventory',
-          'insights',
-          'database',
-          ...Object.keys(pageUploadedFiles || {})
-        ];
+    if (!hasUserFiles) {
+      return [];
+    }
+
+    const allSources = [
+      'central',
+      ...Object.keys(pageUploadedFiles || {})
+    ];
 
     allSources.forEach(sourceKey => {
       if (seen.has(sourceKey)) return;
       seen.add(sourceKey);
 
-      const fMeta = pageUploadedFiles?.[sourceKey] || (!hasUserFiles ? initialPageUploadedFiles?.[sourceKey] : null);
+      const fMeta = pageUploadedFiles?.[sourceKey];
       if (fMeta && fMeta.filename) {
         const metaInfo = moduleMetaMap[sourceKey] || {
           th: sourceKey === 'central' ? 'ไฟล์กลาง (Shoot File)' : (sourceKey.startsWith('custom_file_') ? 'ไฟล์กำหนดเอง' : sourceKey),
@@ -6570,7 +6560,7 @@ export function InsightsTab({
     });
 
     return list;
-  }, [pageUploadedFiles, initialPageUploadedFiles]);
+  }, [pageUploadedFiles]);
 
   const totalSynthesizedRows = useMemo(() => {
     return combinedFilesList.reduce((acc, f) => acc + (f.rows || 0), 0);
@@ -7074,7 +7064,20 @@ export function InsightsTab({
                   </tr>
                 </thead>
                 <tbody>
-                  {combinedFilesList.map((f, idx) => (
+                  {combinedFilesList.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" style={{ padding: '2.5rem 1rem', textAlign: 'center', color: isDark ? '#94a3b8' : '#64748b' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '0.4rem' }}>📭</div>
+                        <div style={{ fontWeight: 800, fontSize: '0.95rem', color: isDark ? '#f1f5f9' : '#1e293b' }}>
+                          {tx('ยังไม่มีไฟล์ถูกนำเข้าในระบบ (ข้อมูลเริ่มต้นเป็น 0 ทั้งหมด)', 'No files uploaded yet (Default state is 0)')}
+                        </div>
+                        <div style={{ fontSize: '0.78rem', marginTop: '0.25rem' }}>
+                          {tx('เมื่อท่านอัปโหลดไฟล์ที่หน้าใดก็ตาม ระบบจะตรวจจับและดึงเข้ามาวิเคราะห์สังเคราะห์ข้ามหน้าให้อัตโนมัติที่นี่', 'When you upload files on any page, AI will aggregate and synthesize insights here automatically.')}
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    combinedFilesList.map((f, idx) => (
                     <tr
                       key={f.sourceKey}
                       style={{
@@ -7155,7 +7158,7 @@ export function InsightsTab({
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  )))}
                 </tbody>
               </table>
             </div>
@@ -12501,15 +12504,36 @@ function App() {
       if (saved !== null) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
-          return parsed;
+          const cleaned = {};
+          let hasRealCustom = false;
+          Object.entries(parsed).forEach(([k, v]) => {
+            if (v && (v.isCustomUpload || v.isUserAdded)) {
+              cleaned[k] = v;
+              hasRealCustom = true;
+            }
+          });
+          if (hasRealCustom) {
+            return cleaned;
+          }
+          return {}; // Legacy demo files cached previously are cleanly dropped to 0
         }
       }
       // Legacy compatibility check: localStorage.getItem('insightflow_page_uploaded_files_v2')
       const legacySaved = localStorage.getItem('insightflow_page_uploaded_files_v2');
       if (legacySaved !== null) {
         const parsedLegacy = JSON.parse(legacySaved);
-        if (parsedLegacy && typeof parsedLegacy === 'object' && Object.keys(parsedLegacy).some(k => parsedLegacy[k]?.isCustomUpload)) {
-          return parsedLegacy;
+        if (parsedLegacy && typeof parsedLegacy === 'object') {
+          const cleaned = {};
+          let hasRealCustom = false;
+          Object.entries(parsedLegacy).forEach(([k, v]) => {
+            if (v && (v.isCustomUpload || v.isUserAdded)) {
+              cleaned[k] = v;
+              hasRealCustom = true;
+            }
+          });
+          if (hasRealCustom) {
+            return cleaned;
+          }
         }
       }
     } catch (e) {
@@ -14358,7 +14382,7 @@ function App() {
               pageUploadedFiles?.insights ||
               pageUploadedFiles?.overview ||
               Object.values(pageUploadedFiles || {}).find(f => f && f.filename) ||
-              initialPageUploadedFiles.insights;
+              null;
 
             const ph = activeFile?.paperHeader || {
               companyName: bizProfile.companyName || 'บริษัท อินไซต์โฟลว์ จำกัด',
@@ -17568,7 +17592,7 @@ function App() {
                   setActiveTab={setActiveTab}
                   pageUploadedFiles={pageUploadedFiles}
                   initialPageUploadedFiles={initialPageUploadedFiles}
-                  uploadedFileMeta={pageUploadedFiles?.central || pageUploadedFiles?.insights || pageUploadedFiles?.overview || (Object.keys(pageUploadedFiles).length > 0 ? pageUploadedFiles[Object.keys(pageUploadedFiles)[0]] : initialPageUploadedFiles.insights)}
+                  uploadedFileMeta={pageUploadedFiles?.central || pageUploadedFiles?.insights || pageUploadedFiles?.overview || (Object.keys(pageUploadedFiles).length > 0 ? pageUploadedFiles[Object.keys(pageUploadedFiles)[0]] : null)}
                   channelsList={channelsList}
                   branchesList={branchesList}
                   dbRecords={dbRecords}

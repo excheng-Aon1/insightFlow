@@ -174,68 +174,11 @@ export function CashFlowAndDemandForecast({
       }
     });
 
-    // 3. Fallbacks if completely empty and no user file is present
-    if (items.length === 0 && !hasUserFiles) {
-      items.push(
-        {
-          sku: 'PKG-001',
-          thName: 'บรรจุภัณฑ์และวัสดุจัดส่งมาตรฐาน',
-          enName: 'Standard Packaging & Dispatch Unit',
-          currentStock: 12,
-          runRatePerDay: 5.5,
-          leadTimeDays: 5,
-          safetyStock: 15,
-          unitCost: 15,
-          suggestedOrderQty: 250,
-          vendor: 'ผู้ผลิตบรรจุภัณฑ์และโลจิสติกส์หลัก',
-          daysUntilStockout: 2.2,
-          reorderPoint: 43,
-          isCritical: true,
-          daysUrgent: -2.8,
-          source: 'demo'
-        },
-        {
-          sku: 'ITM-002',
-          thName: 'สินค้า/วัตถุดิบหมุนเวียนหลัก',
-          enName: 'Fast-Moving Core Inventory',
-          currentStock: 48,
-          runRatePerDay: 8.0,
-          leadTimeDays: 7,
-          safetyStock: 30,
-          unitCost: 250,
-          suggestedOrderQty: 180,
-          vendor: 'ซัพพลายเออร์วัตถุดิบและคู่ค้าหลัก',
-          daysUntilStockout: 6.0,
-          reorderPoint: 86,
-          isCritical: true,
-          daysUrgent: -1.0,
-          source: 'demo'
-        },
-        {
-          sku: 'PRD-001',
-          thName: 'สินค้าและบริการเรือธง',
-          enName: 'Flagship Core Product',
-          currentStock: 450,
-          runRatePerDay: 18.0,
-          leadTimeDays: 10,
-          safetyStock: 60,
-          unitCost: 450,
-          suggestedOrderQty: 400,
-          vendor: 'ผู้ผลิต/พันธมิตรทางธุรกิจหลัก',
-          daysUntilStockout: 25.0,
-          reorderPoint: 240,
-          isCritical: false,
-          daysUrgent: 15.0,
-          source: 'demo'
-        }
-      );
-    }
-
     // Sort critical items to the top
     items.sort((a, b) => (b.isCritical ? 1 : 0) - (a.isCritical ? 1 : 0));
 
     return items;
-  }, [inventoryList, pageUploadedFiles, initialPageUploadedFiles, vendorsList, dbRecords]);
+  }, [inventoryList, pageUploadedFiles, vendorsList, dbRecords]);
 
   const criticalItems = computedRestockItems.filter(i => i.isCritical);
 
@@ -844,7 +787,18 @@ export function CashFlowAndDemandForecast({
 
               {/* Critical Alert Cards List (Scrollable if > 3 items) */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', maxHeight: '380px', overflowY: 'auto' }}>
-                {computedRestockItems.map(item => {
+                {computedRestockItems.length === 0 ? (
+                  <div style={{ padding: '2rem 1rem', textAlign: 'center', color: isDark ? '#94a3b8' : '#64748b' }}>
+                    <div style={{ fontSize: '1.8rem', marginBottom: '0.4rem' }}>📦</div>
+                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: isDark ? '#f1f5f9' : '#1e293b' }}>
+                      {tx('ไม่มีรายการสินค้าที่ต้องสั่งซื้อด่วน (ข้อมูลเริ่มต้นเป็น 0)', 'No restock alerts pending (Default state is 0)')}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', marginTop: '0.2rem' }}>
+                      {tx('เมื่ออัปโหลดไฟล์สต็อกสินค้า AI จะคำนวณจุดสั่งซื้อ ROP อัตโนมัติ', 'Upload an inventory file to activate automated ROP calculations.')}
+                    </div>
+                  </div>
+                ) : (
+                  computedRestockItems.map(item => {
                   const isOrdered = Boolean(restockOrdersPlaced[item.sku]);
                   return (
                     <div
@@ -933,7 +887,7 @@ export function CashFlowAndDemandForecast({
                       )}
                     </div>
                   );
-                })}
+                }))}
               </div>
             </div>
 

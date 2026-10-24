@@ -48,8 +48,8 @@ export function ActionablePlaybooks({
     if (userFiles.length > 0) {
       return userFiles[userFiles.length - 1];
     }
-    return Object.values(initialPageUploadedFiles || {})[0] || null;
-  }, [pageUploadedFiles, initialPageUploadedFiles]);
+    return null;
+  }, [pageUploadedFiles]);
 
   // Derive products dynamically from dbRecords if available
   const topProductsFromDb = useMemo(() => {
