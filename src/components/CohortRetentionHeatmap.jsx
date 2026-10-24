@@ -426,24 +426,26 @@ export default function CohortRetentionHeatmap({
               <button
                 type="button"
                 onClick={() => setDisplayMode('percentage')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
                   displayMode === 'percentage'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                % {tx('เปอร์เซ็นต์', 'Percentage')}
+                <CohortHeatmapMasterIcon size={14} />
+                <span>% {tx('เปอร์เซ็นต์', 'Percentage')}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setDisplayMode('count')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
                   displayMode === 'count'
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                👥 {tx('จำนวนคน', 'Customer Count')}
+                <CustomerRetentionRateIcon size={14} />
+                <span>{tx('จำนวนคน', 'Customer Count')}</span>
               </button>
             </div>
 
@@ -872,7 +874,12 @@ export default function CohortRetentionHeatmap({
           </p>
           <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-300 font-bold flex items-center justify-between">
             <span>{tx('อัตราความพึงพอใจ CSAT:', 'Cohort CSAT Score:')}</span>
-            <span className="font-mono font-black">4.92 / 5.0 ⭐</span>
+            <span className="font-mono font-black flex items-center gap-1.5 text-amber-400">
+              <span>4.92 / 5.0</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B">
+                <polygon points="12,2 15,8.5 22,9.3 17,14 18.5,21 12,17.5 5.5,21 7,14 2,9.3 9,8.5" />
+              </svg>
+            </span>
           </div>
         </div>
       </div>

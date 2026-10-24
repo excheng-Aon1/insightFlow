@@ -50,17 +50,15 @@ import {
   DatabaseAddIcon,
   TrashCanIcon,
   GoogleIcon,
-  MarketPositionRadarIcon,
   PurchaseConversionRateIcon,
   BasketSizePerBillIcon,
   DailyStoreClosingIcon,
   SalesVsFeesComparisonIcon,
-  ReorderPointControlIcon,
   ActualParsedDataTableIcon,
   BaselineTrajectoryIcon,
-  EnterpriseStandardIcon,
-  PowerBiStudioIcon,
-  BusinessOverviewAndGoalIcon,
+  CohortHeatmapMasterIcon,
+  CustomerRetentionRateIcon,
+  MatrixTableIcon,
 } from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
@@ -3837,39 +3835,39 @@ export function CustomersTab({
             <button
               type="button"
               onClick={() => setCustomerViewMode('cohort_heatmap')}
-              className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2.5 ${
                 customerViewMode === 'cohort_heatmap'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white bg-white/5'
+                  ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-lg shadow-blue-500/25 ring-1 ring-blue-400/50'
+                  : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
               }`}
             >
-              <span>📊</span>
+              <CohortHeatmapMasterIcon size={18} />
               <span>{tx('ตาราง Heatmap การซื้อซ้ำ (Cohort Retention)', 'Cohort Retention Heatmap')}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setCustomerViewMode('rfm_table')}
-              className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2.5 ${
                 customerViewMode === 'rfm_table'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md'
-                  : 'text-slate-400 hover:text-white bg-white/5'
+                  ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25 ring-1 ring-amber-300/50'
+                  : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
               }`}
             >
-              <span>👥</span>
+              <CustomerRetentionRateIcon size={18} />
               <span>{tx('ทะเบียนลูกค้า & วิเคราะห์ RFM (Customer Directory)', 'Customer Directory & RFM')}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setCustomerViewMode('all')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2.5 ${
                 customerViewMode === 'all'
-                  ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
-                  : 'text-slate-400 hover:text-white bg-white/5'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/25 font-black ring-1 ring-emerald-300/50'
+                  : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
               }`}
             >
-              <span>🌟</span>
+              <MatrixTableIcon size={18} />
               <span>{tx('แสดงทั้งหมด (Full View)', 'Show All Views')}</span>
             </button>
           </div>

@@ -879,6 +879,7 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(appContent.includes("import CohortRetentionHeatmap from './components/CohortRetentionHeatmap'"), 'App.jsx must import CohortRetentionHeatmap');
     assert.ok(appContent.includes('<CohortRetentionHeatmap'), 'CustomersTab must render CohortRetentionHeatmap');
     assert.ok(appContent.includes('customerViewMode'), 'CustomersTab must provide view mode switcher for cohort heatmap');
+    assert.ok(appContent.includes('<CohortHeatmapMasterIcon'), 'App.jsx switcher pill must use CohortHeatmapMasterIcon');
 
     // 7. Modern 3D Luxury Icons Integration in Heatmap
     assert.ok(heatmapContent.includes('CohortHeatmapMasterIcon'), 'Must render CohortHeatmapMasterIcon');
