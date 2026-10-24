@@ -2527,6 +2527,318 @@ export function ExecutiveSecretaryIcon({ size = 26, className = '' }) {
   );
 }
 
+/**
+ * 13. CohortHeatmapMasterIcon: ไอคอน 3 มิติ "ตาราง Heatmap การซื้อซ้ำ Cohort Retention Matrix"
+ * ดีไซน์: ตาราง Matrix 3D พร้อมระดับสี Heatmap ไต่ระดับ (Emerald, Blue, Amber), วงแหวนสะท้อนแสง และลูกศรวนลูปการซื้อซ้ำ
+ */
+export function CohortHeatmapMasterIcon({ size = 26, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`chmGold_${id}`} x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`chmBlue_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#93C5FD" />
+          <stop offset="50%" stopColor="#2563EB" />
+          <stop offset="100%" stopColor="#1E3A8A" />
+        </linearGradient>
+        <linearGradient id={`chmEm_${id}`} x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="60%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+      </defs>
+      {/* ฐานการ์ดกระจกแก้ว Obsidian มีขอบทอง */}
+      <rect x="2.5" y="2.5" width="27" height="27" rx="7" fill="#070D1E" stroke={`url(#chmGold_${id})`} strokeWidth="1.4" />
+      {/* เซลล์ Matrix แถวที่ 1 (Acquisition Month - มรกตลึก) */}
+      <rect x="6" y="6" width="5.5" height="5.5" rx="1.8" fill={`url(#chmEm_${id})`} />
+      <rect x="13.2" y="6" width="5.5" height="5.5" rx="1.8" fill={`url(#chmEm_${id})`} opacity="0.85" />
+      <rect x="20.5" y="6" width="5.5" height="5.5" rx="1.8" fill={`url(#chmBlue_${id})`} opacity="0.9" />
+      {/* เซลล์ Matrix แถวที่ 2 (Month 1 -> 2) */}
+      <rect x="6" y="13.2" width="5.5" height="5.5" rx="1.8" fill={`url(#chmEm_${id})`} opacity="0.85" />
+      <rect x="13.2" y="13.2" width="5.5" height="5.5" rx="1.8" fill={`url(#chmBlue_${id})`} />
+      <rect x="20.5" y="13.2" width="5.5" height="5.5" rx="1.8" fill="#F59E0B" opacity="0.9" />
+      {/* เซลล์ Matrix แถวที่ 3 (Month 2 -> 3) */}
+      <rect x="6" y="20.5" width="5.5" height="5.5" rx="1.8" fill={`url(#chmBlue_${id})`} opacity="0.9" />
+      <rect x="13.2" y="20.5" width="5.5" height="5.5" rx="1.8" fill="#F59E0B" opacity="0.9" />
+      <rect x="20.5" y="20.5" width="5.5" height="5.5" rx="1.8" fill="#EF4444" opacity="0.85" />
+      {/* ลูกศรลูปการซื้อซ้ำสีทอง (Retention Infinity Orbit) */}
+      <path d="M19 4L22 7L19 10" stroke="#FEF08A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="23.5" cy="8.5" r="1.2" fill="#FFF" />
+    </svg>
+  );
+}
+
+/**
+ * 14. CustomerRetentionRateIcon: ไอคอน 3 มิติ "อัตราการซื้อซ้ำของลูกค้า (Customer Retention Rate)"
+ * ดีไซน์: วงแหวนลูปการซื้อซ้ำสีมรกตและทองคำ ล้อมรอบลูกค้าดาวเด่น 3 มิติ
+ */
+export function CustomerRetentionRateIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`crrEm_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+        <linearGradient id={`crrGold_${id}`} x1="8" y1="8" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#F59E0B" />
+        </linearGradient>
+      </defs>
+      {/* วงแหวนลูปซื้อซ้ำรอบนอก (Retention Cycle Ring) */}
+      <path
+        d="M26 16C26 21.5228 21.5228 26 16 26C10.4772 26 6 21.5228 6 16C6 11.8 8.6 8.2 12.2 6.8"
+        stroke={`url(#crrEm_${id})`}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M10 5L14 7L11.5 10.5"
+        stroke="#A7F3D0"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* ตัวละครลูกค้าตรงกลาง (Customer Profile Node) */}
+      <circle cx="16" cy="13" r="3.8" fill={`url(#crrGold_${id})`} stroke="#FFF" strokeWidth="0.8" />
+      <path
+        d="M10.5 22C10.5 19 13 17.5 16 17.5C19 17.5 21.5 19 21.5 22"
+        stroke={`url(#crrGold_${id})`}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      {/* เครื่องหมายเปอร์เซ็นต์ % เรืองแสง */}
+      <circle cx="23" cy="8" r="1.5" fill="#38BDF8" />
+      <line x1="25" y1="7" x2="21" y2="12" stroke="#38BDF8" strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="23" cy="11.5" r="1.5" fill="#38BDF8" />
+    </svg>
+  );
+}
+
+/**
+ * 15. LongTermLoyaltyIcon: ไอคอน 3 มิติ "ลูกค้าภักดีระยะยาว (Long-Term VIP Loyalty)"
+ * ดีไซน์: มงกุฎทองคำ 24K บนยอดเพชรคริสตัลแซฟไฟร์เรืองแสง ประดับด้วยประกายเพชร
+ */
+export function LongTermLoyaltyIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`ltlGold_${id}`} x1="4" y1="2" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="40%" stopColor="#FBBF24" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`ltlSapph_${id}`} x1="6" y1="12" x2="26" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#93C5FD" />
+          <stop offset="50%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#1E3A8A" />
+        </linearGradient>
+      </defs>
+      {/* มงกุฎทองคำผู้บริหาร VIP */}
+      <path
+        d="M6 13L9.5 7L16 11L22.5 7L26 13H6Z"
+        fill={`url(#ltlGold_${id})`}
+        stroke="#FEF08A"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <circle cx="9.5" cy="7" r="1.5" fill="#FFF" />
+      <circle cx="16" cy="11" r="1.5" fill="#FEF08A" />
+      <circle cx="22.5" cy="7" r="1.5" fill="#FFF" />
+      {/* เพชรคริสตัลแซฟไฟร์ด้านล่าง (Diamond Facet) */}
+      <path
+        d="M6 14L16 27L26 14H6Z"
+        fill={`url(#ltlSapph_${id})`}
+        stroke="#60A5FA"
+        strokeWidth="1.2"
+      />
+      <path d="M12 14L16 27L20 14" stroke="#93C5FD" strokeWidth="1" opacity="0.75" />
+      <line x1="6" y1="14" x2="26" y2="14" stroke="#FEF08A" strokeWidth="1.5" />
+      {/* ประกายดาววิบวับ */}
+      <polygon points="27,18 28,20 30,21 28,22 27,24 26,22 24,21 26,20" fill="#FEF08A" />
+    </svg>
+  );
+}
+
+/**
+ * 16. CriticalDropOffRadarIcon: ไอคอน 3 มิติ "จุดวิกฤต Churn Drop-Off เฝ้าระวัง"
+ * ดีไซน์: สัญญาณเตือนภัย 3 มิติสีส้มอำพันและกุหลาบ พร้อมคลื่นเรดาร์และประกายไฟระวังการเลิกซื้อ
+ */
+export function CriticalDropOffRadarIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`cdoAmber_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FDE68A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#DC2626" />
+        </linearGradient>
+      </defs>
+      {/* คลื่นเรดาร์กระจายสัญญาณตรวจจับลูกค้าหลุด */}
+      <circle cx="16" cy="16" r="13" stroke="#F59E0B" strokeWidth="1.2" strokeDasharray="3 2" opacity="0.4" />
+      <circle cx="16" cy="16" r="9" stroke="#EF4444" strokeWidth="1.4" opacity="0.6" />
+      {/* ตราสามเหลี่ยมเตือนภัย 3 มิติ */}
+      <path
+        d="M16 5L27 24H5L16 5Z"
+        fill="#1A0D0D"
+        stroke={`url(#cdoAmber_${id})`}
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      {/* เครื่องหมายอัศเจรีย์ทองคำระยิบระยับ */}
+      <line x1="16" y1="11" x2="16" y2="18" stroke="#FEF08A" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="16" cy="21.5" r="1.4" fill="#FEF08A" />
+      {/* จุดประกายเตือนด่วน */}
+      <circle cx="6" cy="9" r="1.5" fill="#EF4444" />
+    </svg>
+  );
+}
+
+/**
+ * 17. RepeatRevenueStackIcon: ไอคอน 3 มิติ "ยอดขายจากการซื้อซ้ำ (Repeat Purchase Revenue)"
+ * ดีไซน์: กองเหรียญทองคำ 24K และแท่งกราฟทะยานฟ้า พร้อมสัญลักษณ์สกุลเงินและแสงประกายความมั่งคั่ง
+ */
+export function RepeatRevenueStackIcon({ size = 24, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`rrsGold_${id}`} x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`rrsEm_${id}`} x1="10" y1="4" x2="28" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="100%" stopColor="#10B981" />
+        </linearGradient>
+      </defs>
+      {/* กองเหรียญทองที่ 1 (ซ้ายล่าง) */}
+      <ellipse cx="10" cy="23" rx="6" ry="2.6" fill={`url(#rrsGold_${id})`} stroke="#FEF08A" strokeWidth="0.8" />
+      <path d="M4 23V25.5C4 26.9 6.7 28 10 28C13.3 28 16 26.9 16 25.5V23" fill={`url(#rrsGold_${id})`} stroke="#B45309" strokeWidth="0.8" />
+      {/* กองเหรียญทองที่ 2 (ซ้อนสูงขึ้น) */}
+      <ellipse cx="10" cy="18.5" rx="6" ry="2.6" fill={`url(#rrsGold_${id})`} stroke="#FFF" strokeWidth="0.8" />
+      <path d="M4 18.5V21C4 22.4 6.7 23.5 10 23.5C13.3 23.5 16 22.4 16 21V18.5" fill={`url(#rrsGold_${id})`} stroke="#B45309" strokeWidth="0.8" />
+      {/* กองเหรียญที่ 3 (ขวา) */}
+      <ellipse cx="20" cy="19" rx="6" ry="2.6" fill={`url(#rrsGold_${id})`} stroke="#FEF08A" strokeWidth="0.8" />
+      <path d="M14 19V22C14 23.4 16.7 24.5 20 24.5C23.3 24.5 26 23.4 26 22V19" fill={`url(#rrsGold_${id})`} stroke="#B45309" strokeWidth="0.8" />
+      {/* ลูกศรรายได้พุ่งทะยานสีมรกต (Ascending Growth Arrow) */}
+      <path
+        d="M13 14L22 5M22 5H16M22 5V11"
+        stroke={`url(#rrsEm_${id})`}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* ประกายดาวเงินบริสุทธิ์ */}
+      <circle cx="25" cy="5" r="1.4" fill="#FFF" />
+    </svg>
+  );
+}
+
+/**
+ * 18. CrmVoucherLaserIcon: ไอคอน 3 มิติ "บัตรกำนัลคูปอง CRM ดึงลูกค้ากลับ (CRM Win-Back Voucher)"
+ * ดีไซน์: ตั๋วคูปองสีทองคำนีออน พร้อมรอยปรุโครเมียม สัญลักษณ์สายฟ้า และประกายดาวกระตุ้นยอด
+ */
+export function CrmVoucherLaserIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`cvlGold_${id}`} x1="3" y1="6" x2="29" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      {/* บัตรกำนัลตั๋วคูปองทองคำ (Ticket Voucher Card) */}
+      <path
+        d="M4 10C4 8.89543 4.89543 8 6 8H26C27.1046 8 28 8.89543 28 10V14C26.5 14 25.5 15 25.5 16C25.5 17 26.5 18 28 18V22C28 23.1046 27.1046 24 26 24H6C4.89543 24 4 23.1046 4 22V18C5.5 18 6.5 17 6.5 16C6.5 15 5.5 14 4 14V10Z"
+        fill="#0B132B"
+        stroke={`url(#cvlGold_${id})`}
+        strokeWidth="1.8"
+      />
+      {/* เส้นประรอยปรุตั๋ว (Ticket Perforation) */}
+      <line x1="12" y1="8" x2="12" y2="24" stroke="#FEF08A" strokeWidth="1.2" strokeDasharray="2.5 2" opacity="0.75" />
+      {/* สายฟ้าโปรโมชันแรง (Instant Lightning Promo) */}
+      <path
+        d="M19 10L16 16H20L17 22"
+        stroke="#FEF08A"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* ดาวโบนัสสะสมแต้ม */}
+      <polygon points="8,12 8.8,14 11,14.3 9.4,15.7 9.8,18 8,16.8 6.2,18 6.6,15.7 5,14.3 7.2,14" fill="#FEF08A" />
+    </svg>
+  );
+}
+
+/**
+ * 19. CohortChannelOmniIcon: ไอคอน 3 มิติ "ช่องทาง Omni-Channel Hub"
+ * ดีไซน์: ลูกโลกเครือข่ายดิจิทัลสีฟ้าคราม เชื่อมต่อโหนดร้านค้าออนไลน์และสาขา
+ */
+export function CohortChannelOmniIcon({ size = 20, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`ccoCyan_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#7DD3FC" />
+          <stop offset="50%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+      </defs>
+      <circle cx="16" cy="16" r="12" stroke={`url(#ccoCyan_${id})`} strokeWidth="1.8" />
+      <ellipse cx="16" cy="16" rx="6" ry="12" stroke={`url(#ccoCyan_${id})`} strokeWidth="1.2" opacity="0.75" />
+      <line x1="4" y1="16" x2="28" y2="16" stroke={`url(#ccoCyan_${id})`} strokeWidth="1.4" opacity="0.85" />
+      {/* โหนดเครือข่ายเรืองแสง */}
+      <circle cx="16" cy="16" r="2.5" fill="#FEF08A" />
+      <circle cx="16" cy="4" r="1.6" fill="#FFF" />
+      <circle cx="28" cy="16" r="1.6" fill="#FFF" />
+      <circle cx="16" cy="28" r="1.6" fill="#FFF" />
+      <circle cx="4" cy="16" r="1.6" fill="#FFF" />
+    </svg>
+  );
+}
+
+/**
+ * 20. ExportCsvLuxuryIcon: ไอคอน 3 มิติ "ส่งออกตารางข้อมูล CSV ระดับองค์กร"
+ * ดีไซน์: แผ่นเอกสารสเปรดชีตสีเขียวมรกตพร้อมตารางข้อมูลและลูกศรดาวน์โหลดสีทอง
+ */
+export function ExportCsvLuxuryIcon({ size = 20, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`eclEm_${id}`} x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#047857" />
+        </linearGradient>
+      </defs>
+      {/* แผ่นชีตสเปรดชีต */}
+      <rect x="5" y="4" width="22" height="24" rx="4" fill="#0B132B" stroke={`url(#eclEm_${id})`} strokeWidth="1.8" />
+      {/* เส้นตารางข้อมูลในชีต */}
+      <line x1="9" y1="9" x2="23" y2="9" stroke="#A7F3D0" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="9" y1="13" x2="23" y2="13" stroke="#38BDF8" strokeWidth="1.2" strokeLinecap="round" opacity="0.8" />
+      <line x1="9" y1="17" x2="16" y2="17" stroke="#38BDF8" strokeWidth="1.2" strokeLinecap="round" opacity="0.8" />
+      {/* ลูกศรทองดาวน์โหลดเอกสาร (Download Arrow Badge) */}
+      <circle cx="22" cy="22" r="5.5" fill="#F59E0B" stroke="#FEF08A" strokeWidth="1" />
+      <path d="M22 19V24M22 24L19.5 21.5M22 24L24.5 21.5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 
 
 

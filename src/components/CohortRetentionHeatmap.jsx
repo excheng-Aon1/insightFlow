@@ -1,5 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
+import {
+  CohortHeatmapMasterIcon,
+  CustomerRetentionRateIcon,
+  LongTermLoyaltyIcon,
+  CriticalDropOffRadarIcon,
+  RepeatRevenueStackIcon,
+  CrmVoucherLaserIcon,
+  ExportCsvLuxuryIcon,
+  MatrixTableIcon
+} from './LuxuryIcons';
 
 /**
  * CohortRetentionHeatmap - ตาราง Heatmap วิเคราะห์การซื้อซ้ำของลูกค้า (Customer Retention Rate)
@@ -376,9 +386,9 @@ export default function CohortRetentionHeatmap({
       >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-amber-400 p-0.5 shadow-lg flex-shrink-0">
-              <div className="w-full h-full rounded-[14px] bg-[#071039] flex items-center justify-center text-2xl">
-                📊
+            <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-amber-400 p-0.5 shadow-xl flex-shrink-0 flex items-center justify-center">
+              <div className="w-full h-full rounded-[14px] bg-[#071039] flex items-center justify-center shadow-inner">
+                <CohortHeatmapMasterIcon size={32} />
               </div>
             </div>
             <div>
@@ -463,7 +473,7 @@ export default function CohortRetentionHeatmap({
               }`}
               title={tx('ดาวน์โหลดตาราง Cohort เป็นไฟล์ CSV', 'Export Cohort Table as CSV')}
             >
-              <span>📥</span>
+              <ExportCsvLuxuryIcon size={18} />
               <span className="hidden sm:inline">CSV</span>
             </button>
 
@@ -471,9 +481,9 @@ export default function CohortRetentionHeatmap({
             <button
               type="button"
               onClick={handleTriggerWinBackCampaign}
-              className="px-4 py-2 rounded-2xl text-xs font-black bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md cursor-pointer transition flex items-center gap-1.5"
+              className="px-4 py-2 rounded-2xl text-xs font-black bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md cursor-pointer transition flex items-center gap-2"
             >
-              <span>⚡</span>
+              <CrmVoucherLaserIcon size={18} />
               <span>{tx('ยิงแคมเปญกู้ชีพลูกค้าเดือนที่ 2', 'Trigger Day-45 Win-Back')}</span>
             </button>
           </div>
@@ -483,10 +493,13 @@ export default function CohortRetentionHeatmap({
             2. FOUR CORE RETENTION METRIC CARDS
             ===================================================================== */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/10">
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[11px] font-bold text-slate-400 block uppercase">
-              {tx('อัตราซื้อซ้ำเฉลี่ยเดือนที่ 2 (M+1 Retention)', 'Month 1 Retention (M+1 Avg)')}
-            </span>
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-emerald-500/40 transition">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold text-slate-400 block uppercase">
+                {tx('อัตราซื้อซ้ำเฉลี่ยเดือนที่ 2 (M+1 Retention)', 'Month 1 Retention (M+1 Avg)')}
+              </span>
+              <CustomerRetentionRateIcon size={24} />
+            </div>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-2xl font-black text-emerald-400 font-mono">
                 {kpiStats.m1Retention}%
@@ -500,10 +513,13 @@ export default function CohortRetentionHeatmap({
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[11px] font-bold text-slate-400 block uppercase">
-              {tx('อัตราความภักดีระยะยาว (M+3 Retention)', 'Month 3 Long-Term Retention')}
-            </span>
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/40 transition">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold text-slate-400 block uppercase">
+                {tx('อัตราความภักดีระยะยาว (M+3 Retention)', 'Month 3 Long-Term Retention')}
+              </span>
+              <LongTermLoyaltyIcon size={24} />
+            </div>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-2xl font-black text-blue-400 font-mono">
                 {kpiStats.m3Retention}%
@@ -517,16 +533,19 @@ export default function CohortRetentionHeatmap({
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-amber-500/30 bg-amber-500/5">
-            <span className="text-[11px] font-bold text-amber-300 block uppercase">
-              {tx('จุดวิกฤต Drop-off (เดือน 1 → 2)', 'Critical Churn Drop-Off')}
-            </span>
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 hover:border-amber-400 transition">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold text-amber-300 block uppercase">
+                {tx('จุดวิกฤต Drop-off (เดือน 1 → 2)', 'Critical Churn Drop-Off')}
+              </span>
+              <CriticalDropOffRadarIcon size={24} />
+            </div>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-2xl font-black text-amber-400 font-mono">
                 -{kpiStats.dropOff}%
               </span>
               <span className="text-[10px] text-amber-300 font-bold">
-                ⚠️ {tx('โอกาสกู้ชีพสูงสุด', 'Golden Win-Back Window')}
+                {tx('โอกาสกู้ชีพสูงสุด', 'Golden Win-Back Window')}
               </span>
             </div>
             <p className="text-[11px] text-slate-400 mt-0.5">
@@ -534,10 +553,13 @@ export default function CohortRetentionHeatmap({
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[11px] font-bold text-slate-400 block uppercase">
-              {tx('รายได้จากการซื้อซ้ำรวม (Repeat Revenue)', 'Net Repeat Sales Revenue')}
-            </span>
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-500/40 transition">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold text-slate-400 block uppercase">
+                {tx('รายได้จากการซื้อซ้ำรวม (Repeat Revenue)', 'Net Repeat Sales Revenue')}
+              </span>
+              <RepeatRevenueStackIcon size={24} />
+            </div>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-2xl font-black text-white font-mono">
                 ฿{(kpiStats.repeatRevenue / 1000000).toFixed(2)}M
@@ -564,7 +586,7 @@ export default function CohortRetentionHeatmap({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="text-base font-black flex items-center gap-2">
-              <span>🗓️</span>
+              <MatrixTableIcon size={24} />
               <span>{tx('ตารางการกลับมาซื้อซ้ำรายเดือน (Cohort Retention Rate Matrix)', 'Monthly Repeat Purchase Matrix')}</span>
             </h3>
             <p className="text-xs text-slate-400">
@@ -621,8 +643,12 @@ export default function CohortRetentionHeatmap({
                   >
                     {/* Cohort Name */}
                     <td className="py-2.5 px-3 text-left font-bold whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        {isSelectedCohort && <span className="text-amber-400 text-xs">👉</span>}
+                      <div className="flex items-center gap-2">
+                        {isSelectedCohort ? (
+                          <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#F59E0B] animate-pulse"></span>
+                        ) : (
+                          <span className="w-1.5 h-1.5 rounded-full bg-white/20"></span>
+                        )}
                         <span className={isSelectedCohort ? 'text-amber-300 font-black' : ''}>
                           {isEn ? cohortRow.cohortEn : cohortRow.cohort}
                         </span>
@@ -714,7 +740,7 @@ export default function CohortRetentionHeatmap({
         {hoveredCell && (
           <div className="mt-4 p-4 rounded-2xl bg-black/60 border border-blue-500/40 animate-in fade-in flex flex-wrap items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">🔎</span>
+              <CustomerRetentionRateIcon size={26} />
               <div>
                 <div className="font-black text-amber-300 text-sm">
                   {hoveredCell.cohort} • {hoveredCell.monthLabel} ({tx(`เดือนที่ ${hoveredCell.monthIndex + 1} หลังการซื้อครั้งแรก`, `Month ${hoveredCell.monthIndex + 1} Post-Acquisition`)})
@@ -766,7 +792,7 @@ export default function CohortRetentionHeatmap({
           }`}
         >
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl">🚨</span>
+            <CriticalDropOffRadarIcon size={30} />
             <div>
               <h4 className="text-sm font-black text-amber-300">
                 {tx('1. จุดวิกฤต Drop-off เดือนที่ 2 (Day 45-60)', '1. Critical Month 2 Drop-Off')}
@@ -785,9 +811,9 @@ export default function CohortRetentionHeatmap({
           <button
             type="button"
             onClick={handleTriggerWinBackCampaign}
-            className="w-full py-2 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow"
+            className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow"
           >
-            <span>💬</span>
+            <CrmVoucherLaserIcon size={16} />
             <span>{tx('ตั้งค่าส่งคูปอง LINE วันที่ 45', 'Configure Day-45 LINE Coupon')}</span>
           </button>
         </div>
@@ -799,7 +825,7 @@ export default function CohortRetentionHeatmap({
           }`}
         >
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl">💎</span>
+            <LongTermLoyaltyIcon size={30} />
             <div>
               <h4 className="text-sm font-black text-blue-300">
                 {tx('2. จุดทรงตัว Plateau เดือนที่ 3-4 (VIP Retention)', '2. Month 3-4 Loyalty Plateau')}
@@ -828,7 +854,7 @@ export default function CohortRetentionHeatmap({
           }`}
         >
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl">📈</span>
+            <RepeatRevenueStackIcon size={30} />
             <div>
               <h4 className="text-sm font-black text-emerald-400">
                 {tx('3. แนวโน้มคุณภาพ Cohort ดีขึ้นเรื่อยๆ', '3. Rising Cohort Quality Trend')}
