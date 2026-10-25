@@ -5239,7 +5239,10 @@ export function MultiChannelTab({
                   try {
                     await fetch(`${API_BASE_URL}/api/line/register-contact`, {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
+                      headers: {
+                        'Content-Type': 'application/json',
+                        ...(localStorage.getItem('insightflow_jwt_token') ? { 'Authorization': `Bearer ${localStorage.getItem('insightflow_jwt_token')}` } : {})
+                      },
                       body: JSON.stringify({
                         phone: userPhone,
                         line_id: userLineId,
@@ -5314,7 +5317,10 @@ export function MultiChannelTab({
                     try {
                       const res = await fetch(`${API_BASE_URL}/api/line/send-daily-summary`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                          'Content-Type': 'application/json',
+                          ...(localStorage.getItem('insightflow_jwt_token') ? { 'Authorization': `Bearer ${localStorage.getItem('insightflow_jwt_token')}` } : {})
+                        },
                         body: JSON.stringify({
                           phone: userPhone,
                           line_id: userLineId,

@@ -521,10 +521,11 @@ def get_etl_sources():
 @app.post("/api/etl/trigger", status_code=status.HTTP_200_OK)
 def trigger_etl_pipeline(
     req: Optional[EtlTriggerRequest] = None,
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
-    """สั่งรัน Automated ETL & Data Cleaning Pipeline ทันที"""
+    """สั่งรัน Automated ETL & Data Cleaning Pipeline ทันที (จำกัดสิทธิ์เฉพาะผู้ใช้ที่ยืนยันตัวตนแล้ว)"""
     sources = req.sources if req and req.sources else ["POS_SYSTEM", "FACEBOOK_ADS", "TIKTOK_ADS", "WAREHOUSE_ERP"]
-    user_id = req.user_id if req and req.user_id else "GUEST-EXEC-001"
+    user_id = (req.user_id if req and req.user_id else None) or current_user.get("sub") or "GUEST-EXEC-001"
 
     execution_result = run_etl_pipeline(sources=sources, user_id=user_id)
     return {
@@ -829,42 +830,34 @@ async def login_with_google(req: GoogleAuthRequest, db: Session = Depends(get_db
     display_name = ""
     picture_url = ""
 
-    # 1. หากส่ง credential (Google JWT) มา ให้แกะ token
-    if req.credential:
-        try:
-            from google.oauth2 import id_token
-            from google.auth.transport import requests as google_requests
-            google_client_id = os.environ.get("GOOGLE_CLIENT_ID")
-            id_info = id_token.verify_oauth2_token(
-                req.credential,
-                google_requests.Request(),
-                google_client_id if google_client_id else None
-            )
-            email_clean = str(id_info.get("email", "")).strip().lower()
-            display_name = id_info.get("name") or id_info.get("given_name") or email_clean.split("@")[0]
-            picture_url = id_info.get("picture", "")
-        except Exception as e:
-            logger.warning(f"Google token id_token verification fallback: {e}")
-            try:
-                import base64
-                parts = req.credential.split(".")
-                if len(parts) >= 2:
-                    padded = parts[1] + "=" * ((4 - len(parts[1]) % 4) % 4)
-                    payload_json = json.loads(base64.urlsafe_b64decode(padded).decode("utf-8"))
-                    email_clean = str(payload_json.get("email", "")).strip().lower()
-                    display_name = payload_json.get("name") or payload_json.get("given_name") or email_clean.split("@")[0]
-                    picture_url = payload_json.get("picture", "")
-            except Exception as parse_err:
-                logger.error(f"Failed to parse google credential payload: {parse_err}")
+    # 1. บังคับตรวจสอบ Google JWT Credential Token ผ่าน Google Public Keys เสมอ
+    if not req.credential:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="⚠️ ไม่พบ Google Credential Token: กรุณาเข้าสู่ระบบผ่าน Google Sign-In อย่างเป็นทางการ",
+        )
 
-    # 2. กรณีส่ง email โดยตรง (เช่น direct Google sign-in payload)
-    if not email_clean and req.email:
-        email_clean = str(req.email).strip().lower()
-        display_name = req.name or email_clean.split("@")[0]
-        picture_url = req.picture or ""
+    try:
+        from google.oauth2 import id_token
+        from google.auth.transport import requests as google_requests
+        google_client_id = os.environ.get("GOOGLE_CLIENT_ID")
+        id_info = id_token.verify_oauth2_token(
+            req.credential,
+            google_requests.Request(),
+            google_client_id if google_client_id else None
+        )
+        email_clean = str(id_info.get("email", "")).strip().lower()
+        display_name = id_info.get("name") or id_info.get("given_name") or email_clean.split("@")[0]
+        picture_url = id_info.get("picture", "")
+    except Exception as e:
+        logger.warning(f"🛡️ [Security Guard] Blocked unverified Google OAuth token: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="🔒 การยืนยันตัวตนผ่าน Google ล้มเหลว: Google Token ไม่ถูกต้อง ปลอมแปลง หรือหมดอายุแล้ว",
+        )
 
     if not email_clean:
-        raise HTTPException(status_code=400, detail="ไม่พบข้อมูลอีเมลจาก Google Account")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ไม่พบข้อมูลอีเมลจาก Google Account")
 
     # 3. ตรวจสอบหรือสร้างผู้ใช้ในฐานข้อมูล
     user = db.query(User).filter(User.email == email_clean).first()
@@ -2829,8 +2822,10 @@ async def register_customer_line_contact(req: LineContactRegisterRequest):
 
 
 @app.get("/api/line/contacts")
-async def get_registered_line_contacts():
-    """ดึงสถานะการผูกเบอร์โทร + LINE ID + line_user_id ทั้งหมด"""
+async def get_registered_line_contacts(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """ดึงสถานะการผูกเบอร์โทร + LINE ID + line_user_id ทั้งหมด (จำกัดเฉพาะผู้ใช้งานที่ยืนยันตัวตนแล้วเพื่อความปลอดภัย PDPA)"""
     registry = _load_line_contacts()
     token_ready = bool(get_line_channel_access_token())
     return {
@@ -2847,28 +2842,35 @@ async def get_registered_line_contacts():
 async def line_messaging_api_webhook(request: Request):
     """
     Webhook สำหรับรับข้อความจาก LINE Official Account (@715ljuvj)
-    เมื่อลูกค้าสแกน QR Code แอดเพื่อนแล้วพิมพ์เบอร์โทรศัพท์ส่งเข้าแชท 1 ครั้ง:
-    - ระบบจะจับคู่เบอร์โทรเข้ากับ line_user_id ของลูกค้าโดยอัตโนมัติทันที
-    - ตอบกลับด้วยข้อความยืนยันและการ์ดตัวอย่างสรุปยอดขายทันที
+    พร้อมการตรวจสอบ Digital Signature (HMAC-SHA256) อย่างเคร่งครัด
     """
     raw_body = await request.body()
-    signature = request.headers.get("X-Line-Signature", "")
+    signature = request.headers.get("X-Line-Signature", "").strip()
     channel_secret = os.getenv("LINE_CHANNEL_SECRET", "").strip()
 
-    # ตรวจสอบลายเซ็น HMAC-SHA256 หากส่งมาจาก LINE Platform จริง
-    if signature and channel_secret and signature != "SIMULATED_LOCAL_WEBHOOK":
-        hash_bytes = hmac.new(
-            channel_secret.encode("utf-8"),
-            raw_body,
-            hashlib.sha256,
-        ).digest()
-        expected_sig = base64.b64encode(hash_bytes).decode("utf-8")
-        if not hmac.compare_digest(signature, expected_sig):
-            logger.warning("⚠️ Invalid LINE Webhook signature received.")
+    is_production = os.getenv("ENVIRONMENT", "").lower() == "production"
+
+    # ตรวจสอบลายเซ็น HMAC-SHA256: บังคับตรวจทุกคำขอ (ป้องกัน Webhook Spoofing)
+    if is_production or signature != "SIMULATED_LOCAL_WEBHOOK":
+        if not signature:
+            logger.warning("🛡️ [Security Guard] Blocked unverified LINE Webhook: Missing X-Line-Signature")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Invalid LINE Webhook signature",
+                detail="Missing X-Line-Signature header",
             )
+        if channel_secret:
+            hash_bytes = hmac.new(
+                channel_secret.encode("utf-8"),
+                raw_body,
+                hashlib.sha256,
+            ).digest()
+            expected_sig = base64.b64encode(hash_bytes).decode("utf-8")
+            if not hmac.compare_digest(signature, expected_sig):
+                logger.warning("🛡️ [Security Guard] Blocked fraudulent LINE Webhook: Invalid signature mismatch")
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Invalid LINE Webhook signature",
+                )
 
     try:
         payload = json.loads(raw_body.decode("utf-8") or "{}")
