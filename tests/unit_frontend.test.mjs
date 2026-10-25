@@ -929,6 +929,42 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(biContent.includes('if (grossRevenue === 0 || count === 0)'), 'ExecutiveBiStudio must guard zero state in deepDiveKpis');
   });
 
+  test('UNIT-FE-30: Enterprise CRM Sales Pipeline Kanban, Activity Timeline & Deal Forecasting Suite', () => {
+    // 1. Check LuxuryIcons.jsx exports CRM icons
+    const iconsPath = path.join(projectRoot, 'src', 'components', 'LuxuryIcons.jsx');
+    const iconsContent = fs.readFileSync(iconsPath, 'utf8');
+    assert.ok(iconsContent.includes('export function SalesPipelineKanbanIcon'), 'LuxuryIcons must export SalesPipelineKanbanIcon');
+    assert.ok(iconsContent.includes('export function CrmActivityTimelineIcon'), 'LuxuryIcons must export CrmActivityTimelineIcon');
+    assert.ok(iconsContent.includes('export function DealOpportunityIcon'), 'LuxuryIcons must export DealOpportunityIcon');
+
+    // 2. Check App.jsx CustomersTab integration
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    assert.ok(appContent.includes('sales_pipeline'), 'CustomersTab must support sales_pipeline view mode');
+    assert.ok(appContent.includes('activity_timeline'), 'CustomersTab must support activity_timeline view mode');
+    assert.ok(appContent.includes('crmDeals'), 'CustomersTab must maintain crmDeals state');
+    assert.ok(appContent.includes('crmActivities'), 'CustomersTab must maintain crmActivities state');
+    assert.ok(appContent.includes('totalPipelineVal'), 'CustomersTab must compute totalPipelineVal');
+    assert.ok(appContent.includes('weightedForecastVal'), 'CustomersTab must compute weightedForecastVal');
+    assert.ok(appContent.includes('handleMoveDealStage'), 'CustomersTab must support one-click deal stage movements');
+    assert.ok(appContent.includes('handleToggleActivity'), 'CustomersTab must support interactive activity completion');
+
+    // 3. Check Backend Database CRM Models
+    const dbPath = path.join(projectRoot, 'backend', 'database.py');
+    const dbContent = fs.readFileSync(dbPath, 'utf8');
+    assert.ok(dbContent.includes('class CrmAccount'), 'database.py must define CrmAccount');
+    assert.ok(dbContent.includes('class CrmContact'), 'database.py must define CrmContact');
+    assert.ok(dbContent.includes('class CrmDeal'), 'database.py must define CrmDeal');
+    assert.ok(dbContent.includes('class CrmActivity'), 'database.py must define CrmActivity');
+
+    // 4. Check Backend API CRM Endpoints
+    const mainPath = path.join(projectRoot, 'backend', 'main.py');
+    const mainContent = fs.readFileSync(mainPath, 'utf8');
+    assert.ok(mainContent.includes('/api/crm/overview'), 'main.py must provide /api/crm/overview endpoint');
+    assert.ok(mainContent.includes('/api/crm/deals'), 'main.py must provide /api/crm/deals endpoint');
+    assert.ok(mainContent.includes('/api/crm/activities'), 'main.py must provide /api/crm/activities endpoint');
+  });
+
 });
 
 

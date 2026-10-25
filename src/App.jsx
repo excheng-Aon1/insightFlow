@@ -59,6 +59,9 @@ import {
   CohortHeatmapMasterIcon,
   CustomerRetentionRateIcon,
   MatrixTableIcon,
+  SalesPipelineKanbanIcon,
+  CrmActivityTimelineIcon,
+  DealOpportunityIcon,
 } from './components/LuxuryIcons';
 
 const API_BASE_URL = (import.meta?.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
@@ -3623,10 +3626,312 @@ export function CustomersTab({
 
   const safeCustomers = Array.isArray(customersList) ? customersList.filter(Boolean) : [];
 
-  const [customerViewMode, setCustomerViewMode] = useState('cohort_heatmap'); // 'cohort_heatmap' | 'rfm_table' | 'all'
+  const [customerViewMode, setCustomerViewMode] = useState('sales_pipeline'); // 'sales_pipeline' | 'activity_timeline' | 'rfm_table' | 'cohort_heatmap' | 'all'
   const [selectedRfmSegment, setSelectedRfmSegment] = useState('all');
   const [customerSearch, setCustomerSearch] = useState('');
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+
+  // --- CRM Sales Pipeline & Deals State ---
+  const [crmDeals, setCrmDeals] = useState([
+    {
+      id: 'DEAL-001',
+      title: 'ระบบคลาวด์ ERP และวิเคราะห์ยอดขายสาขา',
+      titleEn: 'Multi-Branch Cloud ERP & Sales Analytics',
+      accountName: 'บจก. สยามฟู้ดส์ โฮลดิ้ง',
+      contactName: 'คุณธนินทร์ อัศวเมธี',
+      amount: 450000,
+      stage: 'negotiation',
+      probability: 80,
+      expectedCloseDate: '2026-11-15',
+      notes: 'นัดตรวจทานสัญญาขั้นสุดท้ายและปรับสโคปฮาร์ดแวร์ POS'
+    },
+    {
+      id: 'DEAL-002',
+      title: 'สัญญาบริการ InsightFlow Enterprise AI รายปี',
+      titleEn: 'Annual InsightFlow Enterprise AI Contract',
+      accountName: 'บมจ. ไทยรีเทล กรุ๊ป',
+      contactName: 'คุณพิมพ์ลภัส วงศ์สุวรรณ',
+      amount: 850000,
+      stage: 'proposal',
+      probability: 60,
+      expectedCloseDate: '2026-11-30',
+      notes: 'ส่งใบเสนอราคาแบบ Multi-Branch พร้อมส่วนลดรายปี'
+    },
+    {
+      id: 'DEAL-003',
+      title: 'ระบบบริหารสต็อกและ CRM อัตโนมัติ 5 สาขา',
+      titleEn: 'Automated 5-Branch Inventory & CRM Suite',
+      accountName: 'บจก. นวัตกรรมความงาม',
+      contactName: 'คุณปิยะพร ลิขิต',
+      amount: 280000,
+      stage: 'qualification',
+      probability: 40,
+      expectedCloseDate: '2026-12-10',
+      notes: 'กำลังสรุป Requirement การเชื่อม API กับระบบบัญชีเดิม'
+    },
+    {
+      id: 'DEAL-004',
+      title: 'แพ็กเกจ POS หน้าร้านและเชื่อมต่อ LINE Official',
+      titleEn: 'Retail POS Package & LINE OA Integration',
+      accountName: 'ร้านกาแฟ คราฟต์ คาเฟ่',
+      contactName: 'คุณณัฐนิชา เกียรติขจร',
+      amount: 95000,
+      stage: 'closed_won',
+      probability: 100,
+      expectedCloseDate: '2026-10-24',
+      notes: 'ลงนามสัญญาและชำระเงินงวดแรกเรียบร้อยแล้ว'
+    },
+    {
+      id: 'DEAL-005',
+      title: 'โซลูชัน Data Warehouse & Demand Forecasting',
+      titleEn: 'Data Warehouse & Demand Forecasting Solution',
+      accountName: 'บจก. สหโลจิสติกส์',
+      contactName: 'คุณวรพจน์ มั่งคั่ง',
+      amount: 1200000,
+      stage: 'lead',
+      probability: 25,
+      expectedCloseDate: '2026-12-31',
+      notes: 'ติดต่อเข้ามาผ่านหน้าเว็บ ต้องการดู Live Demo โฟลว์คลังสินค้า'
+    }
+  ]);
+
+  // --- CRM Activities State ---
+  const [crmActivities, setCrmActivities] = useState([
+    {
+      id: 'ACT-001',
+      type: 'meeting',
+      title: 'ประชุมนำเสนอระบบ Executive AI Briefing กับทีมผู้บริหาร',
+      titleEn: 'Executive AI Briefing Demo Presentation',
+      contactName: 'คุณธนินทร์ อัศวเมธี (สยามฟู้ดส์)',
+      dealId: 'DEAL-001',
+      status: 'pending',
+      scheduledAt: 'พรุ่งนี้ 14:00 น.',
+      notes: 'เตรียมตัวอย่างแดชบอร์ด 7 KPI และ One-Pager PDF'
+    },
+    {
+      id: 'ACT-002',
+      type: 'call',
+      title: 'โทรติดตามใบเสนอราคาแพ็กเกจ Enterprise 2026',
+      titleEn: 'Follow up on Enterprise 2026 Quote Call',
+      contactName: 'คุณพิมพ์ลภัส วงศ์สุวรรณ (ไทยรีเทล)',
+      dealId: 'DEAL-002',
+      status: 'completed',
+      scheduledAt: 'วันนี้ 10:30 น.',
+      notes: 'ลูกค้าตอบรับดี ขอเอกสารประกอบการตัดสินใจเพิ่มเติม'
+    },
+    {
+      id: 'ACT-003',
+      type: 'email',
+      title: 'ส่งรายละเอียดสเปกระบบเชื่อมต่อ LINE Webhook & POS',
+      titleEn: 'Email LINE Webhook & POS integration specs',
+      contactName: 'คุณณัฐนิชา เกียรติขจร (คราฟต์ คาเฟ่)',
+      dealId: 'DEAL-004',
+      status: 'completed',
+      scheduledAt: 'เมื่อวานนี้ 15:45 น.',
+      notes: 'ส่งคู่มือการตั้งค่า Messaging API Token เรียบร้อย'
+    },
+    {
+      id: 'ACT-004',
+      type: 'task',
+      title: 'จัดเตรียมเอกสารสัญญาความปลอดภัยข้อมูล (PDPA / Enterprise NDA)',
+      titleEn: 'Prepare PDPA & Enterprise NDA Agreements',
+      contactName: 'บจก. สหโลจิสติกส์',
+      dealId: 'DEAL-005',
+      status: 'pending',
+      scheduledAt: 'วันศุกร์นี้ 16:00 น.',
+      notes: 'ประสานงานทีมกฎหมายเพื่อตรวจร่างข้อตกลง'
+    }
+  ]);
+
+  // Modals & Form states
+  const [showAddDealModal, setShowAddDealModal] = useState(false);
+  const [newDealTitle, setNewDealTitle] = useState('');
+  const [newDealAccount, setNewDealAccount] = useState('');
+  const [newDealContact, setNewDealContact] = useState('');
+  const [newDealAmount, setNewDealAmount] = useState('');
+  const [newDealStage, setNewDealStage] = useState('qualification');
+  const [newDealProb, setNewDealProb] = useState(50);
+  const [newDealDate, setNewDealDate] = useState('2026-11-30');
+  const [newDealNotes, setNewDealNotes] = useState('');
+
+  const [showAddActivityModal, setShowAddActivityModal] = useState(false);
+  const [newActType, setNewActType] = useState('call');
+  const [newActTitle, setNewActTitle] = useState('');
+  const [newActContact, setNewActContact] = useState('');
+  const [newActDealId, setNewActDealId] = useState('');
+  const [newActDate, setNewActDate] = useState('วันนี้');
+  const [newActNotes, setNewActNotes] = useState('');
+
+  const [activityFilterType, setActivityFilterType] = useState('all');
+  const [activityFilterStatus, setActivityFilterStatus] = useState('all');
+
+  const PIPELINE_STAGES = [
+    { id: 'lead', titleTh: '🎯 ผู้มุ่งหวัง', titleEn: '🎯 Inbound Lead', badgeBg: 'bg-sky-500/20 text-sky-300 border-sky-500/40' },
+    { id: 'qualification', titleTh: '📋 วิเคราะห์ความต้องการ', titleEn: '📋 Qualification', badgeBg: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40' },
+    { id: 'proposal', titleTh: '💼 เสนอราคา & โซลูชัน', titleEn: '💼 Proposal', badgeBg: 'bg-amber-500/20 text-amber-300 border-amber-500/40' },
+    { id: 'negotiation', titleTh: '🤝 เจรจาต่อรอง', titleEn: '🤝 Negotiation', badgeBg: 'bg-purple-500/20 text-purple-300 border-purple-500/40' },
+    { id: 'closed_won', titleTh: '🏆 ปิดการขายสำเร็จ', titleEn: '🏆 Closed Won', badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' },
+    { id: 'closed_lost', titleTh: '❌ ยกเลิก/ชะลอ', titleEn: '❌ Closed Lost', badgeBg: 'bg-rose-500/20 text-rose-300 border-rose-500/40' }
+  ];
+
+  const getNextStage = (currentStage) => {
+    const order = ['lead', 'qualification', 'proposal', 'negotiation', 'closed_won'];
+    const idx = order.indexOf(currentStage);
+    if (idx !== -1 && idx < order.length - 1) return order[idx + 1];
+    return null;
+  };
+
+  const getPrevStage = (currentStage) => {
+    const order = ['lead', 'qualification', 'proposal', 'negotiation', 'closed_won'];
+    const idx = order.indexOf(currentStage);
+    if (idx > 0) return order[idx - 1];
+    return null;
+  };
+
+  const handleMoveDealStage = (dealId, nextStage) => {
+    setCrmDeals(prev =>
+      prev.map(d => {
+        if (d.id === dealId) {
+          const newProb = nextStage === 'closed_won' ? 100 : nextStage === 'closed_lost' ? 0 : d.probability;
+          return { ...d, stage: nextStage, probability: newProb };
+        }
+        return d;
+      })
+    );
+    toast.success(tx('✅ อัปเดตขั้นตอนดีลในไปป์ไลน์สำเร็จ!', '✅ Updated deal stage in pipeline!'));
+    fetch(`/api/crm/deals/${dealId}/stage`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(localStorage.getItem('insightflow_jwt_token') ? { 'Authorization': `Bearer ${localStorage.getItem('insightflow_jwt_token')}` } : {})
+      },
+      body: JSON.stringify({ stage: nextStage })
+    }).catch(() => {});
+  };
+
+  const handleDeleteDeal = (dealId) => {
+    setCrmDeals(prev => prev.filter(d => d.id !== dealId));
+    toast.success(tx('🗑️ ลบดีลการขายเรียบร้อยแล้ว', '🗑️ Deleted deal successfully'));
+  };
+
+  const handleCreateDeal = (e) => {
+    e.preventDefault();
+    if (!newDealTitle.trim()) {
+      toast.error(tx('กรุณาระบุชื่อดีลการขาย', 'Please enter deal title'));
+      return;
+    }
+    const amountNum = Math.max(1000, Number(newDealAmount) || 50000);
+    const newDealObj = {
+      id: 'DEAL-' + Math.floor(100 + Math.random() * 900),
+      title: newDealTitle.trim(),
+      titleEn: newDealTitle.trim(),
+      accountName: newDealAccount.trim() || 'องค์กรลูกค้าทั่วไป',
+      contactName: newDealContact.trim() || 'ผู้ติดต่อหลัก',
+      amount: amountNum,
+      stage: newDealStage,
+      probability: Number(newDealProb) || 50,
+      expectedCloseDate: newDealDate || '2026-12-31',
+      notes: newDealNotes.trim()
+    };
+    setCrmDeals(prev => [newDealObj, ...prev]);
+    setShowAddDealModal(false);
+    setNewDealTitle('');
+    setNewDealAccount('');
+    setNewDealContact('');
+    setNewDealAmount('');
+    setNewDealNotes('');
+    toast.success(tx(`🎉 สร้างดีล "${newDealObj.title}" มูลค่า ฿${amountNum.toLocaleString()} เรียบร้อยแล้ว!`, `🎉 Created deal "${newDealObj.title}" (฿${amountNum.toLocaleString()})!`));
+
+    fetch('/api/crm/deals', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(localStorage.getItem('insightflow_jwt_token') ? { 'Authorization': `Bearer ${localStorage.getItem('insightflow_jwt_token')}` } : {})
+      },
+      body: JSON.stringify({
+        title: newDealObj.title,
+        account_name: newDealObj.accountName,
+        contact_name: newDealObj.contactName,
+        amount: newDealObj.amount,
+        stage: newDealObj.stage,
+        probability: newDealObj.probability,
+        expected_close_date: newDealObj.expectedCloseDate,
+        notes: newDealObj.notes
+      })
+    }).catch(() => {});
+  };
+
+  const handleCreateActivity = (e) => {
+    e.preventDefault();
+    if (!newActTitle.trim()) {
+      toast.error(tx('กรุณาระบุหัวข้อกิจกรรม', 'Please enter activity title'));
+      return;
+    }
+    const newActObj = {
+      id: 'ACT-' + Math.floor(100 + Math.random() * 900),
+      type: newActType,
+      title: newActTitle.trim(),
+      titleEn: newActTitle.trim(),
+      contactName: newActContact.trim() || 'ลูกค้าทั่วไป',
+      dealId: newActDealId || '',
+      status: 'pending',
+      scheduledAt: newActDate.trim() || 'วันนี้',
+      notes: newActNotes.trim()
+    };
+    setCrmActivities(prev => [newActObj, ...prev]);
+    setShowAddActivityModal(false);
+    setNewActTitle('');
+    setNewActContact('');
+    setNewActNotes('');
+    toast.success(tx(`📅 บันทึกกิจกรรม "${newActObj.title}" เรียบร้อยแล้ว!`, `📅 Logged activity "${newActObj.title}"!`));
+
+    fetch('/api/crm/activities', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(localStorage.getItem('insightflow_jwt_token') ? { 'Authorization': `Bearer ${localStorage.getItem('insightflow_jwt_token')}` } : {})
+      },
+      body: JSON.stringify({
+        type: newActObj.type,
+        title: newActObj.title,
+        notes: newActObj.notes,
+        contact_name: newActObj.contactName,
+        deal_id: newActObj.dealId,
+        scheduled_at: newActObj.scheduledAt
+      })
+    }).catch(() => {});
+  };
+
+  const handleToggleActivity = (activityId) => {
+    setCrmActivities(prev =>
+      prev.map(a => {
+        if (a.id === activityId) {
+          const nextStatus = a.status === 'completed' ? 'pending' : 'completed';
+          return { ...a, status: nextStatus };
+        }
+        return a;
+      })
+    );
+    toast.success(tx('อัปเดตสถานะกิจกรรมเรียบร้อยแล้ว', 'Updated activity status'));
+    fetch(`/api/crm/activities/${activityId}/complete`, {
+      method: 'PATCH',
+      headers: {
+        ...(localStorage.getItem('insightflow_jwt_token') ? { 'Authorization': `Bearer ${localStorage.getItem('insightflow_jwt_token')}` } : {})
+      }
+    }).catch(() => {});
+  };
+
+  const handleDeleteActivity = (actId) => {
+    setCrmActivities(prev => prev.filter(a => a.id !== actId));
+    toast.success(tx('ลบกิจกรรมเรียบร้อยแล้ว', 'Deleted activity'));
+  };
+
+  const totalPipelineVal = crmDeals.filter(d => d.stage !== 'closed_lost').reduce((acc, d) => acc + (Number(d.amount) || 0), 0);
+  const weightedForecastVal = Math.round(crmDeals.filter(d => d.stage !== 'closed_lost').reduce((acc, d) => acc + ((Number(d.amount) || 0) * ((d.probability || 0) / 100)), 0));
+  const activeDealsList = crmDeals.filter(d => d.stage !== 'closed_won' && d.stage !== 'closed_lost');
+  const wonDealsList = crmDeals.filter(d => d.stage === 'closed_won');
+  const lostDealsList = crmDeals.filter(d => d.stage === 'closed_lost');
+  const winRatePct = Math.round((wonDealsList.length / Math.max(1, wonDealsList.length + lostDealsList.length)) * 100);
 
   // ฟอร์มเพิ่มลูกค้าใหม่ (ทำงานจริง)
   const [showAddForm, setShowAddForm] = useState(false);
@@ -3802,23 +4107,76 @@ export function CustomersTab({
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3 self-start lg:self-center">
+          <div className="flex flex-wrap gap-2.5 self-start lg:self-center">
+            <button
+              onClick={() => setShowAddDealModal(true)}
+              className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black px-4 py-3 rounded-2xl text-xs transition shadow-lg cursor-pointer flex items-center gap-1.5"
+            >
+              <DealOpportunityIcon size={16} />
+              <span>{tx('➕ สร้างดีลใหม่', '➕ Add Deal')}</span>
+            </button>
+            <button
+              onClick={() => setShowAddActivityModal(true)}
+              className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white font-black px-4 py-3 rounded-2xl text-xs transition shadow-lg cursor-pointer flex items-center gap-1.5"
+            >
+              <CrmActivityTimelineIcon size={16} />
+              <span>{tx('➕ บันทึกกิจกรรม', '➕ Log Activity')}</span>
+            </button>
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black px-5 py-3 rounded-2xl text-xs transition shadow-lg cursor-pointer"
+              className="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black px-4 py-3 rounded-2xl text-xs transition shadow-lg cursor-pointer"
             >
-              {tx('➕ เพิ่มรายชื่อลูกค้าใหม่', '➕ Add New Customer')}
+              {tx('➕ เพิ่มลูกค้า', '➕ Add Customer')}
             </button>
             <button
               onClick={exportCustomerCsv}
-              className="bg-white/10 hover:bg-white/15 text-slate-200 font-bold px-5 py-3 rounded-2xl text-xs border border-white/15 transition cursor-pointer"
+              className="bg-white/10 hover:bg-white/15 text-slate-200 font-bold px-4 py-3 rounded-2xl text-xs border border-white/15 transition cursor-pointer"
             >
-              {tx('📥 ดาวน์โหลดรายชื่อลูกค้า (.csv)', '📥 Export Customers (.csv)')}
+              {tx('📥 ดาวน์โหลด (.csv)', '📥 Export (.csv)')}
             </button>
           </div>
 
           {/* View Mode Switcher Pills */}
           <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-white/10">
+            <button
+              type="button"
+              onClick={() => setCustomerViewMode('sales_pipeline')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2.5 ${
+                customerViewMode === 'sales_pipeline'
+                  ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25 ring-1 ring-amber-300/50'
+                  : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
+              }`}
+            >
+              <SalesPipelineKanbanIcon size={18} />
+              <span>{tx('ไปป์ไลน์การขาย & ดีล (Sales Pipeline)', 'Sales Pipeline & Deals')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCustomerViewMode('activity_timeline')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2.5 ${
+                customerViewMode === 'activity_timeline'
+                  ? 'bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 text-white shadow-lg shadow-pink-500/25 ring-1 ring-pink-400/50'
+                  : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
+              }`}
+            >
+              <CrmActivityTimelineIcon size={18} />
+              <span>{tx('บันทึกกิจกรรม & งานติดตาม (Activities)', 'Activities & Tasks')}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setCustomerViewMode('rfm_table')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2.5 ${
+                customerViewMode === 'rfm_table'
+                  ? 'bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 ring-1 ring-sky-300/50'
+                  : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
+              }`}
+            >
+              <CustomerRetentionRateIcon size={18} />
+              <span>{tx('ทะเบียนลูกค้า & วิเคราะห์ RFM (Customer Directory)', 'Customer Directory & RFM')}</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setCustomerViewMode('cohort_heatmap')}
@@ -3834,19 +4192,6 @@ export function CustomersTab({
 
             <button
               type="button"
-              onClick={() => setCustomerViewMode('rfm_table')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2.5 ${
-                customerViewMode === 'rfm_table'
-                  ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25 ring-1 ring-amber-300/50'
-                  : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
-              }`}
-            >
-              <CustomerRetentionRateIcon size={18} />
-              <span>{tx('ทะเบียนลูกค้า & วิเคราะห์ RFM (Customer Directory)', 'Customer Directory & RFM')}</span>
-            </button>
-
-            <button
-              type="button"
               onClick={() => setCustomerViewMode('all')}
               className={`px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-2.5 ${
                 customerViewMode === 'all'
@@ -3855,7 +4200,7 @@ export function CustomersTab({
               }`}
             >
               <MatrixTableIcon size={18} />
-              <span>{tx('แสดงทั้งหมด (Full View)', 'Show All Views')}</span>
+              <span>{tx('แสดงทั้งหมด (Full CRM Suite)', 'Show All Views')}</span>
             </button>
           </div>
         </div>
@@ -3927,7 +4272,633 @@ export function CustomersTab({
         )}
       </div>
 
-      {/* 2. COHORT RETENTION HEATMAP (SaaS / E-Commerce Customer Retention Rate) */}
+      {/* 2. EXECUTIVE CRM & SALES PIPELINE METRIC BAR */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className={`p-6 rounded-3xl border shadow-xl relative overflow-hidden ${theme === 'dark' ? 'bg-[#0b1020]/85 border-amber-500/30' : 'bg-white border-amber-200'}`}>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-amber-300">{tx('มูลค่าไปป์ไลน์รวม (Pipeline Value)', 'Total Pipeline Value')}</span>
+            <DealOpportunityIcon size={22} />
+          </div>
+          <h3 className="text-2xl lg:text-3xl font-black mt-2 font-mono text-amber-400">
+            ฿ {totalPipelineVal.toLocaleString()}
+          </h3>
+          <p className="text-xs text-slate-300 mt-1">
+            {tx(`รวม ${crmDeals.filter(d => d.stage !== 'closed_lost').length} ดีลที่ยังไม่ยกเลิก`, `Across ${crmDeals.filter(d => d.stage !== 'closed_lost').length} active/won deals`)}
+          </p>
+        </div>
+
+        <div className={`p-6 rounded-3xl border shadow-xl relative overflow-hidden ${theme === 'dark' ? 'bg-[#0b1020]/85 border-sky-500/30' : 'bg-white border-sky-200'}`}>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-sky-300">{tx('ยอดขายคาดการณ์ (Weighted Forecast)', 'Weighted Sales Forecast')}</span>
+            <SalesPipelineKanbanIcon size={22} />
+          </div>
+          <h3 className="text-2xl lg:text-3xl font-black mt-2 font-mono text-sky-400">
+            ฿ {weightedForecastVal.toLocaleString()}
+          </h3>
+          <p className="text-xs text-slate-300 mt-1">
+            {tx('คำนวณตาม % โอกาสปิดการขายจริง', 'Probability-weighted revenue calculation')}
+          </p>
+        </div>
+
+        <div className={`p-6 rounded-3xl border shadow-xl relative overflow-hidden ${theme === 'dark' ? 'bg-[#0b1020]/85 border-indigo-500/30' : 'bg-white border-indigo-200'}`}>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-indigo-300">{tx('ดีลที่กำลังเจรจา (Active Pipeline)', 'Active Deals in Pipeline')}</span>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold font-mono">
+              {activeDealsList.length} Deals
+            </span>
+          </div>
+          <h3 className="text-2xl lg:text-3xl font-black mt-2 text-indigo-400">
+            {activeDealsList.length} <span className="text-sm font-normal text-slate-400">{tx('โครงการ', 'deals')}</span>
+          </h3>
+          <p className="text-xs text-slate-300 mt-1">
+            {tx('กำลังอยู่ในขั้นตอน Lead ถึง Negotiation', 'Stages from Inbound to Negotiation')}
+          </p>
+        </div>
+
+        <div className={`p-6 rounded-3xl border shadow-xl relative overflow-hidden ${theme === 'dark' ? 'bg-[#0b1020]/85 border-emerald-500/30' : 'bg-white border-emerald-200'}`}>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-emerald-300">{tx('อัตราปิดการขาย (Win Rate)', 'Opportunity Win Rate')}</span>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold font-mono">
+              {winRatePct}%
+            </span>
+          </div>
+          <h3 className="text-2xl lg:text-3xl font-black mt-2 text-emerald-400">
+            {winRatePct}% <span className="text-sm font-normal text-slate-400">({wonDealsList.length} Won)</span>
+          </h3>
+          <p className="text-xs text-slate-300 mt-1">
+            {tx(`ปิดการขายสำเร็จแล้ว ${wonDealsList.length} ดีล`, `Successfully won ${wonDealsList.length} deals`)}
+          </p>
+        </div>
+      </div>
+
+      {/* 3. SALES PIPELINE KANBAN BOARD */}
+      {(customerViewMode === 'sales_pipeline' || customerViewMode === 'all') && (
+        <div className={`p-7 rounded-3xl border shadow-2xl ${theme === 'dark' ? 'bg-[#0b1020]/90 border-white/10' : 'bg-white border-slate-200'}`}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-3">
+                <SalesPipelineKanbanIcon size={26} />
+                <h3 className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                  {tx('กระดานไปป์ไลน์การขาย (Sales Pipeline Kanban)', 'Sales Pipeline Kanban Board')}
+                </h3>
+              </div>
+              <p className="text-xs text-slate-300 mt-1">
+                {tx('ลากหรือคลิกเปลี่ยนขั้นตอนของแต่ละดีล ติดตามมูลค่าเงิน และคำนวณยอดขายคาดการณ์แม่นยำ', 'Track opportunities through sales stages, probability forecasting, and one-click stage progression.')}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowAddDealModal(true)}
+              className="self-start md:self-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg cursor-pointer flex items-center gap-2"
+            >
+              <span>➕ {tx('สร้างดีลการขายใหม่', 'Create New Deal')}</span>
+            </button>
+          </div>
+
+          {/* KANBAN GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 overflow-x-auto pb-2">
+            {PIPELINE_STAGES.map(stage => {
+              const stageDeals = crmDeals.filter(d => d.stage === stage.id);
+              const stageTotal = stageDeals.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+              return (
+                <div
+                  key={stage.id}
+                  className={`flex flex-col rounded-2xl border p-3 min-w-[210px] ${
+                    theme === 'dark' ? 'bg-[#060b18]/80 border-white/10' : 'bg-slate-50 border-slate-200'
+                  }`}
+                >
+                  {/* Column Header */}
+                  <div className="flex items-center justify-between gap-1 pb-3 mb-3 border-b border-white/10">
+                    <div>
+                      <span className={`text-[11px] font-black px-2 py-0.5 rounded-md border ${stage.badgeBg}`}>
+                        {tx(stage.titleTh, stage.titleEn)}
+                      </span>
+                      <div className="text-[11px] font-bold text-amber-300 font-mono mt-1">
+                        ฿ {stageTotal.toLocaleString()}
+                      </div>
+                    </div>
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
+                      {stageDeals.length}
+                    </span>
+                  </div>
+
+                  {/* Column Deals List */}
+                  <div className="space-y-3 flex-1 min-h-[160px]">
+                    {stageDeals.length === 0 ? (
+                      <div className="h-full flex items-center justify-center p-4 border border-dashed border-white/10 rounded-xl text-center">
+                        <span className="text-[11px] text-slate-400">{tx('ไม่มีดีลในขั้นนี้', 'No deals in this stage')}</span>
+                      </div>
+                    ) : (
+                      stageDeals.map(deal => {
+                        const prev = getPrevStage(deal.stage);
+                        const next = getNextStage(deal.stage);
+                        return (
+                          <div
+                            key={deal.id}
+                            className={`p-3.5 rounded-xl border transition shadow-lg ${
+                              theme === 'dark'
+                                ? 'bg-[#0c1328] border-white/15 hover:border-amber-400/50'
+                                : 'bg-white border-slate-300 hover:border-amber-400'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-[10px] font-mono text-slate-400 font-bold">{deal.id}</span>
+                              <span className="text-[10px] font-bold text-emerald-400">
+                                {deal.probability}% win
+                              </span>
+                            </div>
+                            <h4 className="text-xs font-black text-white mt-1 line-clamp-2">
+                              {isEn ? (deal.titleEn || deal.title) : deal.title}
+                            </h4>
+                            <p className="text-[11px] text-slate-300 mt-1 flex items-center gap-1">
+                              🏢 {deal.accountName}
+                            </p>
+                            <p className="text-[10px] text-slate-400">
+                              👤 {deal.contactName}
+                            </p>
+
+                            <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between">
+                              <span className="text-xs font-black text-amber-400 font-mono">
+                                ฿ {Number(deal.amount || 0).toLocaleString()}
+                              </span>
+                              <span className="text-[10px] text-slate-400">
+                                📅 {deal.expectedCloseDate}
+                              </span>
+                            </div>
+
+                            {/* Probability Progress Bar */}
+                            <div className="w-full bg-black/40 h-1.5 rounded-full mt-2 overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                  deal.stage === 'closed_won' ? 'bg-emerald-400' :
+                                  deal.stage === 'closed_lost' ? 'bg-rose-500' :
+                                  deal.stage === 'negotiation' ? 'bg-purple-400' :
+                                  'bg-amber-400'
+                                }`}
+                                style={{ width: `${deal.probability}%` }}
+                              />
+                            </div>
+
+                            {/* Quick Stage Shift Actions */}
+                            <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between gap-1">
+                              {prev ? (
+                                <button
+                                  onClick={() => handleMoveDealStage(deal.id, prev)}
+                                  title={tx('ย้อนกลับขั้นก่อนหน้า', 'Previous stage')}
+                                  className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 text-[10px] font-bold cursor-pointer transition"
+                                >
+                                  ◀
+                                </button>
+                              ) : <div />}
+
+                              <div className="flex items-center gap-1">
+                                {deal.stage !== 'closed_won' && (
+                                  <button
+                                    onClick={() => handleMoveDealStage(deal.id, 'closed_won')}
+                                    title={tx('ปิดการขายสำเร็จ (Won)', 'Mark as Won')}
+                                    className="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-black border border-emerald-500/40 cursor-pointer transition"
+                                  >
+                                    🏆
+                                  </button>
+                                )}
+                                {deal.stage !== 'closed_lost' && (
+                                  <button
+                                    onClick={() => handleMoveDealStage(deal.id, 'closed_lost')}
+                                    title={tx('ยกเลิก/ชะลอดีล (Lost)', 'Mark as Lost')}
+                                    className="px-1.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[10px] font-bold border border-rose-500/40 cursor-pointer transition"
+                                  >
+                                    ✕
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDeleteDeal(deal.id)}
+                                  title={tx('ลบดีล', 'Delete deal')}
+                                  className="px-1.5 py-1 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 text-[10px] cursor-pointer transition"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+
+                              {next ? (
+                                <button
+                                  onClick={() => handleMoveDealStage(deal.id, next)}
+                                  title={tx('เลื่อนไปขั้นถัดไป', 'Next stage')}
+                                  className="px-2 py-1 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-[10px] font-bold border border-amber-400/40 cursor-pointer transition"
+                                >
+                                  ▶
+                                </button>
+                              ) : <div />}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 4. CRM ACTIVITIES & FOLLOW-UP TIMELINE */}
+      {(customerViewMode === 'activity_timeline' || customerViewMode === 'all') && (
+        <div className={`p-7 rounded-3xl border shadow-2xl ${theme === 'dark' ? 'bg-[#0b1020]/90 border-white/10' : 'bg-white border-slate-200'}`}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-3">
+                <CrmActivityTimelineIcon size={26} />
+                <h3 className={`text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                  {tx('ประวัติกิจกรรมและการติดตามลูกค้า (CRM Activities & Follow-ups)', 'CRM Activity History & Customer Follow-ups')}
+                </h3>
+              </div>
+              <p className="text-xs text-slate-300 mt-1">
+                {tx('บันทึกการโทร นัดประชุมทางธุรกิจ ส่งอีเมลเสนอราคา และติ๊กถูกเพื่ออัปเดตงานติดตามแบบเรียลไทม์', 'Log sales calls, executive meetings, quotation emails, and check off follow-up tasks.')}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowAddActivityModal(true)}
+              className="self-start md:self-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white font-black text-xs shadow-lg cursor-pointer flex items-center gap-2"
+            >
+              <span>➕ {tx('บันทึกกิจกรรมใหม่', 'Log New Activity')}</span>
+            </button>
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-white/10">
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { id: 'all', labelTh: 'ทั้งหมด', labelEn: 'All Types' },
+                { id: 'call', labelTh: '📞 โทรศัพท์', labelEn: '📞 Calls' },
+                { id: 'meeting', labelTh: '🤝 ประชุม', labelEn: '🤝 Meetings' },
+                { id: 'email', labelTh: '✉️ อีเมล', labelEn: '✉️ Emails' },
+                { id: 'task', labelTh: '✅ งานติดตาม', labelEn: '✅ Tasks' },
+                { id: 'note', labelTh: '📝 บันทึก', labelEn: '📝 Notes' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActivityFilterType(tab.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    activityFilterType === tab.id
+                      ? 'bg-pink-500 text-white shadow-md'
+                      : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {tx(tab.labelTh, tab.labelEn)}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {[
+                { id: 'all', labelTh: 'ทุกสถานะ', labelEn: 'All Status' },
+                { id: 'pending', labelTh: '⏳ รอดำเนินการ', labelEn: '⏳ Pending' },
+                { id: 'completed', labelTh: '✅ เสร็จสิ้นแล้ว', labelEn: '✅ Completed' }
+              ].map(st => (
+                <button
+                  key={st.id}
+                  onClick={() => setActivityFilterStatus(st.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    activityFilterStatus === st.id
+                      ? 'bg-amber-400 text-slate-950 font-black shadow-md'
+                      : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {tx(st.labelTh, st.labelEn)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Activities List */}
+          <div className="space-y-3">
+            {crmActivities
+              .filter(a => (activityFilterType === 'all' || a.type === activityFilterType) && (activityFilterStatus === 'all' || a.status === activityFilterStatus))
+              .map(act => (
+                <div
+                  key={act.id}
+                  className={`p-4 rounded-2xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                    act.status === 'completed'
+                      ? 'bg-black/25 border-emerald-500/20 opacity-80'
+                      : theme === 'dark'
+                      ? 'bg-[#080d1e] border-white/15 hover:border-pink-500/40'
+                      : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <button
+                      onClick={() => handleToggleActivity(act.id)}
+                      title={act.status === 'completed' ? tx('คลิกเพื่อเปลี่ยนเป็นรอดำเนินการ', 'Mark as Pending') : tx('คลิกเพื่อเสร็จสิ้น', 'Mark as Completed')}
+                      className={`w-7 h-7 rounded-lg border flex items-center justify-center flex-shrink-0 mt-0.5 cursor-pointer transition ${
+                        act.status === 'completed'
+                          ? 'bg-emerald-500 border-emerald-400 text-slate-950 font-black'
+                          : 'bg-white/5 border-white/30 text-transparent hover:border-pink-400'
+                      }`}
+                    >
+                      ✓
+                    </button>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${
+                          act.type === 'call' ? 'bg-sky-500/20 text-sky-300 border-sky-500/30' :
+                          act.type === 'meeting' ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' :
+                          act.type === 'email' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
+                          act.type === 'task' ? 'bg-pink-500/20 text-pink-300 border-pink-500/30' :
+                          'bg-slate-500/20 text-slate-300 border-slate-500/30'
+                        }`}>
+                          {act.type}
+                        </span>
+                        <span className="text-xs text-slate-400">📅 {act.scheduledAt}</span>
+                        {act.dealId && (
+                          <span className="text-[10px] font-mono text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                            {act.dealId}
+                          </span>
+                        )}
+                      </div>
+                      <h4 className={`text-sm font-black mt-1 ${act.status === 'completed' ? 'line-through text-slate-400' : 'text-white'}`}>
+                        {isEn ? (act.titleEn || act.title) : act.title}
+                      </h4>
+                      <p className="text-xs text-slate-300 mt-0.5">
+                        👤 <strong className="text-white">{act.contactName}</strong> {act.notes ? `• ${act.notes}` : ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-center">
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
+                      act.status === 'completed'
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                        : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                    }`}>
+                      {act.status === 'completed' ? tx('✅ เสร็จสิ้นแล้ว', 'Completed') : tx('⏳ รอดำเนินการ', 'Pending')}
+                    </span>
+                    <button
+                      onClick={() => handleDeleteActivity(act.id)}
+                      title={tx('ลบกิจกรรมนี้', 'Delete activity')}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 text-xs cursor-pointer transition"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: เพิ่มดีลใหม่ (Add Deal Modal) */}
+      {showAddDealModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-[#0b1226] border border-amber-400/40 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <DealOpportunityIcon size={22} />
+                <h3 className="text-lg font-black text-white">{tx('สร้างดีลการขายใหม่', 'Create New Sales Deal')}</h3>
+              </div>
+              <button
+                onClick={() => setShowAddDealModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateDeal} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-amber-300 mb-1">{tx('ชื่อดีล / โครงการ', 'Deal Title')} *</label>
+                <input
+                  type="text"
+                  value={newDealTitle}
+                  onChange={e => setNewDealTitle(e.target.value)}
+                  placeholder={tx('เช่น สัญญาบริการ AI รายปี, ระบบคลาวด์ POS', 'e.g. Annual AI Service Contract')}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-amber-400 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{tx('ชื่อบริษัท / องค์กร', 'Company / Account')}</label>
+                  <input
+                    type="text"
+                    value={newDealAccount}
+                    onChange={e => setNewDealAccount(e.target.value)}
+                    placeholder="บจก. สยามฟู้ดส์"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-amber-400 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{tx('ชื่อผู้ติดต่อหลัก', 'Contact Person')}</label>
+                  <input
+                    type="text"
+                    value={newDealContact}
+                    onChange={e => setNewDealContact(e.target.value)}
+                    placeholder="คุณสมชาย ใจดี"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-amber-400 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-amber-300 mb-1">{tx('มูลค่าดีล (บาท)', 'Deal Amount (THB)')} *</label>
+                  <input
+                    type="number"
+                    value={newDealAmount}
+                    onChange={e => setNewDealAmount(e.target.value)}
+                    placeholder="250000"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-amber-300 text-xs font-black font-mono focus:border-amber-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{tx('ขั้นตอนเริ่มต้น', 'Initial Stage')}</label>
+                  <select
+                    value={newDealStage}
+                    onChange={e => {
+                      setNewDealStage(e.target.value);
+                      const defProb = e.target.value === 'closed_won' ? 100 : e.target.value === 'closed_lost' ? 0 : e.target.value === 'negotiation' ? 80 : e.target.value === 'proposal' ? 60 : e.target.value === 'qualification' ? 40 : 25;
+                      setNewDealProb(defProb);
+                    }}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-amber-400 focus:outline-none"
+                  >
+                    {PIPELINE_STAGES.map(s => (
+                      <option key={s.id} value={s.id}>{tx(s.titleTh, s.titleEn)}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{tx('โอกาสปิดการขาย (%)', 'Probability (%)')}</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={newDealProb}
+                    onChange={e => setNewDealProb(Number(e.target.value))}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-emerald-400 text-xs font-bold focus:border-amber-400 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{tx('วันที่คาดว่าจะปิด', 'Expected Close Date')}</label>
+                  <input
+                    type="date"
+                    value={newDealDate}
+                    onChange={e => setNewDealDate(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-amber-400 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">{tx('บันทึกรายละเอียด / หมายเหตุ', 'Notes')}</label>
+                <textarea
+                  rows="2"
+                  value={newDealNotes}
+                  onChange={e => setNewDealNotes(e.target.value)}
+                  placeholder={tx('ระบุความต้องการหรือประเด็นที่ต้องเจรจา...', 'Add deal context or requirements...')}
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#050914] border border-white/20 text-white text-xs focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowAddDealModal(false)}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 text-xs font-bold cursor-pointer transition"
+                >
+                  {tx('ยกเลิก', 'Cancel')}
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg cursor-pointer transition"
+                >
+                  {tx('💾 บันทึกดีลการขาย', 'Save Deal')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: บันทึกกิจกรรมใหม่ (Add Activity Modal) */}
+      {showAddActivityModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-[#0b1226] border border-pink-500/40 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <CrmActivityTimelineIcon size={22} />
+                <h3 className="text-lg font-black text-white">{tx('บันทึกกิจกรรม & งานติดตามลูกค้า', 'Log CRM Activity & Task')}</h3>
+              </div>
+              <button
+                onClick={() => setShowAddActivityModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateActivity} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-pink-300 mb-1">{tx('ประเภทกิจกรรม', 'Activity Type')} *</label>
+                  <select
+                    value={newActType}
+                    onChange={e => setNewActType(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-pink-400 focus:outline-none"
+                  >
+                    <option value="call">📞 {tx('โทรศัพท์ติดตาม (Call)', 'Phone Call')}</option>
+                    <option value="meeting">🤝 {tx('ประชุมออนไลน์/หน้าร้าน (Meeting)', 'Meeting')}</option>
+                    <option value="email">✉️ {tx('ส่งอีเมล / ใบเสนอราคา (Email)', 'Email / Quote')}</option>
+                    <option value="task">✅ {tx('งานที่ต้องทำ (Follow-up Task)', 'Task')}</option>
+                    <option value="note">📝 {tx('บันทึกข้อความ (Internal Note)', 'Note')}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{tx('วัน-เวลานัดหมาย', 'Scheduled Time')}</label>
+                  <input
+                    type="text"
+                    value={newActDate}
+                    onChange={e => setNewActDate(e.target.value)}
+                    placeholder="พรุ่งนี้ 14:00 น."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-pink-400 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-pink-300 mb-1">{tx('หัวข้อกิจกรรม', 'Activity Subject')} *</label>
+                <input
+                  type="text"
+                  value={newActTitle}
+                  onChange={e => setNewActTitle(e.target.value)}
+                  placeholder={tx('เช่น โทรติดตามผลการทดสอบระบบ, ประชุมลงนามสัญญา', 'e.g. Follow-up demo call')}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-pink-400 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{tx('ชื่อลูกค้า / ผู้ติดต่อ', 'Contact Name')}</label>
+                  <input
+                    type="text"
+                    value={newActContact}
+                    onChange={e => setNewActContact(e.target.value)}
+                    placeholder="คุณธนินทร์ อัศวเมธี"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-pink-400 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{tx('เชื่อมกับดีลการขาย (ถ้ามี)', 'Related Deal')}</label>
+                  <select
+                    value={newActDealId}
+                    onChange={e => setNewActDealId(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#050914] border border-white/20 text-white text-xs font-bold focus:border-pink-400 focus:outline-none"
+                  >
+                    <option value="">-- {tx('ไม่ระบุดีล', 'None')} --</option>
+                    {crmDeals.map(d => (
+                      <option key={d.id} value={d.id}>{d.id} - {d.title}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">{tx('รายละเอียด / ข้อสรุปการสนทนา', 'Notes')}</label>
+                <textarea
+                  rows="2"
+                  value={newActNotes}
+                  onChange={e => setNewActNotes(e.target.value)}
+                  placeholder={tx('ระบุประเด็นสำคัญที่ลูกค้าถาม หรือสิ่งที่ต้องเตรียมเพิ่ม...', 'Add discussion points or deliverables...')}
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#050914] border border-white/20 text-white text-xs focus:border-pink-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowAddActivityModal(false)}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 text-xs font-bold cursor-pointer transition"
+                >
+                  {tx('ยกเลิก', 'Cancel')}
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white font-black text-xs shadow-lg cursor-pointer transition"
+                >
+                  {tx('💾 บันทึกกิจกรรม', 'Save Activity')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 5. COHORT RETENTION HEATMAP (SaaS / E-Commerce Customer Retention Rate) */}
       {(customerViewMode === 'cohort_heatmap' || customerViewMode === 'all') && (
         <CohortRetentionHeatmap
           lang={lang}
@@ -3937,7 +4908,7 @@ export function CustomersTab({
         />
       )}
 
-      {/* 3. RFM SEGMENTATION CARDS & CUSTOMER DIRECTORY */}
+      {/* 6. RFM SEGMENTATION CARDS & CUSTOMER DIRECTORY */}
       {(customerViewMode === 'rfm_table' || customerViewMode === 'all') && (
         <>
           {/* การ์ดสรุปมูลค่าลูกค้า 4 กล่อง */}

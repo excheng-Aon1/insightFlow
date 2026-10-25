@@ -276,11 +276,77 @@ class EtlJobLog(Base):
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
 
+# ------------------------------------------------------------------------------
+# CRM (CUSTOMER RELATIONSHIP MANAGEMENT & SALES PIPELINE) MODELS
+# ------------------------------------------------------------------------------
+class CrmAccount(Base):
+    __tablename__ = "crm_accounts"
+
+    id = Column(String(128), primary_key=True, index=True)
+    user_id = Column(String(128), index=True, default="GUEST-EXEC-001")
+    name = Column(String(255), nullable=False)
+    industry = Column(String(100), default="General")
+    tier = Column(String(50), default="standard")  # standard, vip, enterprise
+    website = Column(String(255), default="")
+    phone = Column(String(50), default="")
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class CrmContact(Base):
+    __tablename__ = "crm_contacts"
+
+    id = Column(String(128), primary_key=True, index=True)
+    user_id = Column(String(128), index=True, default="GUEST-EXEC-001")
+    account_id = Column(String(128), index=True, default="")
+    name = Column(String(255), nullable=False)
+    email = Column(String(255), index=True, default="")
+    phone = Column(String(50), default="")
+    company_name = Column(String(255), default="")
+    job_title = Column(String(100), default="")
+    segment = Column(String(50), default="lead", index=True)  # lead, prospect, customer, champion, loyal, at_risk
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class CrmDeal(Base):
+    __tablename__ = "crm_deals"
+
+    id = Column(String(128), primary_key=True, index=True)
+    user_id = Column(String(128), index=True, default="GUEST-EXEC-001")
+    title = Column(String(255), nullable=False)
+    account_name = Column(String(255), default="")
+    contact_id = Column(String(128), index=True, default="")
+    contact_name = Column(String(255), default="")
+    amount = Column(Float, default=0.0)
+    currency = Column(String(10), default="THB")
+    stage = Column(String(50), default="qualification", index=True)  # lead, qualification, proposal, negotiation, closed_won, closed_lost
+    probability = Column(Integer, default=50)  # 0 - 100%
+    expected_close_date = Column(String(32), default="")
+    notes = Column(Text, default="")
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class CrmActivity(Base):
+    __tablename__ = "crm_activities"
+
+    id = Column(String(128), primary_key=True, index=True)
+    user_id = Column(String(128), index=True, default="GUEST-EXEC-001")
+    type = Column(String(50), nullable=False)  # call, meeting, email, note, task
+    title = Column(String(255), nullable=False)
+    notes = Column(Text, default="")
+    status = Column(String(32), default="pending", index=True)  # pending, completed
+    contact_name = Column(String(255), default="")
+    deal_id = Column(String(128), index=True, default="")
+    scheduled_at = Column(String(64), default="")
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
 # Composite Indexes สำหรับเพิ่มความเร็วในการคิวรี่และเขียนพร้อมกันระดับพันคำขอ
 Index("ix_cashflow_user_type_date", CashFlowTransaction.user_id, CashFlowTransaction.type, CashFlowTransaction.date)
 Index("ix_products_user_stock", Product.user_id, Product.stock_qty)
 Index("ix_uploaded_files_user_created", UploadedFile.user_id, UploadedFile.created_at)
 Index("ix_etl_job_source_created", EtlJobLog.source, EtlJobLog.created_at)
+Index("ix_crm_deal_user_stage", CrmDeal.user_id, CrmDeal.stage)
+Index("ix_crm_activity_user_status", CrmActivity.user_id, CrmActivity.status)
 
 
 # ------------------------------------------------------------------------------
@@ -322,6 +388,8 @@ def get_pool_telemetry(db: Session) -> Dict[str, Any]:
         "transactions": db.query(AnalyticsTransaction).count(),
         "uploaded_files": db.query(UploadedFile).count(),
         "etl_job_logs": db.query(EtlJobLog).count(),
+        "crm_deals": db.query(CrmDeal).count(),
+        "crm_activities": db.query(CrmActivity).count(),
     }
     return {
         "engine": ACTIVE_DB_METADATA["configured_dialect"].upper(),

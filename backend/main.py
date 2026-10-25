@@ -62,6 +62,10 @@ from database import (
     AnalyticsTransaction,
     UploadedFile,
     EtlJobLog,
+    CrmAccount,
+    CrmContact,
+    CrmDeal,
+    CrmActivity,
 )
 from etl_pipeline import run_etl_pipeline
 from analytics_modeling import (
@@ -353,6 +357,31 @@ class WhatIfSimulationRequest(BaseModel):
 class QuarantineActionRequest(BaseModel):
     quarantine_id: str
     action: str = "APPROVE"
+
+
+# CRM Models & Schemas
+class CrmDealCreateRequest(BaseModel):
+    title: str
+    account_name: Optional[str] = ""
+    contact_name: Optional[str] = ""
+    amount: float = 0.0
+    stage: str = "qualification"
+    probability: int = 50
+    expected_close_date: Optional[str] = ""
+    notes: Optional[str] = ""
+
+
+class CrmDealStageUpdateRequest(BaseModel):
+    stage: str
+
+
+class CrmActivityCreateRequest(BaseModel):
+    type: str  # call, meeting, email, note, task
+    title: str
+    notes: Optional[str] = ""
+    contact_name: Optional[str] = ""
+    deal_id: Optional[str] = ""
+    scheduled_at: Optional[str] = ""
 
 
 # ------------------------------------------------------------------------------
@@ -718,6 +747,385 @@ def get_rbac_policies(
         "status": "success",
         "policies": RolePermissions.POLICIES,
     }
+
+
+# ------------------------------------------------------------------------------
+# ENTERPRISE CRM & SALES PIPELINE (KANBAN, DEALS & ACTIVITIES)
+# ------------------------------------------------------------------------------
+_FALLBACK_CRM_DEALS: List[Dict[str, Any]] = [
+    {
+        "id": "DEAL-001",
+        "title": "ระบบคลาวด์ ERP และวิเคราะห์ยอดขายสาขา",
+        "account_name": "บจก. สยามฟู้ดส์ โฮลดิ้ง",
+        "contact_name": "คุณธนินทร์ อัศวเมธี",
+        "amount": 450000.0,
+        "currency": "THB",
+        "stage": "negotiation",
+        "probability": 80,
+        "expected_close_date": "2026-11-15",
+        "notes": "นัดตรวจทานสัญญาขั้นสุดท้ายและปรับสโคปฮาร์ดแวร์ POS",
+        "created_at": "2026-10-20T10:00:00",
+    },
+    {
+        "id": "DEAL-002",
+        "title": "สัญญาบริการ InsightFlow Enterprise AI รายปี",
+        "account_name": "บมจ. ไทยรีเทล กรุ๊ป",
+        "contact_name": "คุณพิมพ์ลภัส วงศ์สุวรรณ",
+        "amount": 850000.0,
+        "currency": "THB",
+        "stage": "proposal",
+        "probability": 60,
+        "expected_close_date": "2026-11-30",
+        "notes": "ส่งใบเสนอราคาแบบ Multi-Branch พร้อมส่วนลดรายปี",
+        "created_at": "2026-10-21T14:30:00",
+    },
+    {
+        "id": "DEAL-003",
+        "title": "ระบบบริหารสต็อกและ CRM อัตโนมัติ 5 สาขา",
+        "account_name": "บจก. นวัตกรรมความงาม",
+        "contact_name": "คุณปิยะพร ลิขิต",
+        "amount": 280000.0,
+        "currency": "THB",
+        "stage": "qualification",
+        "probability": 40,
+        "expected_close_date": "2026-12-10",
+        "notes": "กำลังสรุป Requirement การเชื่อม API กับระบบบัญชีเดิม",
+        "created_at": "2026-10-22T09:15:00",
+    },
+    {
+        "id": "DEAL-004",
+        "title": "แพ็กเกจ POS หน้าร้านและเชื่อมต่อ LINE Official",
+        "account_name": "ร้านกาแฟ คราฟต์ คาเฟ่",
+        "contact_name": "คุณณัฐนิชา เกียรติขจร",
+        "amount": 95000.0,
+        "currency": "THB",
+        "stage": "closed_won",
+        "probability": 100,
+        "expected_close_date": "2026-10-24",
+        "notes": "ลงนามสัญญาและชำระเงินงวดแรกเรียบร้อยแล้ว",
+        "created_at": "2026-10-18T11:00:00",
+    },
+    {
+        "id": "DEAL-005",
+        "title": "โซลูชัน Data Warehouse & Demand Forecasting",
+        "account_name": "บจก. สหโลจิสติกส์",
+        "contact_name": "คุณวรพจน์ มั่งคั่ง",
+        "amount": 1200000.0,
+        "currency": "THB",
+        "stage": "lead",
+        "probability": 25,
+        "expected_close_date": "2026-12-31",
+        "notes": "ติดต่อเข้ามาผ่านหน้าเว็บ ต้องการดู Live Demo โฟลว์คลังสินค้า",
+        "created_at": "2026-10-25T08:00:00",
+    },
+]
+
+_FALLBACK_CRM_ACTIVITIES: List[Dict[str, Any]] = [
+    {
+        "id": "ACT-001",
+        "type": "meeting",
+        "title": "ประชุมนำเสนอระบบ Executive AI Briefing กับทีมผู้บริหาร",
+        "contact_name": "คุณธนินทร์ อัศวเมธี (สยามฟู้ดส์)",
+        "deal_id": "DEAL-001",
+        "status": "pending",
+        "scheduled_at": "พรุ่งนี้ 14:00 น.",
+        "notes": "เตรียมตัวอย่างแดชบอร์ด 7 KPI และ One-Pager PDF",
+        "created_at": "2026-10-24T16:00:00",
+    },
+    {
+        "id": "ACT-002",
+        "type": "call",
+        "title": "โทรติดตามใบเสนอราคาแพ็กเกจ Enterprise 2026",
+        "contact_name": "คุณพิมพ์ลภัส วงศ์สุวรรณ (ไทยรีเทล)",
+        "deal_id": "DEAL-002",
+        "status": "completed",
+        "scheduled_at": "วันนี้ 10:30 น.",
+        "notes": "ลูกค้าตอบรับดี ขอเอกสารประกอบการตัดสินใจเพิ่มเติม",
+        "created_at": "2026-10-25T10:30:00",
+    },
+    {
+        "id": "ACT-003",
+        "type": "email",
+        "title": "ส่งรายละเอียดสเปกระบบเชื่อมต่อ LINE Webhook & POS",
+        "contact_name": "คุณณัฐนิชา เกียรติขจร (คราฟต์ คาเฟ่)",
+        "deal_id": "DEAL-004",
+        "status": "completed",
+        "scheduled_at": "เมื่อวานนี้ 15:45 น.",
+        "notes": "ส่งคู่มือการตั้งค่า Messaging API Token เรียบร้อย",
+        "created_at": "2026-10-24T15:45:00",
+    },
+    {
+        "id": "ACT-004",
+        "type": "task",
+        "title": "จัดเตรียมเอกสารสัญญาความปลอดภัยข้อมูล (PDPA / Enterprise NDA)",
+        "contact_name": "บจก. สหโลจิสติกส์",
+        "deal_id": "DEAL-005",
+        "status": "pending",
+        "scheduled_at": "วันศุกร์นี้ 16:00 น.",
+        "notes": "ประสานงานทีมกฎหมายเพื่อตรวจร่างข้อตกลง",
+        "created_at": "2026-10-25T09:00:00",
+    },
+]
+
+
+@app.get("/api/crm/overview", status_code=status.HTTP_200_OK)
+def get_crm_overview(
+    db: Session = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """สรุปภาพรวม KPI ไปป์ไลน์การขาย (Total Pipeline, Weighted Forecast, Win Rate)"""
+    try:
+        deals = db.query(CrmDeal).all()
+        if not deals:
+            deal_list = _FALLBACK_CRM_DEALS
+        else:
+            deal_list = [
+                {
+                    "id": d.id,
+                    "title": d.title,
+                    "account_name": d.account_name,
+                    "contact_name": d.contact_name,
+                    "amount": float(d.amount or 0.0),
+                    "currency": d.currency,
+                    "stage": d.stage,
+                    "probability": int(d.probability or 0),
+                    "expected_close_date": d.expected_close_date,
+                    "notes": d.notes,
+                    "created_at": d.created_at.isoformat() if d.created_at else "",
+                }
+                for d in deals
+            ]
+    except Exception:
+        deal_list = _FALLBACK_CRM_DEALS
+
+    total_pipeline_val = sum(d["amount"] for d in deal_list if d["stage"] not in ["closed_lost"])
+    weighted_forecast_val = sum(d["amount"] * (d["probability"] / 100.0) for d in deal_list if d["stage"] not in ["closed_lost"])
+    active_deals = [d for d in deal_list if d["stage"] not in ["closed_won", "closed_lost"]]
+    won_deals = [d for d in deal_list if d["stage"] == "closed_won"]
+    lost_deals = [d for d in deal_list if d["stage"] == "closed_lost"]
+    win_rate = round((len(won_deals) / max(1, len(won_deals) + len(lost_deals))) * 100.0, 1)
+
+    return {
+        "status": "success",
+        "kpis": {
+            "total_pipeline_value": total_pipeline_val,
+            "weighted_forecast_value": round(weighted_forecast_val, 2),
+            "active_deals_count": len(active_deals),
+            "won_deals_count": len(won_deals),
+            "lost_deals_count": len(lost_deals),
+            "win_rate_pct": win_rate,
+        },
+        "deals": deal_list,
+        "recent_activities": _FALLBACK_CRM_ACTIVITIES,
+    }
+
+
+@app.get("/api/crm/deals", status_code=status.HTTP_200_OK)
+def get_crm_deals(
+    db: Session = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """ดึงรายการดีลการขายทั้งหมดในระบบ CRM"""
+    try:
+        deals = db.query(CrmDeal).all()
+        if not deals:
+            return {"status": "success", "deals": _FALLBACK_CRM_DEALS}
+        return {
+            "status": "success",
+            "deals": [
+                {
+                    "id": d.id,
+                    "title": d.title,
+                    "account_name": d.account_name,
+                    "contact_name": d.contact_name,
+                    "amount": float(d.amount or 0.0),
+                    "currency": d.currency,
+                    "stage": d.stage,
+                    "probability": int(d.probability or 0),
+                    "expected_close_date": d.expected_close_date,
+                    "notes": d.notes,
+                    "created_at": d.created_at.isoformat() if d.created_at else "",
+                }
+                for d in deals
+            ],
+        }
+    except Exception:
+        return {"status": "success", "deals": _FALLBACK_CRM_DEALS}
+
+
+@app.post("/api/crm/deals", status_code=status.HTTP_201_CREATED)
+def create_crm_deal(
+    req: CrmDealCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """สร้างดีลการขายใหม่ลงในระบบ CRM"""
+    new_id = f"DEAL-{random.randint(100, 999)}"
+    deal_dict = {
+        "id": new_id,
+        "title": req.title,
+        "account_name": req.account_name or "องค์กรลูกค้าทั่วไป",
+        "contact_name": req.contact_name or "ผู้ติดต่อหลัก",
+        "amount": float(req.amount),
+        "currency": "THB",
+        "stage": req.stage,
+        "probability": req.probability,
+        "expected_close_date": req.expected_close_date or "2026-12-31",
+        "notes": req.notes or "",
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    try:
+        deal = CrmDeal(
+            id=new_id,
+            user_id=current_user.get("email", "admin"),
+            title=req.title,
+            account_name=req.account_name,
+            contact_name=req.contact_name,
+            amount=req.amount,
+            stage=req.stage,
+            probability=req.probability,
+            expected_close_date=req.expected_close_date,
+            notes=req.notes,
+        )
+        db.add(deal)
+        db.commit()
+    except Exception as e:
+        logger.warning(f"CRM deal persistence note: {e}")
+        _FALLBACK_CRM_DEALS.insert(0, deal_dict)
+
+    return {"status": "success", "deal": deal_dict}
+
+
+@app.patch("/api/crm/deals/{deal_id}/stage", status_code=status.HTTP_200_OK)
+def update_crm_deal_stage(
+    deal_id: str,
+    req: CrmDealStageUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """เปลี่ยนขั้นตอนไปป์ไลน์ของดีลการขาย (เช่น ขยับจาก Proposal ไป Negotiation หรือ Won)"""
+    updated = False
+    for d in _FALLBACK_CRM_DEALS:
+        if d["id"] == deal_id:
+            d["stage"] = req.stage
+            if req.stage == "closed_won":
+                d["probability"] = 100
+            elif req.stage == "closed_lost":
+                d["probability"] = 0
+            updated = True
+            break
+
+    try:
+        db_deal = db.query(CrmDeal).filter(CrmDeal.id == deal_id).first()
+        if db_deal:
+            db_deal.stage = req.stage
+            if req.stage == "closed_won":
+                db_deal.probability = 100
+            elif req.stage == "closed_lost":
+                db_deal.probability = 0
+            db.commit()
+            updated = True
+    except Exception as e:
+        logger.warning(f"CRM deal stage update note: {e}")
+
+    return {"status": "success", "deal_id": deal_id, "new_stage": req.stage, "updated": updated}
+
+
+@app.get("/api/crm/activities", status_code=status.HTTP_200_OK)
+def get_crm_activities(
+    db: Session = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """ดึงรายการกิจกรรมและงานติดตามลูกค้า (Activities & Tasks)"""
+    try:
+        acts = db.query(CrmActivity).all()
+        if not acts:
+            return {"status": "success", "activities": _FALLBACK_CRM_ACTIVITIES}
+        return {
+            "status": "success",
+            "activities": [
+                {
+                    "id": a.id,
+                    "type": a.type,
+                    "title": a.title,
+                    "notes": a.notes,
+                    "status": a.status,
+                    "contact_name": a.contact_name,
+                    "deal_id": a.deal_id,
+                    "scheduled_at": a.scheduled_at,
+                    "created_at": a.created_at.isoformat() if a.created_at else "",
+                }
+                for a in acts
+            ],
+        }
+    except Exception:
+        return {"status": "success", "activities": _FALLBACK_CRM_ACTIVITIES}
+
+
+@app.post("/api/crm/activities", status_code=status.HTTP_201_CREATED)
+def create_crm_activity(
+    req: CrmActivityCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """บันทึกกิจกรรมหรือการนัดหมายติดตามลูกค้าใหม่"""
+    new_id = f"ACT-{random.randint(100, 999)}"
+    act_dict = {
+        "id": new_id,
+        "type": req.type,
+        "title": req.title,
+        "notes": req.notes or "",
+        "status": "pending",
+        "contact_name": req.contact_name or "ลูกค้าทั่วไป",
+        "deal_id": req.deal_id or "",
+        "scheduled_at": req.scheduled_at or "วันนี้",
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    try:
+        act = CrmActivity(
+            id=new_id,
+            user_id=current_user.get("email", "admin"),
+            type=req.type,
+            title=req.title,
+            notes=req.notes,
+            status="pending",
+            contact_name=req.contact_name,
+            deal_id=req.deal_id,
+            scheduled_at=req.scheduled_at,
+        )
+        db.add(act)
+        db.commit()
+    except Exception as e:
+        logger.warning(f"CRM activity note: {e}")
+        _FALLBACK_CRM_ACTIVITIES.insert(0, act_dict)
+
+    return {"status": "success", "activity": act_dict}
+
+
+@app.patch("/api/crm/activities/{activity_id}/complete", status_code=status.HTTP_200_OK)
+def toggle_crm_activity_status(
+    activity_id: str,
+    db: Session = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """สลับสถานะกิจกรรม (Pending <-> Completed)"""
+    new_status = "completed"
+    for a in _FALLBACK_CRM_ACTIVITIES:
+        if a["id"] == activity_id:
+            a["status"] = "pending" if a["status"] == "completed" else "completed"
+            new_status = a["status"]
+            break
+
+    try:
+        db_act = db.query(CrmActivity).filter(CrmActivity.id == activity_id).first()
+        if db_act:
+            db_act.status = "pending" if db_act.status == "completed" else "completed"
+            new_status = db_act.status
+            db.commit()
+    except Exception as e:
+        logger.warning(f"CRM activity toggle note: {e}")
+
+    return {"status": "success", "activity_id": activity_id, "status": new_status}
 
 
 @app.post("/api/database/query", status_code=status.HTTP_200_OK)

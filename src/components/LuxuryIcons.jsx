@@ -2839,6 +2839,96 @@ export function ExportCsvLuxuryIcon({ size = 20, className = '' }) {
   );
 }
 
+/**
+ * 21. SalesPipelineKanbanIcon: ไอคอน 3 มิติ "กระดานคัมบังไปป์ไลน์การขาย & ดีล"
+ * ดีไซน์: 3 คอลัมน์ Kanban Stage พร้อมการ์ดดีลเรืองแสงสีทองและแซฟไฟร์
+ */
+export function SalesPipelineKanbanIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`spkGold_${id}`} x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FDE68A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+        <linearGradient id={`spkCyan_${id}`} x1="0" y1="0" x2="0" y2="32" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+      </defs>
+      {/* 3 คอลัมน์ Kanban */}
+      <rect x="3" y="4" width="7.5" height="24" rx="2" fill="#0B132B" stroke="#38BDF8" strokeWidth="1.2" opacity="0.8" />
+      <rect x="12.2" y="4" width="7.5" height="24" rx="2" fill="#0B132B" stroke={`url(#spkGold_${id})`} strokeWidth="1.4" />
+      <rect x="21.5" y="4" width="7.5" height="24" rx="2" fill="#0B132B" stroke="#10B981" strokeWidth="1.2" opacity="0.8" />
+      {/* การ์ดในคอลัมน์ 1 */}
+      <rect x="4.5" y="7" width="4.5" height="5" rx="1" fill="#38BDF8" opacity="0.6" />
+      <rect x="4.5" y="14" width="4.5" height="7" rx="1" fill="#38BDF8" opacity="0.4" />
+      {/* การ์ดในคอลัมน์ 2 (Active Deal Focus) */}
+      <rect x="13.7" y="7" width="4.5" height="8" rx="1" fill="#F59E0B" />
+      <circle cx="16" cy="11" r="1.2" fill="#FFF" />
+      <rect x="13.7" y="17" width="4.5" height="5" rx="1" fill="#FEF08A" opacity="0.7" />
+      {/* การ์ดในคอลัมน์ 3 (Won) */}
+      <rect x="23" y="7" width="4.5" height="6" rx="1" fill="#10B981" opacity="0.7" />
+      <path d="M24 10L25 11L26.5 9" stroke="#FFF" strokeWidth="0.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 22. CrmActivityTimelineIcon: ไอคอน 3 มิติ "บันทึกกิจกรรมและการติดตามงาน CRM"
+ * ดีไซน์: ปฏิทินงานสีทองคำขาวพร้อมเข็มนาฬิกาและเครื่องหมายเช็กถูก
+ */
+export function CrmActivityTimelineIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`catGrad_${id}`} x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#F472B6" />
+          <stop offset="50%" stopColor="#EC4899" />
+          <stop offset="100%" stopColor="#BE185D" />
+        </linearGradient>
+      </defs>
+      {/* แผ่นปฏิทิน */}
+      <rect x="4" y="6" width="24" height="22" rx="4" fill="#0B132B" stroke="#EC4899" strokeWidth="1.5" />
+      <path d="M4 12H28" stroke="#EC4899" strokeWidth="1.2" opacity="0.7" />
+      {/* ห่วงแขวนปฏิทิน */}
+      <rect x="9" y="3" width="2.5" height="5" rx="1" fill="#FEF08A" />
+      <rect x="20.5" y="3" width="2.5" height="5" rx="1" fill="#FEF08A" />
+      {/* วงกลมกิจกรรมเรืองแสง */}
+      <circle cx="16" cy="20" r="5" fill="#BE185D" stroke="#FEF08A" strokeWidth="1" />
+      {/* เครื่องหมายเช็กถูกงานสำเร็จ */}
+      <path d="M13.5 20L15.2 21.8L18.5 18.5" stroke="#FFF" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * 23. DealOpportunityIcon: ไอคอน 3 มิติ "มูลค่าดีลและโอกาสการขาย"
+ * ดีไซน์: โทเค็นทองคำ 24K พร้อมประกายเพชรและถ้วยรางวัลความสำเร็จ
+ */
+export function DealOpportunityIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`doiGold_${id}`} x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#F59E0B" />
+          <stop offset="100%" stopColor="#B45309" />
+        </linearGradient>
+      </defs>
+      <circle cx="16" cy="16" r="12" fill="#0B132B" stroke={`url(#doiGold_${id})`} strokeWidth="1.8" />
+      <circle cx="16" cy="16" r="9" stroke="#FEF08A" strokeWidth="1" strokeDasharray="2 2" opacity="0.8" />
+      {/* สัญลักษณ์สกุลเงินและประกายเพชร */}
+      <path d="M16 10V22M12.5 13.5C12.5 12 14 11.5 16 11.5C18.2 11.5 19.5 12.3 19.5 13.8C19.5 15.5 18 16 16 16C13.8 16 12.5 16.6 12.5 18.2C12.5 19.8 14 20.5 16 20.5C18.5 20.5 19.5 19.5 19.5 18.5" stroke="#FEF08A" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="23" cy="8" r="1.5" fill="#FFF" />
+    </svg>
+  );
+}
+
 
 
 
