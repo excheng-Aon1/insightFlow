@@ -14283,7 +14283,10 @@ function App() {
 
         const res = await fetch('/api/chat', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(localStorage.getItem('insightflow_jwt_token') ? { 'Authorization': `Bearer ${localStorage.getItem('insightflow_jwt_token')}` } : {})
+          },
           body: JSON.stringify({
             question: q,
             business_profile: {

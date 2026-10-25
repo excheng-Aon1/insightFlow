@@ -142,7 +142,12 @@ _RAW_ALLOWED_ORIGINS = os.getenv(
     "ALLOWED_ORIGINS",
     "https://insightflow-webapp.vercel.app,https://insightflow-2026.vercel.app,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000",
 )
-ALLOWED_ORIGINS = [origin.strip() for origin in _RAW_ALLOWED_ORIGINS.split(",") if origin.strip()]
+_parsed_origins = [origin.strip() for origin in _RAW_ALLOWED_ORIGINS.split(",") if origin.strip()]
+if os.getenv("ENVIRONMENT", "").lower() == "production" and not os.getenv("ALLOWED_ORIGINS"):
+    # ในโหมด Production ตัด Localhost ออกเพื่อป้องกัน Cross-Site Scripting จาก Local Network
+    ALLOWED_ORIGINS = [orig for orig in _parsed_origins if not orig.startswith("http://localhost") and not orig.startswith("http://127.0.0.1")]
+else:
+    ALLOWED_ORIGINS = _parsed_origins
 
 app.add_middleware(
     CORSMiddleware,
@@ -618,13 +623,19 @@ def get_executive_summary():
 
 
 @app.post("/api/actionable/ask-copilot", status_code=status.HTTP_200_OK)
-def ask_business_copilot(req: CopilotQueryRequest):
+def ask_business_copilot(
+    req: CopilotQueryRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """ผู้ช่วย AI อัจฉริยะตอบคำถามธุรกิจตรงๆ จากฐานข้อมูล (Text-to-Insights Copilot)"""
     return query_ai_business_copilot(question=req.question)
 
 
 @app.post("/api/actionable/what-if-simulate", status_code=status.HTTP_200_OK)
-def simulate_what_if_scenario(req: WhatIfSimulationRequest):
+def simulate_what_if_scenario(
+    req: WhatIfSimulationRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """จำลองสถานการณ์ธุรกิจ (What-If Simulation): คำนวณจุดคุ้มทุนและผลกระทบของส่วนลดกับต้นทุน"""
     return calculate_what_if_simulation(
         base_price=req.base_price,
@@ -640,19 +651,26 @@ def simulate_what_if_scenario(req: WhatIfSimulationRequest):
 # AUTONOMOUS AI EXECUTIVE SECRETARY AGENT ENDPOINTS
 # ------------------------------------------------------------------------------
 @app.get("/api/secretary/daily-briefing", status_code=status.HTTP_200_OK)
-def get_secretary_daily_briefing():
+def get_secretary_daily_briefing(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """รายงานสรุปสถานการณ์และสุขภาพธุรกิจรอบวันสำหรับผู้บริหาร (AI Secretary Daily Briefing)"""
     return generate_executive_secretary_briefing()
 
 
 @app.post("/api/secretary/agent-chat", status_code=status.HTTP_200_OK)
-def chat_with_secretary_agent(req: SecretaryChatQueryRequest):
-    """แชทสั่งการเลขา AI และเรียกใช้เครื่องมือ Multi-Tool Agent อัตโนมัติ"""
+def chat_with_secretary_agent(
+    req: SecretaryChatQueryRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """แชทสั่งการเลขา AI และเรียกใช้เครื่องมือ Multi-Tool Agent อัตโนมัติ (จำกัดสิทธิ์เฉพาะผู้ใช้ที่ยืนยันตัวตน)"""
     return process_executive_secretary_chat(query=req.query, context=req.context)
 
 
 @app.get("/api/secretary/tasks", status_code=status.HTTP_200_OK)
-def get_secretary_action_tasks():
+def get_secretary_action_tasks(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """ดึงรายการแผนงานที่เลขา AI ช่วยติดตามและมอบหมาย (Executive Action Board)"""
     return {
         "status": "success",
@@ -664,13 +682,17 @@ def get_secretary_action_tasks():
 # ENTERPRISE DATA GOVERNANCE, RBAC & DATA QUALITY FIREWALL
 # ------------------------------------------------------------------------------
 @app.get("/api/governance/quality-score", status_code=status.HTTP_200_OK)
-def get_governance_quality_score():
+def get_governance_quality_score(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """ดึงคะแนนสุขภาพความสะอาดของข้อมูล (Data Quality Health Score)"""
     return get_data_quality_metrics()
 
 
 @app.get("/api/governance/quarantine-logs", status_code=status.HTTP_200_OK)
-def get_governance_quarantine_logs():
+def get_governance_quarantine_logs(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """ดึงรายการข้อมูลขยะที่ถูกดักจับและกักกันไว้ในห้อง Quarantine"""
     return {
         "status": "success",
@@ -679,13 +701,18 @@ def get_governance_quarantine_logs():
 
 
 @app.post("/api/governance/quarantine/resolve", status_code=status.HTTP_200_OK)
-def resolve_governance_quarantine_record(req: QuarantineActionRequest):
+def resolve_governance_quarantine_record(
+    req: QuarantineActionRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """จัดการข้อมูลที่ถูกกักกัน (อนุมัติ APPROVE หรือกำจัดทิ้ง DISCARD)"""
     return resolve_quarantine_record(quarantine_id=req.quarantine_id, action=req.action)
 
 
 @app.get("/api/governance/rbac-policies", status_code=status.HTTP_200_OK)
-def get_rbac_policies():
+def get_rbac_policies(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
     """ดึงตารางสิทธิ์การเข้าถึงข้อมูลตามบทบาท (RBAC Matrix Policy)"""
     return {
         "status": "success",
@@ -718,7 +745,8 @@ def execute_sandbox_query(
 
     forbidden_pattern = re.compile(
         r"\b(drop|delete|update|insert|alter|truncate|pragma|attach|detach|replace|create|grant|revoke|"
-        r"sqlite_master|information_schema|pg_catalog|users|uploaded_files|user_quotas|subscriptions)\b",
+        r"sqlite_master|information_schema|pg_catalog|users|uploaded_files|user_quotas|subscriptions|"
+        r"pg_read_file|pg_write_file|pg_ls_dir|lo_export|lo_import|dblink|copy|exec|sleep|benchmark|load_file|into_outfile)\b",
         re.IGNORECASE,
     )
     if forbidden_pattern.search(clean_sql):
@@ -1964,6 +1992,7 @@ async def train_business_ai_profile(
 async def chat_with_business_ai(
     req: AIChatRequest,
     db: Session = Depends(get_db),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
     """
     ระบบถาม-ตอบ AI ที่ถูกเทรนเพื่อธุรกิจจริงของลูกค้า (Domain-Specific Business AI Copilot)

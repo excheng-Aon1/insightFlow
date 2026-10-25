@@ -26,11 +26,22 @@ import secrets
 # ------------------------------------------------------------------------------
 # 1. JWT CONFIGURATION FROM .ENV
 # ------------------------------------------------------------------------------
-SECRET_KEY = (
-    os.getenv("SECRET_KEY", "").strip()
-    or os.getenv("JWT_SECRET_KEY", "").strip()
-    or secrets.token_urlsafe(48)
-)
+_raw_secret = os.getenv("SECRET_KEY", "").strip() or os.getenv("JWT_SECRET_KEY", "").strip()
+DEFAULT_INSECURE_KEYS = {
+    "super-secret-enterprise-key-change-this-in-production-2026",
+    "secret",
+    "changeme",
+    "123456",
+}
+if os.getenv("ENVIRONMENT", "").lower() == "production" and _raw_secret in DEFAULT_INSECURE_KEYS:
+    import logging
+    logging.getLogger("insightflow.security").warning(
+        "🛡️ [Security Guard] Default insecure SECRET_KEY detected in production! "
+        "Elevating to cryptographically secure runtime ephemeral secret key to prevent token forgery."
+    )
+    SECRET_KEY = secrets.token_urlsafe(64)
+else:
+    SECRET_KEY = _raw_secret or secrets.token_urlsafe(48)
 ALGORITHM = os.getenv("ALGORITHM", "HS256").strip()
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 SUPER_ADMIN_EMAIL = os.getenv("SUPER_ADMIN_EMAIL", "pongsatornnantakong88@gmail.com").strip().lower()
