@@ -965,6 +965,32 @@ describe('InsightFlow Frontend Unit Test Suite', () => {
     assert.ok(mainContent.includes('/api/crm/activities'), 'main.py must provide /api/crm/activities endpoint');
   });
 
+  test('UNIT-FE-31: Cashier Financial Anti-Fraud & Blind Shift Drop Control Suite', () => {
+    const appPath = path.join(projectRoot, 'src', 'App.jsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+
+    // 1. Check Anti-Fraud Daily Checklist integration in StaffPosTab
+    assert.ok(appContent.includes('fraudChecklist'), 'StaffPosTab must maintain fraudChecklist state');
+    assert.ok(appContent.includes('handleToggleChecklist'), 'StaffPosTab must allow toggling checklist items');
+    assert.ok(appContent.includes('checklistScore'), 'StaffPosTab must compute checklistScore in real-time');
+
+    // 2. Check Blind Close Shift Drop Calculator
+    assert.ok(appContent.includes('showBlindShiftModal'), 'StaffPosTab must support Blind Shift Drop modal');
+    assert.ok(appContent.includes('handleSubmitBlindDrop'), 'StaffPosTab must support submitting blind shift drop');
+    assert.ok(appContent.includes('shiftAuditHistory'), 'StaffPosTab must maintain historical shift audit records');
+    assert.ok(appContent.includes('totalCountedCash'), 'StaffPosTab must calculate counted cash live');
+
+    // 3. Check CCTV Security Camera Inspector Modal
+    assert.ok(appContent.includes('selectedCctvLog'), 'StaffPosTab must maintain selectedCctvLog state');
+    assert.ok(appContent.includes('AI TRACKER: CASH DRAWER'), 'StaffPosTab must simulate CAM-01 drawer tracker overlay');
+    assert.ok(appContent.includes('AI DETECT: NO CUSTOMER AT COUNTER'), 'StaffPosTab must simulate CAM-04 counter front overlay');
+
+    // 4. Check Backend Shift Blind Drop API Endpoints
+    const mainPath = path.join(projectRoot, 'backend', 'main.py');
+    const mainContent = fs.readFileSync(mainPath, 'utf8');
+    assert.ok(mainContent.includes('/api/pos/shifts/blind-drop'), 'main.py must provide /api/pos/shifts/blind-drop endpoints');
+  });
+
 });
 
 

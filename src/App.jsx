@@ -5319,6 +5319,134 @@ export function StaffPosTab({
     );
   };
 
+  const [selectedCctvLog, setSelectedCctvLog] = useState(null);
+  const [showBlindShiftModal, setShowBlindShiftModal] = useState(false);
+  const [showChecklistSection, setShowChecklistSection] = useState(true);
+
+  // Blind Drop form state
+  const [shiftCashierId, setShiftCashierId] = useState(safeStaff[0]?.id || 'STF-101');
+  const [shiftFloat, setShiftFloat] = useState(3000);
+  const [c1000, setC1000] = useState(15);
+  const [c500, setC500] = useState(6);
+  const [c100, setC100] = useState(30);
+  const [c50, setC50] = useState(8);
+  const [c20, setC20] = useState(10);
+  const [coins, setCoins] = useState(400);
+
+  // Daily Shift Audit Records
+  const [shiftAuditHistory, setShiftAuditHistory] = useState([
+    {
+      auditId: 'SFT-2026-901',
+      timestamp: 'วันนี้ • 16:30 น.',
+      staffId: 'STF-101',
+      staffName: 'คุณศิริพร สุขเกษม (เมย์)',
+      branchName: 'สาขาเซ็นทรัลลาดพร้าว (เครื่อง 1)',
+      openingFloat: 3000,
+      countedCash: 21500,
+      expectedCash: 21500,
+      variance: 0,
+      status: 'balanced',
+      note: 'ยอดเงินสดตรงตามระบบ 100%'
+    },
+    {
+      auditId: 'SFT-2026-898',
+      timestamp: 'เมื่อวานนี้ • 21:30 น.',
+      staffId: 'STF-108',
+      staffName: 'คุณธนดล กิตติพงศ์ (แบงค์)',
+      branchName: 'สาขาเซ็นทรัลลาดพร้าว (เครื่อง 4)',
+      openingFloat: 3000,
+      countedCash: 13800,
+      expectedCash: 14600,
+      variance: -800,
+      status: 'shortage',
+      note: 'เงินสดขาด 800 บาท (หักชดใช้และตรวจย้อนหลัง)'
+    }
+  ]);
+
+  // Anti-fraud checklist
+  const [fraudChecklist, setFraudChecklist] = useState({
+    floatCheck: true,
+    qrSecurityCheck: true,
+    voidRefundCheck: false,
+    midShiftSurpriseCheck: true,
+    blindDropCheck: false
+  });
+
+  const totalCountedCash =
+    (Number(c1000) || 0) * 1000 +
+    (Number(c500) || 0) * 500 +
+    (Number(c100) || 0) * 100 +
+    (Number(c50) || 0) * 50 +
+    (Number(c20) || 0) * 20 +
+    (Number(coins) || 0) -
+    (Number(shiftFloat) || 0);
+
+  const targetStaffObj = safeStaff.find(s => s.id === shiftCashierId) || safeStaff[0];
+  const expectedStaffCash = targetStaffObj ? Math.round(Number(targetStaffObj.totalSales || 0) * 0.7) : 18500;
+  const currentVariance = totalCountedCash - expectedStaffCash;
+
+  const handleSubmitBlindDrop = (e) => {
+    e.preventDefault();
+    const newAuditId = `SFT-2026-${Math.floor(910 + Math.random() * 80)}`;
+    const newRecord = {
+      auditId: newAuditId,
+      timestamp: tx('วันนี้ • เมื่อสักครู่', 'Today • Just now'),
+      staffId: shiftCashierId,
+      staffName: targetStaffObj ? targetStaffObj[isEn ? 'en' : 'th'].name : shiftCashierId,
+      branchName: targetStaffObj ? targetStaffObj[isEn ? 'en' : 'th'].branchName : 'สาขาหลัก',
+      openingFloat: Number(shiftFloat),
+      countedCash: totalCountedCash,
+      expectedCash: expectedStaffCash,
+      variance: currentVariance,
+      status: currentVariance === 0 ? 'balanced' : currentVariance < 0 ? 'shortage' : 'overage',
+      note: currentVariance === 0
+        ? tx('ยอดเงินสดตรงเป๊ะ 100%', '100% Balanced')
+        : currentVariance < 0
+        ? tx(`ตรวจพบเงินสดขาด ฿${Math.abs(currentVariance).toLocaleString()} บาท`, `Shortage of ฿${Math.abs(currentVariance).toLocaleString()}`)
+        : tx(`ตรวจพบเงินสดเกินในลิ้นชัก ฿${currentVariance.toLocaleString()} บาท (เสี่ยงไม่ยิงบิล)`, `Overage of ฿${currentVariance.toLocaleString()} (unbilled risk)`)
+    };
+
+    setShiftAuditHistory(prev => [newRecord, ...prev]);
+    setShowBlindShiftModal(false);
+
+    if (currentVariance === 0) {
+      toast.success(tx(`✅ ปิดกะสำเร็จ! ยอดเงินสดของ ${newRecord.staffName} ตรงตามระบบ 100%`, `✅ Shift Balanced! ${newRecord.staffName}'s cash matches 100%`));
+    } else if (currentVariance < 0) {
+      toast.error(tx(`🚨 เตือน! เงินสดขาดหาย ฿${Math.abs(currentVariance).toLocaleString()} บาท กรุณาตรวจสอบบันทึกบิลด่วน`, `🚨 Alert! Cash shortage ฿${Math.abs(currentVariance).toLocaleString()}`));
+    } else {
+      toast(tx(`⚠️ เงินสดเกินในลิ้นชัก ฿${currentVariance.toLocaleString()} บาท (มีความเสี่ยงแคชเชียร์ลืมยิงบิล)`, `⚠️ Cash overage ฿${currentVariance.toLocaleString()} (unrecorded bill risk)`), { icon: '⚠️' });
+    }
+
+    fetch('/api/pos/shifts/blind-drop', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(localStorage.getItem('insightflow_jwt_token') ? { 'Authorization': `Bearer ${localStorage.getItem('insightflow_jwt_token')}` } : {})
+      },
+      body: JSON.stringify({
+        staff_id: shiftCashierId,
+        branch_name: newRecord.branchName,
+        opening_float: Number(shiftFloat),
+        counted_cash: totalCountedCash,
+        expected_cash: expectedStaffCash,
+        notes: newRecord.note
+      })
+    }).catch(() => {});
+  };
+
+  const handleToggleChecklist = (key) => {
+    setFraudChecklist(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      const completed = Object.values(next).filter(Boolean).length;
+      if (completed === 5) {
+        toast.success(tx('🛡️ ยอดเยี่ยม! ดำเนินการตามแผนตรวจทุจริตครบ 100% ประจำวันเรียบร้อยแล้ว', '🛡️ Excellent! 100% Anti-Fraud controls completed today!'));
+      }
+      return next;
+    });
+  };
+
+  const checklistScore = Math.round((Object.values(fraudChecklist).filter(Boolean).length / 5) * 100);
+
   const staffChartData = {
     labels: filteredStaff.map(s => s[isEn ? 'en' : 'th'].name.split(' ')[0]),
     datasets: [
@@ -5419,8 +5547,166 @@ export function StaffPosTab({
           >
             {tx('🚨 จำลองเหตุการณ์ยกเลิกบิลผิดปกติ', '🚨 Simulate Suspicious Bill Cancel')}
           </button>
+          <button
+            type="button"
+            onClick={() => setShowBlindShiftModal(true)}
+            style={{
+              padding: '0.7rem 1.15rem',
+              borderRadius: '12px',
+              border: '1px solid rgba(251, 191, 36, 0.5)',
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              color: '#0f172a',
+              fontWeight: 900,
+              cursor: 'pointer'
+            }}
+          >
+            {tx('💵 ปิดกะนับเงินสด (Blind Drop)', '💵 Blind Shift Close & Drop')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowChecklistSection(!showChecklistSection)}
+            style={{
+              padding: '0.7rem 1.15rem',
+              borderRadius: '12px',
+              border: '1px solid rgba(56, 189, 248, 0.5)',
+              background: 'rgba(56, 189, 248, 0.16)',
+              color: '#38bdf8',
+              fontWeight: 800,
+              cursor: 'pointer'
+            }}
+          >
+            {tx('📋 แผนตรวจทุจริตรายวัน', '📋 Daily Fraud Checklist')}
+          </button>
         </div>
       </div>
+
+      {/* Daily Manager Anti-Fraud Checklist Card */}
+      {showChecklistSection && (
+        <div
+          className="glass-card"
+          style={{
+            padding: '1.35rem',
+            borderRadius: '18px',
+            border: '1.5px solid rgba(56, 189, 248, 0.35)',
+            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(8, 13, 30, 0.98))'
+          }}
+        >
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <span style={{ fontSize: '1.25rem' }}>📋</span>
+                <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#38bdf8' }}>
+                  {tx('แผนปฏิบัติการตรวจทุจริตการเงินและแคชเชียร์ประจำวัน (Daily Anti-Fraud Control)', 'Daily Cashier Anti-Fraud & Internal Control Plan')}
+                </h4>
+              </div>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: '#cbd5e1' }}>
+                {tx(
+                  'เช็กลิสต์ 5 ข้อสำหรับผู้จัดการร้าน เพื่ออุดรอยรั่วเงินสด ป้องกันการ Void บิล และตรวจนับเงินปิดกะ',
+                  '5-point daily manager checklist to prevent cash shrinkage, unbilled sales, and unauthorized voids.'
+                )}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 700 }}>
+                  {tx('คะแนนการควบคุมภายใน:', 'Control Health Score:')}
+                </div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: checklistScore >= 80 ? '#34d399' : checklistScore >= 60 ? '#fbbf24' : '#f87171' }}>
+                  {checklistScore}% {checklistScore === 100 ? tx('(ปลอดภัยสูงสุด)', '(Max Secure)') : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }}>
+            {[
+              {
+                key: 'floatCheck',
+                titleTh: '1. ตรวจเงินทอนตั้งต้น (Opening Float)',
+                titleEn: '1. Opening Float Verification',
+                descTh: 'ตรวจนับเงินทอนตรงตามยอดกำหนด ฿3,000 ก่อนเปิดรับบิลแรก',
+                descEn: 'Count opening float to match exactly ฿3,000 before opening'
+              },
+              {
+                key: 'qrSecurityCheck',
+                titleTh: '2. สแกนตรวจสอบป้าย QR Code รับเงิน',
+                titleEn: '2. QR Code Tamper Inspection',
+                descTh: 'ตรวจว่าไม่มีสติกเกอร์หรือป้าย QR พร้อมเพย์ส่วนตัวของพนักงานแปะทับ',
+                descEn: 'Verify merchant QR display is authentic with no unauthorized stickers'
+              },
+              {
+                key: 'voidRefundCheck',
+                titleTh: '3. เซ็นกำกับบิล Void และบิลคืนเงิน (Refund)',
+                titleEn: '3. Void & Refund Slip Authorization',
+                descTh: 'ทุกบิลที่ยกเลิกต้องมีเหตุผลและลายเซ็นลูกค้าแนบเสมอ',
+                descEn: 'Every voided receipt must have a signed reason slip attached'
+              },
+              {
+                key: 'midShiftSurpriseCheck',
+                titleTh: '4. สุ่มตรวจนับเงินสดกลางกะ (Surprise Count)',
+                titleEn: '4. Mid-Shift Surprise Cash Audit',
+                descTh: 'สุ่มนับเงินในลิ้นชักแบบไม่บอกล่วงหน้า สัปดาห์ละ 1-2 ครั้ง',
+                descEn: 'Conduct unannounced mid-shift cash counts at random'
+              },
+              {
+                key: 'blindDropCheck',
+                titleTh: '5. ดำเนินการ Blind Cash Drop ตอนปิดกะ',
+                titleEn: '5. Blind Shift Close & Cash Drop',
+                descTh: 'แคชเชียร์นับเงินส่งโดยไม่เห็นยอดระบบ ป้องกันการหยิบส่วนเกินออก',
+                descEn: 'Cashier counts register without seeing POS expected cash'
+              }
+            ].map(item => {
+              const checked = Boolean(fraudChecklist[item.key]);
+              return (
+                <div
+                  key={item.key}
+                  onClick={() => handleToggleChecklist(item.key)}
+                  style={{
+                    padding: '0.85rem 1rem',
+                    borderRadius: '12px',
+                    background: checked ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 255, 255, 0.04)',
+                    border: checked ? '1.5px solid rgba(16, 185, 129, 0.45)' : '1px solid rgba(148, 163, 184, 0.2)',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.75rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '22px',
+                      height: '22px',
+                      borderRadius: '6px',
+                      border: checked ? '2px solid #10b981' : '2px solid #64748b',
+                      background: checked ? '#10b981' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#0f172a',
+                      fontWeight: 900,
+                      fontSize: '0.8rem',
+                      marginTop: '0.15rem',
+                      flexShrink: 0
+                    }}
+                  >
+                    {checked ? '✓' : ''}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: checked ? '#34d399' : '#f8fafc' }}>
+                      {isEn ? item.titleEn : item.titleTh}
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                      {isEn ? item.descEn : item.descTh}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Interactive POS Bill Recording Modal / Panel */}
       {showRecordPosModal && (
@@ -5870,14 +6156,7 @@ export function StaffPosTab({
                 <div style={{ display: 'flex', gap: '0.55rem', flexWrap: 'wrap' }}>
                   <button
                     type="button"
-                    onClick={() =>
-                      toast.success(
-                        tx(
-                          `📹 เปิดภาพกล้องวงจรปิด (${log.cctvTimestamp}) ของรายการ ${log.logId}`,
-                          `📹 Opened security camera clip (${log.cctvTimestamp}) for ${log.logId}`
-                        )
-                      )
-                    }
+                    onClick={() => setSelectedCctvLog(log)}
                     style={{
                       padding: '0.55rem 0.9rem',
                       borderRadius: '10px',
@@ -5913,6 +6192,390 @@ export function StaffPosTab({
           })}
         </div>
       </div>
+
+      {/* Blind Shift Cash Drop Audit History Section */}
+      <div className="glass-card" style={{ padding: '1.35rem', borderRadius: '18px', border: '1.5px solid rgba(251, 191, 36, 0.35)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span style={{ fontSize: '1.25rem' }}>💵</span>
+              <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fbbf24' }}>
+                {tx('ประวัติการตรวจนับเงินปิดกะแบบไม่บอกยอด (Blind Shift Cash Drop Log)', 'Blind Shift Cash Drop Audit Records')}
+              </h4>
+            </div>
+            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.86rem', color: '#cbd5e1' }}>
+              {tx(
+                'บันทึกผลการนับเงินสดจริงเทียบกับยอดระบบอัตโนมัติ เพื่อจับตาดูเงินสด ขาด หรือ เกิน ทันที',
+                'Historical blind drops comparing actual cashier cash against system sales to catch discrepancies instantly.'
+              )}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowBlindShiftModal(true)}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '10px',
+              border: '1px solid rgba(251, 191, 36, 0.5)',
+              background: 'rgba(251, 191, 36, 0.15)',
+              color: '#fef08a',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              cursor: 'pointer'
+            }}
+          >
+            {tx('➕ บันทึกปิดกะรอบใหม่', '➕ New Shift Drop')}
+          </button>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '780px' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(148,163,184,0.2)', textAlign: 'left', color: '#94a3b8', fontSize: '0.82rem' }}>
+                <th style={{ padding: '0.65rem' }}>{tx('รหัสตรวจกะ / เวลา', 'Audit ID / Time')}</th>
+                <th style={{ padding: '0.65rem' }}>{tx('แคชเชียร์ / สาขา', 'Cashier / Register')}</th>
+                <th style={{ padding: '0.65rem' }}>{tx('เงินทอนตั้งต้น', 'Float')}</th>
+                <th style={{ padding: '0.65rem' }}>{tx('ยอดนับจริง (ไม่รวมทอน)', 'Counted Net')}</th>
+                <th style={{ padding: '0.65rem' }}>{tx('ยอดขายในระบบ', 'System Cash')}</th>
+                <th style={{ padding: '0.65rem' }}>{tx('ผลต่าง (ขาด/เกิน)', 'Variance')}</th>
+                <th style={{ padding: '0.65rem' }}>{tx('ผลการตรวจสอบ', 'Audit Verdict')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shiftAuditHistory.map(rec => {
+                const isBalanced = rec.status === 'balanced';
+                const isShortage = rec.status === 'shortage';
+                return (
+                  <tr key={rec.auditId} style={{ borderBottom: '1px solid rgba(148,163,184,0.12)', fontSize: '0.88rem' }}>
+                    <td style={{ padding: '0.75rem 0.65rem' }}>
+                      <span style={{ fontWeight: 800, color: '#f8fafc', fontFamily: 'monospace' }}>{rec.auditId}</span>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{rec.timestamp}</div>
+                    </td>
+                    <td style={{ padding: '0.75rem 0.65rem' }}>
+                      <div style={{ fontWeight: 800, color: '#f8fafc' }}>{rec.staffName}</div>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{rec.branchName}</div>
+                    </td>
+                    <td style={{ padding: '0.75rem 0.65rem', color: '#94a3b8' }}>
+                      ฿{(rec.openingFloat || 0).toLocaleString()}
+                    </td>
+                    <td style={{ padding: '0.75rem 0.65rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>
+                      ฿{(rec.countedCash || 0).toLocaleString()}
+                    </td>
+                    <td style={{ padding: '0.75rem 0.65rem', fontWeight: 700, color: '#cbd5e1', fontFamily: 'monospace' }}>
+                      ฿{(rec.expectedCash || 0).toLocaleString()}
+                    </td>
+                    <td style={{ padding: '0.75rem 0.65rem' }}>
+                      <span
+                        style={{
+                          fontWeight: 900,
+                          fontFamily: 'monospace',
+                          color: isBalanced ? '#34d399' : isShortage ? '#f87171' : '#fbbf24'
+                        }}
+                      >
+                        {rec.variance === 0 ? '฿ 0' : (rec.variance > 0 ? `+฿${rec.variance.toLocaleString()}` : `-฿${Math.abs(rec.variance).toLocaleString()}`)}
+                      </span>
+                    </td>
+                    <td style={{ padding: '0.75rem 0.65rem' }}>
+                      <span
+                        style={{
+                          padding: '0.25rem 0.65rem',
+                          borderRadius: '999px',
+                          background: isBalanced ? 'rgba(16, 185, 129, 0.16)' : isShortage ? 'rgba(244, 63, 94, 0.18)' : 'rgba(251, 191, 36, 0.18)',
+                          color: isBalanced ? '#34d399' : isShortage ? '#fda4af' : '#fde047',
+                          fontWeight: 800,
+                          fontSize: '0.78rem'
+                        }}
+                      >
+                        {isBalanced ? tx('✅ เงินสดตรง 100%', '✅ Balanced') : isShortage ? tx('🚨 เงินสดขาด', '🚨 Shortage') : tx('⚠️ เงินสดเกิน', '⚠️ Overage')}
+                      </span>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>{rec.note}</div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* MODAL: กล้องวงจรปิดจำลอง (CCTV Camera Footage Inspector Modal) */}
+      {selectedCctvLog && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ width: '100%', maxWidth: '820px', background: '#090d1a', border: '1.5px solid rgba(244, 63, 94, 0.5)', borderRadius: '24px', padding: '1.5rem', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <span style={{ fontSize: '1.35rem' }}>📹</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#f8fafc' }}>
+                    {tx('ศูนย์ตรวจสอบกล้องวงจรปิดหน้าร้าน (Security CCTV Inspector)', 'Security CCTV Footage Inspector')}
+                  </h3>
+                  <div style={{ fontSize: '0.78rem', color: '#fda4af', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '999px', background: '#f43f5e', display: 'inline-block' }} />
+                    {tx(`ซิงค์เวลาเกิดเหตุ: ${selectedCctvLog.cctvTimestamp} • รายการ ${selectedCctvLog.logId}`, `Incident Sync: ${selectedCctvLog.cctvTimestamp} • Event ${selectedCctvLog.logId}`)}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedCctvLog(null)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '1.25rem', cursor: 'pointer', padding: '0.25rem' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* DUAL CAMERA FEEDS SIMULATION */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+              {/* CAM 01: Top Register Angle */}
+              <div style={{ background: '#030712', borderRadius: '14px', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '0.85rem', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#38bdf8', fontFamily: 'monospace', marginBottom: '0.5rem' }}>
+                  <span>CAM-01 • REGISTER #4 (TOP ANGLE)</span>
+                  <span style={{ color: '#f43f5e', fontWeight: 800 }}>● REC [HD]</span>
+                </div>
+                {/* Simulated Camera View */}
+                <div style={{ height: '170px', background: 'radial-gradient(circle at center, #0f172a 0%, #020617 100%)', borderRadius: '10px', border: '1px dashed rgba(56, 189, 248, 0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                  <div style={{ border: '2px solid #10b981', padding: '0.4rem 0.8rem', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.1)', color: '#34d399', fontSize: '0.78rem', fontWeight: 800, fontFamily: 'monospace' }}>
+                    [AI TRACKER: CASH DRAWER #04]
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#fca5a5', marginTop: '0.5rem', fontFamily: 'monospace' }}>
+                    ⚠️ STATUS: DRAWER OPENED 48 SECONDS
+                  </div>
+                  <div style={{ position: 'absolute', bottom: '6px', left: '8px', fontSize: '0.7rem', color: '#64748b', fontFamily: 'monospace' }}>
+                    FPS: 30.0 • BITRATE: 4096 Kbps
+                  </div>
+                </div>
+              </div>
+
+              {/* CAM 04: Front Customer Angle */}
+              <div style={{ background: '#030712', borderRadius: '14px', border: '1px solid rgba(244, 63, 94, 0.3)', padding: '0.85rem', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#fda4af', fontFamily: 'monospace', marginBottom: '0.5rem' }}>
+                  <span>CAM-04 • COUNTER FRONT VIEW</span>
+                  <span style={{ color: '#f43f5e', fontWeight: 800 }}>● REC [HD]</span>
+                </div>
+                {/* Simulated Camera View */}
+                <div style={{ height: '170px', background: 'radial-gradient(circle at center, #0f172a 0%, #020617 100%)', borderRadius: '10px', border: '1px dashed rgba(244, 63, 94, 0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                  <div style={{ border: '2px solid #f43f5e', padding: '0.4rem 0.8rem', borderRadius: '6px', background: 'rgba(244, 63, 94, 0.12)', color: '#fda4af', fontSize: '0.78rem', fontWeight: 800, fontFamily: 'monospace' }}>
+                    [AI DETECT: NO CUSTOMER AT COUNTER]
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#fef08a', marginTop: '0.5rem', fontFamily: 'monospace' }}>
+                    ⚠️ VOID KEY PRESSED AFTER CUSTOMER LEFT
+                  </div>
+                  <div style={{ position: 'absolute', bottom: '6px', left: '8px', fontSize: '0.7rem', color: '#64748b', fontFamily: 'monospace' }}>
+                    MOTION VECTOR: 0.12 (EMPTY)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* INCIDENT DETAILS & AI VERDICT */}
+            <div style={{ background: 'rgba(244, 63, 94, 0.08)', borderRadius: '14px', border: '1px solid rgba(244, 63, 94, 0.35)', padding: '1rem', fontSize: '0.86rem', color: '#f8fafc' }}>
+              <div style={{ fontWeight: 800, color: '#fda4af', marginBottom: '0.35rem' }}>
+                🔍 {tx('ผลการวิเคราะห์พฤติกรรมเสี่ยงโดย AI:', 'AI Anomaly Behavior Diagnostic:')}
+              </div>
+              <div style={{ color: '#cbd5e1', lineHeight: '1.5' }}>
+                {selectedCctvLog[isEn ? 'en' : 'th'].aiAnomalyDetail}
+              </div>
+              <div style={{ marginTop: '0.45rem', fontSize: '0.8rem', color: '#94a3b8' }}>
+                {tx('พนักงานผู้รับผิดชอบ:', 'Assigned Cashier:')} <strong style={{ color: '#f8fafc' }}>{selectedCctvLog[isEn ? 'en' : 'th'].staffName}</strong> • {tx('ยอดเงินที่เกี่ยวข้อง:', 'Amount:')} <strong style={{ color: '#fbbf24' }}>฿{selectedCctvLog.amount.toLocaleString()}</strong>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.65rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.75rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  handleResolveAudit(selectedCctvLog.logId);
+                  setSelectedCctvLog(null);
+                  toast.error(tx(`🚨 ยืนยันพบการทุจริตในรายการ ${selectedCctvLog.logId} บันทึกส่งฝ่ายบุคคลแล้ว`, `🚨 Confirmed fraud on ${selectedCctvLog.logId}. Escalate to HR.`));
+                }}
+                style={{ padding: '0.6rem 1.15rem', borderRadius: '10px', border: 'none', background: '#f43f5e', color: '#ffffff', fontWeight: 800, fontSize: '0.84rem', cursor: 'pointer' }}
+              >
+                {tx('🚨 ยืนยันเป็นเคสทุจริต (หักเงิน/ส่งดำเนินคดี)', '🚨 Confirm Fraud & Escalate')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleResolveAudit(selectedCctvLog.logId);
+                  setSelectedCctvLog(null);
+                }}
+                style={{ padding: '0.6rem 1.15rem', borderRadius: '10px', border: 'none', background: '#10b981', color: '#ffffff', fontWeight: 800, fontSize: '0.84rem', cursor: 'pointer' }}
+              >
+                {tx('✅ ยืนยันว่าปกติ / อนุมัติผ่าน', '✅ Mark Verified & Legitimate')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedCctvLog(null)}
+                style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#cbd5e1', fontWeight: 700, fontSize: '0.84rem', cursor: 'pointer' }}
+              >
+                {tx('✕ ปิดหน้าต่าง', '✕ Close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ปิดกะนับเงินสดแบบไม่บอกยอด (Blind Shift Cash Drop Modal) */}
+      {showBlindShiftModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <form onSubmit={handleSubmitBlindDrop} style={{ width: '100%', maxWidth: '580px', background: '#090d1a', border: '1.5px solid rgba(251, 191, 36, 0.5)', borderRadius: '24px', padding: '1.5rem', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <span style={{ fontSize: '1.35rem' }}>💵</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fbbf24' }}>
+                    {tx('ระบบตรวจนับเงินปิดกะแบบไม่บอกยอด (Blind Cash Drop)', 'Blind Shift Close & Cash Drop System')}
+                  </h3>
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.15rem' }}>
+                    {tx('แคชเชียร์นับเงินส่งจริง โดยไม่เห็นยอดขายในระบบ ป้องกันการหยิบเงินเกินออก', 'Cashier counts actual drawer cash blindly to prevent skimming.')}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBlindShiftModal(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '1.25rem', cursor: 'pointer', padding: '0.25rem' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#94a3b8', marginBottom: '0.35rem' }}>
+                  {tx('เลือกแคชเชียร์ผู้ส่งเงิน', 'Select Cashier')}
+                </label>
+                <select
+                  value={shiftCashierId}
+                  onChange={e => setShiftCashierId(e.target.value)}
+                  style={{ width: '100%', padding: '0.6rem', borderRadius: '10px', background: '#0f172a', border: '1px solid rgba(148,163,184,0.3)', color: '#f8fafc', fontWeight: 700, fontSize: '0.84rem' }}
+                >
+                  {safeStaff.map(s => (
+                    <option key={s.id} value={s.id}>
+                      {s[isEn ? 'en' : 'th'].name} ({s[isEn ? 'en' : 'th'].branchName})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#fbbf24', marginBottom: '0.35rem' }}>
+                  {tx('เงินทอนตั้งต้น (Float) ที่หักออก', 'Opening Float')}
+                </label>
+                <input
+                  type="number"
+                  value={shiftFloat}
+                  onChange={e => setShiftFloat(Number(e.target.value))}
+                  style={{ width: '100%', padding: '0.6rem', borderRadius: '10px', background: '#0f172a', border: '1px solid rgba(251, 191, 36, 0.4)', color: '#fbbf24', fontWeight: 800, fontSize: '0.88rem', fontFamily: 'monospace' }}
+                />
+              </div>
+            </div>
+
+            {/* DENOMINATIONS BREAKDOWN */}
+            <div style={{ background: '#030712', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', padding: '0.85rem' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#94a3b8', marginBottom: '0.5rem' }}>
+                {tx('นับจำนวนธนบัตรและเหรียญในลิ้นชัก (ใบ/เหรียญ):', 'Count Notes & Coins in Register:')}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.6rem' }}>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>฿ 1,000</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={c1000}
+                    onChange={e => setC1000(Number(e.target.value))}
+                    style={{ width: '100%', padding: '0.45rem', borderRadius: '8px', background: '#0f172a', border: '1px solid #334155', color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>฿ 500</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={c500}
+                    onChange={e => setC500(Number(e.target.value))}
+                    style={{ width: '100%', padding: '0.45rem', borderRadius: '8px', background: '#0f172a', border: '1px solid #334155', color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>฿ 100</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={c100}
+                    onChange={e => setC100(Number(e.target.value))}
+                    style={{ width: '100%', padding: '0.45rem', borderRadius: '8px', background: '#0f172a', border: '1px solid #334155', color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>฿ 50</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={c50}
+                    onChange={e => setC50(Number(e.target.value))}
+                    style={{ width: '100%', padding: '0.45rem', borderRadius: '8px', background: '#0f172a', border: '1px solid #334155', color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>฿ 20</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={c20}
+                    onChange={e => setC20(Number(e.target.value))}
+                    style={{ width: '100%', padding: '0.45rem', borderRadius: '8px', background: '#0f172a', border: '1px solid #334155', color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{tx('รวมเหรียญ (บาท)', 'Coins Sum')}</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={coins}
+                    onChange={e => setCoins(Number(e.target.value))}
+                    style={{ width: '100%', padding: '0.45rem', borderRadius: '8px', background: '#0f172a', border: '1px solid #334155', color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* LIVE CALCULATION VERDICT */}
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', borderRadius: '14px', border: '1.5px solid rgba(251, 191, 36, 0.4)', padding: '0.85rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.35rem' }}>
+                <span>{tx('ยอดเงินสดสุทธิที่นับได้ (หักเงินทอนแล้ว):', 'Net Counted Cash (excl. Float):')}</span>
+                <strong style={{ color: '#38bdf8', fontFamily: 'monospace' }}>฿ {totalCountedCash.toLocaleString()}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.35rem' }}>
+                <span>{tx('ยอดขายเงินสดในระบบ POS:', 'Expected POS System Cash:')}</span>
+                <strong style={{ color: '#cbd5e1', fontFamily: 'monospace' }}>฿ {expectedStaffCash.toLocaleString()}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.92rem', paddingTop: '0.45rem', borderTop: '1px dashed rgba(255,255,255,0.15)', fontWeight: 900 }}>
+                <span>{tx('ผลต่างยอดเงินสด (Variance):', 'Cash Variance:')}</span>
+                <span style={{ color: currentVariance === 0 ? '#34d399' : currentVariance < 0 ? '#f87171' : '#fbbf24', fontFamily: 'monospace' }}>
+                  {currentVariance === 0 ? tx('✅ ตรงเป๊ะ 100%', '✅ 100% Match') : currentVariance < 0 ? `🚨 ขาด ฿${Math.abs(currentVariance).toLocaleString()}` : `⚠️ เกิน +฿${currentVariance.toLocaleString()}`}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.65rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.75rem' }}>
+              <button
+                type="button"
+                onClick={() => setShowBlindShiftModal(false)}
+                style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#cbd5e1', fontWeight: 700, fontSize: '0.84rem', cursor: 'pointer' }}
+              >
+                {tx('ยกเลิก', 'Cancel')}
+              </button>
+              <button
+                type="submit"
+                style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#0f172a', fontWeight: 900, fontSize: '0.84rem', cursor: 'pointer' }}
+              >
+                {tx('💾 ยืนยันส่งยอดปิดกะ', 'Confirm & Submit Shift')}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

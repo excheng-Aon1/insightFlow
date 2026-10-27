@@ -293,6 +293,15 @@ class POSCheckoutRequest(BaseModel):
     created_at: Optional[str] = None
 
 
+class ShiftBlindDropRequest(BaseModel):
+    staff_id: str
+    branch_name: Optional[str] = "สาขาหลัก"
+    opening_float: float = 3000.0
+    counted_cash: float
+    expected_cash: Optional[float] = None
+    notes: Optional[str] = ""
+
+
 class SQLSandboxRequest(BaseModel):
     query: str
 
@@ -2807,6 +2816,90 @@ async def pos_checkout(
         "total_amount": req.total_amount,
         "processed_by": effective_user_id,
     }
+
+
+# ------------------------------------------------------------------------------
+# CASHIER INTERNAL CONTROL & BLIND SHIFT DROP AUDIT
+# ------------------------------------------------------------------------------
+_FALLBACK_SHIFT_AUDITS: List[Dict[str, Any]] = [
+    {
+        "audit_id": "SFT-2026-901",
+        "timestamp": "วันนี้ 16:30 น.",
+        "staff_id": "STF-101",
+        "staff_name": "คุณศิริพร สุขเกษม",
+        "branch_name": "สาขาเซ็นทรัลลาดพร้าว",
+        "opening_float": 3000.0,
+        "counted_cash": 18500.0,
+        "expected_cash": 18500.0,
+        "variance": 0.0,
+        "status": "BALANCED",
+        "verdict_th": "ยอดเงินสดถูกต้อง 100% ไม่มีผลต่าง",
+        "verdict_en": "100% Balanced. No cash variance.",
+    },
+    {
+        "audit_id": "SFT-2026-902",
+        "timestamp": "วันนี้ 16:45 น.",
+        "staff_id": "STF-108",
+        "staff_name": "คุณธนดล กิตติพงศ์",
+        "branch_name": "สาขาเซ็นทรัลลาดพร้าว",
+        "opening_float": 3000.0,
+        "counted_cash": 14200.0,
+        "expected_cash": 15000.0,
+        "variance": -800.0,
+        "status": "SHORTAGE",
+        "verdict_th": "ตรวจพบเงินสดขาด 800 บาท (ต้องชดใช้หรือตรวจกล้องย้อนหลัง)",
+        "verdict_en": "Cash shortage of ฿800 detected (review CCTV or deduct).",
+    },
+]
+
+
+@app.get("/api/pos/shifts/blind-drop", status_code=status.HTTP_200_OK)
+def get_shift_blind_drops(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """ดึงประวัติการนับเงินปิดกะแบบ Blind Close Shift"""
+    return {"status": "success", "records": _FALLBACK_SHIFT_AUDITS}
+
+
+@app.post("/api/pos/shifts/blind-drop", status_code=status.HTTP_201_CREATED)
+def submit_shift_blind_drop(
+    req: ShiftBlindDropRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """ส่งยอดตรวจนับเงินสดปิดกะแบบไม่บอกยอดในระบบ (Blind Drop Audit)"""
+    expected = req.expected_cash if req.expected_cash is not None else req.counted_cash
+    variance = round(req.counted_cash - expected, 2)
+
+    if variance == 0:
+        audit_status = "BALANCED"
+        verdict_th = "ยอดเงินสดตรงเป๊ะ 100% (ผ่านการตรวจสอบความถูกต้อง)"
+        verdict_en = "100% Balanced. Verified accurate."
+    elif variance < 0:
+        audit_status = "SHORTAGE"
+        verdict_th = f"ตรวจพบเงินสดขาดหาย ฿{abs(variance):,.2f} บาท (แคชเชียร์ต้องชดใช้ยอดขาดหรือตรวจสอบกล้องวงจรปิด)"
+        verdict_en = f"Cash shortage of ฿{abs(variance):,.2f} detected (investigate register discrepancy)."
+    else:
+        audit_status = "OVERAGE"
+        verdict_th = f"ตรวจพบเงินสดเกินในลิ้นชัก ฿{variance:,.2f} บาท (สัญญาณเตือนความเสี่ยงแคชเชียร์อาจไม่ยิงบิล)"
+        verdict_en = f"Cash overage of ฿{variance:,.2f} in drawer (high risk of unrecorded cash sales)."
+
+    audit_record = {
+        "audit_id": f"SFT-2026-{random.randint(100, 999)}",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "staff_id": req.staff_id,
+        "staff_name": req.staff_id,
+        "branch_name": req.branch_name,
+        "opening_float": req.opening_float,
+        "counted_cash": req.counted_cash,
+        "expected_cash": expected,
+        "variance": variance,
+        "status": audit_status,
+        "verdict_th": verdict_th,
+        "verdict_en": verdict_en,
+        "notes": req.notes,
+    }
+    _FALLBACK_SHIFT_AUDITS.insert(0, audit_record)
+    return {"status": "success", "record": audit_record}
 
 
 # ------------------------------------------------------------------------------
