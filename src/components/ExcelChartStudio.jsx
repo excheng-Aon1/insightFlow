@@ -107,7 +107,7 @@ export default function ExcelChartStudio({
     { id: 'category', name: tx('หมวดหมู่สินค้า (Category)', 'Product Category'), icon: '🏷️' },
     { id: 'branch', name: tx('สาขา / หน้าร้าน (Branch)', 'Branch / Location'), icon: '🏢' },
     { id: 'platform', name: tx('ช่องทางการขาย (Channel/Platform)', 'Sales Channel'), icon: '📱' },
-    { id: 'product', name: tx('รายชื่อสินค้า (Product Name)', 'Product Name'), icon: '📦' },
+    { id: 'product', name: tx('รายชื่อสินค้า (Product Name)', 'Product Name'), icon: '🏷️' },
     { id: 'date', name: tx('วันที่ / ช่วงเวลา (Date/Timeline)', 'Date Timeline'), icon: '📅' }
   ];
 
@@ -116,7 +116,7 @@ export default function ExcelChartStudio({
     { id: 'revenue', name: tx('ยอดขายรวม (Sum Revenue)', 'Total Revenue (฿)'), unit: '฿', icon: '💰' },
     { id: 'profit', name: tx('กำไรสุทธิประมาณการ (Net Profit)', 'Est. Net Profit (฿)'), unit: '฿', icon: '💎' },
     { id: 'orders', name: tx('จำนวนคำสั่งซื้อ (Order Count)', 'Total Orders'), unit: tx('รายการ', 'orders'), icon: '🧾' },
-    { id: 'units', name: tx('จำนวนชิ้นที่ขาย (Units Sold)', 'Total Units'), unit: tx('ชิ้น', 'units'), icon: '📊' },
+    { id: 'units', name: tx('จำนวนชิ้นที่ขายได้ (Units Sold)', 'Total Units'), unit: tx('ชิ้น', 'units'), icon: '📦' },
     { id: 'aov', name: tx('ยอดซื้อเฉลี่ยต่อบิล (AOV)', 'Avg Basket Size (AOV)'), unit: '฿', icon: '🛒' }
   ];
 
@@ -520,7 +520,7 @@ export default function ExcelChartStudio({
                           : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400'
                       }`}
                     >
-                      {t === 'bar' ? '📊 Bar' : t === 'line' ? '📈 Line' : '🍩 Donut'}
+                      {t === 'bar' ? '🏛️ Column' : t === 'line' ? '📈 Line' : '🍩 Donut'}
                     </button>
                   ))}
                 </div>
@@ -636,7 +636,7 @@ export default function ExcelChartStudio({
                       isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
                     }`}
                   >
-                    <option value="bar">📊 {tx('กราฟแท่งแนวตั้ง (Column/Bar Chart)', 'Bar / Column Chart')}</option>
+                    <option value="bar">🏛️ {tx('กราฟแท่งแนวตั้ง (Column/Bar Chart)', 'Bar / Column Chart')}</option>
                     <option value="line">📈 {tx('กราฟเส้นแนวโน้ม (Line Chart)', 'Line Chart')}</option>
                     <option value="doughnut">🍩 {tx('กราฟโดนัท / วงกลม (Donut Share)', 'Donut / Pie Chart')}</option>
                   </select>
@@ -726,3 +726,4 @@ export default function ExcelChartStudio({
     </div>
   );
 }
+
