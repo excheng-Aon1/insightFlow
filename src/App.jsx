@@ -3031,7 +3031,7 @@ export function OverviewTab({
   dbRecords = []
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
 
   const curRevNum = Number(currentRevenueVal) || 0;
   const targetRevNum = Number(targetRevenueVal) || 0;
@@ -3622,7 +3622,7 @@ export function CustomersTab({
   dbRecords = []
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
 
   const safeCustomers = Array.isArray(customersList) ? customersList.filter(Boolean) : [];
 
@@ -5201,7 +5201,7 @@ export function StaffPosTab({
   barChartOptions = {}
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
 
   const safeStaff = Array.isArray(staffList) ? staffList.filter(Boolean) : [];
   const safeAuditLogs = Array.isArray(auditLogs) ? auditLogs.filter(Boolean) : [];
@@ -6600,7 +6600,7 @@ export function MultiChannelTab({
   inventoryList = []
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
   const [showLinePreview, setShowLinePreview] = useState(true);
 
   const safeChannels = Array.isArray(channelsList) ? channelsList.filter(Boolean) : [];
@@ -7436,7 +7436,7 @@ export function InventoryTab({
   setActiveTab = () => {}
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
 
   const safeInventory = Array.isArray(inventoryList) ? inventoryList.filter(Boolean) : [];
   const safeDbRecords = Array.isArray(dbRecords) ? dbRecords.filter(Boolean) : [];
@@ -7491,7 +7491,7 @@ export function InventoryTab({
         suggestedOrderQty
       };
     });
-  }, [inventoryList, dbSalesVelocity, isEn]);
+  }, [safeInventory, dbSalesVelocity, isEn]);
 
   const criticalReorderItems = reorderAnalysis.filter(i => i.isCritical);
 
@@ -8130,7 +8130,7 @@ export function InsightsTab({
 }) {
   const isEn = lang === 'en';
   const isDark = theme === 'dark';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
   const [showTrainingPanel, setShowTrainingPanel] = useState(false);
   const [showHeaderRawDetails, setShowHeaderRawDetails] = useState(false);
   const [aiScenario, setAiScenario] = useState('ai_accelerated');
@@ -9682,7 +9682,7 @@ export function LiveTab({
   setDbRecords = () => {}
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
   const curRevNum = Number(currentRevenueVal) || 0;
 
   const [streamActive, setStreamActive] = useState(true);
@@ -9955,7 +9955,7 @@ export function DatabaseTab({
   theme = 'dark'
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
 
   const safeRecords = Array.isArray(dbRecords) ? dbRecords.filter(Boolean) : [];
 
@@ -10667,7 +10667,7 @@ export function AdminTab({
   onSyncContactWithBackend
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
 
   const [requirePinForVoid, setRequirePinForVoid] = useState(true);
   const [requirePinForRefund, setRequirePinForRefund] = useState(true);
@@ -11838,7 +11838,7 @@ export function ProcurementTab({
   barChartOptions = {}
 }) {
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
 
   // Zero-state clean slate rule: defaults to empty array / 0 when no file is uploaded
   const safeVendors = Array.isArray(vendorsList) ? vendorsList.filter(Boolean) : [];
@@ -13601,7 +13601,7 @@ function App() {
   });
   const [lang, setLang] = useState('th'); // 'th' (ภาษาไทยล้วน) | 'en' (English Only)
   const isEn = lang === 'en';
-  const tx = (th, en) => (isEn ? en : th);
+  const tx = useCallback((th, en) => (lang === 'en' ? en : th), [lang]);
   const t = landingTranslations[isEn ? 'en' : 'th'];
 
   const [theme, setTheme] = useState(() => {
@@ -14109,7 +14109,7 @@ function App() {
         console.warn('GIS auto-init notice:', e);
       }
     }
-  }, []);
+  }, [handleGoogleSignIn]);
 
 
   // Interactive Business State across all tabs (Defaults to 0 / Clean Slate until file is uploaded)

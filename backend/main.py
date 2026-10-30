@@ -43,6 +43,7 @@ import uvicorn
 
 from auth import (
     get_current_user,
+    get_current_user_optional,
     require_super_admin,
     create_access_token, verify_password, get_password_hash,
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -467,7 +468,10 @@ def database_pool_status(
 
 
 @app.get("/api/etl/status", status_code=status.HTTP_200_OK)
-def get_etl_status(db: Session = Depends(get_db)):
+def get_etl_status(
+    db: Session = Depends(get_db),
+    current_user: Optional[Dict[str, Any]] = Depends(get_current_user_optional),
+):
     """ดึงสถานะ Data Pipeline & สถิติการทำความสะอาดข้อมูลอัตโนมัติล่าสุด"""
     logs = (
         db.query(EtlJobLog)
@@ -646,7 +650,10 @@ def get_business_anomalies():
 
 
 @app.post("/api/actionable/send-alert", status_code=status.HTTP_200_OK)
-def trigger_line_alert(req: LineAlertRequest):
+def trigger_line_alert(
+    req: LineAlertRequest,
+    current_user: Optional[Dict[str, Any]] = Depends(get_current_user_optional),
+):
     """ส่งการแจ้งเตือนความผิดปกติเข้า LINE Messaging API / Flex Message"""
     return send_line_anomaly_alert(
         alert_id=req.alert_id,
@@ -1190,9 +1197,10 @@ def execute_sandbox_query(
             "telemetry": telemetry,
         }
     except Exception as exc:
+        logger.error(f"SQL Sandbox execution error: {exc}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"SQL Query Error: {str(exc)}",
+            detail="⚠️ คำสั่ง SQL มีข้อผิดพลาดทางไวยากรณ์ หรือไม่ตรงตามข้อกำหนดของ Sandbox",
         )
 
 
@@ -2393,6 +2401,7 @@ class AIBusinessTrainRequest(BaseModel):
 async def train_business_ai_profile(
     req: AIBusinessTrainRequest,
     db: Session = Depends(get_db),
+    current_user: Optional[Dict[str, Any]] = Depends(get_current_user_optional),
 ):
     """บันทึกและเทรนบริบทธุรกิจเฉพาะของลูกค้าลงในระบบความจำของ AI"""
     profile_data = req.model_dump()
@@ -3283,9 +3292,11 @@ def _send_line_api_request(endpoint_url: str, payload: Dict[str, Any]) -> Dict[s
             return {"ok": True, "status_code": resp.status, "response": resp_text or "{}"}
     except urllib.error.HTTPError as http_err:
         err_body = http_err.read().decode("utf-8", errors="ignore")
-        return {"ok": False, "status_code": http_err.code, "error": err_body}
+        logger.warning(f"LINE API HTTP error ({http_err.code}): {err_body}")
+        return {"ok": False, "status_code": http_err.code, "error": "LINE API Gateway Error"}
     except Exception as exc:
-        return {"ok": False, "error": str(exc)}
+        logger.error(f"LINE API communication error: {exc}")
+        return {"ok": False, "error": "Internal LINE Dispatch Error"}
 
 
 class LineContactRegisterRequest(BaseModel):
@@ -3471,7 +3482,10 @@ async def line_messaging_api_webhook(request: Request):
 
 
 @app.post("/api/line/send-daily-summary")
-async def send_daily_sales_summary_to_line(req: LineSendDailySummaryRequest):
+async def send_daily_sales_summary_to_line(
+    req: LineSendDailySummaryRequest,
+    current_user: Optional[Dict[str, Any]] = Depends(get_current_user_optional),
+):
     """
     ยิงการ์ดสรุปยอดขายรายวัน (Flex Message + Text) เข้าแชท LINE ของลูกค้าทันที
     หรือเรียกใช้เมื่อถึงเวลา 22:00 น.

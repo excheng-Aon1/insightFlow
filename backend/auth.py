@@ -179,6 +179,19 @@ def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Dict[str,
         raise credentials_exception
 
 
+def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme)) -> Optional[Dict[str, Any]]:
+    """
+    FastAPI Dependency แบบยืดหยุ่น:
+    หากมีการส่ง Bearer Token มาจะตรวจสอบความถูกต้อง หากไม่มีจะอนุญาตให้ผ่านโดยคืนค่า None
+    """
+    if not token:
+        return None
+    try:
+        return get_current_user(token)
+    except Exception:
+        return None
+
+
 def require_super_admin(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
     """ตรวจสอบสิทธิ์เฉพาะ Super Admin สำหรับ API ข้อมูลความลับองค์กรและ PDPA"""
     email = str(current_user.get("email", "")).lower()
