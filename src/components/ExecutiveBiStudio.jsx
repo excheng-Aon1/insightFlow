@@ -33,7 +33,8 @@ import {
   BiChannelIcon,
   BiCategoryIcon,
   BiSettingsGearIcon,
-  BiSparklePromptIcon
+  BiSparklePromptIcon,
+  ExcelPivotChartLuxuryIcon
 } from './LuxuryIcons';
 
 ChartJS.register(
@@ -716,13 +717,13 @@ export default function ExecutiveBiStudio({
               onClick={() => setActiveStudioTab('excel_charts')}
               className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
                 activeStudioTab === 'excel_charts'
-                  ? 'bg-gradient-to-r from-sky-500 to-blue-500 text-slate-950 shadow-md font-black'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 shadow-md font-black'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <span className="text-sm">📊</span>
+              <ExcelPivotChartLuxuryIcon size={18} />
               <span>{tx('ชาร์ตตามสั่งสไตล์ Excel (Custom Charts)', 'Excel Custom Charts')}</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] bg-sky-950 text-sky-300 font-extrabold uppercase">
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-950 text-emerald-300 font-extrabold uppercase">
                 Pivot
               </span>
             </button>

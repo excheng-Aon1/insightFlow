@@ -2929,6 +2929,47 @@ export function DealOpportunityIcon({ size = 22, className = '' }) {
   );
 }
 
+/**
+ * 24. ExcelPivotChartLuxuryIcon: ไอคอน 3D Jewel สไตล์ Excel Pivot Chart Studio
+ * ดีไซน์: แผ่นสเปรดชีตสีเขียวมรกต Excel พร้อมแท่งชาร์ตแก้วมรกต 3 มิติ และสัญลักษณ์ Pivot Table ไฮเอนด์
+ */
+export function ExcelPivotChartLuxuryIcon({ size = 22, className = '' }) {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={`flex-shrink-0 ${className}`}>
+      <defs>
+        <linearGradient id={`xlGreen_${id}`} x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A7F3D0" />
+          <stop offset="40%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#064E3B" />
+        </linearGradient>
+        <linearGradient id={`xlEmeraldGlass_${id}`} x1="8" y1="6" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+        <linearGradient id={`xlGoldBadge_${id}`} x1="16" y1="4" x2="28" y2="16" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="100%" stopColor="#D97706" />
+        </linearGradient>
+      </defs>
+      {/* ฐานตารางสเปรดชีตสีเขียว Excel พรีเมียม */}
+      <rect x="3" y="4" width="26" height="24" rx="5" fill="#062E22" stroke={`url(#xlGreen_${id})`} strokeWidth="1.8" />
+      {/* เส้นกริดตาราง Pivot Grid */}
+      <line x1="3" y1="11" x2="29" y2="11" stroke="#047857" strokeWidth="1.2" strokeDasharray="1 1" opacity="0.8" />
+      <line x1="12" y1="4" x2="12" y2="28" stroke="#047857" strokeWidth="1.2" strokeDasharray="1 1" opacity="0.8" />
+      
+      {/* แท่งชาร์ตแท่ง 3 มิติ แก้วมรกตไล่ระดับ (Pivot Bars) */}
+      <rect x="6" y="16" width="3.5" height="9" rx="1.5" fill="#34D399" opacity="0.9" />
+      <rect x="14.5" y="12" width="3.5" height="13" rx="1.5" fill={`url(#xlEmeraldGlass_${id})`} stroke="#A7F3D0" strokeWidth="0.8" />
+      <rect x="21" y="8" width="3.5" height="17" rx="1.5" fill={`url(#xlGreen_${id})`} stroke="#6EE7B7" strokeWidth="0.8" />
+
+      {/* เส้นโค้งแนวโน้มทองคำพาดผ่านแท่งกราฟ (Trend Sparkline) */}
+      <path d="M7.5 15L16 11L22.5 7" stroke={`url(#xlGoldBadge_${id})`} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="22.5" cy="7" r="2" fill="#FEF08A" stroke="#064E3B" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
 
 
 

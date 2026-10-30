@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { toast as hotToast } from 'react-hot-toast';
+import { ExcelPivotChartLuxuryIcon } from './LuxuryIcons';
 
 ChartJS.register(
   CategoryScale,
@@ -326,8 +327,8 @@ export default function ExcelChartStudio({
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-sky-400/20 via-blue-500/20 to-indigo-600/20 border border-sky-400/40 shadow-inner text-3xl">
-              📊
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-sky-600/20 border border-emerald-400/40 shadow-inner">
+              <ExcelPivotChartLuxuryIcon size={34} />
             </div>
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
