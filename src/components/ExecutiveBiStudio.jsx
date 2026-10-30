@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { toast as hotToast } from 'react-hot-toast';
+import ExcelChartStudio from './ExcelChartStudio';
 import {
   PowerBiStudioIcon,
   SlicerFilterIcon,
@@ -709,11 +710,29 @@ export default function ExecutiveBiStudio({
                 7 KPIs
               </span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveStudioTab('excel_charts')}
+              className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                activeStudioTab === 'excel_charts'
+                  ? 'bg-gradient-to-r from-sky-500 to-blue-500 text-slate-950 shadow-md font-black'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span className="text-sm">📊</span>
+              <span>{tx('ชาร์ตตามสั่งสไตล์ Excel (Custom Charts)', 'Excel Custom Charts')}</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-sky-950 text-sky-300 font-extrabold uppercase">
+                Pivot
+              </span>
+            </button>
           </div>
 
           <div className="text-xs font-bold text-slate-400">
             {activeStudioTab === 'canvas'
               ? tx('โหมดแสดงผลกราฟและสไลเซอร์มาตรฐาน', 'Standard Visual Palette Mode')
+              : activeStudioTab === 'excel_charts'
+              ? tx('โหมดเลือกข้อมูลและสร้างชาร์ตหลายอันอิสระ (Excel-Style Pivot)', 'Excel Pivot Charts: Multi-Dimensions & Metrics')
               : tx('โหมดจำลองสถานการณ์และสูตรคำนวณขั้นสูง', 'Unit Economics & Scenario Simulation')}
           </div>
         </div>
@@ -1406,9 +1425,18 @@ export default function ExecutiveBiStudio({
         </div>
       </div>
     </>
+  ) : activeStudioTab === 'excel_charts' ? (
+    /* ========================================================= */
+    /* 3.2. EXCEL-STYLE DYNAMIC PIVOT CHART BUILDER STUDIO       */
+    /* ========================================================= */
+    <ExcelChartStudio
+      records={filteredData}
+      theme={theme}
+      lang={lang}
+    />
   ) : (
     /* ========================================================= */
-    /* 3.2. DEEP-DIVE KPI STUDIO (สูตรคำนวณ KPI เจาะลึกเฉพาะทาง)  */
+    /* 3.3. DEEP-DIVE KPI STUDIO (สูตรคำนวณ KPI เจาะลึกเฉพาะทาง)  */
     /* ========================================================= */
     <div className="space-y-6">
       {/* 1. SCENARIO SIMULATION TOOLBAR */}
