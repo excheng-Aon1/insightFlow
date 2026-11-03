@@ -18939,74 +18939,6 @@ function App() {
             </div>
           </div>
 
-          {/* Quick Navigation Bar (1-Line Touch Swipe Strip on Mobile/Tablet, 8-Column Grid on Desktop) */}
-          <div
-            className={`p-2.5 sm:p-4 rounded-2xl sm:rounded-3xl border shadow-lg ${
-              theme === 'dark' ? 'bg-[#091022]/90 border-white/15' : 'bg-white border-slate-200'
-            }`}
-          >
-            <div className="hidden sm:flex flex-wrap items-center justify-between gap-2 mb-3">
-              <span className="text-sm font-black text-amber-400 flex items-center gap-2">
-                <LuxuryModuleIcon type="crown" size={20} />
-                {tx('ทางลัดเลือกหน้าใช้งานด่วน (คลิกปุ่มที่ต้องการได้เลย):', 'Quick Page Switcher (Click Any Module):')}
-              </span>
-              <span className="text-xs text-slate-400">
-                {tx(
-                  'หน้าที่มีสัญลักษณ์ 🔒 สามารถกดเพื่ออัปเกรดแพ็กเกจและปลดล็อกใช้งานได้ทันทีในคลิกเดียว',
-                  'Modules marked with 🔒 can be unlocked in 1 click by upgrading your package tier'
-                )}
-              </span>
-            </div>
-            <div className="flex lg:grid lg:grid-cols-8 gap-2 overflow-x-auto no-scrollbar pb-0.5">
-              {sidebarMenuItems.map((nav, idx) => {
-                // Show all items in mobile horizontal swipe strip; on desktop grid show top 7 + Admin
-                const hideOnDesktop = idx >= 7 && nav.id !== 'admin' ? 'lg:hidden' : '';
-                const unlocked = isTabUnlocked(nav.id);
-                const reqPlan = planTiersMap[nav.minPlan || 'starter'];
-                return (
-                  <button
-                    key={nav.id}
-                    type="button"
-                    onClick={() => setActiveTab(nav.id)}
-                    className={`${hideOnDesktop} flex-shrink-0 px-3 py-2 sm:p-3 rounded-xl sm:rounded-2xl border-2 text-left transition-all flex items-center gap-2 sm:gap-3 cursor-pointer relative ${
-                      activeTab === nav.id
-                        ? (theme === 'light'
-                            ? 'bg-amber-500/15 border-amber-500 shadow-sm text-slate-950'
-                            : 'bg-amber-400/20 border-amber-400 shadow-lg text-white')
-                        : unlocked
-                        ? (theme === 'light'
-                            ? 'bg-slate-50 border-slate-200 hover:border-amber-400/70 hover:bg-white text-slate-800'
-                            : 'bg-black/20 border-white/10 hover:border-amber-400/40 text-slate-200')
-                        : (theme === 'light'
-                            ? 'bg-slate-100/60 border-dashed border-slate-300 opacity-80 hover:opacity-100 text-slate-500'
-                            : 'bg-black/10 border-dashed border-white/10 opacity-80 hover:opacity-100 text-slate-400')
-                    }`}
-                  >
-                    <LuxuryIconBadge variant={nav.variant} size="sm" active={activeTab === nav.id}>
-                      <LuxuryModuleIcon type={nav.id} size={18} />
-                    </LuxuryIconBadge>
-                    <div className="min-w-0">
-                      <p className={`text-xs font-black whitespace-nowrap lg:truncate ${
-                        activeTab === nav.id
-                          ? (theme === 'light' ? 'text-amber-800' : 'text-amber-300')
-                          : (theme === 'light' ? 'text-slate-900' : 'text-slate-100')
-                      }`}>
-                        {!unlocked ? `🔒 ${nav.label}` : nav.label}
-                      </p>
-                      <p className={`hidden sm:block text-[11px] truncate ${
-                        activeTab === nav.id
-                          ? (theme === 'light' ? 'text-amber-900/80' : 'text-amber-200/80')
-                          : (theme === 'light' ? 'text-slate-500' : 'text-slate-400')
-                      }`}>
-                        {!unlocked ? `${reqPlan.code} (${reqPlan.price})` : nav.subLabel}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* Package Upgrade Gate when clicking a module that requires a higher plan */}
           {!isTabUnlocked(activeTab) ? (
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-[#0f172a] via-[#090d1a] to-[#050814] p-8 sm:p-10 shadow-2xl max-w-4xl mx-auto my-6">
@@ -19621,66 +19553,107 @@ function App() {
           />
         </main>
 
-        {/* Fixed Bottom App Navigation Dock for Smartphone & Tablet (< 1024px) */}
-        <nav
-          className={`fixed bottom-0 inset-x-0 z-30 lg:hidden border-t backdrop-blur-2xl px-2 py-2 ${
-            theme === 'dark'
-              ? 'bg-[#050917]/95 border-white/15'
-              : 'bg-white/95 border-slate-200'
-              
-          }`}
-          style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
-        >
-          <div className="grid grid-cols-6 gap-1 max-w-xl mx-auto">
-            {[
-              { id: 'overview', label: tx('ภาพรวม', 'Overview'), variant: 'gold' },
-              { id: 'bi_studio', label: tx('Power BI', 'Power BI'), variant: 'gold' },
-              { id: 'customers', label: tx('ลูกค้า', 'CRM'), variant: 'ruby' },
-              { id: 'staff_pos', label: tx('แคชเชียร์', 'POS'), variant: 'sapphire' },
-              { id: 'insights', label: tx('วิเคราะห์ AI', 'AI Insights'), variant: 'amethyst' }
-            ].map(mNav => {
-              const unlocked = isTabUnlocked(mNav.id);
-              const isActive = activeTab === mNav.id;
+        {/* ========================================================= */}
+        {/* macOS FLOATING GLASS DOCK (แถบทางลัดด้านล่างสไตล์ Mac)       */}
+        {/* ========================================================= */}
+        <div className="fixed bottom-3 inset-x-0 z-40 flex justify-center pointer-events-none px-3">
+          <nav
+            aria-label="macOS Floating Glass Dock"
+            className={`pointer-events-auto flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-3xl border shadow-2xl backdrop-blur-2xl transition-all duration-300 max-w-full overflow-x-auto no-scrollbar ${
+              theme === 'dark'
+                ? 'bg-slate-950/75 border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.65)] text-white'
+                : 'bg-white/80 border-slate-300/80 shadow-[0_12px_35px_rgba(15,23,42,0.18)] text-slate-900'
+            }`}
+            style={{
+              boxShadow: theme === 'dark'
+                ? '0 20px 45px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2)'
+                : '0 20px 40px -10px rgba(15, 23, 42, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9)'
+            }}
+          >
+            {sidebarMenuItems.map(nav => {
+              const unlocked = isTabUnlocked(nav.id);
+              const isActive = activeTab === nav.id;
+
               return (
-                <button
-                  key={mNav.id}
-                  type="button"
-                  onClick={() => {
-                    setActiveTab(mNav.id);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition cursor-pointer ${
-                    isActive
-                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/50'
-                      : 'text-slate-300 hover:text-white'
-                  }`}
-                >
-                  <div className="relative">
-                    <LuxuryModuleIcon type={mNav.id} size={20} />
+                <div key={nav.id} className="relative group flex flex-col items-center flex-shrink-0">
+                  {/* macOS Tooltip Bubble (ลอยด้านบนไอคอนเมื่อ Hover) */}
+                  <div className="absolute -top-10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform group-hover:-translate-y-1 z-50 whitespace-nowrap">
+                    <div
+                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold shadow-xl border backdrop-blur-md flex items-center gap-1.5 ${
+                        theme === 'dark'
+                          ? 'bg-slate-900/95 border-white/20 text-white'
+                          : 'bg-white/95 border-slate-300 text-slate-900'
+                      }`}
+                    >
+                      {!unlocked && <span>🔒</span>}
+                      <span>{nav.label}</span>
+                    </div>
+                  </div>
+
+                  {/* Mac Dock App Icon Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab(nav.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ease-out transform group-hover:scale-125 group-hover:-translate-y-2 cursor-pointer ${
+                      isActive
+                        ? (theme === 'dark'
+                            ? 'bg-gradient-to-b from-amber-400/30 to-amber-500/10 border-2 border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.45)]'
+                            : 'bg-gradient-to-b from-amber-500/20 to-amber-500/5 border-2 border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.35)]')
+                        : (theme === 'dark'
+                            ? 'bg-white/5 hover:bg-white/15 border border-white/10'
+                            : 'bg-slate-100/80 hover:bg-white border border-slate-200')
+                    }`}
+                  >
+                    <LuxuryModuleIcon type={nav.id} size={22} />
                     {!unlocked && (
-                      <span className="absolute -top-1 -right-2 text-[9px]">🔒</span>
+                      <span className="absolute -top-1 -right-1 text-[10px] drop-shadow">🔒</span>
+                    )}
+                  </button>
+
+                  {/* macOS Running App Indicator Dot (จุดแสงเรืองบอกสถานะหน้าปัจจุบัน) */}
+                  <div className="h-1.5 flex items-center justify-center mt-1">
+                    {isActive ? (
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] animate-pulse"></span>
+                    ) : (
+                      <span className="w-1 h-1 rounded-full bg-slate-400/30 group-hover:bg-slate-400/70 transition"></span>
                     )}
                   </div>
-                  <span className="text-[10px] font-black truncate max-w-full mt-0.5">
-                    {mNav.label}
-                  </span>
-                </button>
+                </div>
               );
             })}
 
-            {/* 6th Button: Open Full Slide-Over Menu Drawer */}
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl bg-white/10 text-amber-300 border border-white/15 cursor-pointer"
-            >
-              <span className="text-base leading-none font-black">☰</span>
-              <span className="text-[10px] font-black truncate max-w-full mt-1">
-                {tx('เมนูทั้งหมด', 'All Menus')}
-              </span>
-            </button>
-          </div>
-        </nav>
+            {/* Mac Dock Divider */}
+            <div className={`w-[1px] h-8 mx-1 ${theme === 'dark' ? 'bg-white/15' : 'bg-slate-300'}`} />
+
+            {/* Quick Action: All Menus / Drawer */}
+            <div className="relative group flex flex-col items-center flex-shrink-0">
+              <div className="absolute -top-10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform group-hover:-translate-y-1 z-50 whitespace-nowrap">
+                <div
+                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold shadow-xl border backdrop-blur-md ${
+                    theme === 'dark' ? 'bg-slate-900/95 border-white/20 text-white' : 'bg-white/95 border-slate-300 text-slate-900'
+                  }`}
+                >
+                  {tx('เปิดลิ้นชักเมนูทั้งหมด', 'Open All Menus')}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ease-out transform group-hover:scale-125 group-hover:-translate-y-2 cursor-pointer ${
+                  theme === 'dark' ? 'bg-white/10 hover:bg-white/20 border border-white/15 text-amber-300' : 'bg-slate-100 hover:bg-white border border-slate-300 text-amber-600'
+                }`}
+              >
+                <span className="text-lg font-black leading-none">☰</span>
+              </button>
+              <div className="h-1.5 flex items-center justify-center mt-1">
+                <span className="w-1 h-1 rounded-full opacity-0"></span>
+              </div>
+            </div>
+          </nav>
+        </div>
       </div>
     </div>
   );
