@@ -30,6 +30,7 @@ import ExecutiveBiStudio from './components/ExecutiveBiStudio';
 import ExecutiveSecretaryTab from './components/ExecutiveSecretaryTab';
 import SettingsTab from './components/SettingsTab';
 import ExecutiveOnePagerModal from './components/ExecutiveOnePagerModal';
+import StockHealthAuditModal from './components/StockHealthAuditModal';
 import CohortRetentionHeatmap from './components/CohortRetentionHeatmap';
 import ErrorBoundary from './components/ErrorBoundary';
 import { InsightFlowGlassBarsLogo } from './components/InsightFlowGlassBarsLogo';
@@ -13786,6 +13787,7 @@ function App() {
   const [inspectingUploadTab, setInspectingUploadTab] = useState(null);
   const [isBasketballModalOpen, setIsBasketballModalOpen] = useState(false);
   const [isExecutiveOnePagerOpen, setIsExecutiveOnePagerOpen] = useState(false);
+  const [isStockHealthModalOpen, setIsStockHealthModalOpen] = useState(false);
 
   // OTP 2FA State & Handlers
   const [otpCode, setOtpCode] = useState('');
@@ -18731,6 +18733,19 @@ function App() {
               </span>
             </button>
 
+            {/* Stock Health & Cash-Trap (A4) Instant Audit Button */}
+            <button
+              type="button"
+              onClick={() => setIsStockHealthModalOpen(true)}
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-rose-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
+              title={tx('ใบสรุปผลตรวจสุขภาพสต็อก & กับดักเงินทุนจม ขนาด 1 หน้า A4', 'Stock Health & Cash-Trap Audit Report (1-Page A4)')}
+            >
+              <span className="text-sm sm:text-base">📋</span>
+              <span className="font-black whitespace-nowrap">
+                {tx('ตรวจสต็อก & เงินจม (A4)', 'Stock Audit (A4)')}
+              </span>
+            </button>
+
             {/* Prominent Language Switcher (100% Thai vs 100% English) */}
             {renderLanguageSwitcher()}
 
@@ -19133,6 +19148,7 @@ function App() {
                   dbRecords={dbRecords}
                   pageUploadedFiles={pageUploadedFiles}
                   setActiveTab={setActiveTab}
+                  onOpenStockHealthModal={() => setIsStockHealthModalOpen(true)}
                 />
               )}
 
@@ -19549,6 +19565,16 @@ function App() {
             theme={theme}
             user={user}
             businessName={user?.businessName || user?.business_name || 'Insight Enterprise Co., Ltd.'}
+            dbRecords={dbRecords}
+          />
+
+          {/* Stock Health & Cash-Trap Audit (A4) Modal Engine */}
+          <StockHealthAuditModal
+            isOpen={isStockHealthModalOpen}
+            onClose={() => setIsStockHealthModalOpen(false)}
+            lang={lang}
+            businessName={user?.businessName || user?.business_name || 'Insight Enterprise Co., Ltd.'}
+            inventoryList={inventoryList}
             dbRecords={dbRecords}
           />
         </main>

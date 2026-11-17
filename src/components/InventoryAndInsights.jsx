@@ -6,7 +6,8 @@ export function InventoryTab({
   lang,
   inventoryList,
   setInventoryList,
-  renderUploadZone
+  renderUploadZone,
+  onOpenStockHealthModal
 }) {
   const isEn = lang === 'en';
   const tx = (th, en) => (isEn ? en : th);
@@ -186,6 +187,29 @@ export function InventoryTab({
           <div style={{ fontSize: '0.8rem', color: '#fde68a', marginTop: '0.2rem' }}>
             {tx('แนะนำจัดโปรโมชันลดราคาเพื่อเปลี่ยนเป็นเงินสด', 'Run clearance promo to free up cash')}
           </div>
+          {onOpenStockHealthModal && (
+            <button
+              type="button"
+              onClick={onOpenStockHealthModal}
+              style={{
+                marginTop: '0.55rem',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '8px',
+                border: '1px solid rgba(245, 158, 11, 0.45)',
+                background: 'rgba(245, 158, 11, 0.18)',
+                color: '#fbbf24',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+            >
+              <span>📋</span>
+              <span>{tx('เปิดใบสรุปผลตรวจสุขภาพสต็อก A4 ➔', 'Open A4 Cash-Trap Audit Report ➔')}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -235,6 +259,28 @@ export function InventoryTab({
                 minWidth: '230px'
               }}
             />
+            {onOpenStockHealthModal && (
+              <button
+                type="button"
+                onClick={onOpenStockHealthModal}
+                style={{
+                  padding: '0.65rem 1.1rem',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(244, 63, 94, 0.45)',
+                  background: 'linear-gradient(135deg, rgba(225, 29, 72, 0.95), rgba(190, 18, 60, 0.95))',
+                  color: '#fff',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  boxShadow: '0 4px 14px rgba(225, 29, 72, 0.35)'
+                }}
+              >
+                <span>📋</span>
+                <span>{tx('ใบสรุปสุขภาพสต็อก (A4 Report)', 'Stock Health Audit (A4)')}</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setShowAddProduct(!showAddProduct)}
