@@ -18467,7 +18467,7 @@ function App() {
       {/* Sidebar Navigation (Slide-Over Drawer on Smartphone/Tablet, Collapsible Sidebar on Desktop) */}
       <aside
         className={`border-r ${
-          theme === 'dark' ? 'border-[#1A3BB0]/50 bg-[#071039]/98' : 'border-[#AFC5F8] bg-white/98 shadow-md'
+          theme === 'dark' ? 'border-emerald-800/40 bg-[#041c14]/98' : 'border-emerald-200/80 bg-white/98 shadow-md'
         } backdrop-blur-2xl flex flex-col justify-between transition-all duration-300 fixed inset-y-0 left-0 z-50 lg:static ${
           isMobileMenuOpen ? 'translate-x-0 w-80 max-w-[86vw]' : '-translate-x-full lg:translate-x-0'
         } ${isSidebarOpen ? 'lg:w-80' : 'lg:w-24'}`}
@@ -18485,7 +18485,7 @@ function App() {
                   <span
                     className={`text-lg font-black tracking-tight ${
                       theme === 'dark'
-                        ? 'bg-gradient-to-r from-white via-amber-100 to-amber-300 bg-clip-text text-transparent'
+                        ? 'bg-gradient-to-r from-white via-emerald-100 to-emerald-300 bg-clip-text text-transparent'
                         : 'text-slate-950 font-black'
                     }`}
                   >
@@ -18493,7 +18493,7 @@ function App() {
                   </span>
                   <span
                     className={`text-[10px] block font-black tracking-wider -mt-0.5 ${
-                      theme === 'dark' ? 'text-amber-400/90' : 'text-blue-700'
+                      theme === 'dark' ? 'text-emerald-400/90' : 'text-emerald-700'
                     }`}
                   >
                     {isEn ? 'Executive Platform' : 'ระบบบริหารข้อมูลองค์กร'}
@@ -18505,14 +18505,14 @@ function App() {
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="lg:hidden text-slate-300 hover:text-amber-400 p-2 rounded-xl bg-white/10 font-black cursor-pointer"
+                className="lg:hidden text-slate-300 hover:text-emerald-400 p-2 rounded-xl bg-white/10 font-black cursor-pointer"
               >
                 ✕
               </button>
               <button
                 type="button"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="hidden lg:inline-flex text-slate-400 hover:text-amber-400 p-1.5 rounded-lg cursor-pointer"
+                className="hidden lg:inline-flex text-slate-400 hover:text-emerald-400 p-1.5 rounded-lg cursor-pointer"
               >
                 {isSidebarOpen ? '◀' : '▶'}
               </button>
@@ -18522,7 +18522,7 @@ function App() {
           <nav className="p-3.5 space-y-2 mt-1">
             {(isSidebarOpen || isMobileMenuOpen) && (
               <div className="px-3 pb-1 flex items-center justify-between">
-                <p className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-blue-700' : 'text-amber-400'}`}>
+                <p className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>
                   {isExemptAdminMode
                     ? tx('เมนู Super Admin (เว้นแพ็กเกจ)', 'Super Admin Menu (Exempt)')
                     : tx('เมนูหลักตามแพ็กเกจ', 'Package Navigation')}
@@ -18552,12 +18552,12 @@ function App() {
                   className={`w-full flex items-center justify-between p-2.5 rounded-2xl text-left transition-all cursor-pointer ${
                     activeTab === item.id
                       ? (theme === 'light'
-                          ? 'bg-blue-50/90 text-blue-900 border-2 border-blue-600 shadow-sm'
-                          : 'bg-gradient-to-r from-amber-400/25 via-amber-400/10 to-transparent text-white border-2 border-amber-400 shadow-lg')
+                          ? 'bg-emerald-50 text-emerald-950 border-2 border-emerald-600 shadow-sm'
+                          : 'bg-gradient-to-r from-emerald-500/25 via-emerald-500/10 to-transparent text-white border-2 border-emerald-400 shadow-lg')
                       : unlocked
                       ? (theme === 'light'
-                          ? 'text-slate-700 hover:text-blue-700 hover:bg-blue-50/60 border-2 border-transparent'
-                          : 'text-slate-200 hover:text-white hover:bg-white/10 border-2 border-transparent')
+                          ? 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 border-2 border-transparent'
+                          : 'text-slate-200 hover:text-white hover:bg-emerald-500/10 border-2 border-transparent')
                       : (theme === 'light'
                           ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 border-2 border-dashed border-slate-200 opacity-85'
                           : 'text-slate-400 hover:text-white hover:bg-white/5 border-2 border-dashed border-white/10 opacity-85')
@@ -18714,7 +18714,7 @@ function App() {
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header
           className={`border-b ${
-            theme === 'dark' ? 'border-[#1A3BB0]/40 bg-[#071039]/95' : 'border-[#AFC5F8] bg-white/95 shadow-sm'
+            theme === 'dark' ? 'border-emerald-800/40 bg-[#041c14]/95 shadow-[0_4px_20px_rgba(4,28,20,0.5)]' : 'border-emerald-200/80 bg-white/95 shadow-sm'
           } backdrop-blur-xl px-3 sm:px-8 py-2.5 sm:py-4 flex justify-between items-center gap-2 sticky top-0 z-20`}
         >
           <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1">
@@ -19675,8 +19675,8 @@ function App() {
                     className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ease-out transform group-hover:scale-125 group-hover:-translate-y-2 cursor-pointer ${
                       isActive
                         ? (theme === 'dark'
-                            ? 'bg-gradient-to-b from-amber-400/30 to-amber-500/10 border-2 border-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.45)]'
-                            : 'bg-gradient-to-b from-amber-500/20 to-amber-500/5 border-2 border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.35)]')
+                            ? 'bg-gradient-to-b from-emerald-400/35 to-emerald-500/15 border-2 border-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.55)]'
+                            : 'bg-gradient-to-b from-emerald-500/25 to-emerald-500/10 border-2 border-emerald-500 shadow-[0_0_14px_rgba(16,185,129,0.4)]')
                         : (theme === 'dark'
                             ? 'bg-white/5 hover:bg-white/15 border border-white/10'
                             : 'bg-slate-100/80 hover:bg-white border border-slate-200')
@@ -19691,7 +19691,7 @@ function App() {
                   {/* macOS Running App Indicator Dot (จุดแสงเรืองบอกสถานะหน้าปัจจุบัน) */}
                   <div className="h-1.5 flex items-center justify-center mt-1">
                     {isActive ? (
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] animate-pulse"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
                     ) : (
                       <span className="w-1 h-1 rounded-full bg-slate-400/30 group-hover:bg-slate-400/70 transition"></span>
                     )}

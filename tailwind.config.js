@@ -17,6 +17,19 @@ export default {
           200: '#AFC5F8', // 6. Soft Ultramarine Ice (Light Borders, Subtle Tint)
           50:  '#E6EDFD', // 7. Clean Frosted Ultramarine White (Light Canvas Background)
         },
+        emeraldLuxury: {
+          950: '#041c14', // Deep Luxury Forest Obsidian Canvas
+          900: '#063527', // Royal Deep Emerald Surfaces
+          800: '#064e3b', // Deep Forest Emerald Cards & Panels
+          700: '#047857', // Bold Classic Emerald Accent
+          600: '#059669', // Vibrant Luxury Emerald Green
+          500: '#10b981', // Radiant Mint Jade (Primary Brand)
+          400: '#34d399', // Glowing Mint Neon (Highlights, Badges)
+          300: '#6ee7b7', // Soft Mint Light
+          200: '#a7f3d0', // Delicate Jade Glass Border
+          100: '#d1fae5', // Subtle Mint Tint
+          50:  '#f0fdf4', // Clean Frosted Pearl Mint White
+        },
       },
       fontFamily: {
         sans: [
