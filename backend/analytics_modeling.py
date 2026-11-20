@@ -2,10 +2,35 @@
 # File: backend/analytics_modeling.py
 # System: InsightFlow Midstream Advanced Analytics & Statistical Modeling Engine
 # Stack: Python, NumPy, Pandas, Pure-Math Statistical Inference (RFC/NIST Standard)
-# Description:
-#   1. Time Series Forecasting & Dynamic Reorder Point (ROP) with Seasonality
-#   2. RFM Customer Segmentation Matrix & Market Basket Association Rules
-#   3. Two-Proportion Hypothesis Testing (A/B Testing Statistical Significance)
+#
+# 📖 FORMULA & STATISTICAL CATALOG (คู่มือสูตรสถิติและคณิตศาสตร์ระดับลึก):
+# ------------------------------------------------------------------------------
+# 1. Normal CDF & P-Value (การแจกแจงแบบปกติมาตรฐาน):
+#    Phi(z) = 0.5 * (1 + erf(z / sqrt(2)))
+#    Two-Tailed P-Value = 2 * (1 - Phi(|z|))
+#
+# 2. Holt-Winters Sales Time Series Forecasting:
+#    - Multiplicative Weekly Seasonal Factors (7-Day cyclical weighting)
+#    - OLS Linear Drift: Trend(t) = Intercept + Slope * t
+#    - 95% Confidence Interval: Margin = 1.96 * Residual_Std * sqrt(1 + k/N)
+#
+# 3. Dynamic Reorder Point (จุดสั่งซื้อสินค้าล่วงหน้าตามฤดูกาล - ROP):
+#    Safety_Stock = ceil(Z * sigma_d * sqrt(Lead_Time))  [Z = 1.645 for 95% Service Level]
+#    ROP = ceil((Demand_seasonal * Lead_Time) + Safety_Stock)
+#
+# 4. Two-Proportion Hypothesis Testing (A/B Testing Z-Test):
+#    p_pooled = (x_A + x_B) / (n_A + n_B)
+#    SE = sqrt(p_pooled * (1 - p_pooled) * (1/n_A + 1/n_B))
+#    Z = (p_B - p_A) / SE
+#
+# 5. Executive Deep-Dive Financial & Supply Chain KPIs:
+#    - GMROI = Gross Profit / Average Inventory Cost (Benchmark >= 2.50x)
+#    - LTV:CAC = Customer Lifetime Value / CAC (Benchmark 3.0x - 5.0x)
+#    - CAC Payback = CAC / Monthly Gross Profit Contribution per Customer
+#    - STR% = (Units Sold / Total Available Stock) * 100
+#    - RPR% = (Repeat Customers / Total Unique Customers) * 100
+#    - PED = (% Delta Quantity) / (% Delta Price)
+#    - Breakeven Orders = Fixed OPEX / Contribution Margin per Order
 # ==============================================================================
 
 import os

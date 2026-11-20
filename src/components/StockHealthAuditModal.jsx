@@ -2,7 +2,30 @@
 // File: src/components/StockHealthAuditModal.jsx
 // System: InsightFlow Stock Health & Cash-Trap Audit Report Engine
 // Description: Print-ready clean white 1-page A4 Executive Stock Health Report
-//              identifying overstock traps, sunk capital, and cash recovery actions
+//              identifying overstock traps, sunk capital, and cash recovery actions.
+//
+// 📖 ARCHITECTURE & FORMULA EXPLANATIONS (หลักการคำนวณทางการเงินในรายงาน):
+// ------------------------------------------------------------------------------
+// 1. Months of Supply (MOS) - ระยะเวลาที่สต็อกพอขายได้ (เดือน):
+//    MOS = จำนวนสต็อกคงเหลือ (Current Stock) ÷ อัตราเร็วการขายต่อเดือน (Monthly Run Rate)
+//    - Fast-Moving: MOS <= 1.0 เดือน (หมุนไว ยอดขายดี)
+//    - Healthy: 1.0 < MOS <= 2.0 เดือน (ระดับปลอดภัย 30 - 60 วัน)
+//    - Overstock Trap: 3.0 <= MOS < 12.0 เดือน (สต็อกบวม เงินจม 90 - 360 วัน)
+//    - Dead Stock: MOS >= 12.0 เดือน หรือ ไม่ขยับเกิน 180 วัน
+//
+// 2. Trapped Cash (เงินสดจมในสต็อกบวม):
+//    Trapped Cash = ผลรวมของ (จำนวนสต็อกคงเหลือ × ต้นทุนสินค้า Cost) ในกลุ่ม Overstock & Dead
+//
+// 3. Liberatable Cash Target (เป้าหมายเงินสดที่กู้คืนได้ทันที):
+//    Liberatable Cash = Trapped Cash × 75% (คำนวณจากการทำ Flash Sale ลด 25-35%)
+//
+// 4. GMROI (Gross Margin Return on Inventory Investment):
+//    GMROI = กำไรขั้นต้นรวม (Gross Profit) ÷ ต้นทุนสต็อกเฉลี่ย (Avg Inventory Cost)
+//    - เกณฑ์สากล: >= 2.50x คือสต็อกหมุนคืนทุนและผลิตกำไรได้ดีเยี่ยม
+//
+// 5. Clean White A4 Engine:
+//    ใช้พื้นหลังสีขาวคมชัด (#ffffff) ไร้เงาสีมืด พร้อม @media print ที่ปรับ Margins
+//    ให้พอดีกับกระดาษ A4 สากลจบใน 1 หน้าสำหรับนำเสนอคณะกรรมการหรือผู้บริหาร
 // ==============================================================================
 
 import React, { useRef, useMemo } from 'react';

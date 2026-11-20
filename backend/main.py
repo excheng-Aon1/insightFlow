@@ -1,7 +1,49 @@
 # ==============================================================================
-# File: main.py
-# System: InsightFlow Enterprise Data & Autonomous Restock Engine
-# Stack: FastAPI, JWT Depends(), SQLAlchemy 2.0 QueuePool, Redis (OTP+Cache), SlowAPI
+# File: backend/main.py
+# System: InsightFlow Enterprise Core API & Autonomous Business Intelligence Engine
+# Stack: FastAPI, SQLAlchemy 2.0 QueuePool, Redis (OTP + Cache), SlowAPI Rate Limiter
+#
+# ==============================================================================
+# 📖 BACKEND MASTER ARCHITECTURE & ROUTE DIRECTORY (สารบัญโครงสร้างระบบหลังบ้าน)
+# ==============================================================================
+#
+# 1. APPLICATION & INFRASTRUCTURE CONFIGURATION (Lines 130 - 200)
+#    - FastAPI App instance, SlowAPI limiter, CORS Middleware (Localhost + Vercel)
+#    - 3-Layer Anti-Bot Shield & OWASP Security Headers (nosniff, frame-options, XSS)
+#    - SQLAlchemy QueuePool High-Concurrency Database Initialization
+#
+# 2. PYDANTIC DATA CONTRACTS & SCHEMAS (Lines 201 - 380)
+#    - User Registration, Login, Google OAuth, OTP 2FA Schemas
+#    - POS Orders, Inventory Products, CRM Accounts, Deals, Activities
+#
+# 3. AUTHENTICATION & SECURITY CONTROLS (Lines 381 - 750)
+#    - /api/auth/register, /api/auth/login, /api/auth/google-login
+#    - /api/auth/send-otp, /api/auth/verify-otp (Redis TTL + Brute-force cooldown)
+#    - User Quota, Subscription Verification, and Role-Based Access Control (RBAC)
+#
+# 4. DATA INGESTION & ETL PIPELINE (Lines 751 - 1,450)
+#    - /api/etl/run-pipeline, /api/etl/status, /api/files/upload
+#    - Automated File Parsing: POS Orders, Cash Flow, Ads Spend, Sheets
+#    - Currency Sanitization, Buddhist Era to A.D. Date Normalization, Deduplication
+#
+# 5. ADVANCED ANALYTICS & PREDICTIVE MODELING (Lines 1,451 - 2,200)
+#    - /api/analytics/forecast-sales (Holt-Winters Seasonality + 95% Confidence Band)
+#    - /api/analytics/dynamic-rop (Dynamic Reorder Point with Lead Time & Safety Stock)
+#    - /api/analytics/rfm-segmentation (Recency, Frequency, Monetary Matrix)
+#    - /api/analytics/market-basket (Apriori Support, Confidence & Lift Association Rules)
+#    - /api/analytics/ab-testing (Two-Proportion Z-Test Hypothesis Testing)
+#    - /api/analytics/deep-dive-kpis (GMROI, LTV:CAC, STR%, RPR%, PED, Breakeven)
+#
+# 6. CRM, POS TRANSACTIONS & CASH FLOW (Lines 2,201 - 3,100)
+#    - /api/crm/deals, /api/crm/accounts, /api/crm/timeline
+#    - /api/pos/checkout, /api/pos/orders, /api/cashflow/transactions
+#    - Cashier Blind Shift Drop Anti-Fraud Reconciliation
+#
+# 7. DATA GOVERNANCE, QUALITY FIREWALL & AUDIT (Lines 3,101 - 3,634)
+#    - /api/governance/quality-score, /api/governance/quarantine-logs
+#    - /api/governance/resolve-quarantine, /api/governance/rbac-policies
+#    - Automated 22:00 Daily LINE Sales Summary Scheduler Thread
+#
 # ==============================================================================
 
 import os

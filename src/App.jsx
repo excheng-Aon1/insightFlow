@@ -1,3 +1,52 @@
+// ==============================================================================
+// File: src/App.jsx
+// System: InsightFlow Enterprise Executive Business Intelligence & Restock Platform
+// Tech Stack: React 19, Tailwind CSS, Chart.js, Vite 8, Lucide-style 3D Jewel Icons
+//
+// ==============================================================================
+// 📖 MASTER CODE NAVIGATION GUIDE & ARCHITECTURE TABLE OF CONTENTS
+// ==============================================================================
+//
+// 1. MODULE IMPORTS & CORE DEPENDENCIES (Lines 25 - 75)
+//    - React 19 Core Hooks: useState, useEffect, useRef, useMemo, useCallback
+//    - Chart.js 4 & React-Chartjs-2: Registration of Scales, Elements & Plugins
+//    - Sub-systems: Playbooks, Forecast, Benchmarks, ETL, BI Studio, Heatmap, etc.
+//    - 3D Vector Icons: LuxuryIconBadge, MasterRecordsIcon, Rbac Icons, etc.
+//
+// 2. CONFIGURATION, API ROUTING & CYBER-LUXURY HUD TOAST (Lines 76 - 350)
+//    - API_BASE_URL resolution (local development vs production Vercel)
+//    - CuteCatToastAvatar & Holographic 3D Notification Badges
+//
+// 3. MULTI-LANGUAGE SYSTEM (i18n DICTIONARY) (Lines 351 - 1,200)
+//    - Complete English & Thai language dictionary pairs for all business metrics
+//
+// 4. DATA SANITIZATION, NORMALIZATION & UTILITIES (Lines 1,201 - 3,500)
+//    - Currency parsing (฿, $, THB, comma removal)
+//    - Buddhist Era to Gregorian Date Normalization (พ.ศ. ➔ ค.ศ.)
+//    - File Parsers: CSV, Excel, TXT, JSON Ingestion Engines
+//
+// 5. EXECUTIVE TAB VIEWS & DASHBOARDS (Lines 3,501 - 13,750)
+//    - Overview & Financial KPI Cards (Revenue, Profit, Cash Flow, Margin)
+//    - Sales Pipeline Kanban, Customers & CRM Timeline
+//    - Inventory & Smart Reorder Point (ROP) Control Center
+//    - Marketing Ads & Multi-Channel Attribution Analytics
+//    - Staff & Cashier Blind Shift Drop Anti-Fraud Controls
+//    - Procurement, Vendor PO Requisitions & Delivery Logs
+//    - Settings Center: 6 Configuration Modules (Profile, Team, DB, etc.)
+//
+// 6. MAIN APPLICATION STATE & LIFECYCLE (Lines 13,751 - 18,500)
+//    - App() Root Component: Auth state, Active Tab state, Data Store
+//    - User session handling (JWT Tokens, OTP 2FA, Google OAuth)
+//    - Central File Registry & File Dispatcher
+//
+// 7. HEADER, NAVIGATION & DOCK ENGINE (Lines 18,501 - 19,700)
+//    - Top Bar: Logo, Shoot-in Zone, Executive One-Pager, Stock Audit (A4)
+//    - Active View Renderers wrapped in ErrorBoundary
+//    - Floating macOS Frosted Glass Dock with Smooth Hover Magnification
+//    - Global Modals: Central Basketball Court, Executive One-Pager, Stock Health Audit
+//
+// ==============================================================================
+
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Chart as ChartJS,
