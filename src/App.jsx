@@ -18686,7 +18686,7 @@ function App() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
                     <p className="text-xs font-black truncate">
-                      {isSuperAdmin ? `👑 ${user.email}` : user.name}
+                      {isSuperAdmin ? user.email : user.name}
                     </p>
                     {user.authProvider === 'google' && (
                       <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-blue-500/20 text-blue-300 border border-blue-400/30 flex-shrink-0">
@@ -18694,9 +18694,17 @@ function App() {
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-emerald-400 font-bold truncate">
-                    ● {activePlanMeta.name} ({activePlanMeta.price})
-                  </p>
+                  {isSuperAdmin ? (
+                    <div className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/25 via-yellow-400/20 to-emerald-500/25 border border-amber-400/80 shadow-[0_0_12px_rgba(251,191,36,0.35)]">
+                      <span className="text-[11px] animate-bounce">👑</span>
+                      <span className="text-[10px] font-black text-amber-300 uppercase tracking-wider">SUPER ADMIN</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] animate-pulse"></span>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-emerald-400 font-bold truncate">
+                      ● {activePlanMeta.name} ({activePlanMeta.price})
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -18740,14 +18748,15 @@ function App() {
                 <span
                   className="hidden md:inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border flex-shrink-0"
                   style={{
-                    color: activePlanMeta.accentColor,
-                    borderColor: `${activePlanMeta.accentColor}55`,
-                    backgroundColor: activePlanMeta.badgeBg
+                    color: isExemptAdminMode ? '#fbbf24' : activePlanMeta.accentColor,
+                    borderColor: isExemptAdminMode ? 'rgba(251, 191, 36, 0.75)' : `${activePlanMeta.accentColor}55`,
+                    backgroundColor: isExemptAdminMode ? 'rgba(251, 191, 36, 0.18)' : activePlanMeta.badgeBg,
+                    boxShadow: isExemptAdminMode ? '0 0 14px rgba(251, 191, 36, 0.25)' : 'none'
                   }}
                 >
                   <span>{isExemptAdminMode ? '👑' : '💎'}</span>
-                  <span>
-                    {activePlanMeta.code}: {activePlanMeta.price}{activePlanMeta.unit}
+                  <span className="tracking-wide">
+                    {isExemptAdminMode ? 'SUPER ADMIN (EXEMPT)' : `${activePlanMeta.code}: ${activePlanMeta.price}${activePlanMeta.unit}`}
                   </span>
                 </span>
               </h1>
@@ -18755,43 +18764,60 @@ function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {/* Central File Upload — Basketball Shoot-In Hub */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+            {/* Prominent Ultra-Luxury Super Admin Crown Jewel Badge */}
+            {isSuperAdmin && (
+              <div
+                className="hidden md:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full border shadow-lg bg-gradient-to-r from-amber-500/20 via-yellow-400/25 to-emerald-500/20 border-amber-400/80 backdrop-blur-md transition-all hover:scale-105 cursor-default flex-shrink-0"
+                style={{
+                  boxShadow: '0 0 16px rgba(251, 191, 36, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5)'
+                }}
+                title={tx('สิทธิ์สูงสุด Super Admin (เข้าถึงได้ทุกระบบ ไม่จำกัดโควตา)', 'Super Admin Full Privileges — Unlimited System Access')}
+              >
+                <span className="text-xs sm:text-sm drop-shadow animate-bounce">👑</span>
+                <span className="font-black text-[10px] sm:text-[11px] tracking-wider bg-gradient-to-r from-amber-300 via-yellow-100 to-amber-400 bg-clip-text text-transparent uppercase">
+                  SUPER ADMIN
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
+              </div>
+            )}
+
+            {/* Central File Upload — Basketball Shoot-In Hub (Compact Refined) */}
             <button
               type="button"
               onClick={() => setIsBasketballModalOpen(true)}
-              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-emerald-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:shadow-emerald-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
               title={tx('ชู้ตไฟล์ (อัปโหลดไฟล์กลาง ทุกหน้ามารับข้อมูลที่นี่)', 'Shoot File (Central Ingest Hub - All pages receive data here)')}
             >
-              <span className="animate-bounce text-sm sm:text-base">🏀</span>
-              <span className="font-black">
-                {tx('ชู้ตไฟล์ (อัปโหลดไฟล์กลาง)', 'Shoot File (Central)')}
+              <span className="text-xs sm:text-sm">🏀</span>
+              <span className="font-bold whitespace-nowrap">
+                {tx('อัปโหลดกลาง', 'Upload Hub')}
               </span>
             </button>
 
-            {/* Executive One-Pager (PDF) Instant Board Briefing Button */}
+            {/* Executive One-Pager (PDF) Instant Board Briefing Button (Compact Refined) */}
             <button
               type="button"
               onClick={() => setIsExecutiveOnePagerOpen(true)}
-              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-amber-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs flex items-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:shadow-amber-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
               title={tx('ดาวน์โหลดเอกสารสรุปผู้บริหาร 1-2 หน้า (PDF/A4 พร้อมส่งที่ประชุมบอร์ด)', 'Download Executive One-Pager (PDF/A4 Board Briefing)')}
             >
-              <span className="text-sm sm:text-base">📄</span>
-              <span className="font-black whitespace-nowrap">
+              <span className="text-xs sm:text-sm">📄</span>
+              <span className="font-bold whitespace-nowrap">
                 {tx('One-Pager (PDF)', 'One-Pager (PDF)')}
               </span>
             </button>
 
-            {/* Stock Health & Cash-Trap (A4) Instant Audit Button */}
+            {/* Stock Health & Cash-Trap (A4) Instant Audit Button (Compact Refined) */}
             <button
               type="button"
               onClick={() => setIsStockHealthModalOpen(true)}
-              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all shadow-md hover:shadow-rose-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs flex items-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:shadow-rose-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
               title={tx('ใบสรุปผลตรวจสุขภาพสต็อก & กับดักเงินทุนจม ขนาด 1 หน้า A4', 'Stock Health & Cash-Trap Audit Report (1-Page A4)')}
             >
-              <span className="text-sm sm:text-base">📋</span>
-              <span className="font-black whitespace-nowrap">
-                {tx('ตรวจสต็อก & เงินจม (A4)', 'Stock Audit (A4)')}
+              <span className="text-xs sm:text-sm">📋</span>
+              <span className="font-bold whitespace-nowrap">
+                {tx('ตรวจสต็อก (A4)', 'Stock Audit (A4)')}
               </span>
             </button>
 
@@ -18938,13 +18964,14 @@ function App() {
                   <button
                     type="button"
                     onClick={handleActivateSuperAdminExemptMode}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-black transition cursor-pointer border whitespace-nowrap flex-shrink-0 ${
+                    className={`px-3 py-1 rounded-xl text-xs font-black transition-all cursor-pointer border whitespace-nowrap flex-shrink-0 flex items-center gap-1.5 shadow-md ${
                       isExemptAdminMode
-                        ? 'bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 border-amber-300 shadow'
-                        : 'bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border-amber-400/40'
+                        ? 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-slate-950 border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.4)] scale-105'
+                        : 'bg-amber-400/15 hover:bg-amber-400/30 text-amber-300 border-amber-400/60'
                     }`}
                   >
-                    {isExemptAdminMode ? tx('👑 Admin', '👑 Admin') : tx('👑 สลับ Admin', '👑 Admin')}
+                    <span>👑</span>
+                    <span>{isExemptAdminMode ? tx('👑 SUPER ADMIN (เต็มสิทธิ์)', '👑 SUPER ADMIN (Full)') : tx('👑 สลับ SUPER ADMIN', '👑 SUPER ADMIN Mode')}</span>
                   </button>
                 ) : (
                   <button
