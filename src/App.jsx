@@ -18745,20 +18745,21 @@ function App() {
             <div className="min-w-0">
               <h1 className="text-sm sm:text-2xl font-black tracking-tight flex items-center gap-2 min-w-0">
                 <span className="truncate">{currentTabMeta.label}</span>
-                <span
-                  className="hidden md:inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border flex-shrink-0"
-                  style={{
-                    color: isExemptAdminMode ? '#fbbf24' : activePlanMeta.accentColor,
-                    borderColor: isExemptAdminMode ? 'rgba(251, 191, 36, 0.75)' : `${activePlanMeta.accentColor}55`,
-                    backgroundColor: isExemptAdminMode ? 'rgba(251, 191, 36, 0.18)' : activePlanMeta.badgeBg,
-                    boxShadow: isExemptAdminMode ? '0 0 14px rgba(251, 191, 36, 0.25)' : 'none'
-                  }}
-                >
-                  <span>{isExemptAdminMode ? '👑' : '💎'}</span>
-                  <span className="tracking-wide">
-                    {isExemptAdminMode ? 'SUPER ADMIN (EXEMPT)' : `${activePlanMeta.code}: ${activePlanMeta.price}${activePlanMeta.unit}`}
+                {!isExemptAdminMode && (
+                  <span
+                    className="hidden md:inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border flex-shrink-0"
+                    style={{
+                      color: activePlanMeta.accentColor,
+                      borderColor: `${activePlanMeta.accentColor}55`,
+                      backgroundColor: activePlanMeta.badgeBg
+                    }}
+                  >
+                    <span>💎</span>
+                    <span>
+                      {activePlanMeta.code}: {activePlanMeta.price}{activePlanMeta.unit}
+                    </span>
                   </span>
-                </span>
+                )}
               </h1>
               <p className="hidden sm:block text-xs text-slate-400 mt-0.5 truncate">{currentTabMeta.subLabel}</p>
             </div>
