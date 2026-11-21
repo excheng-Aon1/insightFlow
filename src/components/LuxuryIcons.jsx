@@ -63,29 +63,31 @@ export function LuxuryIconBadge({
     <div
       data-variant={variant}
       data-active={active ? 'true' : 'false'}
-      className={`wayfinding-icon-badge luxury-icon-badge luxury-icon-badge-${variant} ${active ? 'is-active scale-105' : 'hover:scale-105'} relative flex items-center justify-center flex-shrink-0 transition-transform duration-300 ${className}`}
+      className={`wayfinding-icon-badge luxury-icon-badge luxury-icon-badge-${variant} ${active ? 'is-active scale-110 shadow-lg' : 'hover:scale-105'} relative flex items-center justify-center flex-shrink-0 transition-all duration-300 ${className}`}
       style={{
         width: dims.width,
         height: dims.height,
         borderRadius,
-        background: '#090D16',
+        background: 'linear-gradient(145deg, #122258 0%, #071039 60%, #040924 100%)',
         border: `2px solid ${p.border}`,
-        boxShadow: p.glow,
+        boxShadow: active
+          ? `${p.glow}, inset 0 1.5px 2px rgba(255, 255, 255, 0.45), 0 8px 20px -4px rgba(7, 16, 57, 0.7)`
+          : `0 4px 14px rgba(0, 0, 0, 0.5), inset 0 1px 1.5px rgba(255, 255, 255, 0.35)`,
         color: '#FFFFFF',
         overflow: 'hidden'
       }}
     >
-      {/* วงแหวนสะท้อนแสงด้านบน */}
+      {/* วงแหวนสะท้อนแสงกระจกเงาด้านบน (Modern 3D Glass Jewel Specular Reflection) */}
       <div
         className="luxury-badge-orb"
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 70%)',
+          background: 'radial-gradient(circle at 35% 20%, rgba(255, 255, 255, 0.35), rgba(110, 146, 242, 0.12) 45%, transparent 75%)',
           pointerEvents: 'none'
         }}
       />
-      <div className="relative z-10 flex items-center justify-center text-white">{children}</div>
+      <div className="relative z-10 flex items-center justify-center text-white filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">{children}</div>
     </div>
   );
 }

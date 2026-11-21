@@ -13796,7 +13796,8 @@ function App() {
   };
 
   // Auth, Remember Profile, Phone & LINE ID state for automated daily sales summary
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  // ผู้ใช้ต้องเห็นหน้า Login ก่อนเข้าใช้งานเว็บตามคำขอ
+  const [isLoginOpen, setIsLoginOpen] = useState(true);
   const [authMode, setAuthMode] = useState('login');
   const [authEmail, setAuthEmail] = useState(() => {
     try {
@@ -14782,6 +14783,7 @@ function App() {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('insightflow_saved_user');
+    setIsLoginOpen(true);
     toast.success(tx('ออกจากระบบเรียบร้อยแล้ว', 'Signed out successfully'));
   };
 
@@ -18345,7 +18347,7 @@ function App() {
       label: tx('Executive BI Studio (Power BI)', 'Executive BI Studio (Power BI)'),
       subLabel: tx('สไลเซอร์กรองข้ามกราฟและพิวอตแมทริกซ์', 'Interactive Slicers & Pivot Matrix'),
       badge: 'Power BI',
-      variant: 'gold',
+      variant: 'sapphire',
       minPlan: 'starter'
     },
     {
@@ -18353,7 +18355,7 @@ function App() {
       label: tx('เลขา AI อัจฉริยะ', 'AI Executive Secretary'),
       subLabel: tx('ผู้ช่วยส่วนตัวผู้บริหาร รันสรุปงานรอบวันและงานด่วน', 'Autonomous Executive AI Agent & Daily Briefing'),
       badge: 'AI AGENT',
-      variant: 'gold',
+      variant: 'amethyst',
       minPlan: 'starter'
     },
     {
@@ -18425,7 +18427,7 @@ function App() {
       label: tx('หน้าต่าง Admin (ลูกค้าที่สมัครเว็บ)', 'Admin (Website Customers)'),
       subLabel: tx(`ชื่อ • เบอร์โทร • ไลน์ (${registeredWebCustomers.length} ราย)`, `Name • Phone • LINE (${registeredWebCustomers.length})`),
       badge: `ADMIN (${registeredWebCustomers.length})`,
-      variant: 'ruby',
+      variant: 'gold',
       minPlan: 'super_admin'
     },
     {
@@ -18467,7 +18469,7 @@ function App() {
       {/* Sidebar Navigation (Slide-Over Drawer on Smartphone/Tablet, Collapsible Sidebar on Desktop) */}
       <aside
         className={`border-r ${
-          theme === 'dark' ? 'border-emerald-800/40 bg-[#041c14]/98' : 'border-emerald-200/80 bg-white/98 shadow-md'
+          theme === 'dark' ? 'border-[#1A3BB0]/30 bg-[#071039]/98 shadow-[4px_0_24px_rgba(7,16,57,0.5)]' : 'border-blue-200/80 bg-white/98 shadow-md'
         } backdrop-blur-2xl flex flex-col justify-between transition-all duration-300 fixed inset-y-0 left-0 z-50 lg:static ${
           isMobileMenuOpen ? 'translate-x-0 w-80 max-w-[86vw]' : '-translate-x-full lg:translate-x-0'
         } ${isSidebarOpen ? 'lg:w-80' : 'lg:w-24'}`}
@@ -18485,7 +18487,7 @@ function App() {
                   <span
                     className={`text-lg font-black tracking-tight ${
                       theme === 'dark'
-                        ? 'bg-gradient-to-r from-white via-emerald-100 to-emerald-300 bg-clip-text text-transparent'
+                        ? 'bg-gradient-to-r from-white via-blue-100 to-[#6E92F2] bg-clip-text text-transparent'
                         : 'text-slate-950 font-black'
                     }`}
                   >
@@ -18493,7 +18495,7 @@ function App() {
                   </span>
                   <span
                     className={`text-[10px] block font-black tracking-wider -mt-0.5 ${
-                      theme === 'dark' ? 'text-emerald-400/90' : 'text-emerald-700'
+                      theme === 'dark' ? 'text-[#6E92F2]' : 'text-blue-700'
                     }`}
                   >
                     {isEn ? 'Executive Platform' : 'ระบบบริหารข้อมูลองค์กร'}
@@ -18505,14 +18507,14 @@ function App() {
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="lg:hidden text-slate-300 hover:text-emerald-400 p-2 rounded-xl bg-white/10 font-black cursor-pointer"
+                className="lg:hidden text-slate-300 hover:text-blue-400 p-2 rounded-xl bg-white/10 font-black cursor-pointer"
               >
                 ✕
               </button>
               <button
                 type="button"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="hidden lg:inline-flex text-slate-400 hover:text-emerald-400 p-1.5 rounded-lg cursor-pointer"
+                className="hidden lg:inline-flex text-slate-400 hover:text-blue-400 p-1.5 rounded-lg cursor-pointer"
               >
                 {isSidebarOpen ? '◀' : '▶'}
               </button>
@@ -18522,7 +18524,7 @@ function App() {
           <nav className="p-3.5 space-y-2 mt-1">
             {(isSidebarOpen || isMobileMenuOpen) && (
               <div className="px-3 pb-1 flex items-center justify-between">
-                <p className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>
+                <p className={`text-xs font-bold uppercase tracking-wider ${theme === 'light' ? 'text-blue-700' : 'text-blue-400'}`}>
                   {isExemptAdminMode
                     ? tx('เมนู Super Admin (เว้นแพ็กเกจ)', 'Super Admin Menu (Exempt)')
                     : tx('เมนูหลักตามแพ็กเกจ', 'Package Navigation')}
@@ -18552,12 +18554,12 @@ function App() {
                   className={`w-full flex items-center justify-between p-2.5 rounded-2xl text-left transition-all cursor-pointer ${
                     activeTab === item.id
                       ? (theme === 'light'
-                          ? 'bg-emerald-50 text-emerald-950 border-2 border-emerald-600 shadow-sm'
-                          : 'bg-gradient-to-r from-emerald-500/25 via-emerald-500/10 to-transparent text-white border-2 border-emerald-400 shadow-lg')
+                          ? 'bg-blue-50 text-blue-950 border-2 border-blue-600 shadow-sm'
+                          : 'bg-gradient-to-r from-[#2E5DE6]/30 via-[#1A3BB0]/20 to-transparent text-white border-2 border-[#2E5DE6] shadow-[0_0_20px_rgba(46,93,230,0.35)]')
                       : unlocked
                       ? (theme === 'light'
-                          ? 'text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/60 border-2 border-transparent'
-                          : 'text-slate-200 hover:text-white hover:bg-emerald-500/10 border-2 border-transparent')
+                          ? 'text-slate-700 hover:text-blue-700 hover:bg-blue-50/60 border-2 border-transparent'
+                          : 'text-slate-200 hover:text-white hover:bg-white/5 border-2 border-transparent')
                       : (theme === 'light'
                           ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 border-2 border-dashed border-slate-200 opacity-85'
                           : 'text-slate-400 hover:text-white hover:bg-white/5 border-2 border-dashed border-white/10 opacity-85')
@@ -18617,10 +18619,10 @@ function App() {
             {/* Sidebar Live Cloud & AI Status Quick Card (Visible when sidebar is expanded) */}
             {(isSidebarOpen || isMobileMenuOpen) && (
               <div className="pt-2 px-1">
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-amber-400/5 to-slate-900/60 border border-emerald-400/25 space-y-1.5 shadow-sm">
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-[#0F2270]/40 via-[#1A3BB0]/15 to-[#071039]/80 border border-[#2E5DE6]/35 space-y-1.5 shadow-sm">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-black text-emerald-300 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-black text-blue-300 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#2E5DE6] shadow-[0_0_8px_#2e5de6] animate-pulse" />
                       {tx('สถานะ Cloud AI:', 'Cloud AI Status:')}
                     </span>
                     <span className="font-extrabold text-amber-300 text-[10px] px-1.5 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/30">
@@ -18722,7 +18724,7 @@ function App() {
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header
           className={`border-b ${
-            theme === 'dark' ? 'border-emerald-800/40 bg-[#041c14]/95 shadow-[0_4px_20px_rgba(4,28,20,0.5)]' : 'border-emerald-200/80 bg-white/95 shadow-sm'
+            theme === 'dark' ? 'border-[#1A3BB0]/30 bg-[#071039]/95 shadow-[0_4px_20px_rgba(7,16,57,0.5)]' : 'border-blue-200/80 bg-white/95 shadow-sm'
           } backdrop-blur-xl px-3 sm:px-8 py-2.5 sm:py-4 flex justify-between items-center gap-2 sticky top-0 z-20`}
         >
           <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1">
@@ -18770,7 +18772,7 @@ function App() {
             <button
               type="button"
               onClick={() => setIsBasketballModalOpen(true)}
-              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:shadow-emerald-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 text-white font-bold text-xs flex items-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:shadow-blue-500/30 hover:scale-105 cursor-pointer flex-shrink-0"
               title={tx('ชู้ตไฟล์ (อัปโหลดไฟล์กลาง ทุกหน้ามารับข้อมูลที่นี่)', 'Shoot File (Central Ingest Hub - All pages receive data here)')}
             >
               <span className="text-xs sm:text-sm">🏀</span>
@@ -18937,8 +18939,8 @@ function App() {
                   }}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-black transition cursor-pointer border whitespace-nowrap flex-shrink-0 ${
                     activeTab === 'admin'
-                      ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 border-emerald-300 shadow'
-                      : 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border-emerald-400/50'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-400 shadow'
+                      : 'bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border-blue-400/50'
                   }`}
                 >
                   {tx(`👥 Admin (${registeredWebCustomers.length})`, `👥 Admin (${registeredWebCustomers.length})`)}
@@ -19686,8 +19688,8 @@ function App() {
                     className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ease-out transform group-hover:scale-125 group-hover:-translate-y-2 cursor-pointer ${
                       isActive
                         ? (theme === 'dark'
-                            ? 'bg-gradient-to-b from-emerald-400/35 to-emerald-500/15 border-2 border-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.55)]'
-                            : 'bg-gradient-to-b from-emerald-500/25 to-emerald-500/10 border-2 border-emerald-500 shadow-[0_0_14px_rgba(16,185,129,0.4)]')
+                            ? 'bg-gradient-to-b from-[#2E5DE6]/35 to-[#1A3BB0]/15 border-2 border-[#2E5DE6] shadow-[0_0_18px_rgba(46,93,230,0.55)]'
+                            : 'bg-gradient-to-b from-blue-500/25 to-blue-500/10 border-2 border-blue-500 shadow-[0_0_14px_rgba(37,99,235,0.4)]')
                         : (theme === 'dark'
                             ? 'bg-white/5 hover:bg-white/15 border border-white/10'
                             : 'bg-slate-100/80 hover:bg-white border border-slate-200')
@@ -19702,7 +19704,7 @@ function App() {
                   {/* macOS Running App Indicator Dot (จุดแสงเรืองบอกสถานะหน้าปัจจุบัน) */}
                   <div className="h-1.5 flex items-center justify-center mt-1">
                     {isActive ? (
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2E5DE6] shadow-[0_0_8px_#2e5de6] animate-pulse"></span>
                     ) : (
                       <span className="w-1 h-1 rounded-full bg-slate-400/30 group-hover:bg-slate-400/70 transition"></span>
                     )}

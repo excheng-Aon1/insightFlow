@@ -33,7 +33,7 @@ body {
   font-weight: 400;
   line-height: 1.75;
   letter-spacing: 0.01em;
-  background-color: #041c14; /* Modern Luxury Deep Forest Obsidian (Fallback #071039) */
+  background-color: #071039; /* Modern Luxury Deep Midnight Navy #071039 */
   color: #f8fafc;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -467,14 +467,13 @@ body {
 /* ==========================================================================
    INSIGHTFLOW MODERN EXECUTIVE ULTRAMARINE THEME (7-SHADE PALETTE)
    - ชุดสีอัลตรามารีนฟินเทค & IT (Fintech & IT — Trust Without Boredom)
-   - 1. #041c14: Deepest Luxury Forest Obsidian (Dark Mode Canvas Background, Fallback #071039)
-   - 2. #063527: Royal Deep Emerald (Sidebars, Dark Cards Surface, Fallback #0F2270)
-   - 3. #064e3b: Deep Forest Emerald (Card Borders, Secondary Actions, Fallback #1A3BB0)
-   - 4. #059669: Vibrant Luxury Emerald Green (Primary Brand, Buttons, Highlights, Fallback #2E5DE6)
-   - 5. #10b981: Radiant Mint Jade (Hover States, Badges, Secondary Accents, Fallback #6E92F2)
-   - 6. #a7f3d0: Soft Jade Frost (Light Mode Soft Borders #dbeafe / #AFC5F8)
-   - 7. #f0fdf4: Clean Frosted Pearl Mint White (Light Mode Background #f8fafc / #E6EDFD)
-   - สำรองโทนสีเดิม: #f8fafc, #dbeafe, #2563eb, #1d4ed8, #1e40af
+   - 1. #071039: Deepest Midnight Navy (Dark Canvas Background #071039)
+   - 2. #0F2270: Royal Ultramarine Navy (Sidebars, Dark Surfaces #0F2270)
+   - 3. #1A3BB0: Deep Electric Ultramarine (Card Borders, Secondary Actions #1A3BB0)
+   - 4. #2E5DE6: Vibrant Ultramarine Blue (Primary Brand, Buttons #2E5DE6)
+   - 5. #6E92F2: Bright Ultramarine Sky (Hover States, Badges #6E92F2)
+   - 6. #AFC5F8: Soft Ultramarine Ice (Light Mode Soft Borders #AFC5F8)
+   - 7. #E6EDFD: Clean Frosted Pearl Navy White (Light Mode Background #E6EDFD)
    - ขาขึ้น (Upward Trends, Growth, Gains, +%): สีเขียวมรกต (#047857 / #10b981)
    - ขาลง (Downward Trends, Drops, Losses, -%): สีแดงทับทิม (#b91c1c / #ef4444)
    ========================================================================== */
@@ -482,29 +481,29 @@ body {
 html[data-theme="light"],
 html[data-theme="light"] body,
 body.theme-light {
-  background-color: #f8fafc !important; /* Clean Frosted Pearl White #f8fafc (#E6EDFD) */
-  color: #041c14 !important;
+  background-color: #E6EDFD !important; /* Clean Frosted Pearl Navy White #E6EDFD */
+  color: #071039 !important;
 }
 
 html:not([data-theme="light"]),
 html:not([data-theme="light"]) body,
 body.theme-dark {
-  background-color: #041c14 !important; /* Deep Luxury Forest Obsidian #041c14 (#071039) */
+  background-color: #071039 !important; /* Deepest Midnight Navy #071039 */
   color: #f8fafc !important;
 }
 
-/* 1. การ์ดหลักและกล่องข้อมูล (.glass-card โทน Modern Luxury Emerald & White) */
+/* 1. การ์ดหลักและกล่องข้อมูล (.glass-card โทน Modern Luxury Navy Blue & Pearl White) */
 html[data-theme="light"] .glass-card:not(.cyber-toast-hud) {
   background: #ffffff !important;
-  border-color: #a7f3d0 !important;
-  color: #041c14 !important;
-  box-shadow: 0 8px 30px -4px rgba(6, 78, 59, 0.08), 0 2px 8px -1px rgba(16, 185, 129, 0.05) !important;
+  border-color: #AFC5F8 !important;
+  color: #071039 !important;
+  box-shadow: 0 8px 30px -4px rgba(7, 16, 57, 0.08), 0 2px 8px -1px rgba(46, 93, 230, 0.05) !important;
 }
 
 html:not([data-theme="light"]) .glass-card:not(.cyber-toast-hud) {
-  background: rgba(4, 28, 20, 0.85) !important;
-  border-color: rgba(16, 185, 129, 0.35) !important;
-  box-shadow: 0 12px 40px 0 rgba(4, 28, 20, 0.85), 0 0 25px rgba(16, 185, 129, 0.12) !important;
+  background: rgba(7, 16, 57, 0.88) !important;
+  border-color: rgba(46, 93, 230, 0.35) !important;
+  box-shadow: 0 12px 40px 0 rgba(7, 16, 57, 0.85), 0 0 25px rgba(46, 93, 230, 0.15) !important;
 }
 
 /* แปลงพื้นหลัง Tailwind โทนมืดให้เป็นพื้นขาวคลีนตัดขอบเขียวมรกตละมุนในโหมดสว่าง */
@@ -537,34 +536,34 @@ html[data-theme="light"] .bg-black\/40:not(.cyber-toast-hud),
 html[data-theme="light"] .bg-black\/50:not(.cyber-toast-hud),
 html[data-theme="light"] .bg-black\/60:not(.cyber-toast-hud) {
   background-color: #ffffff !important;
-  color: #041c14 !important;
-  border-color: #d1fae5 !important; /* #dbeafe fallback */
+  color: #071039 !important;
+  border-color: #AFC5F8 !important; /* #dbeafe fallback */
 }
 
-/* แปลง Gradient พื้นหลังมืดให้เป็นขาว-เขียวมิ้นต์อ่อนละมุนตา */
+/* แปลง Gradient พื้นหลังมืดให้เป็นขาว-ไอซ์บลูอ่อนละมุนตา */
 html[data-theme="light"] [class*="from-[#0"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="from-[#1"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="from-slate-9"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="from-slate-8"]:not(.cyber-toast-hud) {
   --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
-  --tw-gradient-to: #f0fdf4 var(--tw-gradient-to-position) !important;
+  --tw-gradient-to: #E6EDFD var(--tw-gradient-to-position) !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
 html[data-theme="light"] [class*="via-[#0"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="via-[#1"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="via-slate-9"]:not(.cyber-toast-hud) {
-  --tw-gradient-via: #f4fdf8 var(--tw-gradient-via-position) !important;
-  --tw-gradient-stops: var(--tw-gradient-from), #f4fdf8, var(--tw-gradient-to) !important;
+  --tw-gradient-via: #f0f4ff var(--tw-gradient-via-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #f0f4ff, var(--tw-gradient-to) !important;
 }
 
 html[data-theme="light"] [class*="to-[#0"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="to-[#1"]:not(.cyber-toast-hud),
 html[data-theme="light"] [class*="to-slate-9"]:not(.cyber-toast-hud) {
-  --tw-gradient-to: #ecfdf5 var(--tw-gradient-to-position) !important;
+  --tw-gradient-to: #e8effe var(--tw-gradient-to-position) !important;
 }
 
-/* แปลง Inline Dark Backgrounds ให้เป็นขาวตัดขอบเขียวมรกตละมุน */
+/* แปลง Inline Dark Backgrounds ให้เป็นขาวตัดขอบไอซ์บลูละมุน */
 html[data-theme="light"] [style*="rgba(15, 23, 42"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
 html[data-theme="light"] [style*="rgba(2, 6, 23"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
 html[data-theme="light"] [style*="rgba(5, 8, 20"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
@@ -578,8 +577,8 @@ html[data-theme="light"] [style*="#0f172a"]:not(.cyber-toast-hud):not(.luxury-ic
 html[data-theme="light"] [style*="#020617"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *),
 html[data-theme="light"] [style*="#1e293b"]:not(.cyber-toast-hud):not(.luxury-icon-badge):not(.luxury-icon-badge *) {
   background: #ffffff !important;
-  border-color: #a7f3d0 !important; /* #dbeafe fallback */
-  color: #041c14 !important;
+  border-color: #AFC5F8 !important; /* #dbeafe fallback */
+  color: #071039 !important;
 }
 
 /* 2. ระบบความคมชัดของโลโก้ (High-Definition 3D Glass Emblem) */
