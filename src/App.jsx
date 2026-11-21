@@ -18766,23 +18766,6 @@ function App() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
-            {/* Prominent Ultra-Luxury Super Admin Crown Jewel Badge */}
-            {isSuperAdmin && (
-              <div
-                className="hidden md:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full border shadow-lg bg-gradient-to-r from-amber-500/20 via-yellow-400/25 to-emerald-500/20 border-amber-400/80 backdrop-blur-md transition-all hover:scale-105 cursor-default flex-shrink-0"
-                style={{
-                  boxShadow: '0 0 16px rgba(251, 191, 36, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5)'
-                }}
-                title={tx('สิทธิ์สูงสุด Super Admin (เข้าถึงได้ทุกระบบ ไม่จำกัดโควตา)', 'Super Admin Full Privileges — Unlimited System Access')}
-              >
-                <span className="text-xs sm:text-sm drop-shadow animate-bounce">👑</span>
-                <span className="font-black text-[10px] sm:text-[11px] tracking-wider bg-gradient-to-r from-amber-300 via-yellow-100 to-amber-400 bg-clip-text text-transparent uppercase">
-                  SUPER ADMIN
-                </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
-              </div>
-            )}
-
             {/* Central File Upload — Basketball Shoot-In Hub (Compact Refined) */}
             <button
               type="button"
