@@ -15999,7 +15999,7 @@ function App() {
           const data = await res.json();
           if (data && data.answer) {
             replyText = data.answer;
-            const modelTag = data.model || 'Groq AI';
+            const modelTag = data.model || 'Google Gemini';
             metrics = isEn
               ? [`Engine: ${modelTag}`, 'Latency: Realtime (<2s)', 'Accuracy: 99.8%']
               : [`เอนจิน AI: ${modelTag}`, 'ความเร็ว: Realtime (<2s)', 'ความแม่นยำ: 99.8%'];

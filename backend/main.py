@@ -2504,29 +2504,90 @@ async def chat_with_business_ai(
             for f in uploaded_files
         ])
 
-    # 4. เรียกใช้งาน Groq LLM (Open-Weight Model) ถ้ามีการตั้งค่า GROQ_API_KEY
+    low_items_str = ", ".join([f"{p.name} (เหลือ {p.stock_qty} ชิ้น)" for p in products_db[:4]]) if products_db else "กล่องพัสดุ (12 ชิ้น), เซ็ตของขวัญ (0 ชิ้น)"
+    system_prompt = (
+        f"คุณคือ 'InsightFlow AI Copilot' ที่ปรึกษาอัจฉริยะประจำร้าน '{biz_name}' ({biz_industry})\n"
+        f"หน้าที่: ให้คำแนะนำเชิงลึกด้านธุรกิจ ยอดขาย กำไร การตลาด คลังสินค้า และป้องกันการทุจริต โดยวิเคราะห์จากข้อมูลจริงของร้านต่อไปนี้:\n"
+        f"1. สถานะการเงิน: ยอดขายปัจจุบัน ฿{current_rev:,.0f} / เป้าหมาย ฿{target_rev:,.0f} (ส่วนต่าง ฿{gap_rev:,.0f}, กำไรขั้นต้นเฉลี่ย {biz_margin:.1f}%)\n"
+        f"2. ฐานลูกค้า: ลูกค้า VIP (Champion) 284 คน, ลูกค้ากลุ่มเสี่ยงเลิกซื้อ (At-Risk ขาดการติดต่อเกิน 45 วัน) 139 คน (มูลค่าที่ดึงกลับได้ ฿164,900 เช่น คุณกิตติพงศ์ หายไป 58 วัน, คุณณัฐนิชา หายไป 64 วัน)\n"
+        f"3. แคชเชียร์ & จุดขาย: พนักงานขายดีอันดับ 1 คือ คุณภัทรพล (ยอดขาย ฿684,500, Up-sell 44.1%) และตรวจพบความเสี่ยงทุจริตบิลที่เครื่อง POS #4 มีการกดยกเลิกบิล (Void) 14 ครั้ง\n"
+        f"4. คลังสินค้า: สินค้าใกล้หมด {low_items_str}, สินค้าค้างสต็อกนานคือ ครีมกันแดด 280 ชิ้น\n"
+        f"5. ช่องทางทำกำไร: แชตร้านค้าโดยตรง (Direct Chat) ให้กำไรสุทธิสูงสุด 52.4% (ค่าธรรมเนียมเพียง 5%)\n"
+        f"6. กฎและโจทย์เฉพาะของร้าน: {biz_pain} | กฎพิเศษ: {biz_rules}\n"
+        f"7. ไฟล์ข้อมูลเชื่อมโยงจากทุกหน้า: {files_summary_text or 'ซิงก์ครบทุกโมดูล'}\n\n"
+        f"แนวทางการตอบ:\n"
+        f"- ตอบเป็นภาษาไทยอย่างมืออาชีพ สุภาพ ชัดเจน และกระชับ\n"
+        f"- ใช้ Bullet points และการเน้นตัวหนาเพื่อให้เจ้าของร้านอ่านเข้าใจง่ายใน 30 วินาที\n"
+        f"- ให้ Action Plan หรือคำแนะนำที่เป็นรูปธรรมที่เจ้าของร้านสามารถกดทำได้ทันทีบนระบบ InsightFlow"
+    )
+
+    # 4. เรียกใช้งาน Google Gemini (Primary Engine) ถ้ามีการตั้งค่า GEMINI_API_KEY
+    gemini_api_key = os.environ.get("GEMINI_API_KEY")
+    gemini_model = os.environ.get("GEMINI_AI_MODEL") or "gemini-2.0-flash"
+
+    if gemini_api_key:
+        try:
+            ai_text = None
+            # วิธีที่ 1: เรียกผ่าน Google GenAI SDK (google-genai)
+            try:
+                from google import genai
+                client = genai.Client(api_key=gemini_api_key)
+                prompt_content = f"{system_prompt}\n\nคำถามจากผู้ใช้:\n{q_raw}"
+                gemini_resp = client.models.generate_content(
+                    model=gemini_model,
+                    contents=prompt_content
+                )
+                if gemini_resp and hasattr(gemini_resp, "text") and gemini_resp.text:
+                    ai_text = gemini_resp.text.strip()
+            except Exception as sdk_err:
+                logging.info(f"[Gemini SDK Notice] {sdk_err}, trying Gemini REST API")
+
+            # วิธีที่ 2: Direct REST API Fallback
+            if not ai_text:
+                gemini_endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{gemini_model}:generateContent?key={gemini_api_key}"
+                payload = {
+                    "contents": [{
+                        "parts": [{"text": f"{system_prompt}\n\nคำถามจากผู้ใช้:\n{q_raw}"}]
+                    }],
+                    "generationConfig": {
+                        "temperature": 0.3,
+                        "maxOutputTokens": 1000
+                    }
+                }
+                resp = requests.post(
+                    gemini_endpoint,
+                    json=payload,
+                    headers={"Content-Type": "application/json"},
+                    timeout=12
+                )
+                if resp.status_code == 200:
+                    res_json = resp.json()
+                    candidates = res_json.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        if parts and "text" in parts[0]:
+                            ai_text = parts[0]["text"].strip()
+
+            if ai_text:
+                return {
+                    "status": "success",
+                    "answer": ai_text,
+                    "matched_module": f"Google Gemini Neural Engine ({gemini_model})",
+                    "business_name": biz_name,
+                    "industry": biz_industry,
+                    "engine": "gemini_llm",
+                    "model": gemini_model,
+                    "timestamp": datetime.now().strftime("%H:%M น."),
+                }
+        except Exception as e:
+            logging.warning(f"[Gemini AI Warning] {e}, checking Groq or local engine")
+
+    # 5. เรียกใช้งาน Groq LLM (Fallback Engine) ถ้ามีการตั้งค่า GROQ_API_KEY
     groq_api_key = os.environ.get("GROQ_API_KEY")
     groq_model = os.environ.get("GROQ_AI_MODEL") or "qwen/qwen3.8-27b"
 
     if groq_api_key:
         try:
-            low_items_str = ", ".join([f"{p.name} (เหลือ {p.stock_qty} ชิ้น)" for p in products_db[:4]]) if products_db else "กล่องพัสดุ (12 ชิ้น), เซ็ตของขวัญ (0 ชิ้น)"
-            system_prompt = (
-                f"คุณคือ 'InsightFlow AI Copilot' ที่ปรึกษาอัจฉริยะประจำร้าน '{biz_name}' ({biz_industry})\n"
-                f"หน้าที่: ให้คำแนะนำเชิงลึกด้านธุรกิจ ยอดขาย กำไร การตลาด คลังสินค้า และป้องกันการทุจริต โดยวิเคราะห์จากข้อมูลจริงของร้านต่อไปนี้:\n"
-                f"1. สถานะการเงิน: ยอดขายปัจจุบัน ฿{current_rev:,.0f} / เป้าหมาย ฿{target_rev:,.0f} (ส่วนต่าง ฿{gap_rev:,.0f}, กำไรขั้นต้นเฉลี่ย {biz_margin:.1f}%)\n"
-                f"2. ฐานลูกค้า: ลูกค้า VIP (Champion) 284 คน, ลูกค้ากลุ่มเสี่ยงเลิกซื้อ (At-Risk ขาดการติดต่อเกิน 45 วัน) 139 คน (มูลค่าที่ดึงกลับได้ ฿164,900 เช่น คุณกิตติพงศ์ หายไป 58 วัน, คุณณัฐนิชา หายไป 64 วัน)\n"
-                f"3. แคชเชียร์ & จุดขาย: พนักงานขายดีอันดับ 1 คือ คุณภัทรพล (ยอดขาย ฿684,500, Up-sell 44.1%) และตรวจพบความเสี่ยงทุจริตบิลที่เครื่อง POS #4 มีการกดยกเลิกบิล (Void) 14 ครั้ง\n"
-                f"4. คลังสินค้า: สินค้าใกล้หมด {low_items_str}, สินค้าค้างสต็อกนานคือ ครีมกันแดด 280 ชิ้น\n"
-                f"5. ช่องทางทำกำไร: แชตร้านค้าโดยตรง (Direct Chat) ให้กำไรสุทธิสูงสุด 52.4% (ค่าธรรมเนียมเพียง 5%)\n"
-                f"6. กฎและโจทย์เฉพาะของร้าน: {biz_pain} | กฎพิเศษ: {biz_rules}\n"
-                f"7. ไฟล์ข้อมูลเชื่อมโยงจากทุกหน้า: {files_summary_text or 'ซิงก์ครบทุกโมดูล'}\n\n"
-                f"แนวทางการตอบ:\n"
-                f"- ตอบเป็นภาษาไทยอย่างมืออาชีพ สุภาพ ชัดเจน และกระชับ\n"
-                f"- ใช้ Bullet points และการเน้นตัวหนาเพื่อให้เจ้าของร้านอ่านเข้าใจง่ายใน 30 วินาที\n"
-                f"- ให้ Action Plan หรือคำแนะนำที่เป็นรูปธรรมที่เจ้าของร้านสามารถกดทำได้ทันทีบนระบบ InsightFlow"
-            )
-
             headers = {
                 "Authorization": f"Bearer {groq_api_key}",
                 "Content-Type": "application/json"
