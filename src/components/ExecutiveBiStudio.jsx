@@ -297,6 +297,8 @@ export default function ExecutiveBiStudio({
         ltvCacNum: 0,
         cacPaybackMonths: '0.0',
         strPct: '0.0',
+        unitsSold: 0,
+        totalStockAvailable: 0,
         rprPct: '0.0',
         churnPct: '0.0',
         uniqueCustomers: 0,
@@ -558,21 +560,27 @@ export default function ExecutiveBiStudio({
       let highlightMetric = '';
 
       if (q.includes('กำไร') || q.includes('profit') || q.includes('สุทธิ')) {
-        answerTh = `กำไรสุทธิจากการดำเนินงานอยู่ที่ ฿${metrics.netOperatingProfit.toLocaleString()} (คิดเป็น ${metrics.netMarginPercent}% ของยอดขายรวม) โดยต้นทุนสินค้าหลัก (CoGS) อยู่ที่ ${costAssumptions.cogsPct}% และค่าใช้จ่ายการตลาดอยู่ที่ ${costAssumptions.marketingPct}% อยู่ในเกณฑ์สุขภาพทางการเงินระดับดีเยี่ยม`;
-        answerEn = `Net operating profit stands at ฿${metrics.netOperatingProfit.toLocaleString()} (${metrics.netMarginPercent}% net margin). CoGS represents ${costAssumptions.cogsPct}% and marketing spend ${costAssumptions.marketingPct}%, maintaining robust financial health.`;
-        highlightMetric = `฿${metrics.netOperatingProfit.toLocaleString()} (${metrics.netMarginPercent}%)`;
+        const netProfit = metrics?.netOperatingProfit || 0;
+        answerTh = `กำไรสุทธิจากการดำเนินงานอยู่ที่ ฿${netProfit.toLocaleString()} (คิดเป็น ${metrics.netMarginPercent}% ของยอดขายรวม) โดยต้นทุนสินค้าหลัก (CoGS) อยู่ที่ ${costAssumptions.cogsPct}% และค่าใช้จ่ายการตลาดอยู่ที่ ${costAssumptions.marketingPct}% อยู่ในเกณฑ์สุขภาพทางการเงินระดับดีเยี่ยม`;
+        answerEn = `Net operating profit stands at ฿${netProfit.toLocaleString()} (${metrics.netMarginPercent}% net margin). CoGS represents ${costAssumptions.cogsPct}% and marketing spend ${costAssumptions.marketingPct}%, maintaining robust financial health.`;
+        highlightMetric = `฿${netProfit.toLocaleString()} (${metrics.netMarginPercent}%)`;
       } else if (q.includes('สาขา') || q.includes('branch') || q.includes('ดีที่สุด')) {
-        const topBranch = matrixTreeData.sort((a, b) => b.totalRevenue - a.totalRevenue)[0] || { name: 'สาขา/ช่องทางหลัก', totalRevenue: metrics.grossRevenue };
-        answerTh = `สาขาที่สร้างรายได้สูงสุดในตัวกรองปัจจุบันคือ "${topBranch.name}" มียอดขายรวม ฿${topBranch.totalRevenue.toLocaleString()} (${topBranch.orders} คำสั่งซื้อ) แนะนำจัดสรรสต็อกสินค้าและทรัพยากรหลักให้เพียงพอเพื่อรองรับความต้องการที่เพิ่มขึ้น`;
-        answerEn = `Top performing branch is "${topBranch.name}" generating ฿${topBranch.totalRevenue.toLocaleString()} across ${topBranch.orders} orders. Recommended to allocate core inventory and capacity to support upcoming peak demand.`;
+        const topBranch = matrixTreeData.sort((a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0))[0] || { name: 'สาขา/ช่องทางหลัก', totalRevenue: metrics.grossRevenue || 0, orders: metrics.ordersCount || 0 };
+        const topRev = (topBranch?.totalRevenue || 0).toLocaleString();
+        const topOrders = (topBranch?.orders || 0).toLocaleString();
+        answerTh = `สาขาที่สร้างรายได้สูงสุดในตัวกรองปัจจุบันคือ "${topBranch.name}" มียอดขายรวม ฿${topRev} (${topOrders} คำสั่งซื้อ) แนะนำจัดสรรสต็อกสินค้าและทรัพยากรหลักให้เพียงพอเพื่อรองรับความต้องการที่เพิ่มขึ้น`;
+        answerEn = `Top performing branch is "${topBranch.name}" generating ฿${topRev} across ${topOrders} orders. Recommended to allocate core inventory and capacity to support upcoming peak demand.`;
         highlightMetric = topBranch.name;
       } else if (q.includes('ช่องทาง') || q.includes('channel') || q.includes('tiktok') || q.includes('shopee')) {
-        answerTh = `ช่องทางที่มีอัตราการหมุนเวียนบิลสูงสุดคือ "TikTok Shop" และ "หน้าร้าน POS" โดยมียอดเฉลี่ยต่อบิล (AOV) ฿${metrics.averageOrderValue.toLocaleString()} ควรดันโปรโมชัน Live Commerce เพิ่มเพื่อดันยอดต่อบิลให้แตะ ฿2,500`;
-        answerEn = `Fastest growing channels are TikTok Shop and Storefront POS with an AOV of ฿${metrics.averageOrderValue.toLocaleString()}. Deploy Live Commerce bundles to reach an AOV target of ฿2,500.`;
-        highlightMetric = `AOV ฿${metrics.averageOrderValue.toLocaleString()}`;
+        const aov = (metrics?.averageOrderValue || 0).toLocaleString();
+        answerTh = `ช่องทางที่มีอัตราการหมุนเวียนบิลสูงสุดคือ "TikTok Shop" และ "หน้าร้าน POS" โดยมียอดเฉลี่ยต่อบิล (AOV) ฿${aov} ควรดันโปรโมชัน Live Commerce เพิ่มเพื่อดันยอดต่อบิลให้แตะ ฿2,500`;
+        answerEn = `Fastest growing channels are TikTok Shop and Storefront POS with an AOV of ฿${aov}. Deploy Live Commerce bundles to reach an AOV target of ฿2,500.`;
+        highlightMetric = `AOV ฿${aov}`;
       } else {
-        answerTh = `จากการวิเคราะห์ข้อมูลตัวกรองปัจจุบัน รายได้รวมอยู่ที่ ฿${metrics.grossRevenue.toLocaleString()} คิดเป็น ${metrics.achievementPercent}% ของเป้าหมายองค์กร โดยมีออเดอร์ทั้งหมด ${metrics.ordersCount} รายการ`;
-        answerEn = `Across current slicers, Gross Revenue stands at ฿${metrics.grossRevenue.toLocaleString()}, achieving ${metrics.achievementPercent}% of corporate target with ${metrics.ordersCount} total transactions.`;
+        const grossRev = (metrics?.grossRevenue || 0).toLocaleString();
+        const ordersCnt = (metrics?.ordersCount || 0).toLocaleString();
+        answerTh = `จากการวิเคราะห์ข้อมูลตัวกรองปัจจุบัน รายได้รวมอยู่ที่ ฿${grossRev} คิดเป็น ${metrics.achievementPercent}% ของเป้าหมายองค์กร โดยมีออเดอร์ทั้งหมด ${ordersCnt} รายการ`;
+        answerEn = `Across current slicers, Gross Revenue stands at ฿${grossRev}, achieving ${metrics.achievementPercent}% of corporate target with ${ordersCnt} total transactions.`;
         highlightMetric = `${metrics.achievementPercent}% Target Achieved`;
       }
 
@@ -891,7 +899,7 @@ export default function ExecutiveBiStudio({
               </div>
               <div className="mt-3">
                 <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-                  ฿{metrics.grossRevenue.toLocaleString()}
+                  ฿{(metrics?.grossRevenue || 0).toLocaleString()}
                 </div>
                 <div className="mt-1 flex items-center gap-2 text-xs font-bold">
                   <span className={`px-2 py-0.5 rounded-md ${Number(metrics.targetVariancePercent) >= 0 ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500'}`}>
@@ -918,7 +926,7 @@ export default function ExecutiveBiStudio({
               </div>
               <div className="mt-3">
                 <div className={`text-2xl font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-700'}`}>
-                  ฿{metrics.netOperatingProfit.toLocaleString()}
+                  ฿{(metrics?.netOperatingProfit || 0).toLocaleString()}
                 </div>
                 <div className="mt-1 flex items-center gap-2 text-xs font-bold">
                   <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-500">
@@ -942,7 +950,7 @@ export default function ExecutiveBiStudio({
               </div>
               <div className="mt-3">
                 <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-                  ฿{metrics.averageOrderValue.toLocaleString()}
+                  ฿{(metrics?.averageOrderValue || 0).toLocaleString()}
                 </div>
                 <div className="mt-1 text-xs font-semibold text-slate-400">
                   {tx('คำนวณจากทุกคำสั่งซื้อ', 'Calculated across all orders')}
@@ -964,7 +972,7 @@ export default function ExecutiveBiStudio({
               </div>
               <div className="mt-3">
                 <div className={`text-2xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-                  {metrics.ordersCount.toLocaleString()} {tx('รายการ', 'orders')}
+                  {(metrics?.ordersCount || 0).toLocaleString()} {tx('รายการ', 'orders')}
                 </div>
                 <div className="mt-1 text-xs font-semibold text-slate-400">
                   {tx('ผ่านเกณฑ์ตัวกรอง', 'Matches current filter')}
@@ -1618,7 +1626,7 @@ export default function ExecutiveBiStudio({
 
           <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
             <div className="text-[11px] font-bold text-amber-400 mb-1">สูตรคำนวณ: Gross Profit ÷ Avg Inventory Cost</div>
-            <div>฿{deepDiveKpis.grossProfit.toLocaleString()} ÷ ฿{Math.round(deepDiveKpis.avgInventoryCost).toLocaleString()}</div>
+            <div>฿{(deepDiveKpis?.grossProfit || 0).toLocaleString()} ÷ ฿{Math.round(deepDiveKpis?.avgInventoryCost || 0).toLocaleString()}</div>
           </div>
         </div>
 
@@ -1669,7 +1677,7 @@ export default function ExecutiveBiStudio({
           </div>
 
           <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
-            <div className="text-[11px] font-bold text-sky-400 mb-1">CLV: ฿{deepDiveKpis.clv.toLocaleString()} | CAC: ฿{deepDiveKpis.cac.toLocaleString()}</div>
+            <div className="text-[11px] font-bold text-sky-400 mb-1">CLV: ฿{(deepDiveKpis?.clv || 0).toLocaleString()} | CAC: ฿{(deepDiveKpis?.cac || 0).toLocaleString()}</div>
             <div>สูตรคำนวณ: CLV ÷ CAC (Benchmark: 3.0x – 5.0x)</div>
           </div>
         </div>
@@ -1721,7 +1729,7 @@ export default function ExecutiveBiStudio({
           </div>
 
           <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
-            <div className="text-[11px] font-bold text-emerald-400 mb-1">ขายได้: {deepDiveKpis.unitsSold.toLocaleString()} ชิ้น / มีของ {deepDiveKpis.totalStockAvailable.toLocaleString()} ชิ้น</div>
+            <div className="text-[11px] font-bold text-emerald-400 mb-1">ขายได้: {(deepDiveKpis?.unitsSold || 0).toLocaleString()} ชิ้น / มีของ {(deepDiveKpis?.totalStockAvailable || 0).toLocaleString()} ชิ้น</div>
             <div>สูตรคำนวณ: (Units Sold ÷ Total Inventory) × 100</div>
           </div>
         </div>
@@ -1773,7 +1781,7 @@ export default function ExecutiveBiStudio({
           </div>
 
           <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
-            <div className="text-[11px] font-bold text-purple-400 mb-1">ลูกค้าซื้อซ้ำ: {deepDiveKpis.repeatCustomers.toLocaleString()} / ลูกค้าทั้งหมด: {deepDiveKpis.uniqueCustomers.toLocaleString()} ราย</div>
+            <div className="text-[11px] font-bold text-purple-400 mb-1">ลูกค้าซื้อซ้ำ: {(deepDiveKpis?.repeatCustomers || 0).toLocaleString()} / ลูกค้าทั้งหมด: {(deepDiveKpis?.uniqueCustomers || 0).toLocaleString()} ราย</div>
             <div>สูตรคำนวณ: (Repeat Customers ÷ Total Unique) × 100</div>
           </div>
         </div>
@@ -1810,13 +1818,13 @@ export default function ExecutiveBiStudio({
           <div className="mt-3 text-xs font-semibold text-slate-400 flex items-center justify-between border-t border-slate-700/40 dark:border-slate-800 pt-3">
             <span>{tx('ผลต่อยอดขายสุทธิ (Δ Rev):', 'Net Revenue Impact:')}</span>
             <span className={`font-black ${deepDiveKpis.revenueDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {deepDiveKpis.revenueDelta >= 0 ? `+฿${deepDiveKpis.revenueDelta.toLocaleString()}` : `-฿${Math.abs(deepDiveKpis.revenueDelta).toLocaleString()}`}
+              {deepDiveKpis.revenueDelta >= 0 ? `+฿${(deepDiveKpis?.revenueDelta || 0).toLocaleString()}` : `-฿${Math.abs(deepDiveKpis?.revenueDelta || 0).toLocaleString()}`}
             </span>
           </div>
 
           <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
             <div className="text-[11px] font-bold text-amber-400 mb-1">ปรับราคา {kpiPriceSimPct > 0 ? `+${kpiPriceSimPct}%` : `${kpiPriceSimPct}%`} → ดีมานด์ {deepDiveKpis.projectedDemandChangePct}%</div>
-            <div>รายได้จำลองใหม่: ฿{deepDiveKpis.projectedSimRevenue.toLocaleString()}</div>
+            <div>รายได้จำลองใหม่: ฿{(deepDiveKpis?.projectedSimRevenue || 0).toLocaleString()}</div>
           </div>
         </div>
 
@@ -1850,7 +1858,7 @@ export default function ExecutiveBiStudio({
 
           <div className="mt-4 flex items-baseline gap-2">
             <span className={`text-4xl font-black ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
-              {deepDiveKpis.breakevenOrders.toLocaleString()}
+              {(deepDiveKpis?.breakevenOrders || 0).toLocaleString()}
             </span>
             <span className="text-xs font-bold text-slate-400">
               {tx('ออเดอร์เพื่อคุ้มทุน OPEX', 'orders to cover fixed OPEX')}
@@ -1859,12 +1867,12 @@ export default function ExecutiveBiStudio({
 
           <div className="mt-3 text-xs font-semibold text-slate-400 flex items-center justify-between border-t border-slate-700/40 dark:border-slate-800 pt-3">
             <span>{tx('กำไรส่วนเกินต่อบิล (CM):', 'Contribution Margin/Order:')}</span>
-            <span className="font-black text-emerald-400">฿{deepDiveKpis.contributionMarginPerOrder.toLocaleString()}</span>
+            <span className="font-black text-emerald-400">฿{(deepDiveKpis?.contributionMarginPerOrder || 0).toLocaleString()}</span>
           </div>
 
           <div className={`mt-3 p-3 rounded-2xl text-xs font-mono ${theme === 'dark' ? 'bg-slate-950/60 text-slate-300' : 'bg-slate-100 text-slate-800'}`}>
-            <div className="text-[11px] font-bold text-emerald-400 mb-1">Fixed OPEX: ฿{metrics.opexAmount.toLocaleString()} ÷ CM ฿{deepDiveKpis.contributionMarginPerOrder.toLocaleString()}</div>
-            <div>ออเดอร์จริงปัจจุบัน: {metrics.ordersCount.toLocaleString()} บิล (ปลอดภัย)</div>
+            <div className="text-[11px] font-bold text-emerald-400 mb-1">Fixed OPEX: ฿{(metrics?.opexAmount || 0).toLocaleString()} ÷ CM ฿{(deepDiveKpis?.contributionMarginPerOrder || 0).toLocaleString()}</div>
+            <div>ออเดอร์จริงปัจจุบัน: {(metrics?.ordersCount || 0).toLocaleString()} บิล (ปลอดภัย)</div>
           </div>
         </div>
       </div>

@@ -460,6 +460,12 @@ def get_worker_telemetry() -> Dict[str, Any]:
     }
 
 
+@app.options("/{full_path:path}")
+async def preflight_options_catchall(full_path: str):
+    """Universal CORS preflight catchall to prevent 400/405 during browser probing"""
+    return JSONResponse(status_code=200, content={"status": "ok", "preflight": full_path})
+
+
 @app.get("/health", status_code=status.HTTP_200_OK)
 def health_check(db: Session = Depends(get_db)):
     telemetry = get_pool_telemetry(db)

@@ -14582,9 +14582,16 @@ function App() {
   // Sync backend LINE contacts into Admin Registry when backend API is available
   useEffect(() => {
     if (!canUseBackendApi()) return;
-    fetch(`${API_BASE_URL}/api/line/contacts`)
-      .then(r => r.json())
+    const token = localStorage.getItem('insightflow_jwt_token');
+    if (!token) return;
+    fetch(`${API_BASE_URL}/api/line/contacts`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(r => (r.ok ? r.json() : null))
       .then(data => {
+        if (!data) return;
         if (data && Array.isArray(data.contacts) && data.contacts.length > 0) {
           setRegisteredWebCustomers(prev => {
             let nextList = [...prev];
