@@ -501,9 +501,67 @@ html[data-theme="light"] .glass-card:not(.cyber-toast-hud) {
 }
 
 html:not([data-theme="light"]) .glass-card:not(.cyber-toast-hud) {
-  background: rgba(7, 16, 57, 0.88) !important;
-  border-color: rgba(46, 93, 230, 0.35) !important;
-  box-shadow: 0 12px 40px 0 rgba(7, 16, 57, 0.85), 0 0 25px rgba(46, 93, 230, 0.15) !important;
+  background: rgba(7, 16, 57, 0.92) !important;
+  border-color: rgba(46, 93, 230, 0.45) !important;
+  box-shadow: 0 12px 40px 0 rgba(7, 16, 57, 0.85), 0 0 25px rgba(46, 93, 230, 0.22) !important;
+}
+
+/* ==========================================================================
+   INSIGHTFLOW MODERN EXECUTIVE DEEP NAVY BLUE SYSTEM (สีน้ำเงินเข้ม)
+   - ปรับทุกพื้นผิว, การ์ด, คอนเทนเนอร์ และแถบเมนูในโหมดมืดให้ออกเป็น "สีน้ำเงินเข้ม" (Royal Ultramarine Navy & Midnight Navy)
+   - แทนที่สีดำ/สีเทาชาร์โคล (#020617, #050814, #050914, #0b1020, #0b1120, slate-900, slate-950) ด้วยสีน้ำเงินเข้มสง่างาม (#071039, #0F2270, #0b1842, #0d1f54)
+   - ขอบการ์ดเปล่งประกายสีน้ำเงินไฟฟ้าหรูหรา (#1A3BB0 / #2E5DE6)
+   ========================================================================== */
+html:not([data-theme="light"]) [class*="bg-[#050814]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#050914]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#060a14]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#060b18]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#070c18]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#070c1a]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#080d1a]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#0b1020]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#0b1120]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#0c1220]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#0c1426]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#10192a]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-slate-950:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-slate-900:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-slate-900\/95:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-slate-900\/90:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-slate-900\/80:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-slate-800:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-slate-800\/90:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-slate-800\/80:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-black\/40:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-black\/50:not(.cyber-toast-hud),
+html:not([data-theme="light"]) .bg-black\/60:not(.cyber-toast-hud) {
+  background-color: #0b1842 !important; /* Deep Royal Navy Blue */
+  border-color: rgba(46, 93, 230, 0.3) !important;
+}
+
+html:not([data-theme="light"]) [class*="bg-[#0b132b]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#091122]"]:not(.cyber-toast-hud),
+html:not([data-theme="light"]) [class*="bg-[#0d1628]"]:not(.cyber-toast-hud) {
+  background-color: #0F2270 !important; /* Royal Ultramarine Navy */
+  border-color: rgba(46, 93, 230, 0.45) !important;
+}
+
+html:not([data-theme="light"]) [class*="from-slate-900"],
+html:not([data-theme="light"]) [class*="from-slate-950"] {
+  --tw-gradient-from: #071039 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #0F2270 var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+html:not([data-theme="light"]) [class*="via-[#0b132b]"],
+html:not([data-theme="light"]) [class*="via-sky-950"] {
+  --tw-gradient-via: #0F2270 var(--tw-gradient-via-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #0F2270, var(--tw-gradient-to) !important;
+}
+
+html:not([data-theme="light"]) [class*="to-slate-900"],
+html:not([data-theme="light"]) [class*="to-slate-950"] {
+  --tw-gradient-to: #071039 var(--tw-gradient-to-position) !important;
 }
 
 /* แปลงพื้นหลัง Tailwind โทนมืดให้เป็นพื้นขาวคลีนตัดขอบเขียวมรกตละมุนในโหมดสว่าง */

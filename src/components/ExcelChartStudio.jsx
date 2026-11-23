@@ -321,7 +321,7 @@ export default function ExcelChartStudio({
       <div
         className={`p-6 rounded-3xl border transition shadow-xl backdrop-blur-xl ${
           isDark
-            ? 'bg-gradient-to-r from-slate-900/95 via-sky-950/40 to-slate-900/95 border-sky-500/30'
+            ? 'bg-gradient-to-r from-[#071039] via-[#0F2270] to-[#071039] border-[#2E5DE6]/40 shadow-xl'
             : 'bg-white/95 border-sky-200 shadow-sky-500/5'
         }`}
       >

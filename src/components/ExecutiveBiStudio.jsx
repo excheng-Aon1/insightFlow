@@ -608,13 +608,13 @@ export default function ExecutiveBiStudio({
       <div
         className={`p-6 rounded-3xl border transition-all shadow-xl backdrop-blur-xl ${
           theme === 'dark'
-            ? 'bg-gradient-to-r from-slate-900/95 via-[#0b132b]/95 to-slate-900/95 border-amber-500/30'
+            ? 'bg-gradient-to-r from-[#071039] via-[#0F2270] to-[#071039] border-[#2E5DE6]/40 shadow-xl'
             : 'bg-white/95 border-blue-200/80 shadow-blue-500/5'
         }`}
       >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-amber-400/20 via-sky-500/20 to-indigo-600/20 border border-amber-400/40 shadow-inner">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#2E5DE6]/25 via-[#1A3BB0]/30 to-[#0F2270]/40 border border-[#2E5DE6]/40 shadow-inner">
               <PowerBiStudioIcon size={34} />
             </div>
             <div>
@@ -622,7 +622,7 @@ export default function ExecutiveBiStudio({
                 <h1 className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-[#000000]'}`}>
                   {tx('Executive BI Studio (สไตล์ Power BI)', 'Executive BI Studio (Power BI Canvas)')}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 border border-amber-400/50 text-amber-500">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-[#2E5DE6]/20 border border-[#2E5DE6]/50 text-[#6E92F2]">
                   {tx('โหมดวิเคราะห์ข้ามมิติ', 'Cross-Filter Engine')}
                 </span>
                 {latestUploadedFile?.filename && (

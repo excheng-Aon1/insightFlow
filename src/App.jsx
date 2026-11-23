@@ -17207,20 +17207,20 @@ function App() {
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border text-xs font-black cursor-pointer transition ${
                   theme === 'dark'
-                    ? 'border-white/15 bg-white/5 text-amber-300 hover:bg-white/10'
+                    ? 'border-[#2E5DE6]/40 bg-[#0F2270]/60 text-[#6E92F2] hover:bg-[#1A3BB0]/40 shadow-sm'
                     : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 shadow-sm'
                 }`}
-                title={tx('สลับโหมดมืด / โหมดสว่าง', 'Switch Dark / Light Mode')}
+                title={tx('สลับโหมดสีน้ำเงินเข้ม / โหมดสว่าง', 'Switch Dark Blue / Light Mode')}
               >
                 <span className="sm:hidden">{theme === 'dark' ? '☀️' : '🌙'}</span>
-                <span className="hidden sm:inline">{theme === 'dark' ? tx('☀️ สว่าง', '☀️ Light') : tx('🌙 มืด', '🌙 Dark')}</span>
+                <span className="hidden sm:inline">{theme === 'dark' ? tx('☀️ สว่าง', '☀️ Light') : tx('🌙 น้ำเงินเข้ม', '🌙 Dark Blue')}</span>
               </button>
               <button
                 onClick={() => setIsLoginOpen(true)}
                 className={`font-black px-3 sm:px-6 py-1.5 sm:py-2.5 rounded-xl text-xs sm:text-sm transition shadow-lg cursor-pointer whitespace-nowrap ${
                   theme === 'light'
                     ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-blue-500/25'
-                    : 'bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950'
+                    : 'bg-gradient-to-r from-[#1A3BB0] via-[#2E5DE6] to-[#0F2270] hover:from-[#2E5DE6] hover:to-[#6E92F2] text-white shadow-md shadow-[#0F2270]/50 border border-[#6E92F2]/30'
                 }`}
               >
                 <span className="sm:hidden">{tx('เข้าใช้งาน', 'Sign In')}</span>
@@ -17247,7 +17247,7 @@ function App() {
                 onClick={() => scrollToSection(item.id)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-black whitespace-nowrap transition cursor-pointer ${
                   activeSection === item.id
-                    ? 'bg-amber-400 text-slate-950 shadow'
+                    ? (theme === 'dark' ? 'bg-[#2E5DE6] text-white shadow shadow-[#0F2270]/50' : 'bg-blue-600 text-white shadow')
                     : theme === 'dark'
                     ? 'bg-white/5 text-slate-300 border border-white/10'
                     : 'bg-slate-100 text-slate-800 border border-slate-300'
@@ -17267,9 +17267,9 @@ function App() {
               <div className={`inline-flex items-center gap-2 text-xs font-black px-3.5 py-1.5 rounded-full mb-4 sm:mb-6 border ${
                 theme === 'light'
                   ? 'bg-blue-50 text-blue-700 border-blue-200'
-                  : 'bg-amber-400/10 text-amber-400 border-amber-400/20'
+                  : 'bg-[#2E5DE6]/15 text-[#6E92F2] border-[#2E5DE6]/35'
               }`}>
-                <span className={`w-2 h-2 rounded-full animate-pulse ${theme === 'light' ? 'bg-blue-600' : 'bg-amber-400'}`}></span>
+                <span className={`w-2 h-2 rounded-full animate-pulse ${theme === 'light' ? 'bg-blue-600' : 'bg-[#6E92F2]'}`}></span>
                 <span>{t.badgeHero}</span>
               </div>
 
@@ -17278,7 +17278,7 @@ function App() {
                 <span
                   className={`block mt-1.5 sm:mt-2 bg-clip-text text-transparent ${
                     theme === 'dark'
-                      ? 'bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500'
+                      ? 'bg-gradient-to-r from-blue-200 via-sky-300 to-[#6E92F2]'
                       : 'bg-gradient-to-r from-blue-700 via-blue-600 to-sky-600'
                   }`}
                 >
@@ -17298,7 +17298,7 @@ function App() {
                   className={`w-full sm:w-auto font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl shadow-xl text-base sm:text-lg cursor-pointer text-center transition-all duration-200 transform hover:scale-[1.02] ${
                     theme === 'light'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-blue-500/25'
-                      : 'bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-400 text-slate-950'
+                      : 'bg-gradient-to-r from-[#1A3BB0] via-[#2E5DE6] to-[#0F2270] hover:from-[#2E5DE6] hover:to-[#6E92F2] text-white shadow-xl shadow-[#0F2270]/60 border border-[#6E92F2]/40'
                   }`}
                 >
                   {t.heroCtaPrimary || t.freeTrial}
@@ -17308,10 +17308,10 @@ function App() {
                   className={`w-full sm:w-auto font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl border text-base sm:text-lg cursor-pointer text-center flex items-center justify-center gap-2 transition-all duration-200 ${
                     theme === 'light'
                       ? 'bg-white hover:bg-blue-50 text-slate-800 border-blue-200 shadow-sm'
-                      : 'bg-[#0b1120] hover:bg-slate-800 text-white border-amber-400/40 shadow-[0_0_25px_rgba(251,191,36,0.2)]'
+                      : 'bg-[#0A1640] hover:bg-[#0F2270] text-white border-[#2E5DE6]/40 shadow-[0_0_25px_rgba(46,93,230,0.25)]'
                   }`}
                 >
-                  <span className={`inline-block w-2.5 h-2.5 rounded-full animate-ping ${theme === 'light' ? 'bg-blue-600' : 'bg-amber-400'}`} />
+                  <span className={`inline-block w-2.5 h-2.5 rounded-full animate-ping ${theme === 'light' ? 'bg-blue-600' : 'bg-[#6E92F2]'}`} />
                   <span>▶ {t.watchDemo}</span>
                 </button>
               </div>
@@ -18596,7 +18596,7 @@ function App() {
                       <div className="min-w-0 flex-1">
                         <p className={`text-sm font-black truncate leading-tight ${
                           activeTab === item.id
-                            ? (theme === 'light' ? 'text-blue-700' : 'text-amber-300')
+                            ? (theme === 'light' ? 'text-blue-700' : 'text-[#6E92F2]')
                             : (theme === 'light' ? 'text-slate-900' : 'text-slate-100')
                         }`}>
                           {item.label}
@@ -18604,7 +18604,7 @@ function App() {
                         {item.subLabel && (
                           <p className={`text-[11px] truncate mt-0.5 leading-snug ${
                             activeTab === item.id
-                              ? (theme === 'light' ? 'text-blue-600 font-bold' : 'text-amber-200/80 font-bold')
+                              ? (theme === 'light' ? 'text-blue-600 font-bold' : 'text-blue-200 font-bold')
                               : (theme === 'light' ? 'text-slate-500 font-medium' : 'text-slate-400 font-medium')
                           }`}>
                             {item.subLabel}
@@ -18850,7 +18850,7 @@ function App() {
                   onClick={() => setFontScale(sz.id)}
                   className={`px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                     fontScale === sz.id
-                      ? (theme === 'light' ? 'bg-blue-600 text-white shadow' : 'bg-amber-400 text-slate-950 shadow')
+                      ? (theme === 'light' ? 'bg-blue-600 text-white shadow' : 'bg-[#2E5DE6] text-white shadow shadow-[#0F2270]/50')
                       : theme === 'dark'
                       ? 'text-slate-300 hover:text-white'
                       : 'text-slate-700 hover:text-blue-700 hover:bg-blue-50'
@@ -18867,12 +18867,12 @@ function App() {
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border text-xs font-black cursor-pointer transition ${
                 theme === 'dark'
-                  ? 'border-white/15 bg-white/5 text-amber-300 hover:bg-white/10'
+                  ? 'border-[#2E5DE6]/40 bg-[#0F2270]/60 text-[#6E92F2] hover:bg-[#1A3BB0]/40 shadow-sm'
                   : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 shadow-sm'
               }`}
             >
               <span className="sm:hidden">{theme === 'dark' ? '☀️' : '🌙'}</span>
-              <span className="hidden sm:inline">{theme === 'dark' ? tx('☀️ สว่าง', '☀️ Light') : tx('🌙 มืด', '🌙 Dark')}</span>
+              <span className="hidden sm:inline">{theme === 'dark' ? tx('☀️ สว่าง', '☀️ Light') : tx('🌙 น้ำเงินเข้ม', '🌙 Dark Blue')}</span>
             </button>
           </div>
         </header>

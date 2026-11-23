@@ -1301,25 +1301,33 @@ export function SettingsTab({
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() => setTheme('dark')}
-                    className={`p-3 rounded-2xl text-xs font-bold transition cursor-pointer border-2 text-center ${
+                    onClick={() => {
+                      setTheme('dark');
+                      toast.success(tx('เปลี่ยนเป็นธีมสีน้ำเงินเข้ม (Deep Navy Blue) เรียบร้อยแล้ว', 'Switched to Deep Navy Blue theme'));
+                    }}
+                    className={`p-3 rounded-2xl text-xs font-bold transition cursor-pointer border-2 text-center flex flex-col items-center justify-center gap-1 ${
                       theme === 'dark'
-                        ? 'border-[#2E5DE6] bg-[#071039] text-white shadow-md'
-                        : 'border-white/10 bg-white/5 text-slate-300'
+                        ? 'border-[#2E5DE6] bg-[#071039] text-white shadow-lg shadow-[#0F2270]/50 ring-2 ring-[#2E5DE6]/30'
+                        : 'border-white/10 bg-white/5 text-slate-300 hover:border-[#2E5DE6]/40'
                     }`}
                   >
-                    🌙 Dark Mode (สีกรม)
+                    <span>🌙 {tx('สีน้ำเงินเข้ม', 'Deep Navy Blue')}</span>
+                    <span className="text-[10px] font-medium text-[#6E92F2]">{tx('(สีกรมผู้บริหาร)', '(Executive Navy)')}</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setTheme('light')}
-                    className={`p-3 rounded-2xl text-xs font-bold transition cursor-pointer border-2 text-center ${
+                    onClick={() => {
+                      setTheme('light');
+                      toast.success(tx('เปลี่ยนเป็นธีมสีขาวฟ้าถนอมสายตาเรียบร้อยแล้ว', 'Switched to White-Blue Light theme'));
+                    }}
+                    className={`p-3 rounded-2xl text-xs font-bold transition cursor-pointer border-2 text-center flex flex-col items-center justify-center gap-1 ${
                       theme === 'light'
-                        ? 'border-blue-600 bg-white text-slate-900 shadow-md'
-                        : 'border-white/10 bg-white/5 text-slate-300'
+                        ? 'border-blue-600 bg-white text-slate-900 shadow-md ring-2 ring-blue-500/20'
+                        : 'border-white/10 bg-white/5 text-slate-300 hover:border-blue-400/40'
                     }`}
                   >
-                    ☀️ Light Mode (สีขาว)
+                    <span>☀️ {tx('สีขาวฟ้า', 'White-Blue')}</span>
+                    <span className="text-[10px] font-medium text-slate-500">{tx('(ถนอมสายตา)', '(Eye Comfort)')}</span>
                   </button>
                 </div>
               </div>
