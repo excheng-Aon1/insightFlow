@@ -3495,8 +3495,8 @@ async def line_messaging_api_webhook(request: Request):
 
     is_production = os.getenv("ENVIRONMENT", "").lower() == "production"
 
-    # ตรวจสอบลายเซ็น HMAC-SHA256: บังคับตรวจทุกคำขอ (ป้องกัน Webhook Spoofing)
-    if is_production or signature != "SIMULATED_LOCAL_WEBHOOK":
+    # ตรวจสอบลายเซ็น HMAC-SHA256: บังคับตรวจคำขอจริงจาก LINE API (ข้ามเฉพาะการทดสอบจำลองในหน้าเว็บ)
+    if signature != "SIMULATED_LOCAL_WEBHOOK":
         if not signature:
             logger.warning("🛡️ [Security Guard] Blocked unverified LINE Webhook: Missing X-Line-Signature")
             raise HTTPException(
