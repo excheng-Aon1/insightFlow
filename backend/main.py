@@ -3464,8 +3464,8 @@ async def register_customer_line_contact(req: LineContactRegisterRequest):
     return {
         "status": "success",
         "contact": registry[norm_phone],
-        "line_oa_id": os.getenv("LINE_OA_ID", "@715ljuvj"),
-        "channel_id": os.getenv("LINE_CHANNEL_ID", "2011977245"),
+        "line_oa_id": os.getenv("LINE_OA_ID", "@693knsqp"),
+        "channel_id": os.getenv("LINE_CHANNEL_ID", "2012755847"),
         "is_line_user_linked": bool(registry[norm_phone].get("line_user_id")),
         "message": f"บันทึกเบอร์โทร {req.phone} และ LINE ID {req.line_id} เข้าสู่ระบบแจ้งเตือนอัตโนมัติ (22:00 น.) เรียบร้อยแล้ว",
     }
@@ -3480,8 +3480,8 @@ async def get_registered_line_contacts(
     token_ready = bool(get_line_channel_access_token())
     return {
         "status": "success",
-        "line_oa_id": os.getenv("LINE_OA_ID", "@715ljuvj"),
-        "channel_id": os.getenv("LINE_CHANNEL_ID", "2011977245"),
+        "line_oa_id": os.getenv("LINE_OA_ID", "@693knsqp"),
+        "channel_id": os.getenv("LINE_CHANNEL_ID", "2012755847"),
         "messaging_api_ready": token_ready,
         "daily_summary_time": os.getenv("LINE_DAILY_SUMMARY_TIME", "22:00"),
         "contacts": list(registry.values()),
@@ -3491,7 +3491,7 @@ async def get_registered_line_contacts(
 @app.post("/api/line/webhook")
 async def line_messaging_api_webhook(request: Request):
     """
-    Webhook สำหรับรับข้อความจาก LINE Official Account (@715ljuvj)
+    Webhook สำหรับรับข้อความจาก LINE Official Account (@693knsqp)
     พร้อมการตรวจสอบ Digital Signature (HMAC-SHA256) อย่างเคร่งครัด
     """
     raw_body = await request.body()
@@ -3665,7 +3665,7 @@ async def send_daily_sales_summary_to_line(
             "ok": True,
             "mode": "token_verified_broadcast_ready" if token else "local_simulation",
             "token_acquired": bool(token),
-            "channel_id": os.getenv("LINE_CHANNEL_ID", "2011977245"),
+            "channel_id": os.getenv("LINE_CHANNEL_ID", "2012755847"),
         }
 
     return {
@@ -3673,7 +3673,7 @@ async def send_daily_sales_summary_to_line(
         "delivered_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "phone": req.phone,
         "line_id": req.line_id,
-        "line_user_id": target_line_user_id or "รอแอดเพื่อนและพิมพ์เบอร์โทรในแชท @715ljuvj",
+        "line_user_id": target_line_user_id or "รอแอดเพื่อนและพิมพ์เบอร์โทรในแชท @693knsqp",
         "summary_text": summary_text,
         "flex_message": flex_card,
         "line_api_status": api_result,
