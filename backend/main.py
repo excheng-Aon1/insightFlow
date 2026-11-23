@@ -187,14 +187,9 @@ app.add_exception_handler(RateLimitExceeded, custom_rate_limit_exceeded_handler)
 
 _RAW_ALLOWED_ORIGINS = os.getenv(
     "ALLOWED_ORIGINS",
-    "https://insightflow-webapp.vercel.app,https://insightflow-2026.vercel.app,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000",
+    "https://insightflow-webapp.vercel.app,https://insightflow-2026.vercel.app,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://localhost:8000,http://127.0.0.1:8000",
 )
-_parsed_origins = [origin.strip() for origin in _RAW_ALLOWED_ORIGINS.split(",") if origin.strip()]
-if os.getenv("ENVIRONMENT", "").lower() == "production" and not os.getenv("ALLOWED_ORIGINS"):
-    # ในโหมด Production ตัด Localhost ออกเพื่อป้องกัน Cross-Site Scripting จาก Local Network
-    ALLOWED_ORIGINS = [orig for orig in _parsed_origins if not orig.startswith("http://localhost") and not orig.startswith("http://127.0.0.1")]
-else:
-    ALLOWED_ORIGINS = _parsed_origins
+ALLOWED_ORIGINS = [origin.strip() for origin in _RAW_ALLOWED_ORIGINS.split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,
