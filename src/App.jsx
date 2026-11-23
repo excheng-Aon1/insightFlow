@@ -14714,6 +14714,13 @@ function App() {
     document.body.classList.toggle('theme-dark', theme === 'dark');
   }, [theme]);
 
+  // Gracefully steer standard SME store owners away from hidden technical tabs (database/admin)
+  useEffect(() => {
+    if (!isExemptAdminMode && (activeTab === 'database' || activeTab === 'admin')) {
+      setActiveTab('overview');
+    }
+  }, [isExemptAdminMode, activeTab]);
+
   const [isAppleFilmOpen, setIsAppleFilmOpen] = useState(false);
   const [activatingPlanId, setActivatingPlanId] = useState(null);
   const [previewSelectedPlanId, setPreviewSelectedPlanId] = useState('professional');
@@ -18446,6 +18453,15 @@ function App() {
     }
   ];
 
+  // คัดกรองเมนูทางเทคนิคระดับ Enterprise (Database/SQL Sandbox และ Admin Registry)
+  // ให้ร้านค้า SME เห็นเฉพาะเมนูที่จำเป็นต่อธุรกิจ และเปิดดูได้เฉพาะเมื่ออยู่ในโหมด Super Admin
+  const displayedMenuItems = sidebarMenuItems.filter(item => {
+    if (item.id === 'database' || item.id === 'admin') {
+      return isExemptAdminMode;
+    }
+    return true;
+  });
+
   const currentTabMeta = sidebarMenuItems.find(m => m.id === activeTab) || sidebarMenuItems[0];
   const isTabUnlocked = tabId => {
     if (tabId === 'admin') return true;
@@ -18547,7 +18563,7 @@ function App() {
                 </span>
               </div>
             )}
-            {sidebarMenuItems.map(item => {
+            {displayedMenuItems.map(item => {
               const unlocked = isTabUnlocked(item.id);
               const reqPlan = planTiersMap[item.minPlan] || planTiersMap.starter;
               const showLabels = isSidebarOpen || isMobileMenuOpen;
@@ -19665,7 +19681,7 @@ function App() {
                 : '0 20px 40px -10px rgba(15, 23, 42, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9)'
             }}
           >
-            {sidebarMenuItems.map(nav => {
+            {displayedMenuItems.map(nav => {
               const unlocked = isTabUnlocked(nav.id);
               const isActive = activeTab === nav.id;
 
