@@ -18877,7 +18877,7 @@ function App() {
           </div>
         </header>
 
-        <main className="p-3 sm:p-6 lg:p-8 pb-28 lg:pb-8 space-y-3.5 sm:space-y-6 flex-1 max-w-full overflow-x-hidden">
+        <main className="p-3 sm:p-6 lg:p-8 pb-10 sm:pb-12 space-y-3.5 sm:space-y-6 flex-1 max-w-full overflow-x-hidden">
           {/* CUTE GINGER CAT ANNOUNCEMENT BILLBOARD WITH LIVELY 3D ANIMATION */}
           <CuteCatAnnouncementBoard
             isEn={isEn}
@@ -19663,108 +19663,6 @@ function App() {
             dbRecords={dbRecords}
           />
         </main>
-
-        {/* ========================================================= */}
-        {/* macOS FLOATING GLASS DOCK (แถบทางลัดด้านล่างสไตล์ Mac)       */}
-        {/* ========================================================= */}
-        <div className="fixed bottom-3 inset-x-0 z-40 flex justify-center pointer-events-none px-3">
-          <nav
-            aria-label="macOS Floating Glass Dock"
-            className={`pointer-events-auto flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl sm:rounded-3xl border shadow-2xl backdrop-blur-2xl transition-all duration-300 max-w-full overflow-x-auto no-scrollbar ${
-              theme === 'dark'
-                ? 'bg-slate-950/75 border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.65)] text-white'
-                : 'bg-white/80 border-slate-300/80 shadow-[0_12px_35px_rgba(15,23,42,0.18)] text-slate-900'
-            }`}
-            style={{
-              boxShadow: theme === 'dark'
-                ? '0 20px 45px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2)'
-                : '0 20px 40px -10px rgba(15, 23, 42, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9)'
-            }}
-          >
-            {displayedMenuItems.map(nav => {
-              const unlocked = isTabUnlocked(nav.id);
-              const isActive = activeTab === nav.id;
-
-              return (
-                <div key={nav.id} className="relative group flex flex-col items-center flex-shrink-0">
-                  {/* macOS Tooltip Bubble (ลอยด้านบนไอคอนเมื่อ Hover) */}
-                  <div className="absolute -top-10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform group-hover:-translate-y-1 z-50 whitespace-nowrap">
-                    <div
-                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold shadow-xl border backdrop-blur-md flex items-center gap-1.5 ${
-                        theme === 'dark'
-                          ? 'bg-slate-900/95 border-white/20 text-white'
-                          : 'bg-white/95 border-slate-300 text-slate-900'
-                      }`}
-                    >
-                      {!unlocked && <span>🔒</span>}
-                      <span>{nav.label}</span>
-                    </div>
-                  </div>
-
-                  {/* Mac Dock App Icon Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab(nav.id);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ease-out transform group-hover:scale-125 group-hover:-translate-y-2 cursor-pointer ${
-                      isActive
-                        ? (theme === 'dark'
-                            ? 'bg-gradient-to-b from-[#2E5DE6]/35 to-[#1A3BB0]/15 border-2 border-[#2E5DE6] shadow-[0_0_18px_rgba(46,93,230,0.55)]'
-                            : 'bg-gradient-to-b from-blue-500/25 to-blue-500/10 border-2 border-blue-500 shadow-[0_0_14px_rgba(37,99,235,0.4)]')
-                        : (theme === 'dark'
-                            ? 'bg-white/5 hover:bg-white/15 border border-white/10'
-                            : 'bg-slate-100/80 hover:bg-white border border-slate-200')
-                    }`}
-                  >
-                    <LuxuryModuleIcon type={nav.id} size={22} />
-                    {!unlocked && (
-                      <span className="absolute -top-1 -right-1 text-[10px] drop-shadow">🔒</span>
-                    )}
-                  </button>
-
-                  {/* macOS Running App Indicator Dot (จุดแสงเรืองบอกสถานะหน้าปัจจุบัน) */}
-                  <div className="h-1.5 flex items-center justify-center mt-1">
-                    {isActive ? (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#2E5DE6] shadow-[0_0_8px_#2e5de6] animate-pulse"></span>
-                    ) : (
-                      <span className="w-1 h-1 rounded-full bg-slate-400/30 group-hover:bg-slate-400/70 transition"></span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Mac Dock Divider */}
-            <div className={`w-[1px] h-8 mx-1 ${theme === 'dark' ? 'bg-white/15' : 'bg-slate-300'}`} />
-
-            {/* Quick Action: All Menus / Drawer */}
-            <div className="relative group flex flex-col items-center flex-shrink-0">
-              <div className="absolute -top-10 opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 transform group-hover:-translate-y-1 z-50 whitespace-nowrap">
-                <div
-                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold shadow-xl border backdrop-blur-md ${
-                    theme === 'dark' ? 'bg-slate-900/95 border-white/20 text-white' : 'bg-white/95 border-slate-300 text-slate-900'
-                  }`}
-                >
-                  {tx('เปิดลิ้นชักเมนูทั้งหมด', 'Open All Menus')}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsMobileMenuOpen(true)}
-                className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-all duration-200 ease-out transform group-hover:scale-125 group-hover:-translate-y-2 cursor-pointer ${
-                  theme === 'dark' ? 'bg-white/10 hover:bg-white/20 border border-white/15 text-amber-300' : 'bg-slate-100 hover:bg-white border border-slate-300 text-amber-600'
-                }`}
-              >
-                <span className="text-lg font-black leading-none">☰</span>
-              </button>
-              <div className="h-1.5 flex items-center justify-center mt-1">
-                <span className="w-1 h-1 rounded-full opacity-0"></span>
-              </div>
-            </div>
-          </nav>
-        </div>
       </div>
     </div>
   );
