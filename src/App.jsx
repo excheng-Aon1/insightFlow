@@ -6770,8 +6770,8 @@ export function MultiChannelTab({
             </span>
             <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: '#f8fafc' }}>
               {tx(
-                'ส่งสรุปยอดขายเข้ามือถืออัตโนมัติทุกวัน 22:00 น. & ส่งออกไฟล์ภาษีขาย',
-                'Daily 22:00 Mobile Summary Notification & 1-Click Tax Report Export'
+                `ส่งสรุปยอดขายเข้ามือถืออัตโนมัติ (${lineNotifyTime || '22:00'} น.) & ส่งออกไฟล์ภาษีขาย`,
+                `Daily (${lineNotifyTime || '22:00'}) Mobile Summary Notification & 1-Click Tax Report Export`
               )}
             </h3>
             <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.9rem', color: '#cbd5e1' }}>
@@ -6876,22 +6876,54 @@ export function MultiChannelTab({
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.65rem' }}>
-              <label style={{ color: '#cbd5e1', fontSize: '0.88rem', fontWeight: 700 }}>
-                {tx('เวลาส่งอัตโนมัติ:', 'Schedule Time:')}
+              <label style={{ color: '#cbd5e1', fontSize: '0.88rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <span>⏰ {tx('ตั้งเวลาส่งอัตโนมัติ:', 'Schedule Time:')}</span>
                 <input
                   type="time"
                   value={lineNotifyTime}
-                  onChange={e => setLineNotifyTime(e.target.value)}
+                  onChange={e => {
+                    const newTime = e.target.value;
+                    setLineNotifyTime(newTime);
+                    try {
+                      localStorage.setItem('insightflow_line_notify_time', newTime);
+                    } catch {}
+                  }}
                   style={{
-                    marginLeft: '0.5rem',
                     padding: '0.45rem 0.65rem',
                     borderRadius: '8px',
                     background: '#0f172a',
                     color: '#f8fafc',
-                    border: '1px solid rgba(148,163,184,0.3)'
+                    border: '1px solid rgba(148,163,184,0.3)',
+                    fontFamily: 'monospace',
+                    cursor: 'pointer'
                   }}
                 />
               </label>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setLineNotifyTime('22:00');
+                  try {
+                    localStorage.setItem('insightflow_line_notify_time', '22:00');
+                  } catch {}
+                  toast.success(tx('รีเซ็ตเวลาเป็น 22:00 น. (ค่าเริ่มต้น)', 'Reset to default 22:00'));
+                }}
+                style={{
+                  padding: '0.45rem 0.75rem',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(148,163,184,0.3)',
+                  background: 'rgba(255,255,255,0.06)',
+                  color: '#94a3b8',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+                title={tx('รีเซ็ตเป็นเวลาเริ่มต้น 22:00 น.', 'Reset to default 22:00')}
+              >
+                {tx('⏰ 22:00 (เบื้องต้น)', '⏰ 22:00 (Default)')}
+              </button>
+
               <button
                 type="button"
                 onClick={() => setLineNotifyEnabled(!lineNotifyEnabled)}
@@ -6905,7 +6937,9 @@ export function MultiChannelTab({
                   cursor: 'pointer'
                 }}
               >
-                {lineNotifyEnabled ? tx('✅ เปิดส่งอัตโนมัติ 22:00 น.', '✅ Auto-Send Enabled') : tx('⏸️ ปิดใช้งานชั่วคราว', '⏸️ Paused')}
+                {lineNotifyEnabled
+                  ? tx(`✅ เปิดส่งอัตโนมัติ ${lineNotifyTime || '22:00'} น.`, `✅ Auto-Send (${lineNotifyTime || '22:00'}) Enabled`)
+                  : tx('⏸️ ปิดใช้งานชั่วคราว', '⏸️ Paused')}
               </button>
 
               <button
@@ -14186,7 +14220,13 @@ function App() {
   const [centralPosList, setCentralPosList] = useState([]);
 
   const [lineNotifyEnabled, setLineNotifyEnabled] = useState(true);
-  const [lineNotifyTime, setLineNotifyTime] = useState('22:00');
+  const [lineNotifyTime, setLineNotifyTime] = useState(() => {
+    try {
+      const saved = localStorage.getItem('insightflow_line_notify_time');
+      if (saved) return saved;
+    } catch {}
+    return '22:00';
+  });
   const [isUploading, setIsUploading] = useState(false);
   const [dragOverTabKey, setDragOverTabKey] = useState(null);
 
@@ -14649,7 +14689,7 @@ function App() {
   }, []);
 
   // Sync Phone & LINE ID with Backend LINE OA Registry (backend/main.py)
-  const syncContactWithLineBackend = (phoneVal, lineIdVal, emailVal, nameVal) => {
+  const syncContactWithLineBackend = (phoneVal, lineIdVal, emailVal, nameVal, customTime) => {
     if (!canUseBackendApi()) {
       return;
     }
@@ -14661,19 +14701,26 @@ function App() {
         name: nameVal || user?.name || authName || 'เจ้าของธุรกิจ InsightFlow',
         phone: phoneVal,
         line_id: lineIdVal,
-        notify_time: lineNotifyTime || '22:00',
+        notify_time: customTime || lineNotifyTime || '22:00',
         notify_enabled: lineNotifyEnabled
       })
     }).catch(() => {});
   };
 
   // Update Phone & LINE ID live from Dashboard or Settings
-  const handleUpdateUserContact = (newPhone, newLineId) => {
+  const handleUpdateUserContact = (newPhone, newLineId, newTime) => {
     setAuthPhone(newPhone);
     setAuthLineId(newLineId);
+    const effectiveTime = newTime || lineNotifyTime || '22:00';
+    if (newTime) {
+      setLineNotifyTime(newTime);
+      try {
+        localStorage.setItem('insightflow_line_notify_time', newTime);
+      } catch {}
+    }
     setUser(prev => {
       if (!prev) return prev;
-      const updated = { ...prev, phone: newPhone, lineId: newLineId };
+      const updated = { ...prev, phone: newPhone, lineId: newLineId, notifyTime: effectiveTime };
       try {
         localStorage.setItem('insightflow_saved_user', JSON.stringify(updated));
       } catch {
@@ -14688,7 +14735,7 @@ function App() {
       lineId: newLineId,
       plan: subscriptionPlan
     });
-    syncContactWithLineBackend(newPhone, newLineId);
+    syncContactWithLineBackend(newPhone, newLineId, user?.email, user?.name, effectiveTime);
   };
 
   // Apply font scale to root document via data-font-scale so mobile/tablet/desktop media queries scale proportionally
@@ -19328,6 +19375,10 @@ function App() {
                   setRememberCredentials={setRememberPassword}
                   userPhone={user?.phone || authPhone}
                   userLineId={user?.lineId || authLineId}
+                  lineNotifyTime={lineNotifyTime}
+                  setLineNotifyTime={setLineNotifyTime}
+                  lineNotifyEnabled={lineNotifyEnabled}
+                  setLineNotifyEnabled={setLineNotifyEnabled}
                   onUpdateUserContact={handleUpdateUserContact}
                   user={user}
                   activePlan={subscriptionPlan}

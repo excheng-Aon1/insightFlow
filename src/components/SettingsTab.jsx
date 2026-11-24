@@ -25,6 +25,10 @@ export function SettingsTab({
   setRememberCredentials = () => {},
   userPhone = '0610156160',
   userLineId = '@madi01',
+  lineNotifyTime = '22:00',
+  setLineNotifyTime = () => {},
+  lineNotifyEnabled = true,
+  setLineNotifyEnabled = () => {},
   onUpdateUserContact = () => {},
   user = null,
   activePlan = 'professional',
@@ -53,7 +57,21 @@ export function SettingsTab({
   // --- 2. Notification Center State ---
   const [phoneVal, setPhoneVal] = useState(userPhone || '0610156160');
   const [lineVal, setLineVal] = useState(userLineId || '@madi01');
-  const [dailyAlertTime, setDailyAlertTime] = useState('22:00');
+  const [dailyAlertTime, setDailyAlertTime] = useState(() => {
+    try {
+      return localStorage.getItem('insightflow_line_notify_time') || lineNotifyTime || '22:00';
+    } catch {
+      return lineNotifyTime || '22:00';
+    }
+  });
+
+  const handleAlertTimeChange = (newTime) => {
+    setDailyAlertTime(newTime);
+    setLineNotifyTime(newTime);
+    try {
+      localStorage.setItem('insightflow_line_notify_time', newTime);
+    } catch {}
+  };
   const [enableDailySummary, setEnableDailySummary] = useState(true);
   const [enableLowStockAlert, setEnableLowStockAlert] = useState(true);
   const [lowStockThreshold, setLowStockThreshold] = useState('15');
@@ -116,11 +134,14 @@ export function SettingsTab({
 
   // Sync prop changes for phone and LINE ID
   const handleSaveContact = () => {
-    onUpdateUserContact(phoneVal, lineVal);
+    onUpdateUserContact(phoneVal, lineVal, dailyAlertTime);
+    try {
+      localStorage.setItem('insightflow_line_notify_time', dailyAlertTime);
+    } catch {}
     toast.success(
       tx(
-        `✅ บันทึกเบอร์โทรศัพท์ "${phoneVal}" และ LINE ID "${lineVal}" สำเร็จ!`,
-        `✅ Saved phone "${phoneVal}" and LINE ID "${lineVal}"!`
+        `✅ บันทึกเบอร์โทรศัพท์ "${phoneVal}", LINE ID "${lineVal}" และเวลาส่งอัตโนมัติ "${dailyAlertTime} น." สำเร็จ!`,
+        `✅ Saved phone "${phoneVal}", LINE ID "${lineVal}", and alert time "${dailyAlertTime}"!`
       )
     );
   };
@@ -784,22 +805,38 @@ export function SettingsTab({
 
               <div>
                 <label className="block text-xs font-bold mb-1.5 opacity-80">
-                  ⏰ {tx('เวลาส่งสรุปยอดขายอัตโนมัติ', 'Automated Daily Alert Time')}
+                  ⏰ {tx('ตั้งเวลาส่งสรุปยอดขายอัตโนมัติ (เบื้องต้น 22:00 น.)', 'Custom Daily Alert Time (Default 22:00)')}
                 </label>
-                <select
-                  value={dailyAlertTime}
-                  onChange={e => setDailyAlertTime(e.target.value)}
-                  className={`w-full px-4 py-2.5 rounded-xl text-sm outline-none border transition cursor-pointer ${
-                    theme === 'light'
-                      ? 'bg-slate-50 border-slate-200 text-slate-900'
-                      : 'bg-[#071039] border-[#1A3BB0]/50 text-white'
-                  }`}
-                >
-                  <option value="20:00">20:00 น. (สองทุ่ม)</option>
-                  <option value="21:00">21:00 น. (สามทุ่ม)</option>
-                  <option value="22:00">22:00 น. (สี่ทุ่ม - แนะนำสำหรับร้านค้า)</option>
-                  <option value="23:00">23:00 น. (ห้าทุ่ม)</option>
-                </select>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="time"
+                    value={dailyAlertTime}
+                    onChange={e => handleAlertTimeChange(e.target.value)}
+                    className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-mono outline-none border transition cursor-pointer ${
+                      theme === 'light'
+                        ? 'bg-slate-50 border-slate-200 text-slate-900 focus:border-[#2E5DE6]'
+                        : 'bg-[#071039] border-[#1A3BB0]/50 text-white focus:border-[#6E92F2]'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleAlertTimeChange('22:00');
+                      toast.success(tx('รีเซ็ตเวลาเป็น 22:00 น. (ค่าเริ่มต้น)', 'Reset to default 22:00'));
+                    }}
+                    className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition whitespace-nowrap cursor-pointer ${
+                      dailyAlertTime === '22:00'
+                        ? 'border-[#2E5DE6] bg-[#2E5DE6]/15 text-[#6E92F2]'
+                        : 'border-white/10 hover:border-blue-400 bg-white/5 text-slate-300 hover:text-white'
+                    }`}
+                    title={tx('รีเซ็ตเป็นเวลาเริ่มต้น 22:00 น.', 'Reset to default 22:00')}
+                  >
+                    ⏰ 22:00 (เบื้องต้น)
+                  </button>
+                </div>
+                <p className="text-[11px] opacity-65 mt-1">
+                  {tx(`ตั้งเวลาส่งการ์ดสรุปยอดขายเข้า LINE ได้เองตามต้องการ (เวลาเบื้องต้นคือ 22:00 น.)`, `Customizable daily alert time (defaults to 22:00).`)}
+                </p>
               </div>
             </div>
 
@@ -809,12 +846,20 @@ export function SettingsTab({
                 <input
                   type="checkbox"
                   checked={enableDailySummary}
-                  onChange={e => setEnableDailySummary(e.target.checked)}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    setEnableDailySummary(checked);
+                    setLineNotifyEnabled(checked);
+                  }}
                   className="w-4 h-4 mt-0.5 accent-[#2E5DE6] rounded cursor-pointer"
                 />
                 <div>
-                  <p className="text-xs font-bold">{tx('ส่งการ์ดสรุปยอดขายประจำวัน (Daily Flex)', 'Daily Sales Flex Brief')}</p>
-                  <p className="text-[11px] opacity-70">{tx('ส่งยอดขายรวมและกำไรสุทธิตอนปิดร้าน', 'Daily revenue & margin closing card')}</p>
+                  <p className="text-xs font-bold">
+                    {tx(`ส่งการ์ดสรุปยอดขายประจำวัน (${dailyAlertTime || '22:00'} น.)`, `Daily Sales Flex Brief (${dailyAlertTime || '22:00'})`)}
+                  </p>
+                  <p className="text-[11px] opacity-70">
+                    {tx(`ส่งยอดขายรวมและกำไรสุทธิตอนปิดร้านทุกวันเวลา ${dailyAlertTime || '22:00'} น.`, `Daily revenue & margin closing card at ${dailyAlertTime || '22:00'}`)}
+                  </p>
                 </div>
               </label>
 
