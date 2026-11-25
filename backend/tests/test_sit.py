@@ -211,6 +211,55 @@ class TestSystemIntegrationSuite(unittest.TestCase):
         self.assertEqual(data.get("status"), "success")
         self.assertIn("contacts", data)
 
+    def test_sit_line_uploaded_data_qa_webhook(self):
+        """SIT-18: ตรวจสอบการซิงก์ไฟล์อัปโหลดและการถาม-ตอบข้อมูลผ่าน LINE Webhook & /api/line/ask"""
+        sync_payload = {
+            "business_name": "InsightFlow Test Store",
+            "uploaded_files": [
+                {
+                    "tab": "overview",
+                    "filename": "sales_test_nov.xlsx",
+                    "rows": 120,
+                    "columns": ["Product", "Branch", "Revenue"],
+                    "sample_rows": [{"Product": "กาแฟพรีเมียม", "Branch": "สาขาอโศก", "Revenue": 45000}],
+                }
+            ],
+            "metrics": {
+                "total_revenue": 150000,
+                "net_profit": 42000,
+                "total_orders": 120,
+                "top_branch": "สาขาอโศก",
+            },
+        }
+        sync_resp = self.client.post("/api/line/sync-uploaded-context", json=sync_payload)
+        self.assertEqual(sync_resp.status_code, 200)
+        self.assertEqual(sync_resp.json().get("files_count"), 1)
+
+        ask_resp = self.client.post("/api/line/ask", json={"question": "ไฟล์ที่อัปโหลดล่าสุดมีข้อมูลอะไรบ้าง"})
+        self.assertEqual(ask_resp.status_code, 200)
+        ask_data = ask_resp.json()
+        self.assertEqual(ask_data.get("status"), "success")
+        self.assertIn("sales_test_nov.xlsx", ask_data.get("answer", ""))
+
+        webhook_resp = self.client.post(
+            "/api/line/webhook",
+            headers={"X-Line-Signature": "SIMULATED_LOCAL_WEBHOOK"},
+            json={
+                "events": [
+                    {
+                        "type": "message",
+                        "replyToken": "00000000000000000000000000000000",
+                        "source": {"userId": "Utestuser1234567890"},
+                        "message": {"type": "text", "text": "ยอดขายรวมตอนนี้เท่าไหร่"},
+                    }
+                ]
+            },
+        )
+        self.assertEqual(webhook_resp.status_code, 200)
+        wh_data = webhook_resp.json()
+        self.assertEqual(wh_data.get("ai_reply_count"), 1)
+        self.assertTrue(len(wh_data.get("ai_replies", [])) == 1)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

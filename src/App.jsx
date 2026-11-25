@@ -14768,6 +14768,78 @@ function App() {
     }
   }, [isExemptAdminMode, activeTab]);
 
+  // Auto-sync uploaded files & live store metrics to Backend for real-time LINE OA AI Q&A
+  useEffect(() => {
+    if (!canUseBackendApi()) return;
+    const timer = setTimeout(() => {
+      try {
+        const uploadedFilesArr = Object.entries(pageUploadedFiles || {})
+          .filter(([, meta]) => meta && meta.filename)
+          .map(([tabKey, meta]) => ({
+            tab: tabKey,
+            filename: meta.filename,
+            rows: Number(meta.rows || 0),
+            columns: Array.isArray(meta.headers) ? meta.headers.slice(0, 15) : [],
+            sample_rows: Array.isArray(meta.sampleRows) ? meta.sampleRows.slice(0, 5) : [],
+            company: meta.paperHeader?.company || '',
+          }));
+
+        const totalRevenue = (dbRecords || []).reduce(
+          (sum, r) => sum + Number(r.revenue || r.amount || r.total || 0),
+          0
+        );
+        const totalCost = (dbRecords || []).reduce(
+          (sum, r) => sum + Number(r.cost || 0),
+          0
+        );
+        const netProfit = totalCost > 0 ? totalRevenue - totalCost : totalRevenue * 0.25;
+
+        const branchSummaries = (branchesList || []).slice(0, 5).map(b => ({
+          name: b?.th?.branchName || b?.name || 'สาขาหลัก',
+          revenue: Number(b?.th?.revenue || b?.revenue || 0),
+        }));
+
+        const channelSummaries = (channelsList || []).slice(0, 5).map(c => ({
+          name: c?.th?.channelName || c?.name || 'หน้าร้าน POS',
+          revenue: Number(c?.th?.revenue || c?.revenue || 0),
+        }));
+
+        const lowStockItems = (inventoryList || [])
+          .filter(it => Number(it.stock ?? it.stock_qty ?? 999) <= 15)
+          .slice(0, 8)
+          .map(it => ({
+            name: it.name || it.productName || 'สินค้า',
+            stock: Number(it.stock ?? it.stock_qty ?? 0),
+          }));
+
+        fetch(`${API_BASE_URL}/api/line/sync-uploaded-context`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user?.email || authEmail || 'owner@insightflow.app',
+            phone: user?.phone || authPhone || '',
+            line_id: user?.lineId || authLineId || '',
+            business_name: user?.businessName || user?.business_name || localStorage.getItem('insightflow_biz_name') || 'InsightFlow Store',
+            uploaded_files: uploadedFilesArr,
+            metrics: {
+              total_revenue: totalRevenue,
+              net_profit: netProfit,
+              total_orders: (dbRecords || []).length,
+              top_branch: branchSummaries[0]?.name || 'ไม่มีข้อมูลสาขา',
+              top_channel: channelSummaries[0]?.name || 'ไม่มีข้อมูลช่องทาง',
+              branches: branchSummaries,
+              channels: channelSummaries,
+              low_stock_items: lowStockItems,
+            },
+          }),
+        }).catch(() => {});
+      } catch {
+        // ignore background sync error
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [pageUploadedFiles, dbRecords, branchesList, channelsList, inventoryList, user, authEmail, authPhone, authLineId]);
+
   const [isAppleFilmOpen, setIsAppleFilmOpen] = useState(false);
   const [activatingPlanId, setActivatingPlanId] = useState(null);
   const [previewSelectedPlanId, setPreviewSelectedPlanId] = useState('professional');

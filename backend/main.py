@@ -3027,8 +3027,37 @@ import urllib.parse
 import urllib.error
 
 LINE_CONTACTS_FILE = os.path.join(os.path.dirname(__file__), "line_contacts_registry.json")
+LINE_UPLOADED_CONTEXT_FILE = os.path.join(os.path.dirname(__file__), "line_uploaded_context.json")
 _LINE_REGISTRY_LOCK = threading.Lock()
+_LINE_CONTEXT_LOCK = threading.Lock()
 _CACHED_LINE_ACCESS_TOKEN: Dict[str, Any] = {"token": "", "expires_at": 0.0}
+
+
+def _load_line_uploaded_context() -> Dict[str, Any]:
+    with _LINE_CONTEXT_LOCK:
+        try:
+            if os.path.exists(LINE_UPLOADED_CONTEXT_FILE):
+                with open(LINE_UPLOADED_CONTEXT_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        return data
+        except Exception as exc:
+            logger.warning(f"Could not read line_uploaded_context.json: {exc}")
+    cached = cache_get_json("line:uploaded_context:latest")
+    return cached if isinstance(cached, dict) else {}
+
+
+def _save_line_uploaded_context(ctx_data: Dict[str, Any]) -> None:
+    with _LINE_CONTEXT_LOCK:
+        try:
+            with open(LINE_UPLOADED_CONTEXT_FILE, "w", encoding="utf-8") as f:
+                json.dump(ctx_data, f, ensure_ascii=False, indent=2)
+        except Exception as exc:
+            logger.warning(f"Could not write line_uploaded_context.json: {exc}")
+    try:
+        cache_set_json("line:uploaded_context:latest", ctx_data, ttl_seconds=2592000)
+    except Exception:
+        pass
 
 
 def _normalize_phone(raw_phone: str) -> str:
@@ -3483,17 +3512,386 @@ async def get_registered_line_contacts(
     }
 
 
+class LineUploadedContextSyncRequest(BaseModel):
+    email: Optional[str] = "owner@insightflow.app"
+    phone: Optional[str] = None
+    line_id: Optional[str] = None
+    business_name: Optional[str] = "InsightFlow Store"
+    uploaded_files: Optional[List[Dict[str, Any]]] = []
+    metrics: Optional[Dict[str, Any]] = {}
+
+
+class LineAskRequest(BaseModel):
+    question: str
+    phone: Optional[str] = None
+    line_user_id: Optional[str] = None
+    push_to_line: Optional[bool] = False
+
+
+@app.post("/api/line/sync-uploaded-context")
+async def sync_uploaded_context_for_line(req: LineUploadedContextSyncRequest):
+    """
+    ซิงก์ข้อมูลจากไฟล์ที่ลูกค้าอัปโหลดบนหน้าเว็บ (ชื่อไฟล์, คอลัมน์, ตัวอย่างแถวข้อมูล, ยอดขาย, กำไร, สาขา, สต็อก)
+    มาเก็บไว้ใน Backend เพื่อใช้ตอบคำถามผ่านแชท LINE Official Account แบบเรียลไทม์
+    """
+    ctx_payload = {
+        "email": req.email or "owner@insightflow.app",
+        "phone": req.phone or "",
+        "line_id": req.line_id or "",
+        "business_name": req.business_name or "InsightFlow Store",
+        "uploaded_files": req.uploaded_files or [],
+        "metrics": req.metrics or {},
+        "synced_at": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+    }
+    _save_line_uploaded_context(ctx_payload)
+    return {
+        "status": "success",
+        "files_count": len(ctx_payload["uploaded_files"]),
+        "synced_at": ctx_payload["synced_at"],
+    }
+
+
+@app.get("/api/line/uploaded-context")
+async def get_line_uploaded_context(db: Session = Depends(get_db)):
+    """ตรวจสอบสถานะไฟล์ข้อมูลที่ซิงก์พร้อมตอบคำถามผ่าน LINE OA"""
+    synced = _load_line_uploaded_context()
+    web_files = synced.get("uploaded_files") or []
+    db_files = db.query(UploadedFile).order_by(UploadedFile.created_at.desc()).limit(10).all()
+    all_names = []
+    for wf in web_files:
+        if wf.get("filename"):
+            all_names.append(wf["filename"])
+    for df in db_files:
+        if df.filename and df.filename not in all_names:
+            all_names.append(df.filename)
+
+    return {
+        "status": "success",
+        "synced_at": synced.get("synced_at", ""),
+        "files_count": len(all_names),
+        "filenames": all_names,
+        "business_name": synced.get("business_name", "InsightFlow Store"),
+    }
+
+
+def _clean_line_markdown(text: str) -> str:
+    """แปลง Markdown ให้เป็นข้อความอ่านง่ายสำหรับห้องแชท LINE"""
+    cleaned = re.sub(r"\*\*(.*?)\*\*", r"\1", text or "")
+    cleaned = re.sub(r"^#{1,6}\s*", "📌 ", cleaned, flags=re.MULTILINE)
+    cleaned = cleaned.strip()
+    if len(cleaned) > 1900:
+        cleaned = cleaned[:1880] + "\n... (ดูเพิ่มเติมในแดชบอร์ด)"
+    return cleaned
+
+
+def _answer_business_question_from_uploaded_data(
+    question: str,
+    db: Session,
+    line_user_id: str = "",
+    phone: str = "",
+) -> Dict[str, Any]:
+    """
+    เครื่องมือถาม-ตอบข้อมูลจากไฟล์ที่ลูกค้าอัปโหลดเข้าเว็บ สำหรับแชทบอท LINE OA
+    รองรับทั้งไฟล์ที่ซิงก์จากหน้าเว็บ (line_uploaded_context.json) และไฟล์ในฐานข้อมูล (UploadedFile, AnalyticsTransaction, Product, CashFlow)
+    ใช้ Google Gemini 2.0 Flash เป็นหลัก พร้อม Groq และ Local Deterministic Engine สำรอง
+    """
+    q_raw = (question or "").strip()
+    q = q_raw.lower()
+
+    # 1. โหลดข้อมูลที่ซิงก์จากหน้าเว็บ (เมื่อลูกค้าอัปโหลดไฟล์ Excel/CSV)
+    synced = _load_line_uploaded_context()
+    web_files = synced.get("uploaded_files") or []
+    web_metrics = synced.get("metrics") or {}
+
+    # 2. โหลดข้อมูลไฟล์ที่บันทึกใน SQLite/PostgreSQL
+    db_files = db.query(UploadedFile).order_by(UploadedFile.created_at.desc()).limit(10).all()
+    products_db = db.query(Product).order_by(Product.stock_qty.asc()).all()
+    txns_db = db.query(AnalyticsTransaction).all()
+
+    saved_profile = cache_get_json("ai:trained_business_profile") or {}
+    biz_name = (
+        synced.get("business_name")
+        or saved_profile.get("businessName")
+        or saved_profile.get("business_name")
+        or "InsightFlow Store"
+    )
+
+    # รวมข้อมูลไฟล์ทั้งหมด
+    combined_files: List[Dict[str, Any]] = []
+    seen_names = set()
+    for wf in web_files:
+        fname = wf.get("filename") or "uploaded_file"
+        seen_names.add(fname)
+        combined_files.append(wf)
+    for df in db_files:
+        if df.filename not in seen_names:
+            serialized = _serialize_uploaded_file(df, include_preview=True)
+            combined_files.append({
+                "tab": serialized.get("source_tab"),
+                "filename": serialized.get("filename"),
+                "rows": serialized.get("total_records"),
+                "columns": serialized.get("columns", []),
+                "sample_rows": (serialized.get("preview_rows") or [])[:5],
+                "summary_note": serialized.get("summary_note", ""),
+            })
+
+    # คำนวณตัวเลขธุรกิจจริง
+    db_rev = sum(float(getattr(t, "total_revenue", 0) or 0) for t in txns_db)
+    total_rev = float(web_metrics.get("total_revenue") or db_rev or 0)
+    net_profit = float(web_metrics.get("net_profit") or (db_rev * 0.25) or 0)
+    total_orders = int(web_metrics.get("total_orders") or len(txns_db) or 0)
+    top_branch = web_metrics.get("top_branch") or "ไม่มีข้อมูลสาขา"
+    top_channel = web_metrics.get("top_channel") or "ไม่มีข้อมูลช่องทาง"
+    branches_summary = web_metrics.get("branches") or []
+    channels_summary = web_metrics.get("channels") or []
+    top_products = web_metrics.get("top_products") or []
+    low_stock_web = web_metrics.get("low_stock_items") or []
+
+    low_stock_db = [
+        {"name": p.name, "stock": int(p.stock_qty or 0)}
+        for p in products_db
+        if (p.stock_qty or 0) <= 15
+    ]
+    low_stock_all = low_stock_web or low_stock_db
+
+    # สร้างข้อความสรุปไฟล์สำหรับให้ AI อ่าน
+    files_context_lines = []
+    for f in combined_files[:8]:
+        cols_str = ", ".join([str(c) for c in (f.get("columns") or [])[:12]])
+        sample_str = json.dumps((f.get("sample_rows") or [])[:4], ensure_ascii=False)
+        files_context_lines.append(
+            f"- ไฟล์ '{f.get('filename')}' (หน้า: {f.get('tab', 'ทั่วไป')}, จำนวน {f.get('rows', 0)} แถว)\n"
+            f"  คอลัมน์: [{cols_str}]\n"
+            f"  ตัวอย่างข้อมูลจริง: {sample_str[:700]}"
+        )
+    files_context_text = "\n".join(files_context_lines) if files_context_lines else "ยังไม่มีไฟล์ที่อัปโหลดเข้าสู่ระบบในขณะนี้"
+
+    # สร้าง System Prompt สำหรับตอบผ่านแชท LINE
+    system_prompt = (
+        f"คุณคือ 'ผู้ช่วย AI อัจฉริยะผ่าน LINE' ประจำร้าน '{biz_name}'\n"
+        f"หน้าที่: ตอบคำถามเจ้าของร้านหรือผู้ใช้งานทาง LINE โดยอ้างอิงจากข้อมูลจริงที่ลูกค้าอัปโหลดเข้าเว็บไซต์เท่านั้น\n\n"
+        f"=== ข้อมูลไฟล์ที่อัปโหลดเข้าสู่ระบบ ({len(combined_files)} ไฟล์) ===\n"
+        f"{files_context_text}\n\n"
+        f"=== สรุปตัวเลขจากข้อมูลจริง ===\n"
+        f"• ยอดขายรวม: ฿{total_rev:,.2f}\n"
+        f"• กำไรสุทธิ: ฿{net_profit:,.2f}\n"
+        f"• จำนวนออเดอร์/รายการ: {total_orders:,} รายการ\n"
+        f"• สาขาอันดับ 1: {top_branch}\n"
+        f"• ช่องทางขายหลัก: {top_channel}\n"
+        f"• รายละเอียดสาขา: {json.dumps(branches_summary[:5], ensure_ascii=False)}\n"
+        f"• รายละเอียดช่องทาง: {json.dumps(channels_summary[:5], ensure_ascii=False)}\n"
+        f"• สินค้าขายดี/เด่น: {json.dumps(top_products[:6], ensure_ascii=False)}\n"
+        f"• สินค้าสต็อกต่ำ: {json.dumps(low_stock_all[:6], ensure_ascii=False)}\n\n"
+        f"กติกาการตอบกลับผ่าน LINE:\n"
+        f"1. ตอบเป็นภาษาไทยที่สุภาพ กระชับ อ่านง่ายบนหน้าจอมือถือ (ใช้ Emoji นำหน้าหัวข้อ ไม่ใช้ตาราง Markdown)\n"
+        f"2. ห้ามใช้เครื่องหมาย ** หรือ ### ให้เขียนข้อความธรรมดาที่จัดย่อหน้าสวยงาม\n"
+        f"3. อ้างอิงชื่อไฟล์หรือตัวเลขจริงจากด้านบน หากยังไม่มีไฟล์อัปโหลดให้แจ้งให้ลูกค้าทราบอย่างสุภาพว่าสามารถอัปโหลดไฟล์ Excel/CSV บนหน้าเว็บก่อน แล้วมาถามต่อในแชทนี้ได้ทันที\n"
+        f"4. ความยาวไม่เกิน 800-1,000 ตัวอักษร เพื่อให้เหมาะกับห้องแชท LINE"
+    )
+
+    ai_text = None
+    engine_used = "local_uploaded_qa"
+
+    # Tier 1: Google Gemini 2.0 Flash
+    gemini_api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    gemini_model = os.environ.get("GEMINI_AI_MODEL") or "gemini-2.0-flash"
+    if gemini_api_key:
+        try:
+            try:
+                from google import genai
+                client = genai.Client(api_key=gemini_api_key)
+                gemini_resp = client.models.generate_content(
+                    model=gemini_model,
+                    contents=f"{system_prompt}\n\nคำถามจากผู้ใช้ทาง LINE:\n{q_raw}",
+                )
+                if gemini_resp and hasattr(gemini_resp, "text") and gemini_resp.text:
+                    ai_text = gemini_resp.text.strip()
+                    engine_used = f"gemini:{gemini_model}"
+            except Exception as sdk_err:
+                logger.info(f"[LINE Gemini SDK Notice] {sdk_err}")
+
+            if not ai_text:
+                gemini_endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{gemini_model}:generateContent?key={gemini_api_key}"
+                resp = requests.post(
+                    gemini_endpoint,
+                    json={
+                        "contents": [{"parts": [{"text": f"{system_prompt}\n\nคำถามจากผู้ใช้ทาง LINE:\n{q_raw}"}]}],
+                        "generationConfig": {"temperature": 0.25, "maxOutputTokens": 700},
+                    },
+                    headers={"Content-Type": "application/json"},
+                    timeout=10,
+                )
+                if resp.status_code == 200:
+                    candidates = resp.json().get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        if parts and "text" in parts[0]:
+                            ai_text = parts[0]["text"].strip()
+                            engine_used = f"gemini_rest:{gemini_model}"
+        except Exception as exc:
+            logger.warning(f"[LINE Gemini Q&A Warning] {exc}")
+
+    # Tier 2: Groq LLM Fallback
+    if not ai_text:
+        groq_api_key = os.environ.get("GROQ_API_KEY", "").strip()
+        groq_model = os.environ.get("GROQ_AI_MODEL") or "qwen/qwen3.8-27b"
+        if groq_api_key:
+            try:
+                resp = requests.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    json={
+                        "model": groq_model,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": q_raw},
+                        ],
+                        "max_tokens": 600,
+                        "temperature": 0.25,
+                    },
+                    headers={"Authorization": f"Bearer {groq_api_key}", "Content-Type": "application/json"},
+                    timeout=10,
+                )
+                if resp.status_code == 200:
+                    ai_text = resp.json().get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                    if ai_text:
+                        engine_used = f"groq:{groq_model}"
+            except Exception as exc:
+                logger.warning(f"[LINE Groq Q&A Warning] {exc}")
+
+    # Tier 3: Smart Deterministic Local Q&A Engine (อ่านข้อมูลจริงจากไฟล์ที่อัปโหลด)
+    if not ai_text:
+        if any(k in q for k in ["สวัสดี", "หวัดดี", "hi", "hello", "help", "ช่วย", "เมนู", "ทำอะไรได้", "ถามอะไร"]):
+            files_list = "\n".join([f"• {f.get('filename')} ({f.get('rows', 0):,} แถว)" for f in combined_files[:5]]) or "• ยังไม่มีไฟล์อัปโหลด"
+            ai_text = (
+                f"👋 สวัสดีครับ! ผู้ช่วย AI ประจำร้าน {biz_name} พร้อมตอบคำถามจากข้อมูลที่คุณอัปโหลดเข้าเว็บครับ\n\n"
+                f"📁 ไฟล์ที่เชื่อมต่ออยู่ ({len(combined_files)} ไฟล์):\n{files_list}\n\n"
+                f"💬 คุณสามารถพิมพ์ถามได้เลย เช่น:\n"
+                f"• ยอดขายรวมและกำไรตอนนี้เท่าไหร่\n"
+                f"• ไฟล์ล่าสุดที่อัปโหลดมีข้อมูลอะไรบ้าง\n"
+                f"• สาขาไหนหรือช่องทางไหนขายดีที่สุด\n"
+                f"• สินค้าไหนขายดี หรือใกล้หมดสต็อก"
+            )
+        elif any(k in q for k in ["ไฟล์", "อัปโหลด", "คอลัมน์", "ข้อมูล", "upload", "file", "column"]):
+            if combined_files:
+                lines = []
+                for idx, f in enumerate(combined_files[:5], 1):
+                    cols = ", ".join([str(c) for c in (f.get("columns") or [])[:6]])
+                    lines.append(f"{idx}. 📄 {f.get('filename')} ({f.get('rows', 0):,} แถว)\n   คอลัมน์: {cols or '-'}")
+                ai_text = (
+                    f"📁 รายการไฟล์ที่อัปโหลดเข้าสู่ระบบ ({len(combined_files)} ไฟล์):\n\n"
+                    + "\n".join(lines)
+                    + f"\n\n📊 สรุปรวม: ยอดขาย ฿{total_rev:,.0f} | กำไรสุทธิ ฿{net_profit:,.0f} ({total_orders:,} รายการ)"
+                )
+            else:
+                ai_text = "📂 ตอนนี้ยังไม่มีไฟล์ที่อัปโหลดเข้าสู่เว็บไซต์ครับ กรุณาอัปโหลดไฟล์ Excel หรือ CSV บนหน้าเว็บ InsightFlow แล้วกลับมาถามข้อมูลในแชทนี้ได้เลยครับ!"
+        elif any(k in q for k in ["สต็อก", "สินค้า", "หมด", "ขายดี", "stock", "product", "sku", "inventory"]):
+            top_p_str = "\n".join([f"• {p.get('name', p.get('product', '-'))}: ฿{float(p.get('revenue', p.get('sales', 0))):,.0f}" for p in top_products[:5]])
+            low_s_str = "\n".join([f"• {s.get('name', '-')}: เหลือ {s.get('stock', 0)} ชิ้น" for s in low_stock_all[:5]])
+            ai_text = (
+                f"📦 สรุปสินค้าและคลังสต็อก ({biz_name}):\n\n"
+                f"🏆 สินค้าทำยอดขายเด่น:\n{top_p_str or '• ยังไม่มีข้อมูลรายการสินค้าขายดีจากไฟล์'}\n\n"
+                f"⚠️ สินค้าใกล้หมดสต็อก (ควรสั่งเติม):\n{low_s_str or '• สต็อกสินค้าอยู่ในเกณฑ์ปลอดภัยครับ'}"
+            )
+        elif any(k in q for k in ["สาขา", "ช่องทาง", "branch", "channel", "shopee", "tiktok", "lazada", "pos"]):
+            br_str = "\n".join([f"• {b.get('name', '-')}: ฿{float(b.get('revenue', 0)):,.0f}" for b in branches_summary[:5]])
+            ch_str = "\n".join([f"• {c.get('name', '-')}: ฿{float(c.get('revenue', 0)):,.0f}" for c in channels_summary[:5]])
+            ai_text = (
+                f"🏪 สรุปผลงานแยกตามสาขาและช่องทางขาย:\n\n"
+                f"📍 อันดับสาขา:\n{br_str or f'• สาขาหลัก: {top_branch}'}\n\n"
+                f"🌐 ช่องทางขาย:\n{ch_str or f'• ช่องทางหลัก: {top_channel}'}"
+            )
+        else:
+            # ค้นหาคำสำคัญในแถวข้อมูลตัวอย่างของไฟล์ที่อัปโหลด
+            matched_rows_info = []
+            for f in combined_files:
+                for row in (f.get("sample_rows") or []):
+                    row_text = json.dumps(row, ensure_ascii=False).lower()
+                    if any(tok in row_text for tok in q.split() if len(tok) >= 2):
+                        matched_rows_info.append(f"• [{f.get('filename')}] {json.dumps(row, ensure_ascii=False)[:180]}")
+                        if len(matched_rows_info) >= 3:
+                            break
+            if matched_rows_info:
+                ai_text = (
+                    f"🔎 พบข้อมูลที่เกี่ยวข้องจากไฟล์อัปโหลด:\n\n"
+                    + "\n".join(matched_rows_info)
+                    + f"\n\n💰 ยอดขายรวมทั้งหมดในระบบ: ฿{total_rev:,.0f} (กำไร ฿{net_profit:,.0f})"
+                )
+            else:
+                files_note = f"จากไฟล์ {combined_files[0].get('filename')} และข้อมูลทั้งหมด {len(combined_files)} ไฟล์" if combined_files else "จากฐานข้อมูลร้านค้า"
+                ai_text = (
+                    f"📊 สรุปภาพรวมธุรกิจ ({biz_name})\n"
+                    f"({files_note}):\n\n"
+                    f"💰 ยอดขายรวม: ฿{total_rev:,.0f}\n"
+                    f"📈 กำไรสุทธิ: ฿{net_profit:,.0f}\n"
+                    f"🧾 จำนวนรายการ: {total_orders:,} บิล\n"
+                    f"🏆 สาขาอันดับ 1: {top_branch}\n"
+                    f"🌐 ช่องทางหลัก: {top_channel}\n\n"
+                    f"💡 พิมพ์ถามเจาะจงเพิ่มเติมได้เลย เช่น 'สินค้าใกล้หมด' หรือ 'สรุปไฟล์ล่าสุด'"
+                )
+
+    return {
+        "answer": _clean_line_markdown(ai_text),
+        "engine": engine_used,
+        "files_count": len(combined_files),
+        "total_revenue": total_rev,
+        "net_profit": net_profit,
+    }
+
+
+@app.post("/api/line/ask")
+async def ask_line_uploaded_data(
+    req: LineAskRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Endpoint ทดสอบถาม-ตอบข้อมูลที่อัปโหลดเข้าเว็บ (เหมือนพิมพ์ถามผ่านแชท LINE OA จริง)
+    สามารถเลือก push_to_line=True เพื่อส่งคำตอบเข้าแชท LINE จริงของลูกค้าได้ด้วย
+    """
+    result = _answer_business_question_from_uploaded_data(
+        question=req.question,
+        db=db,
+        line_user_id=req.line_user_id or "",
+        phone=req.phone or "",
+    )
+
+    push_result = None
+    if req.push_to_line:
+        target_uid = (req.line_user_id or os.getenv("LINE_DEFAULT_USER_ID", "")).strip()
+        if target_uid:
+            push_result = _send_line_api_request(
+                "https://api.line.me/v2/bot/message/push",
+                {
+                    "to": target_uid,
+                    "messages": [
+                        {
+                            "type": "text",
+                            "text": f"💬 คำถาม: {req.question}\n\n{result['answer']}",
+                        }
+                    ],
+                },
+            )
+
+    return {
+        "status": "success",
+        "question": req.question,
+        "answer": result["answer"],
+        "engine": result["engine"],
+        "files_count": result["files_count"],
+        "push_result": push_result,
+    }
+
+
 @app.post("/api/line/webhook")
-async def line_messaging_api_webhook(request: Request):
+async def line_messaging_api_webhook(request: Request, db: Session = Depends(get_db)):
     """
     Webhook สำหรับรับข้อความจาก LINE Official Account (@693knsqp)
+    1. รองรับการพิมพ์เบอร์โทรศัพท์เพื่อผูกบัญชี LINE อัตโนมัติ
+    2. รองรับการพิมพ์ถาม-ตอบข้อมูลจากไฟล์ที่ลูกค้าอัปโหลดเข้าเว็บ (LINE AI Q&A) แบบเรียลไทม์
     พร้อมการตรวจสอบ Digital Signature (HMAC-SHA256) อย่างเคร่งครัด
     """
     raw_body = await request.body()
     signature = request.headers.get("X-Line-Signature", "").strip()
     channel_secret = os.getenv("LINE_CHANNEL_SECRET", "").strip()
-
-    is_production = os.getenv("ENVIRONMENT", "").lower() == "production"
 
     # ตรวจสอบลายเซ็น HMAC-SHA256: บังคับตรวจคำขอจริงจาก LINE API (ข้ามเฉพาะการทดสอบจำลองในหน้าเว็บ)
     if signature != "SIMULATED_LOCAL_WEBHOOK":
@@ -3525,6 +3923,7 @@ async def line_messaging_api_webhook(request: Request):
     events = payload.get("events", [])
     registry = _load_line_contacts()
     matched_results = []
+    ai_replies = []
 
     for event in events:
         event_type = event.get("type")
@@ -3535,9 +3934,10 @@ async def line_messaging_api_webhook(request: Request):
         if event_type == "message" and event.get("message", {}).get("type") == "text":
             user_text = event["message"].get("text", "").strip()
             norm_phone = _normalize_phone(user_text)
+            is_pure_phone = bool(re.fullmatch(r"[\d\s\-+()]{9,15}", user_text)) and len(norm_phone) >= 9
 
-            # ตรวจสอบว่าข้อความที่พิมพ์มาเป็นเบอร์โทรศัพท์ 9-10 หลักหรือไม่
-            if len(norm_phone) >= 9:
+            # กรณีที่ 1: ลูกค้าพิมพ์เบอร์โทรศัพท์ 9-10 หลักเพื่อผูกบัญชี
+            if is_pure_phone:
                 contact = registry.get(norm_phone, {
                     "email": "owner@insightflow.app",
                     "name": "เจ้าของธุรกิจ InsightFlow",
@@ -3554,7 +3954,6 @@ async def line_messaging_api_webhook(request: Request):
 
                 matched_results.append(contact)
 
-                # ตอบกลับเข้าแชท LINE ของลูกค้าทันทีผ่าน Reply API
                 if reply_token and reply_token != "00000000000000000000000000000000":
                     flex_card = build_daily_sales_flex_message(
                         phone=contact["phone"],
@@ -3570,10 +3969,58 @@ async def line_messaging_api_webhook(request: Request):
                                     "text": (
                                         f"✅ เชื่อมบัญชีสำเร็จ!\n"
                                         f"เบอร์โทร {contact['phone']} ถูกผูกเข้ากับรหัส LINE ({contact['line_user_id'][:10]}...) เรียบร้อยแล้วครับ\n"
-                                        f"ระบบจะส่งการ์ดสรุปยอดขายรายวันให้คุณอัตโนมัติทุกวันเวลา {contact.get('notify_time', '22:00')} น."
+                                        f"ระบบจะส่งการ์ดสรุปยอดขายรายวันให้คุณอัตโนมัติทุกวันเวลา {contact.get('notify_time', '22:00')} น.\n\n"
+                                        f"💬 พิเศษ! คุณสามารถพิมพ์ถาม-ตอบข้อมูลยอดขาย สต็อก หรือไฟล์ที่อัปโหลดเข้าเว็บในแชทนี้ได้ทันทีเลยครับ"
                                     ),
                                 },
                                 flex_card,
+                            ],
+                        },
+                    )
+            else:
+                # กรณีที่ 2: ลูกค้าพิมพ์คำถามเพื่อถาม-ตอบข้อมูลที่อัปโหลดเข้าเว็บผ่าน LINE
+                qa_result = _answer_business_question_from_uploaded_data(
+                    question=user_text,
+                    db=db,
+                    line_user_id=line_user_id,
+                )
+                ai_replies.append({
+                    "question": user_text,
+                    "answer": qa_result["answer"],
+                    "engine": qa_result["engine"],
+                    "files_count": qa_result["files_count"],
+                })
+
+                if reply_token and reply_token != "00000000000000000000000000000000":
+                    _send_line_api_request(
+                        "https://api.line.me/v2/bot/message/reply",
+                        {
+                            "replyToken": reply_token,
+                            "messages": [
+                                {
+                                    "type": "text",
+                                    "text": qa_result["answer"],
+                                    "quickReply": {
+                                        "items": [
+                                            {
+                                                "type": "action",
+                                                "action": {"type": "message", "label": "📊 สรุปยอดขายรวม", "text": "สรุปยอดขายรวมและกำไรตอนนี้เท่าไหร่"},
+                                            },
+                                            {
+                                                "type": "action",
+                                                "action": {"type": "message", "label": "📁 ไฟล์ที่อัปโหลด", "text": "ไฟล์ที่อัปโหลดล่าสุดมีข้อมูลอะไรบ้าง"},
+                                            },
+                                            {
+                                                "type": "action",
+                                                "action": {"type": "message", "label": "📦 สินค้าใกล้หมด", "text": "สินค้าไหนขายดีและใกล้หมดสต็อก"},
+                                            },
+                                            {
+                                                "type": "action",
+                                                "action": {"type": "message", "label": "🏪 สาขาขายดี", "text": "สาขาไหนและช่องทางไหนขายดีที่สุด"},
+                                            },
+                                        ]
+                                    },
+                                }
                             ],
                         },
                     )
@@ -3582,6 +4029,8 @@ async def line_messaging_api_webhook(request: Request):
         "status": "success",
         "matched_count": len(matched_results),
         "matched_contacts": matched_results,
+        "ai_reply_count": len(ai_replies),
+        "ai_replies": ai_replies,
     }
 
 
