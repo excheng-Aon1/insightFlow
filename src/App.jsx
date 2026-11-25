@@ -6668,80 +6668,16 @@ export function MultiChannelTab({
   const offlineProfit = offlineChannels.reduce((acc, c) => acc + (Number(c?.netProfit) || 0), 0);
   const onlineProfit = onlineChannels.reduce((acc, c) => acc + (Number(c?.netProfit) || 0), 0);
 
-  const handleTransferDeadStock = branchId => {
-    setBranchesList(prev =>
-      prev.map(b => {
-        if (b.branchId !== branchId) return b;
-        return {
-          ...b,
-          deadStockValue: 0,
-          inventoryTurnover: Number((b.inventoryTurnover + 1.4).toFixed(1)),
-          turnoverDays: Math.max(10, b.turnoverDays - 9)
-        };
-      })
-    );
-    const targetBranchTh = branchesList[0]?.th?.branchName || branchesList[0]?.name || 'สาขาหลัก';
-    const targetBranchEn = branchesList[0]?.en?.branchName || branchesList[0]?.name || 'Primary Branch';
-    toast.success(
-      tx(
-        `🚚 สร้างใบโอนย้ายสินค้าค้างสต็อกไปยัง "${targetBranchTh}" เรียบร้อยแล้ว! อัตราหมุนเวียนสต็อกดีขึ้นทันที`,
-        `🚚 Created stock transfer order to "${targetBranchEn}"! Inventory turnover improved immediately.`
-      )
-    );
-  };
-
-  const handleExportTaxExcel = () => {
-    const headers = isEn
-      ? ['Channel / Branch', 'Gross Revenue (THB)', 'Platform & Store Fees (THB)', 'Net Profit (THB)', 'Gross Margin (%)']
-      : ['ช่องทางขาย / สาขา', 'ยอดขายรวม (บาท)', 'ค่าธรรมเนียมและค่าใช้จ่าย (บาท)', 'กำไรสุทธิ (บาท)', 'อัตรากำไร (%)'];
-    const rows = channelsList.map(c => {
-      const info = c[isEn ? 'en' : 'th'];
-      return [`"${info.name}"`, c.revenue, c.costAndFees, c.netProfit, `${c.grossMarginPct}%`].join(',');
-    });
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = isEn ? 'Tax_And_Channel_Report_2026.csv' : 'รายงานภาษีขายและกำไรรายช่องทาง_2026.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success(
-      tx(
-        '📥 ดาวน์โหลดไฟล์ตารางรายงานภาษีขายและสต็อกเรียบร้อยแล้ว!',
-        '📥 Downloaded Sales Tax & Inventory Spreadsheet Report!'
-      )
-    );
-  };
-
-  const channelChartData = {
-    labels: channelsList.map(c => c[isEn ? 'en' : 'th'].name.replace(/^[^\s]+\s/, '')),
-    datasets: [
-      {
-        label: tx('ยอดขายรวม (บาท)', 'Gross Revenue (THB)'),
-        data: channelsList.map(c => c.revenue),
-        backgroundColor: 'rgba(56, 189, 248, 0.85)',
-        borderRadius: 8
-      },
-      {
-        label: tx('กำไรสุทธิหลังหักค่าใช้จ่าย (บาท)', 'Net Profit After Fees (THB)'),
-        data: channelsList.map(c => c.netProfit),
-        backgroundColor: 'rgba(16, 185, 129, 0.85)',
-        borderRadius: 8
-      }
-    ]
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Quick Wins: Automated Export & 22:00 Daily Summary Scheduler */}
+      {/* Automated LINE Sending Header Card */}
       <div
         className="glass-card"
         style={{
           padding: '1.4rem',
           borderRadius: '18px',
-          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(15, 23, 42, 0.92))',
-          border: '1.5px solid rgba(245, 158, 11, 0.4)',
+          background: 'linear-gradient(135deg, rgba(6, 199, 85, 0.14), rgba(7, 16, 57, 0.94))',
+          border: '1.5px solid rgba(6, 199, 85, 0.45)',
           display: 'flex',
           flexWrap: 'wrap',
           justifyContent: 'space-between',
@@ -6750,7 +6686,7 @@ export function MultiChannelTab({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: '1 1 320px' }}>
-          <LuxuryIconBadge variant="gold" size="lg" active>
+          <LuxuryIconBadge variant="emerald" size="lg" active>
             <LuxuryModuleIcon type="multi_channel" size={30} />
           </LuxuryIconBadge>
           <div>
@@ -6759,47 +6695,31 @@ export function MultiChannelTab({
                 display: 'inline-block',
                 padding: '0.28rem 0.75rem',
                 borderRadius: '999px',
-                background: 'rgba(245, 158, 11, 0.2)',
-                color: '#fbbf24',
+                background: 'rgba(6, 199, 85, 0.2)',
+                color: '#34d399',
                 fontWeight: 800,
                 fontSize: '0.8rem',
                 marginBottom: '0.4rem'
               }}
             >
-              {tx('ระบบส่งรายงานอัตโนมัติ & ส่งออกไฟล์บัญชี', 'AUTOMATED REPORT SCHEDULER & TAX EXPORT')}
+              {tx('ระบบส่งไลน์อัตโนมัติ • LINE OA (@693knsqp)', 'AUTOMATED LINE OA DISPATCH (@693knsqp)')}
             </span>
             <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: '#f8fafc' }}>
               {tx(
-                `ส่งสรุปยอดขายเข้ามือถืออัตโนมัติ (${lineNotifyTime || '22:00'} น.) & ส่งออกไฟล์ภาษีขาย`,
-                `Daily (${lineNotifyTime || '22:00'}) Mobile Summary Notification & 1-Click Tax Report Export`
+                `ส่งสรุปยอดขายเข้าไลน์อัตโนมัติ (${lineNotifyTime || '22:00'} น.)`,
+                `Automated Daily LINE Sales Summary (${lineNotifyTime || '22:00'})`
               )}
             </h3>
             <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.9rem', color: '#cbd5e1' }}>
               {tx(
-                'ไม่ต้องนั่งบวกเลขเองตอนปิดร้าน ระบบสรุปยอดขาย กำไรสุทธิ และสต็อกส่งเข้ามือถือให้อัตโนมัติทุกคืน',
-                'No manual bookkeeping at closing time—receive daily revenue, net profit, and stock alerts automatically.'
+                'ตั้งเวลาส่งการ์ดสรุปยอดขาย กำไร และแจ้งเตือนสต็อกเข้า LINE อัตโนมัติ พร้อมทดสอบส่งได้ทันที',
+                'Schedule automated daily sales, profit & stock Flex Cards directly to your LINE chat.'
               )}
             </p>
           </div>
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.65rem' }}>
-          <button
-            type="button"
-            onClick={handleExportTaxExcel}
-            style={{
-              padding: '0.7rem 1.1rem',
-              borderRadius: '12px',
-              border: '1px solid rgba(16, 185, 129, 0.5)',
-              background: 'linear-gradient(135deg, #10b981, #059669)',
-              color: '#fff',
-              fontWeight: 800,
-              cursor: 'pointer'
-            }}
-          >
-            {tx('📥 ส่งออกรายงานภาษีขาย / สต็อก (ไฟล์ตาราง)', '📥 Export Sales Tax & Stock Report')}
-          </button>
-
           <button
             type="button"
             onClick={() => setShowLinePreview(!showLinePreview)}
@@ -6813,7 +6733,7 @@ export function MultiChannelTab({
               cursor: 'pointer'
             }}
           >
-            {tx(`📲 ตั้งค่าแจ้งเตือนรายวัน (${lineNotifyTime} น.)`, `📲 Daily Mobile Alert (${lineNotifyTime})`)}
+            {tx(`📲 ตั้งค่า & ดูตัวอย่างการ์ด LINE (${lineNotifyTime} น.)`, `📲 Preview LINE Card (${lineNotifyTime})`)}
           </button>
         </div>
       </div>
@@ -7267,242 +7187,6 @@ export function MultiChannelTab({
           )}
         </div>
       )}
-
-      {/* Alerts & Anomaly Detection Box */}
-      {anomaliesList.length > 0 && (
-        <div
-          className="glass-card"
-          style={{
-            padding: '1.35rem',
-            borderRadius: '18px',
-            border: '1.5px solid rgba(244, 63, 94, 0.45)',
-            background: 'rgba(244, 63, 94, 0.06)'
-          }}
-        >
-          <h4 style={{ margin: '0 0 0.85rem 0', fontSize: '1.15rem', fontWeight: 900, color: '#fda4af' }}>
-            {tx('🚨 กล่องแจ้งเตือนความผิดปกติอัจฉริยะ (ต้องรีบจัดการ)', '🚨 Smart Anomaly Detection Alerts (Immediate Action)')}
-          </h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-            {anomaliesList.map(anm => {
-              const info = anm[isEn ? 'en' : 'th'];
-              return (
-                <div
-                  key={anm.id}
-                  style={{
-                    padding: '1.1rem',
-                    borderRadius: '14px',
-                    background: 'rgba(15, 23, 42, 0.85)',
-                    border: '1px solid rgba(244, 63, 94, 0.35)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: '0.75rem'
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#fbbf24', marginBottom: '0.3rem' }}>
-                      {info.badge}
-                    </div>
-                    <div style={{ fontSize: '1rem', fontWeight: 900, color: '#f8fafc', marginBottom: '0.35rem' }}>
-                      {info.title}
-                    </div>
-                    <div style={{ fontSize: '0.86rem', color: '#cbd5e1', lineHeight: 1.5 }}>{info.detail}</div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        toast.success(info.actionToast);
-                        setAnomaliesList(prev => prev.filter(item => item.id !== anm.id));
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: '0.6rem 0.9rem',
-                        borderRadius: '10px',
-                        border: 'none',
-                        background: 'linear-gradient(135deg, #f43f5e, #e11d48)',
-                        color: '#fff',
-                        fontWeight: 800,
-                        fontSize: '0.82rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {info.actionLabel}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Offline vs Online Comparison Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-        <div className="glass-card" style={{ padding: '1.3rem', borderRadius: '16px', borderLeft: '4px solid #38bdf8' }}>
-          <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#38bdf8' }}>
-            {tx('🏪 หน้าร้านจริงทั้งหมด (4 สาขา)', '🏪 Physical Storefronts (4 Branches)')}
-          </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#f8fafc', marginTop: '0.3rem' }}>
-            ฿{offlineRev.toLocaleString()}
-          </div>
-          <div style={{ fontSize: '0.88rem', color: '#34d399', fontWeight: 700, marginTop: '0.25rem' }}>
-            {tx(`กำไรสุทธิ: ฿${offlineProfit.toLocaleString()} (ไม่เสียค่าธรรมเนียมแอป)`, `Net Profit: ฿${offlineProfit.toLocaleString()} (Zero App Commission)`)}
-          </div>
-        </div>
-
-        <div className="glass-card" style={{ padding: '1.3rem', borderRadius: '16px', borderLeft: '4px solid #a855f7' }}>
-          <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#c084fc' }}>
-            {tx('🌐 ช่องทางออนไลน์ทั้งหมด (รวม 3 แพลตฟอร์ม)', '🌐 Online Channels (All 3 Platforms)')}
-          </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#f8fafc', marginTop: '0.3rem' }}>
-            ฿{onlineRev.toLocaleString()}
-          </div>
-          <div style={{ fontSize: '0.88rem', color: '#fbbf24', fontWeight: 700, marginTop: '0.25rem' }}>
-            {tx(`กำไรสุทธิหลังหักค่าธรรมเนียม: ฿${onlineProfit.toLocaleString()}`, `Net Profit After Platform Fees: ฿${onlineProfit.toLocaleString()}`)}
-          </div>
-        </div>
-      </div>
-
-      {/* Channel Comparison Chart & Table */}
-      <div className="glass-card" style={{ padding: '1.35rem', borderRadius: '18px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.1rem' }}>
-          <LuxuryIconBadge variant="amethyst" size="md">
-            <SalesVsFeesComparisonIcon size={22} />
-          </LuxuryIconBadge>
-          <div>
-            <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>
-              {tx('เปรียบเทียบยอดขาย ค่าธรรมเนียม และกำไรสุทธิระหว่างหน้าร้านกับออนไลน์', 'Channel Comparison: Gross Revenue, Fees & Net Profit')}
-            </h4>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
-              {tx('วิเคราะห์กำไรสุทธิตัวจริงหลังหักค่าธรรมเนียมและค่านายหน้าแอปในแต่ละช่องทาง', 'Analyze true net profits after platform fees and commissions across all channels')}
-            </p>
-          </div>
-        </div>
-        <div style={{ height: '240px', marginBottom: '1.25rem' }}>
-          <Bar data={channelChartData} options={barChartOptions} />
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-          {channelsList.map(ch => {
-            const info = ch[isEn ? 'en' : 'th'];
-            return (
-              <div
-                key={ch.id}
-                style={{
-                  padding: '1.1rem',
-                  borderRadius: '14px',
-                  background: 'rgba(15, 23, 42, 0.7)',
-                  border: '1px solid rgba(148, 163, 184, 0.2)'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                  <span style={{ fontWeight: 900, color: '#f8fafc', fontSize: '0.98rem' }}>{info.name}</span>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#34d399' }}>{ch.growth}</span>
-                </div>
-                <div style={{ fontSize: '0.82rem', color: '#fbbf24', fontWeight: 700, marginBottom: '0.5rem' }}>
-                  {info.badge}
-                </div>
-                <div style={{ fontSize: '0.86rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                  <div>
-                    {tx('ยอดขายรวม:', 'Revenue:')} <strong>฿{(ch.revenue || 0).toLocaleString()}</strong> ({ch.orders || 0} {tx('คำสั่งซื้อ', 'orders')})
-                  </div>
-                  <div>
-                    {tx('ค่าใช้จ่าย:', 'Fees/Costs:')} <span style={{ color: '#fda4af' }}>-฿{(ch.costAndFees || 0).toLocaleString()}</span> ({info.feeDesc || '-'})
-                  </div>
-                  <div>
-                    {tx('กำไรสุทธิ:', 'Net Profit:')}{' '}
-                    <strong style={{ color: '#34d399' }}>
-                      ฿{(ch.netProfit || 0).toLocaleString()} ({ch.grossMarginPct || 0}%)
-                    </strong>
-                  </div>
-                </div>
-                <div style={{ marginTop: '0.6rem', paddingTop: '0.55rem', borderTop: '1px dashed rgba(148,163,184,0.2)', fontSize: '0.82rem', color: '#94a3b8' }}>
-                  💡 {info.aiAdvice || '-'}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Store Ranking & Inventory Turnover Table */}
-      <div className="glass-card" style={{ padding: '1.35rem', borderRadius: '18px', overflowX: 'auto' }}>
-        <h4 style={{ margin: '0 0 0.85rem 0', fontSize: '1.15rem', fontWeight: 800 }}>
-          {tx('🏆 จัดอันดับสาขาตามยอดขายและอัตราการหมุนเวียนสินค้า', '🏆 Store Ranking by Revenue & Inventory Turnover Speed')}
-        </h4>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '780px' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid rgba(148,163,184,0.2)', textAlign: 'left', color: '#94a3b8', fontSize: '0.84rem' }}>
-              <th style={{ padding: '0.75rem' }}>{tx('อันดับ / สาขา', 'Rank / Branch')}</th>
-              <th style={{ padding: '0.75rem' }}>{tx('ยอดขายต่อเดือน', 'Monthly Sales')}</th>
-              <th style={{ padding: '0.75rem' }}>{tx('ความเร็วการหมุนสต็อก', 'Inventory Turnover')}</th>
-              <th style={{ padding: '0.75rem' }}>{tx('มูลค่าสินค้าค้างคลัง', 'Stagnant Stock')}</th>
-              <th style={{ padding: '0.75rem' }}>{tx('สถานะสาขา', 'Branch Status')}</th>
-              <th style={{ padding: '0.75rem' }}>{tx('การจัดการสต็อก', 'Stock Action')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {branchesList.map(br => {
-              const info = (br && br[isEn ? 'en' : 'th']) || {};
-              return (
-                <tr key={br.branchId} style={{ borderBottom: '1px solid rgba(148,163,184,0.12)' }}>
-                  <td style={{ padding: '0.85rem 0.75rem' }}>
-                    <div style={{ fontWeight: 900, color: '#f8fafc' }}>
-                      #{br.rank || 1} {info.branchName || br.branchId}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                      {tx('ผู้จัดการ:', 'Manager:')} {info.manager || '-'}
-                    </div>
-                  </td>
-                  <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: '#38bdf8' }}>
-                    ฿{(br.revenue || 0).toLocaleString()}
-                    <div style={{ fontSize: '0.78rem', color: '#34d399' }}>
-                      {tx('อัตรากำไร', 'Margin')} {br.netMarginPct || 0}%
-                    </div>
-                  </td>
-                  <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: '#fbbf24' }}>
-                    {br.inventoryTurnover || 0} {tx('รอบ/ปี', 'turns/yr')}
-                    <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
-                      ({tx(`ขายออกเฉลี่ย ${br.turnoverDays || 0} วัน`, `Avg ${br.turnoverDays || 0} days to sell`)})
-                    </div>
-                  </td>
-                  <td style={{ padding: '0.85rem 0.75rem', fontWeight: 800, color: (br.deadStockValue || 0) > 40000 ? '#f43f5e' : '#cbd5e1' }}>
-                    ฿{(br.deadStockValue || 0).toLocaleString()}
-                  </td>
-                  <td style={{ padding: '0.85rem 0.75rem', fontSize: '0.84rem', color: '#e2e8f0' }}>
-                    {info.statusText || '-'}
-                  </td>
-                  <td style={{ padding: '0.85rem 0.75rem' }}>
-                    {br.deadStockValue > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => handleTransferDeadStock(br.branchId)}
-                        style={{
-                          padding: '0.45rem 0.85rem',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(245, 158, 11, 0.45)',
-                          background: 'rgba(245, 158, 11, 0.16)',
-                          color: '#fbbf24',
-                          fontWeight: 800,
-                          fontSize: '0.8rem',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {tx('🚚 โอนสต็อกไปสาขาขายดี', '🚚 Transfer Stock to #1 Branch')}
-                      </button>
-                    ) : (
-                      <span style={{ color: '#34d399', fontWeight: 800, fontSize: '0.82rem' }}>
-                        {tx('✅ สต็อกคล่องตัวดีเยี่ยม', '✅ Optimal Stock')}
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }
@@ -10107,7 +9791,7 @@ export function DatabaseTab({
     overview: { th: 'ภาพรวมธุรกิจและเป้าหมายร้าน', en: 'Business Overview & Targets' },
     customers: { th: 'วิเคราะห์ลูกค้าประจำและคนหาย', en: 'Customer CRM & Retention' },
     staff_pos: { th: 'พนักงานและตรวจบิลแคชเชียร์', en: 'Staff & Cashier Audit' },
-    multi_channel: { th: 'เปรียบเทียบสาขาและออนไลน์', en: 'Branch & Multi-Channel' },
+    multi_channel: { th: 'ส่งไลน์อัตโนมัติ', en: 'Automated LINE OA' },
     procurement: { th: 'ซัพพลายเออร์และจัดซื้อรวมศูนย์', en: 'Suppliers & Central PO' },
     inventory: { th: 'คลังสินค้าอัจฉริยะ', en: 'Smart Inventory' },
     insights: { th: 'วิเคราะห์ข้อมูลด้วย AI', en: 'AI Data Analytics' },
@@ -18509,11 +18193,11 @@ function App() {
     },
     {
       id: 'multi_channel',
-      label: tx('เปรียบเทียบสาขาและออนไลน์', 'Branch & Channel Compare'),
-      subLabel: tx('เทียบกำไรและแจ้งเตือนรายวัน', 'Margins & Daily 22:00 Alert'),
-      badge: tx('ยอดนิยม', 'HOT'),
-      variant: 'gold',
-      minPlan: 'professional'
+      label: tx('ส่งไลน์อัตโนมัติ', 'Automated LINE OA'),
+      subLabel: tx(`ส่งสรุปยอดอัตโนมัติ (${lineNotifyTime || '22:00'} น.)`, `Auto Daily Summary (${lineNotifyTime || '22:00'})`),
+      badge: 'LINE OA',
+      variant: 'emerald',
+      minPlan: 'starter'
     },
     {
       id: 'procurement',
