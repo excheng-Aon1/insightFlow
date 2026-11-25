@@ -265,6 +265,47 @@ class TestSystemIntegrationSuite(unittest.TestCase):
         self.assertEqual(wh_data.get("ai_reply_count"), 1)
         self.assertTrue(len(wh_data.get("ai_replies", [])) == 1)
 
+    def test_sit_line_incoming_file_extraction_and_sender_info(self):
+        """SIT-19: ตรวจสอบการดึงข้อมูลอัตโนมัติเมื่อลูกค้าส่งไฟล์เข้ามาใน LINE พร้อมระบุชื่อและ LINE ID ผู้ส่ง"""
+        import base64
+        csv_content = "Product,Branch,Revenue,Cost\nกาแฟพรีเมียม,สาขาอโศก,25000,10000\nชาเขียวมัทฉะ,สาขาสยาม,15000,5000\n"
+        b64_payload = base64.b64encode(csv_content.encode("utf-8")).decode("utf-8")
+
+        wh_resp = self.client.post(
+            "/api/line/webhook",
+            headers={"X-Line-Signature": "SIMULATED_LOCAL_WEBHOOK"},
+            json={
+                "events": [
+                    {
+                        "type": "message",
+                        "replyToken": "00000000000000000000000000000000",
+                        "source": {"userId": "Utest_sender_99887766"},
+                        "message": {
+                            "type": "file",
+                            "id": "msg_file_001",
+                            "fileName": "customer_line_sales.csv",
+                            "fileSize": len(csv_content),
+                            "simulated_content_base64": b64_payload,
+                        },
+                    }
+                ]
+            },
+        )
+        self.assertEqual(wh_resp.status_code, 200)
+        wh_data = wh_resp.json()
+        self.assertEqual(wh_data.get("received_files_count"), 1)
+        rf = wh_data["received_files"][0]
+        self.assertEqual(rf.get("filename"), "customer_line_sales.csv")
+        self.assertEqual(rf.get("sender_line_user_id"), "Utest_sender_99887766")
+        self.assertTrue(len(rf.get("sender_name", "")) > 0)
+        self.assertEqual(rf.get("rows"), 2)
+        self.assertEqual(rf.get("total_revenue"), 40000.0)
+
+        rec_resp = self.client.get("/api/line/received-files")
+        self.assertEqual(rec_resp.status_code, 200)
+        rec_data = rec_resp.json()
+        self.assertGreaterEqual(rec_data.get("count", 0), 1)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -84,6 +84,19 @@ export function SettingsTab({
   const [lineQaAnswer, setLineQaAnswer] = useState('');
   const [isAskingLineQa, setIsAskingLineQa] = useState(false);
   const [pushLineQaToChat, setPushLineQaToChat] = useState(true);
+  const [lineReceivedFiles, setLineReceivedFiles] = useState([]);
+
+  useEffect(() => {
+    if (subTab !== 'notifications') return;
+    fetch('/api/line/received-files')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (data && Array.isArray(data.files)) {
+          setLineReceivedFiles(data.files);
+        }
+      })
+      .catch(() => {});
+  }, [subTab]);
 
   // --- 3. AI Secretary Settings State ---
   const [aiPersonality, setAiPersonality] = useState('executive'); // 'executive' | 'strategic' | 'coach'
@@ -889,6 +902,55 @@ export function SettingsTab({
                 {lineQaAnswer}
               </div>
             )}
+
+            {/* Incoming Files from LINE OA (Auto-Extracted with Sender Name & LINE ID) */}
+            <div className="pt-3 border-t border-slate-200 dark:border-white/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-black opacity-90">
+                  📥 {tx('ไฟล์ที่ลูกค้าส่งเข้ามาทาง LINE อัตโนมัติ (พร้อมชื่อและ LINE ID ผู้ส่ง)', 'Auto-Extracted Files Sent via LINE (with Sender Name & ID)')}
+                </p>
+                <span className="text-[11px] font-bold opacity-70">
+                  {lineReceivedFiles.length} {tx('ไฟล์', 'files')}
+                </span>
+              </div>
+              {lineReceivedFiles.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                  {lineReceivedFiles.slice(0, 4).map((rf, idx) => (
+                    <div
+                      key={`${rf.filename}-${idx}`}
+                      className={`p-3 rounded-xl border text-xs space-y-1 ${
+                        theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-[#071039]/70 border-[#1A3BB0]/40'
+                      }`}
+                    >
+                      <div className="font-black flex items-center justify-between gap-2">
+                        <span className="truncate">📄 {rf.filename}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">
+                          {Number(rf.rows || 0).toLocaleString()} {tx('แถว', 'rows')}
+                        </span>
+                      </div>
+                      <div className="opacity-85">
+                        👤 {tx('ผู้ส่ง:', 'Sender:')} <strong>{rf.sender_name || 'ลูกค้า LINE'}</strong>
+                      </div>
+                      <div className="font-mono text-[11px] opacity-70 truncate">
+                        🆔 ID: {rf.sender_line_user_id || '-'}
+                      </div>
+                      {Number(rf.total_revenue || 0) > 0 && (
+                        <div className="text-emerald-400 font-bold">
+                          💰 {tx('ยอดขายในไฟล์:', 'File Revenue:')} ฿{Number(rf.total_revenue).toLocaleString()}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[11px] opacity-65">
+                  {tx(
+                    'เมื่อลูกค้าส่งไฟล์ Excel (.xlsx) หรือ CSV (.csv) เข้ามาในแชท LINE OA (@693knsqp) ระบบจะดึงข้อมูล ชื่อ และ LINE ID ผู้ส่งมาแสดงที่นี่อัตโนมัติทันที',
+                    'When a customer sends an Excel/CSV file to LINE OA (@693knsqp), extracted data, sender name & LINE ID will appear here automatically.'
+                  )}
+                </p>
+              )}
+            </div>
           </div>
 
           <div

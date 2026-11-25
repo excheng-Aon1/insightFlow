@@ -3534,6 +3534,7 @@ async def sync_uploaded_context_for_line(req: LineUploadedContextSyncRequest):
     ซิงก์ข้อมูลจากไฟล์ที่ลูกค้าอัปโหลดบนหน้าเว็บ (ชื่อไฟล์, คอลัมน์, ตัวอย่างแถวข้อมูล, ยอดขาย, กำไร, สาขา, สต็อก)
     มาเก็บไว้ใน Backend เพื่อใช้ตอบคำถามผ่านแชท LINE Official Account แบบเรียลไทม์
     """
+    existing = _load_line_uploaded_context()
     ctx_payload = {
         "email": req.email or "owner@insightflow.app",
         "phone": req.phone or "",
@@ -3541,6 +3542,7 @@ async def sync_uploaded_context_for_line(req: LineUploadedContextSyncRequest):
         "business_name": req.business_name or "InsightFlow Store",
         "uploaded_files": req.uploaded_files or [],
         "metrics": req.metrics or {},
+        "line_received_files": existing.get("line_received_files", []),
         "synced_at": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
     }
     _save_line_uploaded_context(ctx_payload)
@@ -3896,6 +3898,185 @@ async def ask_line_uploaded_data(
     }
 
 
+def _fetch_line_user_profile(line_user_id: str, registry: Optional[Dict[str, Dict[str, Any]]] = None) -> Dict[str, Any]:
+    """
+    ดึงข้อมูลชื่อผู้ส่ง (Display Name) และเบอร์โทร/อีเมลจาก LINE Profile API + Registry
+    """
+    uid = (line_user_id or "").strip()
+    reg = registry if registry is not None else _load_line_contacts()
+    matched_contact = {}
+    for c in reg.values():
+        if c.get("line_user_id") == uid and uid:
+            matched_contact = c
+            break
+
+    display_name = matched_contact.get("name") or ""
+    picture_url = ""
+
+    if uid and not uid.startswith("Utest"):
+        token = get_line_channel_access_token()
+        if token:
+            try:
+                req = urllib.request.Request(
+                    f"https://api.line.me/v2/bot/profile/{urllib.parse.quote(uid)}",
+                    headers={"Authorization": f"Bearer {token}"},
+                    method="GET",
+                )
+                with urllib.request.urlopen(req, timeout=6) as resp:
+                    prof = json.loads(resp.read().decode("utf-8"))
+                    if prof.get("displayName"):
+                        display_name = prof["displayName"]
+                    picture_url = prof.get("pictureUrl", "")
+            except Exception as exc:
+                logger.info(f"[LINE Profile Notice] Could not fetch live LINE profile for {uid}: {exc}")
+
+    if not display_name:
+        display_name = f"ลูกค้า LINE ({uid[:8]}...)" if uid else "ลูกค้า LINE OA"
+
+    return {
+        "display_name": display_name,
+        "line_user_id": uid or "UNKNOWN_LINE_ID",
+        "phone": matched_contact.get("phone", ""),
+        "email": matched_contact.get("email", ""),
+        "line_id": matched_contact.get("line_id", ""),
+        "picture_url": picture_url,
+    }
+
+
+def _download_line_message_content(message_id: str) -> bytes:
+    """
+    ดาวน์โหลดไฟล์ที่ลูกค้าส่งเข้ามาในแชท LINE ผ่าน LINE Messaging Content API
+    (https://api-data.line.me/v2/bot/message/{messageId}/content)
+    """
+    token = get_line_channel_access_token()
+    if not token or not message_id:
+        return b""
+    try:
+        req = urllib.request.Request(
+            f"https://api-data.line.me/v2/bot/message/{urllib.parse.quote(str(message_id))}/content",
+            headers={"Authorization": f"Bearer {token}"},
+            method="GET",
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return resp.read()
+    except Exception as exc:
+        logger.warning(f"⚠️ [LINE Content API] Failed to download message {message_id}: {exc}")
+        return b""
+
+
+def _parse_uploaded_spreadsheet_bytes(file_bytes: bytes, filename: str) -> Dict[str, Any]:
+    """
+    อ่านและสกัดข้อมูลจากไฟล์ .csv / .xlsx / .xls ที่ลูกค้าส่งเข้ามาใน LINE อัตโนมัติ
+    """
+    import io
+    import pandas as pd
+
+    fname_lower = (filename or "file.csv").lower()
+    df = None
+    if fname_lower.endswith(".csv"):
+        for enc in ("utf-8-sig", "utf-8", "cp874", "tis-620", "latin1"):
+            try:
+                df = pd.read_csv(io.BytesIO(file_bytes), encoding=enc)
+                break
+            except Exception:
+                continue
+    elif fname_lower.endswith(".xlsx") or fname_lower.endswith(".xls"):
+        try:
+            df = pd.read_excel(io.BytesIO(file_bytes))
+        except Exception as exc:
+            logger.warning(f"Excel parse warning for {filename}: {exc}")
+
+    if df is None:
+        return {
+            "parsed": False,
+            "columns": [],
+            "total_rows": 0,
+            "sample_rows": [],
+            "total_revenue": 0.0,
+            "net_profit": 0.0,
+            "top_branch": "-",
+            "top_products": [],
+        }
+
+    df = df.dropna(how="all")
+    columns = [str(c).strip() for c in df.columns.tolist()]
+    total_rows = int(len(df))
+
+    # แปลงตัวอย่าง 5 แถวแรกให้เป็น JSON-safe
+    sample_df = df.head(5).fillna("")
+    sample_rows = []
+    for _, row in sample_df.iterrows():
+        clean_row = {}
+        for col in columns:
+            val = row[col]
+            if hasattr(val, "item"):
+                val = val.item()
+            clean_row[col] = val if isinstance(val, (int, float, bool)) else str(val)
+        sample_rows.append(clean_row)
+
+    # ตรวจหาคอลัมน์ยอดขาย / ต้นทุน / สินค้า / สาขา อัตโนมัติ
+    rev_col = next((c for c in columns if re.search(r"revenue|sales|amount|total|price|ยอด|รายได้|สุทธิ", c, re.I)), None)
+    cost_col = next((c for c in columns if re.search(r"cost|cogs|ต้นทุน", c, re.I)), None)
+    prod_col = next((c for c in columns if re.search(r"product|item|sku|menu|สินค้า|รายการ|name|ชื่อ", c, re.I)), None)
+    branch_col = next((c for c in columns if re.search(r"branch|store|shop|สาขา|ร้าน", c, re.I)), None)
+
+    total_rev = 0.0
+    if rev_col:
+        rev_series = pd.to_numeric(df[rev_col].astype(str).str.replace(",", "").str.replace("฿", ""), errors="coerce").fillna(0.0)
+        total_rev = float(rev_series.sum())
+
+    total_cost = 0.0
+    if cost_col:
+        cost_series = pd.to_numeric(df[cost_col].astype(str).str.replace(",", "").str.replace("฿", ""), errors="coerce").fillna(0.0)
+        total_cost = float(cost_series.sum())
+
+    net_profit = (total_rev - total_cost) if total_cost > 0 else (total_rev * 0.25)
+
+    top_branch = "-"
+    if branch_col and rev_col and total_rows > 0:
+        try:
+            df_tmp = df[[branch_col]].copy()
+            df_tmp["_rev"] = pd.to_numeric(df[rev_col].astype(str).str.replace(",", "").str.replace("฿", ""), errors="coerce").fillna(0.0)
+            grp = df_tmp.groupby(branch_col)["_rev"].sum().sort_values(ascending=False)
+            if len(grp) > 0:
+                top_branch = str(grp.index[0])
+        except Exception:
+            pass
+
+    top_products = []
+    if prod_col and rev_col and total_rows > 0:
+        try:
+            df_tmp = df[[prod_col]].copy()
+            df_tmp["_rev"] = pd.to_numeric(df[rev_col].astype(str).str.replace(",", "").str.replace("฿", ""), errors="coerce").fillna(0.0)
+            grp = df_tmp.groupby(prod_col)["_rev"].sum().sort_values(ascending=False).head(5)
+            top_products = [{"name": str(k), "revenue": float(v)} for k, v in grp.items()]
+        except Exception:
+            pass
+
+    return {
+        "parsed": True,
+        "columns": columns,
+        "total_rows": total_rows,
+        "sample_rows": sample_rows,
+        "total_revenue": total_rev,
+        "net_profit": net_profit,
+        "top_branch": top_branch,
+        "top_products": top_products,
+    }
+
+
+@app.get("/api/line/received-files")
+async def get_line_received_files():
+    """ดึงรายการไฟล์ที่ลูกค้าส่งเข้ามาในแชท LINE OA พร้อมชื่อผู้ส่งและ LINE ID"""
+    ctx = _load_line_uploaded_context()
+    received = ctx.get("line_received_files") or []
+    return {
+        "status": "success",
+        "count": len(received),
+        "files": received,
+    }
+
+
 @app.post("/api/line/webhook")
 async def line_messaging_api_webhook(request: Request, db: Session = Depends(get_db)):
     """
@@ -3939,6 +4120,7 @@ async def line_messaging_api_webhook(request: Request, db: Session = Depends(get
     registry = _load_line_contacts()
     matched_results = []
     ai_replies = []
+    received_files = []
 
     for event in events:
         event_type = event.get("type")
@@ -3946,7 +4128,154 @@ async def line_messaging_api_webhook(request: Request, db: Session = Depends(get
         line_user_id = source.get("userId", "")
         reply_token = event.get("replyToken", "")
 
-        if event_type == "message" and event.get("message", {}).get("type") == "text":
+        if event_type == "message" and event.get("message", {}).get("type") == "file":
+            msg_obj = event.get("message", {})
+            msg_id = str(msg_obj.get("id", ""))
+            file_name = str(msg_obj.get("fileName") or f"line_upload_{msg_id}.csv")
+            file_size = int(msg_obj.get("fileSize") or 0)
+
+            # 1. ดึงข้อมูลชื่อผู้ส่ง และ LINE User ID
+            sender_profile = _fetch_line_user_profile(line_user_id, registry=registry)
+            sender_name = sender_profile["display_name"]
+            sender_uid = sender_profile["line_user_id"]
+
+            # 2. ดาวน์โหลดไฟล์จาก LINE Content API (หรือใช้ base64 สำหรับโหมดทดสอบ)
+            sim_b64 = msg_obj.get("simulated_content_base64")
+            if sim_b64:
+                try:
+                    file_bytes = base64.b64decode(sim_b64)
+                except Exception:
+                    file_bytes = b""
+            else:
+                file_bytes = _download_line_message_content(msg_id)
+
+            parsed_info = _parse_uploaded_spreadsheet_bytes(file_bytes, file_name) if file_bytes else {
+                "parsed": False,
+                "columns": [],
+                "total_rows": 0,
+                "sample_rows": [],
+                "total_revenue": 0.0,
+                "net_profit": 0.0,
+                "top_branch": "-",
+                "top_products": [],
+            }
+
+            # 3. บันทึกลงฐานข้อมูล UploadedFile + ซิงก์เข้า line_uploaded_context.json
+            received_at_str = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            file_record_summary = {
+                "tab": "LINE OA (@693knsqp)",
+                "filename": file_name,
+                "rows": parsed_info["total_rows"],
+                "columns": parsed_info["columns"],
+                "sample_rows": parsed_info["sample_rows"],
+                "sender_name": sender_name,
+                "sender_line_user_id": sender_uid,
+                "sender_phone": sender_profile.get("phone", ""),
+                "total_revenue": parsed_info["total_revenue"],
+                "net_profit": parsed_info["net_profit"],
+                "top_branch": parsed_info["top_branch"],
+                "file_size": file_size or len(file_bytes),
+                "received_at": received_at_str,
+            }
+            received_files.append(file_record_summary)
+
+            try:
+                file_id_db = f"LINE-{uuid.uuid4().hex[:12].upper()}"
+                db_file = UploadedFile(
+                    id=file_id_db,
+                    user_id=sender_uid,
+                    user_email=sender_profile.get("email") or "line-user@insightflow.app",
+                    user_name=sender_name,
+                    filename=file_name,
+                    task_type="line_upload",
+                    source_tab="LINE OA (@693knsqp)",
+                    file_size_bytes=file_size or len(file_bytes),
+                    total_records=parsed_info["total_rows"],
+                    status="COMPLETED" if parsed_info["parsed"] else "RECEIVED",
+                    summary_note=f"ส่งจาก LINE โดย {sender_name} (ID: {sender_uid})",
+                    columns_json=json.dumps(parsed_info["columns"], ensure_ascii=False),
+                    preview_json=json.dumps(parsed_info["sample_rows"], ensure_ascii=False),
+                    linked_records_json=json.dumps({"sender_line_user_id": sender_uid, "sender_name": sender_name}, ensure_ascii=False),
+                )
+                db.add(db_file)
+                db.commit()
+            except Exception as db_exc:
+                logger.warning(f"Could not save LINE file record to DB: {db_exc}")
+                db.rollback()
+
+            ctx = _load_line_uploaded_context()
+            existing_files = [f for f in (ctx.get("uploaded_files") or []) if f.get("filename") != file_name]
+            existing_files.insert(0, file_record_summary)
+            ctx["uploaded_files"] = existing_files[:20]
+
+            existing_line_files = ctx.get("line_received_files") or []
+            existing_line_files.insert(0, file_record_summary)
+            ctx["line_received_files"] = existing_line_files[:30]
+
+            if parsed_info["total_revenue"] > 0:
+                metrics = ctx.get("metrics") or {}
+                metrics["total_revenue"] = parsed_info["total_revenue"]
+                metrics["net_profit"] = parsed_info["net_profit"]
+                metrics["total_orders"] = parsed_info["total_rows"]
+                if parsed_info["top_branch"] and parsed_info["top_branch"] != "-":
+                    metrics["top_branch"] = parsed_info["top_branch"]
+                if parsed_info["top_products"]:
+                    metrics["top_products"] = parsed_info["top_products"]
+                ctx["metrics"] = metrics
+
+            ctx["synced_at"] = received_at_str
+            _save_line_uploaded_context(ctx)
+
+            # 4. ตอบกลับเข้าแชท LINE พร้อมแจ้งชื่อคนส่ง/ID และสรุปยอดจากไฟล์
+            if parsed_info["parsed"]:
+                reply_msg = (
+                    f"📥 พี่ครับ ผมดึงข้อมูลจากไฟล์ที่ส่งเข้ามาเรียบร้อยแล้วครับ!\n\n"
+                    f"👤 ผู้ส่ง: **{sender_name}**\n"
+                    f"🆔 LINE ID: `{sender_uid}`\n"
+                    f"📄 ชื่อไฟล์: **{file_name}** ({parsed_info['total_rows']:,} แถว)\n"
+                    f"💰 ยอดขายรวมในไฟล์: **฿{parsed_info['total_revenue']:,.0f}**\n"
+                    f"📈 กำไรเบื้องต้น: **฿{parsed_info['net_profit']:,.0f}**\n\n"
+                    f"👉 ก้าวต่อไป (Next Step):\n"
+                    f"1. พี่พิมพ์ถามผมเกี่ยวกับไฟล์ **{file_name}** ในแชทนี้ต่อได้เลยครับ (เช่น สินค้าขายดี หรือสาขาเด่น)\n"
+                    f"2. ระบบซิงก์ข้อมูลเข้าหน้าเว็บ InsightFlow ให้พี่เรียบร้อยแล้วครับ"
+                )
+            else:
+                reply_msg = (
+                    f"📥 พี่ครับ ผมได้รับไฟล์ **{file_name}** แล้วครับ\n\n"
+                    f"👤 ผู้ส่ง: **{sender_name}**\n"
+                    f"🆔 LINE ID: `{sender_uid}`\n\n"
+                    f"👉 ก้าวต่อไป (Next Step):\n"
+                    f"1. หากต้องการให้ผมสรุปตัวเลขและยอดขายอัตโนมัติ แนะนำส่งเป็นไฟล์ **.xlsx** หรือ **.csv** นะครับพี่\n"
+                    f"2. หรือกดปุ่มด้านล่างเพื่อดูยอดขายล่าสุดในระบบได้เลยครับ"
+                )
+
+            if reply_token and reply_token != "00000000000000000000000000000000":
+                _send_line_api_request(
+                    "https://api.line.me/v2/bot/message/reply",
+                    {
+                        "replyToken": reply_token,
+                        "messages": [
+                            {
+                                "type": "text",
+                                "text": reply_msg,
+                                "quickReply": {
+                                    "items": [
+                                        {
+                                            "type": "action",
+                                            "action": {"type": "message", "label": "📊 สรุปยอดจากไฟล์นี้", "text": "ไฟล์ที่อัปโหลดล่าสุดมีข้อมูลอะไรบ้าง"},
+                                        },
+                                        {
+                                            "type": "action",
+                                            "action": {"type": "message", "label": "📦 สินค้าขายดี", "text": "สินค้าไหนขายดีและใกล้หมดสต็อก"},
+                                        },
+                                    ]
+                                },
+                            }
+                        ],
+                    },
+                )
+
+        elif event_type == "message" and event.get("message", {}).get("type") == "text":
             user_text = event["message"].get("text", "").strip()
             norm_phone = _normalize_phone(user_text)
             is_pure_phone = bool(re.fullmatch(r"[\d\s\-+()]{9,15}", user_text)) and len(norm_phone) >= 9
@@ -4046,6 +4375,8 @@ async def line_messaging_api_webhook(request: Request, db: Session = Depends(get
         "matched_contacts": matched_results,
         "ai_reply_count": len(ai_replies),
         "ai_replies": ai_replies,
+        "received_files_count": len(received_files),
+        "received_files": received_files,
     }
 
 
