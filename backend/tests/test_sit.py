@@ -239,7 +239,12 @@ class TestSystemIntegrationSuite(unittest.TestCase):
         self.assertEqual(ask_resp.status_code, 200)
         ask_data = ask_resp.json()
         self.assertEqual(ask_data.get("status"), "success")
-        self.assertIn("sales_test_nov.xlsx", ask_data.get("answer", ""))
+        ans_text = ask_data.get("answer", "")
+        self.assertIn("sales_test_nov.xlsx", ans_text)
+        self.assertIn("พี่", ans_text)
+        self.assertIn("ผม", ans_text)
+        self.assertIn("ก้าวต่อไป", ans_text)
+        self.assertIn("**", ans_text)
 
         webhook_resp = self.client.post(
             "/api/line/webhook",
